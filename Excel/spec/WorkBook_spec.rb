@@ -84,19 +84,36 @@ describe WorkBook do
 	end
 	
 	describe '#[]' do
-		it 'でシートが取得できる' do
-			subject['Sheet1'].should equal subject.sheets[0]
-			subject['Sheet2'].should equal subject.sheets[1]
+		context '引数として文字列を指定' do
+			it 'でシートが取得できる' do
+				subject['Sheet1'].should equal subject.sheets[0]
+				subject['Sheet2'].should equal subject.sheets[1]
+			end
+			
+			it 'は存在しない名前を指定された時にはnilを返す。' do
+				subject['Sheet999'].should be_nil
+			end
+			
+			it 'は同一シートを同一オブジェクトとして扱う。' do
+				subject['Sheet1'].should equal subject['Sheet1']
+			end
 		end
-		
-		it 'は存在しない名前を指定された時にはnilを返す。' do
-			subject['Sheet999'].should be_nil
-		end
-		
-		it 'は同一シートを同一オブジェクトとして扱う。' do
-			subject['Sheet1'].should equal subject['Sheet1']
+		context '引数としてシンボルを指定' do
+			it 'でシートが取得できる' do
+				subject[:Sheet1].should equal subject.sheets[0]
+				subject[:Sheet2].should equal subject.sheets[1]
+			end
+			
+			it 'は存在しない名前を指定された時にはnilを返す。' do
+				subject[:Sheet999].should be_nil
+			end
+			
+			it 'は同一シートを同一オブジェクトとして扱う。' do
+				subject[:Sheet1].should equal subject[:Sheet1]
+			end
 		end
 	end
+	
 	
 	describe '#シート名' do
 		it 'でシートが取得できる' do

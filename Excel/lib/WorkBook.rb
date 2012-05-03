@@ -12,7 +12,7 @@ class WorkBook
 
 	# 開いたExcelファイルのパスです。
 	def file_path
-		return @package.file_path
+		@package.file_path
 	end
 	
 	# 新しいインスタンスの初期化を行います。
@@ -42,25 +42,18 @@ class WorkBook
 	
 	# ブックが持つシートを取得します。
 	def sheets
-		if !@sheets then
-			@sheets = @part.xml_document.elements.to_a('//sheet')
-					.map{ |tag| WorkSheet.new(tag, @part.relations[tag].xml_document)}
-		end
-		return @sheets
+		@sheets ||=
+			@part.xml_document.elements.to_a('//sheet')
+			.map{ |tag| WorkSheet.new(tag, @part.relations[tag].xml_document)}
 	end
 	
 	# 名前を指定し、ブックが持つシートを取得します。
 	def [](name)
-		return sheets.select{|sheet| sheet.name == name}[0]
+		sheets.find{|sheet| sheet.name == name.to_s}
 	end
 	
 	# 指定したメソッド名が定義されていない場合に呼び出されます。
 	def method_missing(method_name)
-		sheet = self[method_name.to_s]
-		if sheet then
-			return sheet
-		else
-			super
-		end
+		self[method_name] || super
 	end
 end
