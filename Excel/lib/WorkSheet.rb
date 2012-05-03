@@ -25,11 +25,15 @@ class WorkSheet
 	
 	# シート名を取得します。
 	def name
-		return @tag.attributes['name']
+		return @tag.attributes['name'].encode('Shift_JIS')
 	end
 	
-	def cell(ref)
-		cell = Cell.new(@xml.elements.to_a('//c').select{|c| c.attributes['r'] == ref}[0])
+	def cell_value(ref)
+		cell = Cell.new(@xml.elements.to_a('//c').find{|c| c.attributes['r'] == ref.to_s})
 		return cell.value
+	end
+	
+		def method_missing(method_name)
+		self.cell_value(method_name) || super
 	end
 end

@@ -49,7 +49,7 @@ class WorkBook
 	
 	# 名前を指定し、ブックが持つシートを取得します。
 	def [](name)
-		sheets.find{|sheet| sheet.name == name.to_s}
+		sheets.find{|sheet| sheet.name == name.to_s.encode('Shift_JIS')}
 	end
 	
 	# 指定したメソッド名が定義されていない場合に呼び出されます。

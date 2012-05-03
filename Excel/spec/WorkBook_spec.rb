@@ -43,7 +43,7 @@ describe WorkBook do
 		
 		context 'ファイル内のリレーション' do
 			it 'が変則的な場合でも動作する。' do
-				anomaly.Sheet1.cell('C3').should == 4
+				anomaly.Sheet1.C3.should == 4
 			end
 		end
 		context '内部ファイル操作' do
@@ -78,7 +78,6 @@ describe WorkBook do
 	end
 	describe '#sheets' do
 		it 'でシートが取得できる。' do
-			subject.sheets.map(&:name).should == %w[Sheet1 Sheet2 Sheet3]
 			book2.sheets.map(&:name).should == %w[Sheet1 Sheet2]
 		end
 	end
@@ -97,19 +96,15 @@ describe WorkBook do
 			it 'は同一シートを同一オブジェクトとして扱う。' do
 				subject['Sheet1'].should equal subject['Sheet1']
 			end
+			
+			it 'で日本語名のシートが取得できる' do
+				subject['いろいろなデータ'].should equal subject.sheets[2]
+			end
 		end
 		context '引数としてシンボルを指定' do
 			it 'でシートが取得できる' do
 				subject[:Sheet1].should equal subject.sheets[0]
 				subject[:Sheet2].should equal subject.sheets[1]
-			end
-			
-			it 'は存在しない名前を指定された時にはnilを返す。' do
-				subject[:Sheet999].should be_nil
-			end
-			
-			it 'は同一シートを同一オブジェクトとして扱う。' do
-				subject[:Sheet1].should equal subject[:Sheet1]
 			end
 		end
 	end
@@ -125,8 +120,8 @@ describe WorkBook do
 			lambda{subject.Sheet999}.should raise_error NoMethodError
 		end
 		
-		it 'は同一シートを同一オブジェクトとして扱う。' do
-			subject.Sheet1.should equal subject.Sheet1
+		it 'で日本語名のシートが取得できる' do
+			subject.いろいろなデータ.should equal subject.sheets[2]
 		end
 	end
 end
