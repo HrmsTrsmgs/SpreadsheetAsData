@@ -29,6 +29,7 @@ class WorkSheet
 	end
 	
 	def cell(ref)
-		return Cell.new(@xml.elements.to_a('//c').select{|c| c.attributes['r'] == ref}[0])
+		cell = Cell.new(@xml.elements.to_a('//c').select{|c| c.attributes['r'] == ref}[0])
+		return cell.value
 	end
 end

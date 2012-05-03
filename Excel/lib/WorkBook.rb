@@ -27,8 +27,12 @@ class WorkBook
 	#  開くファイルのパスを指定します。
 	def self.open(file_path)
 			book = WorkBook.new(file_path)
-			yield book
-			book.close
+			if block_given? then
+				yield book
+				book.close
+			else
+				return book
+			end
 	end
 	
 	# ファイルの操作を終了し、ファイルを開放します。
