@@ -117,7 +117,7 @@ describe WorkBook do
 		end
 		
 		it 'は存在しないシート名を指定された時にはNoMethodErrorを返す。' do
-			lambda{subject.Sheet999}.should raise_error NoMethodError
+			->{subject.Sheet999}.should raise_error NoMethodError
 		end
 		
 		it 'で日本語名のシートが取得できる' do
