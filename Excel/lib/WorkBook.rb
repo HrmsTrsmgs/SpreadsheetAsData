@@ -10,6 +10,8 @@ require 'Package'
 # Excelブックを扱うクラスです。
 class WorkBook
 
+	attr_reader :shared_strings
+
 	# 開いたExcelファイルのパスです。
 	def file_path
 		@package.file_path
@@ -19,6 +21,9 @@ class WorkBook
 	def initialize(file_path)
 		@package = Package.new(file_path)
 		@part = @package.part('/xl/workbook.xml')
+		shared_strings_xml = @part.relation(SHARED_STRING_ID)
+		@shared_strings = 
+			shared_strings_xml ? shared_strings_xml.xml_document.elements.to_a('//t').map {|t| t.text } : []
 	end
 
 	# Excelファイルのパスを指定し、開きます。<br/>
@@ -56,4 +61,6 @@ class WorkBook
 	def method_missing(method_name)
 		self[method_name] || super
 	end
+	
+	SHARED_STRING_ID = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings'
 end

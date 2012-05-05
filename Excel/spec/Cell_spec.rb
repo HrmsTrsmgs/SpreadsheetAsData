@@ -35,6 +35,10 @@ describe Cell do
 		it 'がfalseを取得できる。' do
 			sheet.cell(:B2).value.should == false
 		end
+		it 'が文字列を取得できる。' do
+			sheet.cell(:A3).value.should == 'あいうえお'.encode('Shift_JIS')
+			sheet.cell(:B3).value.should == 'かきくけこ'.encode('Shift_JIS')
+		end
 	end
 	
 end

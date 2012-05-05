@@ -23,7 +23,7 @@ class PackagePart
 	end
 	
 	def relation_tags
-		File.open(rels_file_path) {|file| REXML::Document.new(file) }.elements.to_a('//Relationship')
+		@relation_tags ||= File.open(rels_file_path) {|file| REXML::Document.new(file) }.elements.to_a('//Relationship')
 	end
 	
 	def relation_cache
@@ -31,7 +31,7 @@ class PackagePart
 			relations_array =
 				relation_tags
 					.map{|tag| 
-						[tag.attributes['Id'],
+						[tag,
 						PackagePart.new(
 							@package,
 							File.dirname(@part_uri) +"/" + tag.attributes['Target'])
@@ -43,28 +43,13 @@ class PackagePart
 		@hash
 	end
 	
-	def relation(relation_id_or_tag)
-			if relation_id_or_tag.respond_to?(:attributes) && relation_id_or_tag.attributes['r:id'] then
-				relation_cache[relation_id_or_tag.attributes['r:id']]
+	def relation(key)
+			if key.respond_to?(:attributes) && key.attributes['r:id'] then
+				relation_cache[relation_tags.find {|tag| tag.attributes['Id'] == key.attributes['r:id'] }]
+			elsif key =~ %r!^http://schemas.openxmlformats.org/officeDocument/2006/relationships/! then
+				relation_cache[relation_tags.find {|tag| tag.attributes['Type'] == key }]
 			else
-				relation_cache[relation_id_or_tag]
+				relation_cache[relation_tags.find {|tag| tag.attributes['Id'] == key }]
 			end
-	end
-	
-	def relations
-		if !@relations then
-			relations_array =
-				relation_tags
-					.map{|tag| 
-						[tag.attributes['Id'],
-						PackagePart.new(
-							@package,
-							File.dirname(@part_uri) +"/" + tag.attributes['Target'])
-						]
-					}
-			@relations = PackageRelations.new(Hash[*relations_array.flatten(1)])
-		end
-		
-		@relations
 	end
 end
