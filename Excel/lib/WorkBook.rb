@@ -44,7 +44,7 @@ class WorkBook
 	def sheets
 		@sheets ||=
 			@part.xml_document.elements.to_a('//sheet')
-			.map{ |tag| WorkSheet.new(tag, @part.relations[tag].xml_document)}
+			.map{ |tag| WorkSheet.new(tag, @part.relations[tag].xml_document, self)}
 	end
 	
 	# 名前を指定し、ブックが持つシートを取得します。

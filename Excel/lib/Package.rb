@@ -13,11 +13,25 @@ class Package
 	# 新しいインスタンスの初期化を行います。
 	def initialize(file_path)
 		@file_path = file_path
-		unzip_excel_file
+		unzip_file
 	end
 	
+	# ファイルの操作を終了し、ファイルを開放します。
+	def close
+		delete_all(unziped_dir_path.encode("Shift_JIS"))
+	end
+	
+	def part(uri)
+		return PackagePart.new(self, uri)
+	end
+	
+	def part_path(uri)
+		(unziped_dir_path + uri).gsub('//', '/')
+	end
+	
+	private
 	# ファイルのzip圧縮を解凍し、編集可能とします。
-	def unzip_excel_file
+	def unzip_file
 		Zip::ZipInputStream.open(slashed_file_path) do |stream|
 			while ziped_file = stream.get_next_entry()
 				dir_name = File.dirname(ziped_file.name)
@@ -32,26 +46,16 @@ class Package
 		end
 	end
 	
-	# Ruby上でファイルパスとして認識される、スラッシュ区切りのファイルパスを取得します。
-	def slashed_file_path
-		return file_path.gsub('\\', '/')
-	end
-	
-	# ファイルの操作を終了し、ファイルを開放します。
-	def close
-		delete_all(unziped_dir_path.encode("Shift_JIS"))
-	end
-	
-	def part(url)
-		return PackagePart.new(self, url)
-	end
-	
 	# 編集用に解凍されたフォルダのパスを取得します。
 	def unziped_dir_path
-		return File.dirname(slashed_file_path) + "/tmp_" + File.basename(slashed_file_path) + "/"
+		File.dirname(slashed_file_path) + "/tmp_" + File.basename(slashed_file_path) + "/"
 	end
 	
-	private
+	# Ruby上でファイルパスとして認識される、スラッシュ区切りのファイルパスを取得します。
+	def slashed_file_path
+		file_path.gsub('\\', '/')
+	end
+	
 	# 指定したパスのフォルダ及び、その下にあるファイル、フォルダをすべて削除します。
 	def delete_all(deleted)
 		if FileTest.directory?(deleted) then

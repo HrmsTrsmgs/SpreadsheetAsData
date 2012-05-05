@@ -6,11 +6,15 @@ require 'Cell'
 
 # Excelのシートです。
 class WorkSheet
+	
+	attr_reader :book
+
 	# インスタンスを初期化します。
-	def initialize(tag, doc)
+	def initialize(tag, doc, book)
 		@tag = tag
 		@xml = doc
-		@cell_hash = {}
+		@book = book
+		@cell_cache = {}
 	end
 	
 	# シート名を取得します。
@@ -24,12 +28,13 @@ class WorkSheet
 	end
 	
 	def cell(ref)
-		cell = @cell_hash[ref]
+		cell = @cell_cache[ref]
 		return cell if cell
+		
 		xml = @xml.elements.to_a('//c').find{|c| c.attributes['r'] == ref.to_s}
 		if xml then
-			cell = Cell.new(xml)
-			@cell_hash[ref] = cell
+			cell = Cell.new(xml, self)
+			@cell_cache[ref] = cell
 		end
 	end
 	

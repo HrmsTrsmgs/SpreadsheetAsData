@@ -23,6 +23,20 @@ describe Cell do
 		it 'がfalseを取得できる。' do
 			sheet.cell(:B2).value.should == false
 		end
+		it 'が文字列を取得できる。' do
+			pending 'ブック周りの実装が終わるまで待つ。'
+			sheet.cell(:A3).value.should == 'あいうえお'.encoding('Shift_JIS')
+			sheet.cell(:B3).value.should == 'かきくけこ'.encoding('Shift_JIS')
+		end
 	end
-	
+	describe '#sheet' do
+		it 'で所属するシートを取得します。' do
+			sheet.cell(:A1).sheet.should equal sheet
+		end
+	end
+	describe '#book' do
+		it 'で所属するブックを取得します。' do
+			sheet.cell(:A1).book.should equal book
+		end
+	end
 end
