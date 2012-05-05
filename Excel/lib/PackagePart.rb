@@ -67,18 +67,4 @@ class PackagePart
 		
 		@relations
 	end
-	
-	class PackageRelations
-		def initialize(relations_hash)
-			@hash = relations_hash
-		end
-		
-		def [](relation_id_or_tag)
-			if relation_id_or_tag.respond_to?(:attributes) && relation_id_or_tag.attributes['r:id'] then
-				@hash[relation_id_or_tag.attributes['r:id']]
-			else
-				@hash[relation_id_or_tag]
-			end
-		end
-	end
 end
