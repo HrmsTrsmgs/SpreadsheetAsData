@@ -25,6 +25,12 @@ describe WorkSheet do
 		end
 	end
 	
+	describe '#book' do
+		it '取得できる' do
+			sheet1.book.should equal book
+		end
+	end
+	
 	describe '#cell_value' do
 		it 'はセルの値を取得する。' do
 			sheet1.cell_value('C3').should == 4

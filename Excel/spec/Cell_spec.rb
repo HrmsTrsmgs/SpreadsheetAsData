@@ -12,6 +12,18 @@ describe Cell do
 	let(:book) { WorkBook.open(test_file('Book1')) }
 	let(:sheet) { book.sheets[2] } 
 	
+	describe '#sheet' do
+		it '取得できる' do
+			sheet.cell(:A1).sheet.should equal sheet
+		end
+	end
+	
+	describe '#book' do
+		it '取得できる' do
+			sheet.cell(:A1).book.should equal book
+		end
+	end
+	
 	describe '#value' do
 		it 'が数値を取得できる。' do
 			sheet.cell(:A1).value.should == 1

@@ -1,10 +1,19 @@
 require 'rexml/document'
 
 class Cell
+	
+	attr_reader :sheet
+		
 	# インスタンスを初期化します。
-	def initialize(xml)
+	def initialize(xml, sheet)
 		@xml = xml
+		@sheet = sheet
 	end
+	
+	def book
+		sheet.book
+	end
+	
 	def value
 		case @xml.attributes['t']
 		when nil

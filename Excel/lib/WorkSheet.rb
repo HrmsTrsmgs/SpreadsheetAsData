@@ -32,7 +32,7 @@ class WorkSheet
 		return cell if cell
 		xml = @xml.elements.to_a('//c').find{|c| c.attributes['r'] == ref.to_s}
 		if xml then
-			cell = Cell.new(xml)
+			cell = Cell.new(xml, self)
 			@cell_hash[ref] = cell
 		end
 	end
