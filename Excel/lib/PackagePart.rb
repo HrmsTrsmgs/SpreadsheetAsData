@@ -22,11 +22,39 @@ class PackagePart
 		@xml_document ||= File.open(file_path) {|file| REXML::Document.new(file) }
 	end
 	
+	def relation_tags
+		File.open(rels_file_path) {|file| REXML::Document.new(file) }.elements.to_a('//Relationship')
+	end
+	
+	def relation_cache
+		if !@hash then
+			relations_array =
+				relation_tags
+					.map{|tag| 
+						[tag.attributes['Id'],
+						PackagePart.new(
+							@package,
+							File.dirname(@part_uri) +"/" + tag.attributes['Target'])
+						]
+					}
+			@hash = Hash[*relations_array.flatten(1)]
+		end
+		
+		@hash
+	end
+	
+	def relation(relation_id_or_tag)
+			if relation_id_or_tag.respond_to?(:attributes) && relation_id_or_tag.attributes['r:id'] then
+				relation_cache[relation_id_or_tag.attributes['r:id']]
+			else
+				relation_cache[relation_id_or_tag]
+			end
+	end
+	
 	def relations
 		if !@relations then
 			relations_array =
-				xml_document
-					.elements.to_a('//Relationship')
+				relation_tags
 					.map{|tag| 
 						[tag.attributes['Id'],
 						PackagePart.new(
