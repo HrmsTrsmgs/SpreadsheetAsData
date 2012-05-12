@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- encoding: Shift_JIS -*- 
 require File.dirname(__FILE__) + '/../lib/WorkBook'
 describe WorkSheet do
 	def test_file(file_name)
@@ -15,81 +15,81 @@ describe WorkSheet do
 	let(:data) { book.sheets[2] } 
 	
 	describe '#name' do
-		it 'ã§ã‚·ãƒ¼ãƒˆåãŒå–å¾—ã§ãã‚‹ã€‚' do
+		it '‚ÅƒV[ƒg–¼‚ªæ“¾‚Å‚«‚éB' do
 			sheet1.name.should == 'Sheet1'
 			sheet2.name.should == 'Sheet2'
 		end
 		
-		it 'ã§æ—¥æœ¬èªã§æŒ‡å®šã—ãŸã‚·ãƒ¼ãƒˆåãŒShift_JISã§å–å¾—ã§ãã‚‹ã€‚' do
-			data.name.should == 'ã„ã‚ã„ã‚ãªãƒ‡ãƒ¼ã‚¿'.encode("Shift_JIS")
+		it '‚Å“ú–{Œê‚Åw’è‚µ‚½ƒV[ƒg–¼‚ªShift_JIS‚Åæ“¾‚Å‚«‚éB' do
+			data.name.should == '‚¢‚ë‚¢‚ë‚Èƒf[ƒ^'
 		end
 	end
 	
 	describe '#book' do
-		it 'å–å¾—ã§ãã‚‹' do
+		it 'æ“¾‚Å‚«‚é' do
 			sheet1.book.should equal book
 		end
 	end
 	
 	describe '#cell_value' do
-		it 'ã¯ã‚»ãƒ«ã®å€¤ã‚’å–å¾—ã™ã‚‹ã€‚' do
+		it '‚ÍƒZƒ‹‚Ì’l‚ğæ“¾‚·‚éB' do
 			sheet1.cell_value('C3').should == 4
 		end
 		
-		it 'ã¯ã‚·ãƒ³ãƒœãƒ«ã‚’æ¸¡ã—ã¦ã‚‚å‹•ä½œã™ã‚‹ã€‚' do
+		it '‚ÍƒVƒ“ƒ{ƒ‹‚ğ“n‚µ‚Ä‚à“®ì‚·‚éB' do
 			sheet1.cell_value(:C3).should == 4
 		end
 		
-		it 'ã¯å­˜åœ¨ã—ãªã„ã‚»ãƒ«åã‚’æŒ‡å®šã—ãŸæ™‚ã«nilã‚’è¿”ã™' do
+		it '‚Í‘¶İ‚µ‚È‚¢ƒZƒ‹–¼‚ğw’è‚µ‚½‚Énil‚ğ•Ô‚·' do
 			sheet1.cell_value('a1').should be_nil
 		end
 	end
 	
 	describe '#cell' do
-		it 'ã¯ã‚»ãƒ«ã‚’å–å¾—ã™ã‚‹ã€‚' do
+		it '‚ÍƒZƒ‹‚ğæ“¾‚·‚éB' do
 			sheet1.cell('C3').value.should == 4
 		end
-		it 'ã¯ã‚·ãƒ³ãƒœãƒ«ã‚’æ¸¡ã—ã¦ã‚‚å‹•ä½œã™ã‚‹ã€‚' do
+		it '‚ÍƒVƒ“ƒ{ƒ‹‚ğ“n‚µ‚Ä‚à“®ì‚·‚éB' do
 			sheet1.cell(:C3).value.should == 4
 		end
 		
-		it 'ã¯å­˜åœ¨ã—ãªã„ã‚»ãƒ«åã‚’æŒ‡å®šã—ãŸæ™‚ã«nilã‚’è¿”ã™' do
+		it '‚Í‘¶İ‚µ‚È‚¢ƒZƒ‹–¼‚ğw’è‚µ‚½‚Énil‚ğ•Ô‚·' do
 			sheet1.cell('a1').should be_nil
 		end
 		
-		it 'ã¯åŒã˜ã‚»ãƒ«ã®å ´åˆã¯åŒã˜ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å–å¾—ã™ã‚‹ã€‚' do
+		it '‚Í“¯‚¶ƒZƒ‹‚Ìê‡‚Í“¯‚¶ƒIƒuƒWƒFƒNƒg‚ğæ“¾‚·‚éB' do
 			sheet1.cell('C3').should equal sheet1.cell('C3')
 		end                                                                                                                                                           
 	end
 	
-	describe '#ã‚»ãƒ«å' do
-		it 'ã¯å€¤ã‚’å–å¾—ã§ãã‚‹ã€‚' do
+	describe '#ƒZƒ‹–¼' do
+		it '‚Í’l‚ğæ“¾‚Å‚«‚éB' do
 			sheet1.A1.should == 1
 			sheet1.C3.should == 4
 		end
-		it 'ã¯å­˜åœ¨ã—ãªã„ã‚»ãƒ«åã‚’æŒ‡å®šã—ãŸæ™‚ã«NoMethodErrorã‚’è¿”ã™' do
+		it '‚Í‘¶İ‚µ‚È‚¢ƒZƒ‹–¼‚ğw’è‚µ‚½‚ÉNoMethodError‚ğ•Ô‚·' do
 			->{ sheet1.a1 }.should raise_error NoMethodError
 		end
-		it 'ã¯åˆ—æ–¹å‘ã«æ­£ã—ã„ã‚»ãƒ«ã‚’å–å¾—ã™ã‚‹ã€‚' do
+		it '‚Í—ñ•ûŒü‚É³‚µ‚¢ƒZƒ‹‚ğæ“¾‚·‚éB' do
 			sheet1.A1.should == 1
 			sheet1.C1.should == 2
 		end
 		
-		it 'ã¯è¡Œæ–¹å‘ã«æ­£ã—ã„ã‚»ãƒ«ã‚’å–å¾—ã™ã‚‹ã€‚' do
+		it '‚Ís•ûŒü‚É³‚µ‚¢ƒZƒ‹‚ğæ“¾‚·‚éB' do
 			sheet1.A1.should == 1
 			sheet1.A3.should == 3
 		end
 		
-		it 'ã¯ã‚·ãƒ¼ãƒˆã‚’åŒºåˆ¥ã—ã¦æ­£ã—ã„ã‚»ãƒ«ã‚’å–å¾—ã™ã‚‹ã€‚' do
+		it '‚ÍƒV[ƒg‚ğ‹æ•Ê‚µ‚Ä³‚µ‚¢ƒZƒ‹‚ğæ“¾‚·‚éB' do
 			sheet1.A1.should == 1
 			sheet2.A1.should == 5
 		end
 		
-		it 'ã¯ã‚·ãƒ³ãƒœãƒ«ã‚’æ¸¡ã—ã¦ã‚‚å‹•ä½œã™ã‚‹ã€‚' do
+		it '‚ÍƒVƒ“ƒ{ƒ‹‚ğ“n‚µ‚Ä‚à“®ì‚·‚éB' do
 			sheet1.C3.should == 4
 		end
 		
-		it 'ã¯åŒã˜ã‚»ãƒ«ã®å ´åˆã¯åŒã˜ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å–å¾—ã™ã‚‹ã€‚' do
+		it '‚Í“¯‚¶ƒZƒ‹‚Ìê‡‚Í“¯‚¶ƒIƒuƒWƒFƒNƒg‚ğæ“¾‚·‚éB' do
 			sheet1.C3.should equal sheet1.C3
 		end
 	end

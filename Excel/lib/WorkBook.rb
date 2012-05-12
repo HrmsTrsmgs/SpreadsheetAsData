@@ -10,7 +10,7 @@ require 'Package'
 # Excelブックを扱うクラスです。
 class WorkBook
 
-	attr_reader :shared_strings
+	attr_reader :encoding, :shared_strings
 
 	# 開いたExcelファイルのパスです。
 	def file_path
@@ -18,7 +18,8 @@ class WorkBook
 	end
 	
 	# 新しいインスタンスの初期化を行います。
-	def initialize(file_path)
+	def initialize(file_path, encoding)
+		@encoding = encoding
 		@package = Package.new(file_path)
 		@part = @package.part('/xl/workbook.xml')
 		shared_strings_xml = @part.relation(SHARED_STRING_ID)
@@ -30,8 +31,8 @@ class WorkBook
 	# <br/>
 	# ==== <b>[PARAM]file_path</b><br/>
 	#  開くファイルのパスを指定します。
-	def self.open(file_path)
-			book = WorkBook.new(file_path)
+	def self.open(file_path, encoding = 'Shift_JIS')
+			book = WorkBook.new(file_path, encoding)
 			if block_given? then
 				yield book
 				book.close
@@ -54,7 +55,7 @@ class WorkBook
 	
 	# 名前を指定し、ブックが持つシートを取得します。
 	def [](name)
-		sheets.find{|sheet| sheet.name == name.to_s.encode('Shift_JIS')}
+		sheets.find{|sheet| sheet.name == name.to_s.encode(encoding)}
 	end
 	
 	# 指定したメソッド名が定義されていない場合に呼び出されます。

@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- encoding: Shift_JIS -*- 
 require File.dirname(__FILE__) + '/../lib/WorkBook'
 describe Cell do
 	def test_file(file_name)
@@ -13,31 +13,31 @@ describe Cell do
 	let(:sheet) { book.sheets[2] } 
 	
 	describe '#sheet' do
-		it 'å–å¾—ã§ãã‚‹' do
+		it 'æ“¾‚Å‚«‚é' do
 			sheet.cell(:A1).sheet.should equal sheet
 		end
 	end
 	
 	describe '#book' do
-		it 'å–å¾—ã§ãã‚‹' do
+		it 'æ“¾‚Å‚«‚é' do
 			sheet.cell(:A1).book.should equal book
 		end
 	end
 	
 	describe '#value' do
-		it 'ãŒæ•°å€¤ã‚’å–å¾—ã§ãã‚‹ã€‚' do
+		it '‚ª”’l‚ğæ“¾‚Å‚«‚éB' do
 			sheet.cell(:A1).value.should == 1
 			sheet.cell(:B1).value.should == 2
 		end
-		it 'ãŒtrueã‚’å–å¾—ã§ãã‚‹ã€‚' do
+		it '‚ªtrue‚ğæ“¾‚Å‚«‚éB' do
 			sheet.cell(:A2).value.should == true
 		end
-		it 'ãŒfalseã‚’å–å¾—ã§ãã‚‹ã€‚' do
+		it '‚ªfalse‚ğæ“¾‚Å‚«‚éB' do
 			sheet.cell(:B2).value.should == false
 		end
-		it 'ãŒæ–‡å­—åˆ—ã‚’å–å¾—ã§ãã‚‹ã€‚' do
-			sheet.cell(:A3).value.should == 'ã‚ã„ã†ãˆãŠ'.encode('Shift_JIS')
-			sheet.cell(:B3).value.should == 'ã‹ããã‘ã“'.encode('Shift_JIS')
+		it '‚ª•¶š—ñ‚ğæ“¾‚Å‚«‚éB' do
+			sheet.cell(:A3).value.should == '‚ ‚¢‚¤‚¦‚¨'
+			sheet.cell(:B3).value.should == '‚©‚«‚­‚¯‚±'
 		end
 	end
 	

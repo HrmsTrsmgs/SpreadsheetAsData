@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- encoding: Shift_JIS -*- 
 require File.dirname(__FILE__) + '/../lib/WorkBook'
 describe WorkBook do
 	def test_file(file_name)
@@ -6,48 +6,52 @@ describe WorkBook do
 	end
 	
 	def unopened_file_name
-		return 'é€æ¬¡é–‹ã‹ã‚Œã‚‹Book'
+		return '’€ŸŠJ‚©‚ê‚éBook'
 	end
 	
 	after(:all) do
 		subject.close
 		book2.close
 		anomaly.close
+		utf_8.close
+		euc_jp.close
 	end
 	
 	subject{WorkBook.open(test_file('Book1'))}
 	let(:book2){WorkBook.open(test_file('Book2'))}
-	let(:anomaly){WorkBook.open(test_file('å¤‰å‰‡ãƒªãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³'))}
+	let(:anomaly){WorkBook.open(test_file('•Ï‘¥ƒŠƒŒ[ƒVƒ‡ƒ“'))}
+	let(:utf_8){WorkBook.open(test_file('UTF-8‚ÅŠJ‚­Book'), 'UTF-8')}
+	let(:euc_jp){WorkBook.open(test_file('EUC-JP‚ÅŠJ‚­Book'), 'EUC-JP')}
 	
 	describe '#open' do
 	
-		it 'ã®æˆ»ã‚Šå€¤ã¯nilã§ã¯ãªã„ã€‚' do
+		it '‚Ì–ß‚è’l‚Ínil‚Å‚Í‚È‚¢B' do
 			should_not be_nil
 		end
 		
-		it 'ã®æˆ»ã‚Šå€¤ã¯WorkBookã§ã‚ã‚‹ã€‚' do
+		it '‚Ì–ß‚è’l‚ÍWorkBook‚Å‚ ‚éB' do
 			subject.class.should == WorkBook
 		end
 	
-		it 'ã®ãƒ–ãƒ­ãƒƒã‚¯å¼•æ•°ã¯nilã§ã¯ãªã„ã€‚' do
+		it '‚ÌƒuƒƒbƒNˆø”‚Ínil‚Å‚Í‚È‚¢B' do
 			WorkBook.open(test_file(unopened_file_name)) do |book|
 				book.should_not be_nil
 			end
 		end
 		
-		it 'ã®ãƒ–ãƒ­ãƒƒã‚¯å¼•æ•°ã¯WorkBookã§ã‚ã‚‹ã€‚' do
+		it '‚ÌƒuƒƒbƒNˆø”‚ÍWorkBook‚Å‚ ‚éB' do
 			WorkBook.open(test_file(unopened_file_name)) do |book|
 				book.class.should == WorkBook
 			end
 		end
 		
-		context 'ãƒ•ã‚¡ã‚¤ãƒ«å†…ã®ãƒªãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³' do
-			it 'ãŒå¤‰å‰‡çš„ãªå ´åˆã§ã‚‚å‹•ä½œã™ã‚‹ã€‚' do
+		context 'ƒtƒ@ƒCƒ‹“à‚ÌƒŠƒŒ[ƒVƒ‡ƒ“' do
+			it '‚ª•Ï‘¥“I‚Èê‡‚Å‚à“®ì‚·‚éB' do
 				anomaly.Sheet1.C3.should == 4
 			end
 		end
-		context 'å†…éƒ¨ãƒ•ã‚¡ã‚¤ãƒ«æ“ä½œ' do
-			it 'ã®æ™‚ã«è§£å‡ã‚’è¡Œã£ã¦ã„ã‚‹ã€‚' do
+		context '“à•”ƒtƒ@ƒCƒ‹‘€ì' do
+			it '‚Ì‚É‰ğ“€‚ğs‚Á‚Ä‚¢‚éB' do
 				temp_dir_name = test_file('tmp_' + unopened_file_name)
 				delete_all(temp_dir_name) if Dir.exist?(temp_dir_name)
 				WorkBook.open(test_file(unopened_file_name)) do |book|
@@ -55,21 +59,41 @@ describe WorkBook do
 				end
 			end
 			
-			it 'ã®çµ‚äº†æ™‚ã«è§£å‡ã—ãŸä½œæ¥­ãƒ•ã‚¡ã‚¤ãƒ«ã®å‰Šé™¤ã‚’è¡Œã£ã¦ã„ã‚‹ã€‚' do
+			it '‚ÌI—¹‚É‰ğ“€‚µ‚½ì‹Æƒtƒ@ƒCƒ‹‚Ìíœ‚ğs‚Á‚Ä‚¢‚éB' do
 				temp_dir_name = test_file('tmp_' + unopened_file_name)
 				delete_all(temp_dir_name) if Dir.exist?(temp_dir_name)
 				WorkBook.open(test_file(unopened_file_name)) do |book|
 				end
 				Dir.exist?(temp_dir_name).should == false
 			end
+			
+			it '‚ÅƒGƒ“ƒR[ƒh‚ğw’è‚µAƒV[ƒg–¼‚ğæ“¾‚·‚é•¶šƒR[ƒh‚ğ‘I‘ğ‚Å‚«‚éB' do
+				utf_8.sheets[2].name.should == '‚¢‚ë‚¢‚ë‚Èƒf[ƒ^'.encode('UTF-8')
+				euc_jp.sheets[2].name.should == '‚¢‚ë‚¢‚ë‚Èƒf[ƒ^'.encode('EUC-JP')
+			end
+			
+			it '‚ÅƒGƒ“ƒR[ƒh‚ğw’è‚µ‚½‚ÉAƒV[ƒg‚ğ‘I‘ğ‚·‚é•¶š—ñ‚Í§ŒÀ‚³‚ê‚È‚¢B' do
+				utf_8['‚¢‚ë‚¢‚ë‚Èƒf[ƒ^'].should equal utf_8.sheets[2]
+				euc_jp['‚¢‚ë‚¢‚ë‚Èƒf[ƒ^'].should equal euc_jp.sheets[2]
+			end
+			
+			it '‚ÅƒGƒ“ƒR[ƒh‚ğw’è‚µ‚½‚ÉAƒV[ƒg‚ğæ“¾‚·‚éƒƒ\ƒbƒh‚Í§ŒÀ‚³‚ê‚È‚¢B' do
+				utf_8.‚¢‚ë‚¢‚ë‚Èƒf[ƒ^.should equal utf_8.sheets[2]
+				euc_jp.‚¢‚ë‚¢‚ë‚Èƒf[ƒ^.should equal euc_jp.sheets[2]
+			end
+			
+			it '‚ÅƒGƒ“ƒR[ƒh‚ğw’è‚·‚é‚±‚Æ‚ÅA•¶š—ñƒf[ƒ^‚ğæ“¾‚·‚é•¶šƒR[ƒh‚ğw’è‚Å‚«‚éB' do
+				utf_8.‚¢‚ë‚¢‚ë‚Èƒf[ƒ^.A3.should == '‚ ‚¢‚¤‚¦‚¨'.encode('UTF-8')
+				euc_jp.‚¢‚ë‚¢‚ë‚Èƒf[ƒ^.A3.should == '‚ ‚¢‚¤‚¦‚¨'.encode('EUC-JP')
+			end
 		end
 	end
 	describe '#file_path' do
-		it 'ãŒæŒ‡å®šã—ãŸãƒ‘ã‚¹å–å¾—ã§ãã‚‹ã€‚' do
+		it '‚ªw’è‚µ‚½ƒpƒXæ“¾‚Å‚«‚éB' do
 			subject.file_path.should == test_file('Book1')
 			book2.file_path.should == test_file('Book2')
 		end
-		it 'ãŒã‚¹ãƒ©ãƒƒã‚·ãƒ¥åŒºåˆ‡ã‚Šã§æŒ‡å®šã—ãŸå ´åˆã«ã‚‚æŒ‡å®šã—ãŸé€šã‚Šã«ãƒ‘ã‚¹å–å¾—ã§ãã‚‹ã€‚' do
+		it '‚ªƒXƒ‰ƒbƒVƒ…‹æØ‚è‚Åw’è‚µ‚½ê‡‚É‚àw’è‚µ‚½’Ê‚è‚ÉƒpƒXæ“¾‚Å‚«‚éB' do
 			test_file_slash = test_file(unopened_file_name).gsub('\\', '/')
 			WorkBook.open(test_file_slash) do |book|
 				book.file_path.should == test_file_slash
@@ -77,32 +101,32 @@ describe WorkBook do
 		end
 	end
 	describe '#sheets' do
-		it 'ã§ã‚·ãƒ¼ãƒˆãŒå–å¾—ã§ãã‚‹ã€‚' do
+		it '‚ÅƒV[ƒg‚ªæ“¾‚Å‚«‚éB' do
 			book2.sheets.map(&:name).should == %w[Sheet1 Sheet2]
 		end
 	end
 	
 	describe '#[]' do
-		context 'å¼•æ•°ã¨ã—ã¦æ–‡å­—åˆ—ã‚’æŒ‡å®š' do
-			it 'ã§ã‚·ãƒ¼ãƒˆãŒå–å¾—ã§ãã‚‹' do
+		context 'ˆø”‚Æ‚µ‚Ä•¶š—ñ‚ğw’è' do
+			it '‚ÅƒV[ƒg‚ªæ“¾‚Å‚«‚é' do
 				subject['Sheet1'].should equal subject.sheets[0]
 				subject['Sheet2'].should equal subject.sheets[1]
 			end
 			
-			it 'ã¯å­˜åœ¨ã—ãªã„åå‰ã‚’æŒ‡å®šã•ã‚ŒãŸæ™‚ã«ã¯nilã‚’è¿”ã™ã€‚' do
+			it '‚Í‘¶İ‚µ‚È‚¢–¼‘O‚ğw’è‚³‚ê‚½‚É‚Ínil‚ğ•Ô‚·B' do
 				subject['Sheet999'].should be_nil
 			end
 			
-			it 'ã¯åŒä¸€ã‚·ãƒ¼ãƒˆã‚’åŒä¸€ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¨ã—ã¦æ‰±ã†ã€‚' do
+			it '‚Í“¯ˆêƒV[ƒg‚ğ“¯ˆêƒIƒuƒWƒFƒNƒg‚Æ‚µ‚Äˆµ‚¤B' do
 				subject['Sheet1'].should equal subject['Sheet1']
 			end
 			
-			it 'ã§æ—¥æœ¬èªåã®ã‚·ãƒ¼ãƒˆãŒå–å¾—ã§ãã‚‹' do
-				subject['ã„ã‚ã„ã‚ãªãƒ‡ãƒ¼ã‚¿'].should equal subject.sheets[2]
+			it '‚Å“ú–{Œê–¼‚ÌƒV[ƒg‚ªæ“¾‚Å‚«‚é' do
+				subject['‚¢‚ë‚¢‚ë‚Èƒf[ƒ^'].should equal subject.sheets[2]
 			end
 		end
-		context 'å¼•æ•°ã¨ã—ã¦ã‚·ãƒ³ãƒœãƒ«ã‚’æŒ‡å®š' do
-			it 'ã§ã‚·ãƒ¼ãƒˆãŒå–å¾—ã§ãã‚‹' do
+		context 'ˆø”‚Æ‚µ‚ÄƒVƒ“ƒ{ƒ‹‚ğw’è' do
+			it '‚ÅƒV[ƒg‚ªæ“¾‚Å‚«‚é' do
 				subject[:Sheet1].should equal subject.sheets[0]
 				subject[:Sheet2].should equal subject.sheets[1]
 			end
@@ -110,23 +134,23 @@ describe WorkBook do
 	end
 	
 	
-	describe '#ã‚·ãƒ¼ãƒˆå' do
-		it 'ã§ã‚·ãƒ¼ãƒˆãŒå–å¾—ã§ãã‚‹' do
+	describe '#ƒV[ƒg–¼' do
+		it '‚ÅƒV[ƒg‚ªæ“¾‚Å‚«‚é' do
 			subject.Sheet1.should equal subject.sheets[0]
 			subject.Sheet2.should equal subject.sheets[1]
 		end
 		
-		it 'ã¯å­˜åœ¨ã—ãªã„ã‚·ãƒ¼ãƒˆåã‚’æŒ‡å®šã•ã‚ŒãŸæ™‚ã«ã¯NoMethodErrorã‚’è¿”ã™ã€‚' do
+		it '‚Í‘¶İ‚µ‚È‚¢ƒV[ƒg–¼‚ğw’è‚³‚ê‚½‚É‚ÍNoMethodError‚ğ•Ô‚·B' do
 			->{subject.Sheet999}.should raise_error NoMethodError
 		end
 		
-		it 'ã§æ—¥æœ¬èªåã®ã‚·ãƒ¼ãƒˆãŒå–å¾—ã§ãã‚‹' do
-			subject.ã„ã‚ã„ã‚ãªãƒ‡ãƒ¼ã‚¿.should equal subject.sheets[2]
+		it '‚Å“ú–{Œê–¼‚ÌƒV[ƒg‚ªæ“¾‚Å‚«‚é' do
+			subject.‚¢‚ë‚¢‚ë‚Èƒf[ƒ^.should equal subject.sheets[2]
 		end
 	end
 end
 
-# æŒ‡å®šã—ãŸãƒ‘ã‚¹ã®ãƒ•ã‚©ãƒ«ãƒ€åŠã³ã€ãã®ä¸‹ã«ã‚ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ã€ãƒ•ã‚©ãƒ«ãƒ€ã‚’ã™ã¹ã¦å‰Šé™¤ã—ã¾ã™ã€‚
+# w’è‚µ‚½ƒpƒX‚ÌƒtƒHƒ‹ƒ_‹y‚ÑA‚»‚Ì‰º‚É‚ ‚éƒtƒ@ƒCƒ‹AƒtƒHƒ‹ƒ_‚ğ‚·‚×‚Äíœ‚µ‚Ü‚·B
 def delete_all(deleted)
 	if FileTest.directory?(deleted) then
 		Dir.foreach(deleted) do |child_path|

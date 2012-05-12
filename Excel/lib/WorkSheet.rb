@@ -19,7 +19,7 @@ class WorkSheet
 	
 	# シート名を取得します。
 	def name
-		@tag.attributes['name'].encode('Shift_JIS')
+		@tag.attributes['name'].encode(book.encoding)
 	end
 	
 	def cell_value(ref)
