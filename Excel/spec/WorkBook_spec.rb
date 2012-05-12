@@ -2,11 +2,11 @@
 require File.dirname(__FILE__) + '/../lib/WorkBook'
 describe WorkBook do
 	def test_file(file_name)
-		return '.\spec\test_data\\' + file_name + '.xlsx'
+		'.\spec\test_data\\' + file_name + '.xlsx'
 	end
 	
 	def unopened_file_name
-		return '’€ŽŸŠJ‚©‚ê‚éBook'
+		'’€ŽŸŠJ‚©‚ê‚éBook'
 	end
 	
 	after(:all) do

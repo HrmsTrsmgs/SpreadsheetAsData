@@ -31,7 +31,7 @@ class WorkBook
 	# <br/>
 	# ==== <b>[PARAM]file_path</b><br/>
 	#  開くファイルのパスを指定します。
-	def self.open(file_path, encoding = 'Shift_JIS')
+	def self.open(file_path, encoding = file_path.encoding)
 			book = WorkBook.new(file_path, encoding)
 			if block_given? then
 				yield book
