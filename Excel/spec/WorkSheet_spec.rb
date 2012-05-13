@@ -89,8 +89,12 @@ describe WorkSheet do
 			sheet1.C3.should == 4
 		end
 		
-		it 'は同じセルの場合は同じオブジェクトを取得する。' do
+		it 'で数字を取得する場合、同じセルの場合は同じオブジェクトを取得する。' do
 			sheet1.C3.should equal sheet1.C3
+		end
+		
+		it 'で文字列を取得する場合、同じセルの場合は同じオブジェクトを取得する。' do
+			data.A3.should equal data.A3
 		end
 	end
 end

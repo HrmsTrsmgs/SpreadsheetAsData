@@ -15,13 +15,18 @@ class Cell
 	end
 	
 	def value
-		case @xml.attributes['t']
-		when nil
-			@xml.elements[1].text.to_i
-		when 'b'
-			@xml.elements[1].text != '0'
-		when 's'
-			book.shared_strings[@xml.elements[1].text.to_i].encode(book.encoding)
-		end
+		@value ||=
+			case @xml.attributes['t']
+			when nil
+				@xml.elements[1].text.to_f
+			when 'b'
+				@xml.elements[1].text != '0'
+			when 's'
+				book.shared_strings[@xml.elements[1].text.to_i].encode(book.encoding)
+			end
+	end
+	
+	def ref
+		@xml.attributes['r']
 	end
 end

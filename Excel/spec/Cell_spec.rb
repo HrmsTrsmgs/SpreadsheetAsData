@@ -26,8 +26,8 @@ describe Cell do
 	
 	describe '#value' do
 		it 'が数値を取得できる。' do
-			sheet.cell(:A1).value.should == 1
-			sheet.cell(:B1).value.should == 2
+			sheet.cell(:A1).value.should == 1.1
+			sheet.cell(:B1).value.should == 2.2
 		end
 		it 'がtrueを取得できる。' do
 			sheet.cell(:A2).value.should == true
@@ -41,4 +41,10 @@ describe Cell do
 		end
 	end
 	
+	describe '#ref' do
+		it 'がセル参照の名称を取得できる。' do
+			sheet.cell(:A1).ref.should == 'A1'
+			sheet.cell(:B1).ref.should == 'B1'
+		end
+	end
 end

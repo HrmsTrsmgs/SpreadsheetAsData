@@ -23,8 +23,7 @@ class WorkSheet
 	end
 	
 	def cell_value(ref)
-		cell = cell(ref)
-		cell.value if cell
+		cell(ref).value if cell(ref)
 	end
 	
 	def cell(ref)
