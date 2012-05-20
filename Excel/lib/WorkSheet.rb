@@ -33,6 +33,9 @@ class WorkSheet
 		if xml then
 			cell = Cell.new(xml, self)
 			@cell_hash[ref] = cell
+		elsif ref =~ /[A-Z]+\d+/ then
+			cell = Cell.new(ref, self)
+			@cell_hash[ref] = cell
 		end
 	end
 	

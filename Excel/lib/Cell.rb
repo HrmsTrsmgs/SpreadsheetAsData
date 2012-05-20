@@ -6,7 +6,11 @@ class Cell
 		
 	# インスタンスを初期化します。
 	def initialize(xml, sheet)
-		@xml = xml
+		if xml =~ /[A-Z]+[0-9]+/ then
+			@ref = xml
+		else
+			@xml = xml
+		end
 		@sheet = sheet
 	end
 	
@@ -27,6 +31,10 @@ class Cell
 	end
 	
 	def ref
-		@xml.attributes['r']
+		if @xml then
+			@xml.attributes['r']
+		else
+			@ref
+		end
 	end
 end
