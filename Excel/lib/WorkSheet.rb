@@ -3,6 +3,7 @@ require 'rexml/document'
 
 require 'Package'
 require 'Cell'
+require 'BlankValue'
 
 # Excelのシートです。
 class WorkSheet

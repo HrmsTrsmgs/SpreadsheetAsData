@@ -9,8 +9,8 @@ describe WorkSheet do
 		book.close
 	end
 	
-	let(:sheet1) { book.Sheet1}
 	let(:book) { WorkBook.open(test_file('Book1')) }
+	let(:sheet1) { book.Sheet1 }
 	let(:sheet2) { book.Sheet2 }
 	let(:data) { book.sheets[2] } 
 	
@@ -65,7 +65,6 @@ describe WorkSheet do
 			sheet1.cell('C3').should equal sheet1.cell('C3')
 		end                                                                                                                                                           
 		
-		
 		it 'は空のセルの場合も同じセルの場合は同じオブジェクトを取得する。' do
 			sheet1.cell('B1').should equal sheet1.cell('B1')
 		end                                                                                                                                                           
@@ -96,8 +95,8 @@ describe WorkSheet do
 			sheet2.A1.should == 5
 		end
 		
-		it 'はシンボルを渡しても動作する。' do
-			sheet1.C3.should == 4
+		it 'は空白セルを取得できる。' do
+			sheet1.B1.should_not be_nil
 		end
 		
 		it 'で数字を取得する場合、同じセルの場合は同じオブジェクトを取得する。' do

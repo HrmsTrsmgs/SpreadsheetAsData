@@ -19,6 +19,8 @@ class Cell
 	end
 	
 	def value
+	
+		return @value = BlankValue.new until @xml
 		@value ||=
 			case @xml.attributes['t']
 			when nil
