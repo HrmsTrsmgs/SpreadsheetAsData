@@ -1,50 +1,48 @@
 # -*- encoding: Shift_JIS -*- 
-require File.dirname(__FILE__) + '/../lib/WorkBook'
+
+require 'spec_helper'
+
 describe Cell do
-	def test_file(file_name)
-		return '.\spec\test_data\\' + file_name + '.xlsx'
-	end
-	
-	after(:all) do
-		book.close
-	end
-	
-	let(:book) { WorkBook.open(test_file('Book1')) }
-	let(:sheet) { book.sheets[2] } 
-	
-	describe '#sheet' do
-		it '取得できる' do
-			sheet.cell(:A1).sheet.should equal sheet
-		end
-	end
-	
-	describe '#book' do
-		it '取得できる' do
-			sheet.cell(:A1).book.should equal book
-		end
-	end
-	
-	describe '#value' do
-		it 'が数値を取得できる。' do
-			sheet.cell(:A1).value.should == 1.1
-			sheet.cell(:B1).value.should == 2.2
-		end
-		it 'がtrueを取得できる。' do
-			sheet.cell(:A2).value.should == true
-		end
-		it 'がfalseを取得できる。' do
-			sheet.cell(:B2).value.should == false
-		end
-		it 'が文字列を取得できる。' do
-			sheet.cell(:A3).value.should == 'あいうえお'
-			sheet.cell(:B3).value.should == 'かきくけこ'
-		end
-	end
-	
-	describe '#ref' do
-		it 'がセル参照の名称を取得できる。' do
-			sheet.cell(:A1).ref.should == 'A1'
-			sheet.cell(:B1).ref.should == 'B1'
-		end
-	end
+  let(:book) { WorkBook.open(test_file('Book1')) }
+  let(:sheet) { book.いろいろなデータ }
+
+  after(:all) do
+    book.close
+  end
+
+  describe '#sheet' do
+    it 'で所属するシートが取得できる' do
+      sheet.cell(:A1).sheet.should equal sheet
+    end
+  end
+
+  describe '#book' do
+    it 'で所属するシートが取得できる' do
+      sheet.cell(:A1).book.should equal book
+    end
+  end
+
+  describe '#value' do
+    it 'が数値を取得できる。' do
+      sheet.cell(:A1).value.should == 1.1
+      sheet.cell(:B1).value.should == 2.2
+    end
+    it 'がtrueを取得できる。' do
+      sheet.cell(:A2).value.should == true
+    end
+    it 'がfalseを取得できる。' do
+      sheet.cell(:B2).value.should == false
+    end
+    it 'が文字列を取得できる。' do
+      sheet.cell(:A3).value.should == 'あいうえお'
+      sheet.cell(:B3).value.should == 'かきくけこ'
+    end
+  end
+
+  describe '#ref' do
+    it 'がセル参照の名称を取得できる。' do
+      sheet.cell(:A1).ref.should == 'A1'
+      sheet.cell(:B1).ref.should == 'B1'
+    end
+  end
 end
