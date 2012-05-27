@@ -1,4 +1,5 @@
-﻿require 'rexml/document'
+﻿require 'pathname'
+require 'rexml/document'
 
 class PackagePart
 
@@ -6,13 +7,12 @@ class PackagePart
 
   def initialize(package, part_uri)
     @package = package
-    @part_uri = part_uri
+    @part_uri = Pathname(part_uri)
     @cache = {}
   end
 
   # ブック情報を記述してあるWorkBook.xmlドキュメントを取得します。
   def xml_document
-    #workbook.xmlのパスは変更するとExcelでも起動できなくなるため、変更には対応しません。
     @xml_document ||= @package.xml_document(@part_uri)
   end
 
@@ -27,7 +27,7 @@ class PackagePart
       end
       
     tag && 
-      @cache[tag] ||= PackagePart.new(@package, File.dirname(@part_uri) +"/" + tag.attributes['Target'])
+      @cache[tag] ||= PackagePart.new(@package, @part_uri.dirname + tag.attributes['Target'])
   end
 
 private

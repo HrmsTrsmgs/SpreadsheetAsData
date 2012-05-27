@@ -1,16 +1,20 @@
-﻿require 'zipruby'
+﻿require 'pathname'
 require 'rexml/document'
+
+require 'zipruby'
 
 require 'package_part'
 
 class Package
 
   # 開いたファイルのパスです。
-  attr_reader :file_path
+  def file_path
+    @file_path.to_s
+  end
 
   # 新しいインスタンスの初期化を行います。
   def initialize(file_path)
-    @file_path = file_path
+    @file_path = Pathname(file_path)
     @archive = Zip::Archive.open(file_path)
   end
 
@@ -26,17 +30,15 @@ class Package
   # ブック情報を記述してあるWorkBook.xmlドキュメントを取得します。
   def xml_document(part_uri)
     #workbook.xmlのパスは変更するとExcelでも起動できなくなるため、変更には対応しません。
-    part_uri.gsub!(/^\//, '')
-    @archive.fopen(part_uri){|file| REXML::Document.new(file.read) }
+    @archive.fopen(part_uri.to_s){|file| REXML::Document.new(file.read) }
   end
 
   def relation_tags(part_uri)
-    part_uri.gsub!(/^\//, '')
-    @archive.fopen(part_rels_file_path(part_uri)){|file| REXML::Document.new(file.read) }.elements.to_a('//Relationship')
+    @archive.fopen(part_rels_file_path(part_uri).to_s){|file| REXML::Document.new(file.read) }.elements.to_a('//Relationship')
   end
 
   private
   def part_rels_file_path(part_uri)
-    File.dirname(part_uri) + '/_rels/' + File.basename(part_uri) + '.rels'
+    part_uri.dirname + '_rels/' + (part_uri.basename.to_s + '.rels')
   end
 end
