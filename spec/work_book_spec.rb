@@ -58,23 +58,6 @@ describe WorkBook do
       utf_8.いろいろなデータ.A3.should == 'あいうえお'.encode('UTF-8')
       euc_jp.いろいろなデータ.A3.should == 'あいうえお'.encode('EUC-JP')
     end
-
-    context 'での内部ファイル操作' do
-      it 'の時に解凍を行っている。' do
-        temp_dir_name = test_file('tmp_' + BOOK_OPEND_EACH_TIME)
-        FileUtils.remove_entry(temp_dir_name) if Dir.exist?(temp_dir_name)
-        WorkBook.open(test_file(BOOK_OPEND_EACH_TIME)) do |book|
-          Dir.exist?(temp_dir_name).should == true
-        end
-      end
-
-      it 'の終了時に解凍した作業ファイルの削除を行っている。' do
-        temp_dir_name = test_file('tmp_' + BOOK_OPEND_EACH_TIME)
-        FileUtils.remove_entry(temp_dir_name) if Dir.exist?(temp_dir_name)
-        WorkBook.open(test_file(BOOK_OPEND_EACH_TIME)) {|book| }
-        Dir.exist?(temp_dir_name).should == false
-      end
-    end
   end
 
   describe '#file_path' do
