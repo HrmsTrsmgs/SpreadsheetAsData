@@ -1,28 +1,22 @@
-﻿require 'zip/zipfilesystem'
-require 'rexml/document'
+﻿require 'rexml/document'
 
 class PackagePart
+
+  attr_reader :part_uri
+
   def initialize(package, part_uri)
     @package = package
     @part_uri = part_uri
   end
 
-  def file_path
-    @package.part_path(@part_uri)
-  end
-
-  def rels_file_path
-    File.dirname(file_path) + '/_rels/' + File.basename(file_path) + '.rels'
-  end
-
   # ブック情報を記述してあるWorkBook.xmlドキュメントを取得します。
   def xml_document
     #workbook.xmlのパスは変更するとExcelでも起動できなくなるため、変更には対応しません。
-    @xml_document ||= File.open(file_path) {|file| REXML::Document.new(file) }
+    @xml_document ||= @package.xml_document(@part_uri)
   end
 
   def relation_tags
-    @relation_tags ||= File.open(rels_file_path) {|file| REXML::Document.new(file) }.elements.to_a('//Relationship')
+    @relation_tags ||= @package.relation_tags(@part_uri)
   end
 
   def relation_cache

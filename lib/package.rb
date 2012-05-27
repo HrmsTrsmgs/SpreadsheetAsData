@@ -24,9 +24,15 @@ class Package
   def part(uri)
     PackagePart.new(self, uri)
   end
+  
+  # ブック情報を記述してあるWorkBook.xmlドキュメントを取得します。
+  def xml_document(part_uri)
+    #workbook.xmlのパスは変更するとExcelでも起動できなくなるため、変更には対応しません。
+    File.open(part_file_path(part_uri)) {|file| REXML::Document.new(file) }
+  end
 
-  def part_path(uri)
-    (unziped_dir_path + uri).gsub('//', '/')
+  def relation_tags(part_uri)
+    File.open(part_rels_file_path(part_uri)) {|file| REXML::Document.new(file) }.elements.to_a('//Relationship')
   end
 
   private
@@ -54,5 +60,16 @@ class Package
   # Ruby上でファイルパスとして認識される、スラッシュ区切りのファイルパスを取得します。
   def slashed_file_path
     file_path.gsub('\\', '/')
+  end
+
+  def part_path(uri)
+    (unziped_dir_path + uri).gsub('//', '/')
+  end
+  def part_file_path(part_uri)
+    part_path(part_uri)
+  end
+
+  def part_rels_file_path(part_uri)
+    File.dirname(part_file_path(part_uri)) + '/_rels/' + File.basename(part_file_path(part_uri)) + '.rels'
   end
 end
