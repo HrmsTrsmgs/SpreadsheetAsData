@@ -1,4 +1,5 @@
-ï»¿require 'pathname'
+# -*- encoding: UTF-8 -*- 
+require 'pathname'
 require 'rexml/document'
 
 require 'zipruby'
@@ -7,18 +8,18 @@ require 'package_part'
 
 class Package
 
-  # é–‹ã„ãŸãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹ã§ã™ã€‚
+  # ŠJ‚¢‚½ƒtƒ@ƒCƒ‹‚ÌƒpƒX‚Å‚·B
   def file_path
     @file_path.to_s
   end
 
-  # æ–°ã—ã„ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®åˆæœŸåŒ–ã‚’è¡Œã„ã¾ã™ã€‚
+  # V‚µ‚¢ƒCƒ“ƒXƒ^ƒ“ƒX‚Ì‰Šú‰»‚ğs‚¢‚Ü‚·B
   def initialize(file_path)
     @file_path = Pathname(file_path)
     @archive = Zip::Archive.open(file_path)
   end
 
-  # ãƒ•ã‚¡ã‚¤ãƒ«ã®æ“ä½œã‚’çµ‚äº†ã—ã€ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹æ”¾ã—ã¾ã™ã€‚
+  # ƒtƒ@ƒCƒ‹‚Ì‘€ì‚ğI—¹‚µAƒtƒ@ƒCƒ‹‚ğŠJ•ú‚µ‚Ü‚·B
   def close
     @archive.close()
   end
@@ -27,9 +28,9 @@ class Package
     PackagePart.new(self, uri)
   end
   
-  # ãƒ–ãƒƒã‚¯æƒ…å ±ã‚’è¨˜è¿°ã—ã¦ã‚ã‚‹WorkBook.xmlãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆã‚’å–å¾—ã—ã¾ã™ã€‚
+  # ƒuƒbƒNî•ñ‚ğ‹Lq‚µ‚Ä‚ ‚éWorkBook.xmlƒhƒLƒ…ƒƒ“ƒg‚ğæ“¾‚µ‚Ü‚·B
   def xml_document(part_uri)
-    #workbook.xmlã®ãƒ‘ã‚¹ã¯å¤‰æ›´ã™ã‚‹ã¨Excelã§ã‚‚èµ·å‹•ã§ããªããªã‚‹ãŸã‚ã€å¤‰æ›´ã«ã¯å¯¾å¿œã—ã¾ã›ã‚“ã€‚
+    #workbook.xml‚ÌƒpƒX‚Í•ÏX‚·‚é‚ÆExcel‚Å‚à‹N“®‚Å‚«‚È‚­‚È‚é‚½‚ßA•ÏX‚É‚Í‘Î‰‚µ‚Ü‚¹‚ñB
     @archive.fopen(part_uri.to_s){|file| REXML::Document.new(file.read) }
   end
 
