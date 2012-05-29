@@ -1,4 +1,6 @@
-﻿require 'rexml/document'
+# coding: UTF-8
+require 'zip/zipfilesystem'
+require 'rexml/document'
 
 require 'work_sheet'
 require 'package'
@@ -19,8 +21,7 @@ class WorkBook
   def initialize(file_path, encoding)
     @package = Package.new(file_path)
     @encoding = encoding
-    #workbook.xmlのパスは変更するとExcelでも起動できなくなるため、変更には対応しません。
-    @part = @package.part('xl/workbook.xml')
+    @part = @package.part('/xl/workbook.xml')
     shared_strings_xml = @part.relation(SHARED_STRING_ID)
     @shared_strings = 
       shared_strings_xml ? shared_strings_xml.xml_document.elements.to_a('//t').map {|t| t.text } : []
@@ -31,13 +32,13 @@ class WorkBook
   # ==== <b>[PARAM]file_path</b><br/>
   #  開くファイルのパスを指定します。
   def self.open(file_path, encoding = file_path.encoding)
-    book = WorkBook.new(file_path, encoding)
-    if block_given?
-      yield book
-      book.close
-    else
-      book
-    end
+      book = WorkBook.new(file_path, encoding)
+      if block_given?
+        yield book
+        book.close
+      else
+        book
+      end
   end
 
   # ファイルの操作を終了し、ファイルを開放します。

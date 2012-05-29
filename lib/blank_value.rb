@@ -1,3 +1,5 @@
+# coding: UTF-8
+
 class BlankValue < Numeric
   def ==(other)
     other == 0 || other == ''

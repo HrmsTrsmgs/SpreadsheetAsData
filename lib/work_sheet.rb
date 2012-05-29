@@ -1,4 +1,5 @@
-﻿require 'rexml/document'
+# coding: UTF-8
+require 'rexml/document'
 
 require 'cell'
 require 'blank_value'

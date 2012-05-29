@@ -1,10 +1,12 @@
+# coding: UTF-8
+
 require 'rexml/document'
 
 class Cell
 
   attr_reader :sheet
 
-  # インスタンスを初期化します。
+  # 繧､繝ｳ繧ｹ繧ｿ繝ｳ繧ｹ繧貞�晄悄蛹悶＠縺ｾ縺吶�
   def initialize(xml, sheet)
     if xml =~ /[A-Z]+[0-9]+/
       @ref = xml

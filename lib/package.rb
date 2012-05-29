@@ -1,25 +1,22 @@
-# -*- encoding: UTF-8 -*- 
-require 'pathname'
-require 'rexml/document'
+# coding: UTF-8
 
 require 'zipruby'
+require 'rexml/document'
 
 require 'package_part'
 
 class Package
 
-  # ŠJ‚¢‚½ƒtƒ@ƒCƒ‹‚ÌƒpƒX‚Å‚·B
-  def file_path
-    @file_path.to_s
-  end
+  # é–‹ã„ãŸãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹ã§ã™ã€‚
+  attr_reader :file_path
 
-  # V‚µ‚¢ƒCƒ“ƒXƒ^ƒ“ƒX‚Ì‰Šú‰»‚ğs‚¢‚Ü‚·B
+  # æ–°ã—ã„ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®åˆæœŸåŒ–ã‚’è¡Œã„ã¾ã™ã€‚
   def initialize(file_path)
-    @file_path = Pathname(file_path)
-    @archive = Zip::Archive.open(file_path)
+    @file_path = file_path
+    @archive = Zip::Archive.open(file_path.encode('Shift_JIS'))
   end
 
-  # ƒtƒ@ƒCƒ‹‚Ì‘€ì‚ğI—¹‚µAƒtƒ@ƒCƒ‹‚ğŠJ•ú‚µ‚Ü‚·B
+  # ãƒ•ã‚¡ã‚¤ãƒ«ã®æ“ä½œã‚’çµ‚äº†ã—ã€ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹æ”¾ã—ã¾ã™ã€‚
   def close
     @archive.close()
   end
@@ -28,18 +25,20 @@ class Package
     PackagePart.new(self, uri)
   end
   
-  # ƒuƒbƒNî•ñ‚ğ‹Lq‚µ‚Ä‚ ‚éWorkBook.xmlƒhƒLƒ…ƒƒ“ƒg‚ğæ“¾‚µ‚Ü‚·B
+  # ãƒ–ãƒƒã‚¯æƒ…å ±ã‚’è¨˜è¿°ã—ã¦ã‚ã‚‹WorkBook.xmlãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆã‚’èªŒãƒ»ï½µã¾ã™ã€‚
   def xml_document(part_uri)
-    #workbook.xml‚ÌƒpƒX‚Í•ÏX‚·‚é‚ÆExcel‚Å‚à‹N“®‚Å‚«‚È‚­‚È‚é‚½‚ßA•ÏX‚É‚Í‘Î‰‚µ‚Ü‚¹‚ñB
-    @archive.fopen(part_uri.to_s){|file| REXML::Document.new(file.read) }
+    #workbook.xmlã®ãƒ‘ã‚¹ã¯å¤‰æ›´ã™ã‚‹ã¨Excelã§ã‚‚èµ·å‹•ã§ããªããªã‚‹ãŸã‚ã€å¤‰æ›´ã«ã¯å¯¾å¿œã—ã¾ã›ã‚“ã€‚
+    part_uri.gsub!(/^\//, '')
+    @archive.fopen(part_uri){|file| REXML::Document.new(file.read) }
   end
 
   def relation_tags(part_uri)
-    @archive.fopen(part_rels_file_path(part_uri).to_s){|file| REXML::Document.new(file.read) }.elements.to_a('//Relationship')
+    part_uri.gsub!(/^\//, '')
+    @archive.fopen(part_rels_file_path(part_uri)){|file| REXML::Document.new(file.read) }.elements.to_a('//Relationship')
   end
 
   private
   def part_rels_file_path(part_uri)
-    part_uri.dirname + '_rels/' + (part_uri.basename.to_s + '.rels')
+    File.dirname(part_uri) + '/_rels/' + File.basename(part_uri) + '.rels'
   end
 end

@@ -1,4 +1,5 @@
-# -*- encoding: Shift_JIS -*- 
+# coding: UTF-8
+
 require 'spec_helper'
 
 describe BlankValue do
@@ -11,79 +12,79 @@ describe BlankValue do
   end
 
   describe '#==' do
-    it '‚Å”äŠr‚·‚é‚Æ""‚Æ“¯‚¶‚Æ‚¢‚¤‚±‚Æ‚É‚È‚éB' do
+    it 'ã§æ¯”è¼ƒã™ã‚‹ã¨""ã¨åŒã˜ã¨ã„ã†ã“ã¨ã«ãªã‚‹ã€‚' do
       subject.should == ''
     end
 
-    it '‚Å”äŠr‚·‚é‚Æ0‚Æ“¯‚¶‚Æ‚¢‚¤‚±‚Æ‚É‚È‚éB' do
+    it 'ã§æ¯”è¼ƒã™ã‚‹ã¨0ã¨åŒã˜ã¨ã„ã†ã“ã¨ã«ãªã‚‹ã€‚' do
       subject.should == 0
     end
 
-    it '‚Å”äŠr‚·‚é‚Æ0ˆÈŠO‚Ì®”‚Æ‚Í‚Æ“¯‚¶‚Æ‚¢‚¤‚±‚Æ‚É‚ç‚È‚¢B' do
+    it 'ã§æ¯”è¼ƒã™ã‚‹ã¨0ä»¥å¤–ã®æ•´æ•°ã¨ã¯ã¨åŒã˜ã¨ã„ã†ã“ã¨ã«ã‚‰ãªã„ã€‚' do
       subject.should_not == 1
       subject.should_not == -1
     end
 
-    it '‚Å”äŠr‚·‚é‚Æ0ˆÈŠO‚Ì¬”‚Æ‚Í‚Æ“¯‚¶‚Æ‚¢‚¤‚±‚Æ‚É‚ç‚È‚¢B' do
+    it 'ã§æ¯”è¼ƒã™ã‚‹ã¨0ä»¥å¤–ã®å°æ•°ã¨ã¯ã¨åŒã˜ã¨ã„ã†ã“ã¨ã«ã‚‰ãªã„ã€‚' do
       subject.should_not == 0.01
       subject.should_not == -0.01
     end
 
-    it '‚Å”äŠr‚·‚é‚Æ''ˆÈŠO‚Ì•¶š—ñ‚Æ‚Í‚Æ“¯‚¶‚Æ‚¢‚¤‚±‚Æ‚É‚ç‚È‚¢B' do
+    it 'ã§æ¯”è¼ƒã™ã‚‹ã¨''ä»¥å¤–ã®æ–‡å­—åˆ—ã¨ã¯ã¨åŒã˜ã¨ã„ã†ã“ã¨ã«ã‚‰ãªã„ã€‚' do
       subject.should_not == 'a'
-      subject.should_not == '‚ ‚¢‚¤'
+      subject.should_not == 'ã‚ã„ã†'
     end
   end
 
   describe '#+' do
-    it '‚Å0ˆµ‚¢‚Å”š‚Æ‘«‚·‚±‚Æ‚ª‚Å‚«‚éB' do
+    it 'ã§0æ‰±ã„ã§æ•°å­—ã¨è¶³ã™ã“ã¨ãŒã§ãã‚‹ã€‚' do
       (subject + 10).should == 10
       (subject + -5).should == -5
     end
 
-    it '‚Å0ˆµ‚¢‚Å”š‚É‘«‚³‚ê‚é‚±‚Æ‚ª‚Å‚«‚éB' do
+    it 'ã§0æ‰±ã„ã§æ•°å­—ã«è¶³ã•ã‚Œã‚‹ã“ã¨ãŒã§ãã‚‹ã€‚' do
       (10 + subject).should == 10
       (-5 + subject).should == -5
     end
 
-    it '‚Å""ˆµ‚¢‚Å•¶š—ñ‚Æ‘«‚·‚±‚Æ‚ª‚Å‚«‚éB' do
+    it 'ã§""æ‰±ã„ã§æ–‡å­—åˆ—ã¨è¶³ã™ã“ã¨ãŒã§ãã‚‹ã€‚' do
       (subject + 'abc').should == 'abc'
     end
 
-    it '‚Å""ˆµ‚¢‚Å•¶š—ñ‚É‘«‚³‚ê‚é‚±‚Æ‚ª‚Å‚«‚éB' do
+    it 'ã§""æ‰±ã„ã§æ–‡å­—åˆ—ã«è¶³ã•ã‚Œã‚‹ã“ã¨ãŒã§ãã‚‹ã€‚' do
       ('abc' + subject).should == 'abc'
     end
   end
 
   describe '#*' do
-    it '‚Å0ˆµ‚¢‚Å”š‚ÆŠ|‚¯‚é‚±‚Æ‚ª‚Å‚«‚éB' do
+    it 'ã§0æ‰±ã„ã§æ•°å­—ã¨æ›ã‘ã‚‹ã“ã¨ãŒã§ãã‚‹ã€‚' do
       (subject * 10).should == 0
     end
 
-    it '‚Å0ˆµ‚¢‚Å”š‚ÉŠ|‚¯‚ç‚ê‚é‚±‚Æ‚ª‚Å‚«‚éB' do
+    it 'ã§0æ‰±ã„ã§æ•°å­—ã«æ›ã‘ã‚‰ã‚Œã‚‹ã“ã¨ãŒã§ãã‚‹ã€‚' do
       (10 * subject).should == 0
     end
 
-    it '‚Å""ˆµ‚¢‚Å•¶š—ñ‚É‘«‚³‚ê‚é‚±‚Æ‚ª‚Å‚«‚éB' do
+    it 'ã§""æ‰±ã„ã§æ–‡å­—åˆ—ã«è¶³ã•ã‚Œã‚‹ã“ã¨ãŒã§ãã‚‹ã€‚' do
       ('abc' * subject).should == ''
     end
   end
 
-  describe '”’l‰‰Z' do
-    it '‚É—˜—p‚·‚é‚±‚Æ‚ª‚Å‚«‚éB' do
+  describe 'æ•°å€¤æ¼”ç®—' do
+    it 'ã«åˆ©ç”¨ã™ã‚‹ã“ã¨ãŒã§ãã‚‹ã€‚' do
       Math::sin(subject).should == 0
       Math::cos(subject).should == 1
     end
   end
 
   describe '#inspect' do
-    it '‚Í{blank}‚ğ•Ô‚·' do
+    it 'ã¯{blank}ã‚’è¿”ã™' do
       subject.inspect.should == '{blank}'
     end
   end
 
   describe '#to_s' do
-    it '‚Í""‚ğ•Ô‚·' do
+    it 'ã¯""ã‚’è¿”ã™' do
       subject.to_s.should == ''
     end
   end

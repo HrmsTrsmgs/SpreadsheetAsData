@@ -1,1 +1,0 @@
-rdoc lib/excel_book.rb

@@ -1,46 +1,46 @@
-# -*- encoding: Shift_JIS -*- 
+# coding: UTF-8
 
 require 'spec_helper'
 
 describe Cell do
   let(:book) { WorkBook.open(test_file('Book1')) }
-  let(:sheet) { book.‚¢‚ë‚¢‚ë‚Èƒf[ƒ^ }
+  let(:sheet) { book.ã„ã‚ã„ã‚ãªãƒ‡ãƒ¼ã‚¿ }
 
   after(:all) do
     book.close
   end
 
   describe '#sheet' do
-    it '‚ÅŠ‘®‚·‚éƒV[ƒg‚ªæ“¾‚Å‚«‚é' do
+    it 'ã§æ‰€å±ã™ã‚‹ã‚·ãƒ¼ãƒˆãŒå–å¾—ã§ãã‚‹' do
       sheet.cell(:A1).sheet.should equal sheet
     end
   end
 
   describe '#book' do
-    it '‚ÅŠ‘®‚·‚éƒV[ƒg‚ªæ“¾‚Å‚«‚é' do
+    it 'ã§æ‰€å±ã™ã‚‹ã‚·ãƒ¼ãƒˆãŒå–å¾—ã§ãã‚‹' do
       sheet.cell(:A1).book.should equal book
     end
   end
 
   describe '#value' do
-    it '‚ª”’l‚ğæ“¾‚Å‚«‚éB' do
+    it 'ãŒæ•°å€¤ã‚’å–å¾—ã§ãã‚‹ã€‚' do
       sheet.cell(:A1).value.should == 1.1
       sheet.cell(:B1).value.should == 2.2
     end
-    it '‚ªtrue‚ğæ“¾‚Å‚«‚éB' do
+    it 'ãŒtrueã‚’å–å¾—ã§ãã‚‹ã€‚' do
       sheet.cell(:A2).value.should == true
     end
-    it '‚ªfalse‚ğæ“¾‚Å‚«‚éB' do
+    it 'ãŒfalseã‚’å–å¾—ã§ãã‚‹ã€‚' do
       sheet.cell(:B2).value.should == false
     end
-    it '‚ª•¶š—ñ‚ğæ“¾‚Å‚«‚éB' do
-      sheet.cell(:A3).value.should == '‚ ‚¢‚¤‚¦‚¨'
-      sheet.cell(:B3).value.should == '‚©‚«‚­‚¯‚±'
+    it 'ãŒæ–‡å­—åˆ—ã‚’å–å¾—ã§ãã‚‹ã€‚' do
+      sheet.cell(:A3).value.should == 'ã‚ã„ã†ãˆãŠ'
+      sheet.cell(:B3).value.should == 'ã‹ããã‘ã“'
     end
   end
 
   describe '#ref' do
-    it '‚ªƒZƒ‹QÆ‚Ì–¼Ì‚ğæ“¾‚Å‚«‚éB' do
+    it 'ãŒã‚»ãƒ«å‚ç…§ã®åç§°ã‚’å–å¾—ã§ãã‚‹ã€‚' do
       sheet.cell(:A1).ref.should == 'A1'
       sheet.cell(:B1).ref.should == 'B1'
     end
