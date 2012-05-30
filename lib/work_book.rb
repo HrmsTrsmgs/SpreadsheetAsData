@@ -1,5 +1,4 @@
 # coding: UTF-8
-require 'zip/zipfilesystem'
 require 'rexml/document'
 
 require 'work_sheet'
