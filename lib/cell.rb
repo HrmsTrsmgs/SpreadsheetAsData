@@ -50,6 +50,9 @@ class Cell
       when true, false
         @xml.elements['//v'].text = value ? 1 : 0
         @xml.attributes['t'] = 'b'
+      else
+        @xml.elements['//v'].text = book.set_shared_string(value)
+        @xml.attributes['t'] = 's'
     end
   end
 

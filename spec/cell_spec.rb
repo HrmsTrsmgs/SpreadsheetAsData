@@ -57,6 +57,11 @@ describe Cell do
       sheet.cell(:A1).value = false
       sheet.cell(:A1).value.should == false
     end
+    
+    it 'が文字列を設定できる。' do
+      sheet.cell(:A1).value = 'abcde'
+      sheet.cell(:A1).value.should == 'abcde'
+    end
   end
 
   describe '#ref' do
