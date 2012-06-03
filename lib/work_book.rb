@@ -20,7 +20,7 @@ class WorkBook
   def initialize(file_path, encoding)
     @package = Package.new(file_path)
     @encoding = encoding
-    @part = @package.part('/xl/workbook.xml')
+    @part = @package.part('xl/workbook.xml')
     shared_strings_xml = @part.relation(SHARED_STRING_ID)
     @shared_strings = 
       shared_strings_xml ? shared_strings_xml.xml_document.elements.to_a('//t').map {|t| t.text } : []
@@ -49,7 +49,7 @@ class WorkBook
   def sheets
     @sheets ||=
       @part.xml_document.elements.to_a('//sheet')
-        .map{ |tag| WorkSheet.new(tag, @part.relation(tag).xml_document, self)}
+        .map{ |tag| WorkSheet.new(tag, @part.relation(tag).xml_document, self, @part.relation(tag))}
   end
 
   # 名前を指定し、ブックが持つシートを取得します。

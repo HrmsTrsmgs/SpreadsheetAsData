@@ -7,14 +7,23 @@ class PackagePart
 
   def initialize(package, part_uri)
     @package = package
+    package.initialized_parts << self
     @part_uri = part_uri
     @cache = {}
+  end
+  
+  def changed?
+    @changed
+  end
+
+  def change
+    @changed = true
   end
 
   # ブック情報を記述してあるWorkBook.xmlドキュメントを取得します。
   def xml_document
     #workbook.xmlのパスは変更するとExcelでも起動できなくなるため、変更には対応しません。
-    @xml_document ||= @package.xml_document(@part_uri)
+    @xml_document ||= @package.xml_document(self)
   end
 
   def relation(key)
@@ -33,6 +42,6 @@ class PackagePart
 
 private
   def relation_tags
-    @relation_tags ||= @package.relation_tags(@part_uri)
+    @relation_tags ||= @package.relation_tags(self)
   end
 end

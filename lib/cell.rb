@@ -7,13 +7,14 @@ class Cell
   attr_reader :sheet
 
   # インスタンスを初期化します。
-  def initialize(xml, sheet)
+  def initialize(xml, sheet, part)
     if xml =~ /[A-Z]+[0-9]+/
       @ref = xml
     else
       @xml = xml
     end
     @sheet = sheet
+    @part = part
   end
 
   def book
@@ -22,9 +23,7 @@ class Cell
 
   def value
     @value ||=
-      if not @xml
-        BlankValue.new
-      else
+      if @xml
         case @xml.attributes['t']
         when nil
           @xml.elements[1].text.to_f
@@ -33,7 +32,15 @@ class Cell
         when 's'
           book.shared_strings[@xml.elements[1].text.to_i].encode(book.encoding)
         end
+      else
+        BlankValue.new
       end
+  end
+
+  def value=(value)
+    @part.change
+    @value = value
+    @xml.elements['//v'].text = value.to_s
   end
 
   def ref

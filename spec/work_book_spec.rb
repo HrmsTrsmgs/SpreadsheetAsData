@@ -6,14 +6,14 @@ require 'spec_helper'
 
 describe WorkBook do
 
-  BOOK_OPEND_EACH_TIME = '逐次開かれるBook'
+  BOOK_OPEND_EACH_TIME = test_file('逐次開かれるBook')
+  WRITTEN_BOOK = test_file('書き込み')
 
   subject{WorkBook.open(test_file('Book1'))}
   let(:book2){WorkBook.open(test_file('Book2'))}
   let(:anomaly){WorkBook.open(test_file('変則リレーション'))}
   let(:utf_8){WorkBook.open(test_file('UTF-8で開くBook'), 'UTF-8')}
   let(:euc_jp){WorkBook.open(test_file('EUC-JPで開くBook'), 'EUC-JP')}
-
   after(:all) do
     subject.close
     book2.close
@@ -28,7 +28,7 @@ describe WorkBook do
     end
 
     it 'のブロック引数はWorkBookである。' do
-      WorkBook.open(test_file(BOOK_OPEND_EACH_TIME)) do |book|
+      WorkBook.open(BOOK_OPEND_EACH_TIME) do |book|
         book.class.should == WorkBook
       end
     end
@@ -60,13 +60,25 @@ describe WorkBook do
     end
   end
 
+  describe '#close' do
+    it 'の時に変更は保存されている。' do
+      book = WorkBook.open(WRITTEN_BOOK) do |book|
+        book.Sheet1.cell(:A1).value = 999
+      end
+      
+      WorkBook.open(WRITTEN_BOOK) do |book|
+        book.Sheet1.A1.should == 999
+      end
+    end
+  end
+
   describe '#file_path' do
     it 'で指定したパス取得できる。' do
       subject.file_path.should == test_file('Book1')
       book2.file_path.should == test_file('Book2')
     end
     it 'が、open時にスラッシュ区切りでパスを指定した場合にも、指定した通りにパス取得できる。' do
-      test_file_slash = test_file(BOOK_OPEND_EACH_TIME).gsub('\\', '/')
+      test_file_slash = BOOK_OPEND_EACH_TIME.gsub('\\', '/')
       WorkBook.open(test_file_slash) do |book|
         book.file_path.should == test_file_slash
       end

@@ -10,10 +10,11 @@ class WorkSheet
   attr_reader :book
 
   # インスタンスを初期化します。
-  def initialize(tag, doc, book)
+  def initialize(tag, doc, book, doc_part)
     @tag = tag
     @xml = doc
     @book = book
+    @doc_part = doc_part
     @cell_hash = {}
   end
 
@@ -29,9 +30,9 @@ class WorkSheet
   def cell(ref)
     @cell_hash[ref] ||=
       if cell_xml(ref)
-        @cell_hash[ref] = Cell.new(cell_xml(ref), self)
+        @cell_hash[ref] = Cell.new(cell_xml(ref), self, @doc_part)
       elsif ref =~ /[A-Z]+\d+/
-        @cell_hash[ref] = Cell.new(ref, self)
+        @cell_hash[ref] = Cell.new(ref, self, @doc_part)
       end
   end
 

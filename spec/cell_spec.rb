@@ -27,15 +27,23 @@ describe Cell do
       sheet.cell(:A1).value.should == 1.1
       sheet.cell(:B1).value.should == 2.2
     end
+
     it 'がtrueを取得できる。' do
       sheet.cell(:A2).value.should == true
     end
+
     it 'がfalseを取得できる。' do
       sheet.cell(:B2).value.should == false
     end
+
     it 'が文字列を取得できる。' do
       sheet.cell(:A3).value.should == 'あいうえお'
       sheet.cell(:B3).value.should == 'かきくけこ'
+    end
+
+    it 'が数値を設定できる。' do
+      sheet.cell(:A1).value = 3.3
+      sheet.cell(:A1).value.should == 3.3
     end
   end
 
