@@ -40,10 +40,22 @@ describe Cell do
       sheet.cell(:A3).value.should == 'あいうえお'
       sheet.cell(:B3).value.should == 'かきくけこ'
     end
+  end
 
+  describe '#value=' do
     it 'が数値を設定できる。' do
       sheet.cell(:A1).value = 3.3
       sheet.cell(:A1).value.should == 3.3
+    end
+
+    it 'がtrueを設定できる。' do
+      sheet.cell(:A1).value = true
+      sheet.cell(:A1).value.should == true
+    end
+
+    it 'がfalseを設定できる。' do
+      sheet.cell(:A1).value = false
+      sheet.cell(:A1).value.should == false
     end
   end
 

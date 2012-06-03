@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe WorkBook do
+describe WorkBook, 'がShift_JISのコードから開かれた場合' do
   subject{WorkBook.open(test_file('Book1'))}
 
   def test_file(file_name)

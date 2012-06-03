@@ -22,25 +22,35 @@ class Cell
   end
 
   def value
-    @value ||=
-      if @xml
-        case @xml.attributes['t']
-        when nil
-          @xml.elements[1].text.to_f
-        when 'b'
-          @xml.elements[1].text != '0'
-        when 's'
-          book.shared_strings[@xml.elements[1].text.to_i].encode(book.encoding)
+    if @value.nil?
+      @value =
+        if @xml
+          case @xml.attributes['t']
+          when nil
+            @xml.elements[1].text.to_f
+          when 'b'
+            @xml.elements[1].text != '0'
+          when 's'
+            book.shared_strings[@xml.elements[1].text.to_i].encode(book.encoding)
+          end
+        else
+          BlankValue.new
         end
-      else
-        BlankValue.new
-      end
+    end
+    @value
   end
 
   def value=(value)
     @part.change
     @value = value
-    @xml.elements['//v'].text = value.to_s
+    case value
+      when Numeric
+        @xml.elements['//v'].text = value.to_s
+        @xml.attributes['t'] = nil
+      when true, false
+        @xml.elements['//v'].text = value ? 1 : 0
+        @xml.attributes['t'] = 'b'
+    end
   end
 
   def ref
