@@ -51,7 +51,7 @@ class Cell
         @xml.elements['//v'].text = value ? 1 : 0
         @xml.attributes['t'] = 'b'
       else
-        @xml.elements['//v'].text = book.set_shared_string(value)
+        @xml.elements['//v'].text = book.shared_strings << value
         @xml.attributes['t'] = 's'
     end
   end

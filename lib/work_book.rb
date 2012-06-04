@@ -3,6 +3,7 @@ require 'rexml/document'
 
 require 'work_sheet'
 require 'package'
+require 'shared_strings'
 
 # Excelブックを扱うクラスです。
 class WorkBook
@@ -21,23 +22,7 @@ class WorkBook
     @package = Package.new(file_path)
     @encoding = encoding
     @part = @package.part('xl/workbook.xml')
-    shared_strings_xml = @part.relation(SHARED_STRING_ID)
-    @shared_strings = 
-      shared_strings_xml ? shared_strings_xml.xml_document.elements.to_a('//t').map {|t| t.text } : []
-  end
-  
-  def set_shared_string(string)
-    t = REXML::Element.new('t')
-    t.text = string
-    phonetic = REXML::Element.new('phoneticPr')
-    phonetic.attributes['fontId'] = 1
-    si = REXML::Element.new('si')
-    si.add_element(t)
-    si.add_element(phonetic)
-    shared_strings_xml = @part.relation(SHARED_STRING_ID)
-    shared_strings_xml.xml_document.elements['//sst'].add_element(si)
-    shared_strings_xml.change
-    shared_strings_xml.xml_document.elements['//sst'].elements.size - 1
+    @shared_strings = SharedStrings.new(@part.relation(SHARED_STRING_ID))
   end
 
   # Excelファイルのパスを指定し、開きます。<br/>
