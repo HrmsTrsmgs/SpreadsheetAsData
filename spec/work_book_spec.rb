@@ -14,7 +14,8 @@ describe WorkBook do
   let(:anomaly){WorkBook.open(test_file('変則リレーション'))}
   let(:utf_8){WorkBook.open(test_file('UTF-8で開くBook'), 'UTF-8')}
   let(:euc_jp){WorkBook.open(test_file('EUC-JPで開くBook'), 'EUC-JP')}
-  after(:all) do
+  
+  after do
     subject.close
     book2.close
     anomaly.close
@@ -22,7 +23,7 @@ describe WorkBook do
     euc_jp.close
   end
 
-  describe '#open' do
+  describe '::open' do
     it 'の戻り値はWorkBookである。' do
       subject.class.should == WorkBook
     end

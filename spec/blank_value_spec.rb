@@ -7,7 +7,7 @@ describe BlankValue do
   let(:book) { WorkBook.open test_file('Book1') }
   let(:sheet) { book.Sheet1 } 
 
-  after(:all) do
+  after do
     book.close
   end
 

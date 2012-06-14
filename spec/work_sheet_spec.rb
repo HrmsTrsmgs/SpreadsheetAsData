@@ -8,7 +8,7 @@ describe WorkSheet do
   let(:sheet2) { book.Sheet2 }
   let(:data) { book.いろいろなデータ } 
 
-  after(:all) do
+  after do
     book.close
   end
 

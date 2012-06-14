@@ -5,26 +5,31 @@ require 'spec_helper'
 describe Cell do
   let(:book) { WorkBook.open(test_file('Book1')) }
   let(:sheet) { book.いろいろなデータ }
+  subject { sheet.cell(:A1) }
+  let(:written_book) { WorkBook.open(test_file('書き込み')) }
+  let(:written_sheet) { written_book.いろいろなデータ }
+  let(:written_cell) { written_sheet.cell(:A1) }
 
-  after(:all) do
+  after do
     book.close
+    written_book.close
   end
 
   describe '#sheet' do
     it 'で所属するシートが取得できる' do
-      sheet.cell(:A1).sheet.should equal sheet
+      subject.sheet.should equal sheet
     end
   end
 
   describe '#book' do
     it 'で所属するシートが取得できる' do
-      sheet.cell(:A1).book.should equal book
+      subject.book.should equal book
     end
   end
 
   describe '#value' do
     it 'が数値を取得できる。' do
-      sheet.cell(:A1).value.should == 1.1
+      subject.value.should == 1.1
       sheet.cell(:B1).value.should == 2.2
     end
 
@@ -44,29 +49,29 @@ describe Cell do
 
   describe '#value=' do
     it 'が数値を設定できる。' do
-      sheet.cell(:A1).value = 3.3
-      sheet.cell(:A1).value.should == 3.3
+      written_cell.value = 3.3
+      written_cell.value.should == 3.3
     end
 
     it 'がtrueを設定できる。' do
-      sheet.cell(:A1).value = true
-      sheet.cell(:A1).value.should == true
+      written_cell.value = true
+      written_cell.value.should == true
     end
 
     it 'がfalseを設定できる。' do
-      sheet.cell(:A1).value = false
-      sheet.cell(:A1).value.should == false
+      written_cell.value = false
+      written_cell.value.should == false
     end
     
     it 'が文字列を設定できる。' do
-      sheet.cell(:A1).value = 'abcde'
-      sheet.cell(:A1).value.should == 'abcde'
+      written_cell.value = 'abcde'
+      written_cell.value.should == 'abcde'
     end
   end
 
   describe '#ref' do
     it 'がセル参照の名称を取得できる。' do
-      sheet.cell(:A1).ref.should == 'A1'
+      subject.ref.should == 'A1'
       sheet.cell(:B1).ref.should == 'B1'
     end
   end

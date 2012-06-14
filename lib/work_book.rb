@@ -9,20 +9,15 @@ require 'shared_strings'
 class WorkBook
 
   SHARED_STRING_ID = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings'
+  DOCUMENT_ID = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument'
 
-  attr_reader :encoding, :shared_strings
-
-  # 開いたExcelファイルのパスです。
-  def file_path
-    @package.file_path
-  end
+  attr_reader :encoding
 
   # 新しいインスタンスの初期化を行います。
   def initialize(file_path, encoding)
     @package = Package.new(file_path)
     @encoding = encoding
-    @part = @package.part('xl/workbook.xml')
-    @shared_strings = SharedStrings.new(@part.relation(SHARED_STRING_ID))
+    @part = @package.root.relation(DOCUMENT_ID)
   end
 
   # Excelファイルのパスを指定し、開きます。<br/>
@@ -43,6 +38,15 @@ class WorkBook
   def close
     @package.close
   end
+  
+  # 開いたExcelファイルのパスです。
+  def file_path
+    @package.file_path
+  end
+  
+  def shared_strings
+    @shared_strings ||= SharedStrings.new(@part.relation(SHARED_STRING_ID))
+  end
 
   # ブックが持つシートを取得します。
   def sheets
@@ -57,7 +61,7 @@ class WorkBook
   end
 
   # 指定したメソッド名が定義されていない場合に呼び出されます。
-  def method_missing(method_name)
+  def method_missing(method_name, *args)
     self[method_name] || super
   end
 end

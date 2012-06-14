@@ -9,7 +9,7 @@ describe WorkBook, 'がShift_JISのコードから開かれた場合' do
     "./spec/test_data/#{file_name}.xlsx"
   end
 
-  after(:all) do
+  after do
     subject.close
   end
 
