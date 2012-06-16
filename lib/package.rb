@@ -40,10 +40,8 @@ class Package
   end
 
   def xml_document(part)
-    begin
-      @archive.fopen(part.part_uri){|file| REXML::Document.new(file.read) }
-    rescue REXML::ParseException
-    end
+    @archive.fopen(part.part_uri){|file| REXML::Document.new(file.read) }
+  rescue REXML::ParseException
   end
 
   def relation_tags(part)

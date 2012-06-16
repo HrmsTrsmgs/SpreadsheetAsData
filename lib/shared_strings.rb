@@ -9,17 +9,36 @@ class SharedStrings
   end
   
   def <<(string)
-    @part.xml_document.elements['//sst'].add_element(new_string_tag(string))
-    @part.change
-    @part.xml_document.elements['//sst'].elements.size - 1
+    strings.find_index(string) ||
+      begin
+        sst_tag.add_element(new_t(string))
+        @part.change
+        size - 1
+      end
   end
   
   def [](index)
-    @part.xml_document.elements.to_a('//t').map {|t| t.text }[index]
+    strings[index]
+  end
+  
+  def size
+    sst_tag.elements.size
   end
   
 private
-  def new_string_tag(string)
+  def sst_tag
+    @part.xml_document.elements['//sst']
+  end
+  
+  def t_tags
+    @part.xml_document.get_elements('//t')
+  end
+  
+  def strings
+    t_tags.map {|t| t.text }
+  end
+  
+  def new_t(string)
     t = REXML::Element.new('t')
     t.text = string
     phonetic = REXML::Element.new('phoneticPr')
