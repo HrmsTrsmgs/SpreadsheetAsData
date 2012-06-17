@@ -7,20 +7,15 @@ require 'spec_helper'
 describe WorkBook do
 
   BOOK_OPEND_EACH_TIME = test_file('逐次開かれるBook')
-  WRITTEN_BOOK = test_file('書き込み_WorkBook')
 
-  subject{WorkBook.open(test_file('Book1'))}
-  let(:book2){WorkBook.open(test_file('Book2'))}
-  let(:anomaly){WorkBook.open(test_file('変則リレーション'))}
-  let(:utf_8){WorkBook.open(test_file('UTF-8で開くBook'), 'UTF-8')}
-  let(:euc_jp){WorkBook.open(test_file('EUC-JPで開くBook'), 'EUC-JP')}
-  
-  before do
-    FileUtils.cp(test_file('Book1'), test_file('書き込み_WorkBook'))
-  end
+  subject{ TestFile.book1 }
+  let(:book2){ TestFile.book2 }
+  let(:anomaly){ TestFile.変則リレーション }
+  let(:utf_8){WorkBook.open(TestFile.utf_8で開くbook_path, 'UTF-8')}
+  let(:euc_jp){WorkBook.open(TestFile.euc_jpで開くbook_path, 'EUC-JP')}
   
   after do
-    FileUtils.rm(test_file('書き込み_WorkBook'))
+    TestFile.close
   end
   
   after do
@@ -71,11 +66,11 @@ describe WorkBook do
 
   describe '#close' do
     it 'の時に変更は保存されている。' do
-      book = WorkBook.open(WRITTEN_BOOK) do |book|
+      book = WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.cell(:A1).value = 999
       end
       
-      WorkBook.open(WRITTEN_BOOK) do |book|
+      WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.A1.should == 999
       end
     end

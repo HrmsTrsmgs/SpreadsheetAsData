@@ -66,7 +66,6 @@ class Cell
         @xml.elements['//v'].text = book.shared_strings << value
         @xml.attributes['t'] = 's'
     end
-    p sheet.xml.to_s
   end
 
   def ref

@@ -4,10 +4,11 @@ require 'spec_helper'
 require 'package'
 
 describe Package do
-  subject { Package.open(test_file('Book1')) }
+  subject { Package.open(TestFile.book1_path) }
   
   after do
     subject.close
+    TestFile.close
   end
   
   describe '::open' do
@@ -15,6 +16,9 @@ describe Package do
       Package.open(test_file('Book1')) do |package|
         package.part('xl/workbook.xml').xml_document.should_not be_nil
       end
+    end
+    
+    it 'はファイル更新中にロックをかける' do
     end
   end
   

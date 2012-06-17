@@ -4,11 +4,11 @@ require 'spec_helper'
 
 describe BlankValue do
   subject { sheet.B1 }
-  let(:book) { WorkBook.open test_file('Book1') }
+  let(:book) { TestFile.book1 }
   let(:sheet) { book.Sheet1 } 
 
   after do
-    book.close
+    TestFile.close
   end
 
   describe '#==' do

@@ -4,15 +4,16 @@ require 'spec_helper'
 require 'package'
 
 describe PackagePart do
-  let(:package){ Package.open(test_file('Book1')) }
+  let(:package){ Package.open(TestFile.book1_path) }
   subject { package.part('xl/workbook.xml') }
   let(:printer_settings1){ package.part('xl/printerSettings/printerSettings1.bin')}
-  let(:written){ Package.open(test_file('書き込み')) }
+  let(:written){ Package.open(TestFile.book1_copy_path) }
   let(:written_part){ written.part('xl/workbook.xml') }
   
   after do
     package.close
     written.close
+    TestFile.close
   end
   
   describe '#part_uri' do

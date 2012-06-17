@@ -5,16 +5,11 @@ require 'spec_helper'
 require 'work_book'
 
 describe SharedStrings do
-  let(:book) { WorkBook.open(test_file('書き込み_SharedStrings')) }
+  let(:book) { TestFile.book1_copy }
   subject { book.shared_strings }
-
-  before do
-   FileUtils.cp(test_file('Book1'), test_file('書き込み_SharedStrings'))
-  end
   
   after do
-    book.close
-    FileUtils.rm(test_file('書き込み_SharedStrings'))
+    TestFile.close
   end
 
   describe '#size' do

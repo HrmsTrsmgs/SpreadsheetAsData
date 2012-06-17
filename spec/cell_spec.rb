@@ -3,16 +3,16 @@
 require 'spec_helper'
 
 describe Cell do
-  let(:book) { WorkBook.open(test_file('Book1')) }
+  let(:book) { TestFile.book1 }
   let(:sheet) { book.いろいろなデータ }
   subject { sheet.cell(:A1) }
-  let(:written_book) { WorkBook.open(test_file('書き込み')) }
+  
+  let(:written_book) { TestFile.book1_copy }
   let(:written_sheet) { written_book.いろいろなデータ }
   let(:written_cell) { written_sheet.cell(:A1) }
 
   after do
-    book.close
-    written_book.close
+    TestFile.close
   end
 
   describe '#sheet' do
