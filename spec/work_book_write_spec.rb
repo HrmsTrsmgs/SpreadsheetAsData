@@ -15,25 +15,27 @@ describe WorkBook, 'を保存する時' do
   after do
     FileUtils.rm(test_file('書き込み_WorkBook'))
   end
-  
-  it 'にcell.valueを使った書き込みは保存されています。' do
-    book = WorkBook.open(WRITTEN_BOOK) do |book|
-      book.Sheet1.cell(:A1).value = 999
+  context 'に保存方法として' do
+    it 'cell.valueを使った書き込みは保存されています。' do
+      book = WorkBook.open(WRITTEN_BOOK) do |book|
+        book.Sheet1.cell(:A1).value = 999
+      end
+      
+      WorkBook.open(WRITTEN_BOOK) do |book|
+        book.Sheet1.A1.should == 999
+      end
     end
     
-    WorkBook.open(WRITTEN_BOOK) do |book|
-      book.Sheet1.A1.should == 999
+    it 'セル名を使った書き込みは保存されています。' do
+      book = WorkBook.open(WRITTEN_BOOK) do |book|
+        book.Sheet1.A1 = 999
+      end
+      
+      WorkBook.open(WRITTEN_BOOK) do |book|
+        book.Sheet1.A1.should == 999
+      end
     end
-  end
   
-  it 'にセル名を使った書き込みは保存されています。' do
-    book = WorkBook.open(WRITTEN_BOOK) do |book|
-      book.Sheet1.A1 = 999
-    end
-    
-    WorkBook.open(WRITTEN_BOOK) do |book|
-      book.Sheet1.A1.should == 999
-    end
   end
 
   it 'に整数値の書き込みは保存されています。' do

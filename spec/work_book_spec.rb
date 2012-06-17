@@ -7,13 +7,21 @@ require 'spec_helper'
 describe WorkBook do
 
   BOOK_OPEND_EACH_TIME = test_file('逐次開かれるBook')
-  WRITTEN_BOOK = test_file('書き込み')
+  WRITTEN_BOOK = test_file('書き込み_WorkBook')
 
   subject{WorkBook.open(test_file('Book1'))}
   let(:book2){WorkBook.open(test_file('Book2'))}
   let(:anomaly){WorkBook.open(test_file('変則リレーション'))}
   let(:utf_8){WorkBook.open(test_file('UTF-8で開くBook'), 'UTF-8')}
   let(:euc_jp){WorkBook.open(test_file('EUC-JPで開くBook'), 'EUC-JP')}
+  
+  before do
+    FileUtils.cp(test_file('Book1'), test_file('書き込み_WorkBook'))
+  end
+  
+  after do
+    FileUtils.rm(test_file('書き込み_WorkBook'))
+  end
   
   after do
     subject.close
