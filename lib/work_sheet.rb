@@ -7,7 +7,7 @@ require 'blank_value'
 # Excelのシートです。
 class WorkSheet
 
-  attr_reader :book
+  attr_reader :book, :xml
 
   # インスタンスを初期化します。
   def initialize(tag, doc, book, doc_part)

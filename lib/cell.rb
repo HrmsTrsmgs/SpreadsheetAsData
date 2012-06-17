@@ -7,11 +7,11 @@ class Cell
   attr_reader :sheet
 
   # インスタンスを初期化します。
-  def initialize(xml, sheet, part)
-    if xml =~ /[A-Z]+[0-9]+/
-      @ref = xml
+  def initialize(xml_or_ref, sheet, part)
+    if xml_or_ref =~ /[A-Z]+[0-9]+/
+      @ref = xml_or_ref
     else
-      @xml = xml
+      @xml = xml_or_ref
     end
     @sheet = sheet
     @part = part
@@ -43,6 +43,18 @@ class Cell
   def value=(value)
     @part.change
     @value = value
+    if not @xml
+      v = REXML::Element.new('v')
+      v.text = value.to_s
+      c = REXML::Element.new('c')
+      c.attributes['r'] = @ref
+      c.add_element(v)
+      @ref =~ /\d+/
+      row = sheet.xml.get_elements('//row').find {|row| row.attributes['r'] == $& }
+      row.add_element(c)
+      @xml = sheet.xml.elements.to_a('//c').find{|c| c.attributes['r'] == @ref.to_s}
+    end
+    
     case value
       when Numeric
         @xml.elements['//v'].text = value.to_s
@@ -54,6 +66,7 @@ class Cell
         @xml.elements['//v'].text = book.shared_strings << value
         @xml.attributes['t'] = 's'
     end
+    p sheet.xml.to_s
   end
 
   def ref

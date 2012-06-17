@@ -35,46 +35,57 @@ describe WorkBook, 'を保存する時' do
         book.Sheet1.A1.should == 999
       end
     end
-  
   end
 
-  it 'に整数値の書き込みは保存されています。' do
-    book = WorkBook.open(WRITTEN_BOOK) do |book|
-      book.Sheet1.A1 = 999
+  context 'に保存するデータとして' do
+    it '整数値の書き込みは保存されています。' do
+      book = WorkBook.open(WRITTEN_BOOK) do |book|
+        book.Sheet1.A1 = 999
+      end
+      
+      WorkBook.open(WRITTEN_BOOK) do |book|
+        book.Sheet1.A1.should == 999
+      end
     end
     
-    WorkBook.open(WRITTEN_BOOK) do |book|
-      book.Sheet1.A1.should == 999
+    it 'trueの書き込みは保存されています。' do
+      book = WorkBook.open(WRITTEN_BOOK) do |book|
+        book.Sheet1.A1 = true
+      end
+      
+      WorkBook.open(WRITTEN_BOOK) do |book|
+        book.Sheet1.A1.should == true
+      end
+    end
+    
+    it 'falseの書き込みは保存されています。' do
+      book = WorkBook.open(WRITTEN_BOOK) do |book|
+        book.Sheet1.A1 = false
+      end
+      
+      WorkBook.open(WRITTEN_BOOK) do |book|
+        book.Sheet1.A1.should == false
+      end
+    end
+    
+    it '文字列の書き込みは保存されています。' do
+      book = WorkBook.open(WRITTEN_BOOK) do |book|
+        book.Sheet1.A1 = 'abcde'
+      end
+      
+      WorkBook.open(WRITTEN_BOOK) do |book|
+        book.Sheet1.A1.should == 'abcde'
+      end
     end
   end
   
-  it 'にtrueの書き込みは保存されています。' do
+  it 'の空白セルに書き込みがされています。' do
     book = WorkBook.open(WRITTEN_BOOK) do |book|
-      book.Sheet1.A1 = true
+      book.Sheet1.B1 = 999
     end
     
     WorkBook.open(WRITTEN_BOOK) do |book|
-      book.Sheet1.A1.should == true
-    end
-  end
-  
-  it 'にfalseの書き込みは保存されています。' do
-    book = WorkBook.open(WRITTEN_BOOK) do |book|
-      book.Sheet1.A1 = false
-    end
-    
-    WorkBook.open(WRITTEN_BOOK) do |book|
-      book.Sheet1.A1.should == false
-    end
-  end
-  
-  it 'に文字列の書き込みは保存されています。' do
-    book = WorkBook.open(WRITTEN_BOOK) do |book|
-      book.Sheet1.A1 = 'abcde'
-    end
-    
-    WorkBook.open(WRITTEN_BOOK) do |book|
-      book.Sheet1.A1.should == 'abcde'
+      book.Sheet1.B1.should == 999
     end
   end
 end
