@@ -37,11 +37,15 @@ class WorkSheet
   end
 
   def method_missing(method_name, *args)
-    value = self.cell_value(method_name)
-    if value.nil?
-      super
+    if method_name =~ /.*(?=\=$)/
+      cell($&).value = args.first
     else
-      value
+      value = self.cell_value(method_name)
+      if value.nil?
+        super
+      else
+        value
+      end
     end
   end
 
