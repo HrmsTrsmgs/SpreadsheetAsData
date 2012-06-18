@@ -9,8 +9,8 @@ describe WorkBook do
   subject{ TestFile.book1 }
   let(:book2){ TestFile.book2 }
   let(:anomaly){ TestFile.変則リレーション }
-  let(:utf_8){WorkBook.open(TestFile.utf_8で開くbook_path, 'UTF-8')}
-  let(:euc_jp){WorkBook.open(TestFile.euc_jpで開くbook_path, 'EUC-JP')}
+  let(:utf_8){WorkBook.open(TestFile.book1_path, 'UTF-8')}
+  let(:euc_jp){WorkBook.open(TestFile.book1_path, 'EUC-JP')}
   
   after do
     TestFile.close
