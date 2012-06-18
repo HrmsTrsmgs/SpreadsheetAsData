@@ -20,7 +20,13 @@ class Package
   end
 
   def self.open(file_path)
-    Package.new(file_path)
+    if block_given?
+      package = Package.new(file_path)
+      yield package
+      package.close
+    else
+      Package.new(file_path)
+    end
   end
 
   # ファイルの操作を終了し、ファイルを開放します。

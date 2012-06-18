@@ -13,12 +13,15 @@ describe Package do
   
   describe '::open' do
     it 'はブロック引数をとります。' do
-      Package.open(test_file('Book1')) do |package|
+      Package.open(TestFile.book1_path) do |package|
         package.part('xl/workbook.xml').xml_document.should_not be_nil
       end
     end
     
-    it 'はファイル更新中にロックをかけます。' do
+    it 'は終了時にファイルを開放します。' do
+      Package.open(TestFile.book1_copy_path) do |package|
+      end
+      File.delete(TestFile.book1_copy_path)
     end
   end
   
