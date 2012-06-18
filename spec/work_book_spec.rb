@@ -6,8 +6,6 @@ require 'spec_helper'
 
 describe WorkBook do
 
-  BOOK_OPEND_EACH_TIME = test_file('逐次開かれるBook')
-
   subject{ TestFile.book1 }
   let(:book2){ TestFile.book2 }
   let(:anomaly){ TestFile.変則リレーション }
@@ -17,55 +15,47 @@ describe WorkBook do
   after do
     TestFile.close
   end
-  
-  after do
-    subject.close
-    book2.close
-    anomaly.close
-    utf_8.close
-    euc_jp.close
-  end
 
   describe '::open' do
-    it 'の戻り値はWorkBookである。' do
+    it 'の戻り値はWorkBookです。' do
       subject.class.should == WorkBook
     end
 
-    it 'のブロック引数はWorkBookである。' do
-      WorkBook.open(BOOK_OPEND_EACH_TIME) do |book|
+    it 'のブロック引数はWorkBookです。' do
+      WorkBook.open(TestFile.book1_path) do |book|
         book.class.should == WorkBook
       end
     end
 
     context 'はファイル内のリレーション' do
-      it 'が変則的な場合でも動作する。' do
+      it 'が変則的な場合でも動作します。' do
         anomaly.Sheet1.C3.should == 4
       end
     end
 
-    it 'でエンコードを指定することにより、シート名を取得する文字コードを選択できる。' do
+    it 'でエンコードを指定することにより、シート名を取得する文字コードを選択できます。' do
       utf_8.sheets[2].name.should == 'いろいろなデータ'.encode('UTF-8')
       euc_jp.sheets[2].name.should == 'いろいろなデータ'.encode('EUC-JP')
     end
 
-    it 'でエンコードを指定した時に、シートを選択する文字列のエンコードは制限されない。' do
+    it 'でエンコードを指定した時に、シートを選択する文字列のエンコードは制限されません。' do
       utf_8['いろいろなデータ'].should equal utf_8.sheets[2]
       euc_jp['いろいろなデータ'].should equal euc_jp.sheets[2]
     end
 
-    it 'でエンコードを指定した時に、メソッド呼び出しのエンコードは制限されない。' do
+    it 'でエンコードを指定した時に、メソッド呼び出しのエンコードは制限されません。' do
       utf_8.いろいろなデータ.should equal utf_8.sheets[2]
       euc_jp.いろいろなデータ.should equal euc_jp.sheets[2]
     end
 
-    it 'でエンコードを指定することで、文字列データを取得する文字コードを指定できる。' do
+    it 'でエンコードを指定することで、文字列データを取得する文字コードを指定できます。' do
       utf_8.いろいろなデータ.A3.should == 'あいうえお'.encode('UTF-8')
       euc_jp.いろいろなデータ.A3.should == 'あいうえお'.encode('EUC-JP')
     end
   end
 
   describe '#close' do
-    it 'の時に変更は保存されている。' do
+    it 'の時に変更は保存されています。' do
       book = WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.cell(:A1).value = 999
       end
@@ -77,12 +67,12 @@ describe WorkBook do
   end
 
   describe '#file_path' do
-    it 'で指定したパス取得できる。' do
+    it 'で指定したパス取得できます。' do
       subject.file_path.should == test_file('Book1')
       book2.file_path.should == test_file('Book2')
     end
-    it 'が、open時にスラッシュ区切りでパスを指定した場合にも、指定した通りにパス取得できる。' do
-      test_file_slash = BOOK_OPEND_EACH_TIME.gsub('\\', '/')
+    it 'が、open時にスラッシュ区切りでパスを指定した場合にも、指定した通りにパス取得できます。' do
+      test_file_slash = TestFile.book1_path.gsub('\\', '/')
       WorkBook.open(test_file_slash) do |book|
         book.file_path.should == test_file_slash
       end
@@ -90,32 +80,32 @@ describe WorkBook do
   end
 
   describe '#sheets' do
-    it 'でシートが取得できる。' do
+    it 'でシートが取得できます。' do
       book2.sheets.map(&:name).should == %w[Sheet1 Sheet2]
     end
   end
 
   describe '#[]' do
-    context 'の引数として文字列を指定した時。' do
-      it 'にシートが取得できる' do
+    context 'の引数として文字列を指定した時' do
+      it 'にシートが取得できます。' do
         subject['Sheet1'].should equal subject.sheets[0]
         subject['Sheet2'].should equal subject.sheets[1]
       end
 
-      it 'に存在しない名前を指定された時にはnilを返す。' do
+      it 'に存在しない名前を指定された時にはnilを返します。' do
         subject['Sheet999'].should be_nil
       end
 
-      it 'に同一シートを同一オブジェクトとして扱う。' do
+      it 'に同一シートを同一オブジェクトとして扱います。' do
         subject['Sheet1'].should equal subject['Sheet1']
       end
 
-      it 'に日本語名のシートが取得できる。' do
+      it 'に日本語名のシートが取得できます。' do
         subject['いろいろなデータ'].should equal subject.sheets[2]
       end
     end
     context 'の引数としてシンボルを指定した時' do
-      it 'にシートが取得できる。' do
+      it 'にシートが取得できます。' do
         subject[:Sheet1].should equal subject.sheets[0]
         subject[:Sheet2].should equal subject.sheets[1]
       end
@@ -123,17 +113,91 @@ describe WorkBook do
   end
 
   describe '#シート名' do
-    it 'がシートを取得できる。' do
+    it 'がシートを取得できます。' do
       subject.Sheet1.should equal subject.sheets[0]
       subject.Sheet2.should equal subject.sheets[1]
     end
 
-    it 'は存在しないシート名を指定された時にはNoMethodErrorを返す。' do
+    it 'は存在しないシート名を指定された時にはNoMethodErrorを返します。' do
       ->{subject.Sheet999}.should raise_error NoMethodError
     end
 
-    it 'で日本語名のシートが取得できる' do
+    it 'で日本語名のシートが取得できます。' do
       subject.いろいろなデータ.should equal subject.sheets[2]
+    end
+  end
+  
+  context 'に保存方法として' do
+    it 'cell.valueを使った書き込みは保存されています。' do
+      book = WorkBook.open(TestFile.book1_copy_path) do |book|
+        book.Sheet1.cell(:A1).value = 999
+      end
+      
+      WorkBook.open(TestFile.book1_copy_path) do |book|
+        book.Sheet1.A1.should == 999
+      end
+    end
+    
+    it 'セル名を使った書き込みは保存されています。' do
+      book = WorkBook.open(TestFile.book1_copy_path) do |book|
+        book.Sheet1.A1 = 999
+      end
+      
+      WorkBook.open(TestFile.book1_copy_path) do |book|
+        book.Sheet1.A1.should == 999
+      end
+    end
+  end
+
+  context 'に保存するデータとして' do
+    it '整数値の書き込みは保存されています。' do
+      book = WorkBook.open(TestFile.book1_copy_path) do |book|
+        book.Sheet1.A1 = 999
+      end
+      
+      WorkBook.open(TestFile.book1_copy_path) do |book|
+        book.Sheet1.A1.should == 999
+      end
+    end
+    
+    it 'trueの書き込みは保存されています。' do
+      book = WorkBook.open(TestFile.book1_copy_path) do |book|
+        book.Sheet1.A1 = true
+      end
+      
+      WorkBook.open(TestFile.book1_copy_path) do |book|
+        book.Sheet1.A1.should == true
+      end
+    end
+    
+    it 'falseの書き込みは保存されています。' do
+      book = WorkBook.open(TestFile.book1_copy_path) do |book|
+        book.Sheet1.A1 = false
+      end
+      
+      WorkBook.open(TestFile.book1_copy_path) do |book|
+        book.Sheet1.A1.should == false
+      end
+    end
+    
+    it '文字列の書き込みは保存されています。' do
+      book = WorkBook.open(TestFile.book1_copy_path) do |book|
+        book.Sheet1.A1 = 'abcde'
+      end
+      
+      WorkBook.open(TestFile.book1_copy_path) do |book|
+        book.Sheet1.A1.should == 'abcde'
+      end
+    end
+  end
+  
+  it 'の空白セルに書き込みがされています。' do
+    book = WorkBook.open(TestFile.book1_copy_path) do |book|
+      book.Sheet1.B1 = 999
+    end
+    
+    WorkBook.open(TestFile.book1_copy_path) do |book|
+      book.Sheet1.B1.should == 999
     end
   end
 end

@@ -15,7 +15,7 @@ class TestFile
     basenames = Dir.glob("#{TEST_FILE_DIRECTORY}*.xlsx").map{|file| File.basename(file, '.xlsx') }
     
     basenames.each do |basename|
-      p basename_downcase = basename.downcase.gsub('-', '_')
+      basename_downcase = basename.downcase.gsub('-', '_')
       define_method basename_downcase do
         book = WorkBook.open(send("#{basename_downcase}_path"))
         name = "@#{basename_downcase}"
@@ -52,13 +52,15 @@ class TestFile
           instance_variable_get(book_name).close
           instance_variable_set(book_name, nil)
         end
-        book_name_copy = "@#{basename_downcase}_copy"
-        if instance_variable_get(book_name_copy)
-          instance_variable_get(book_name_copy).close
-          instance_variable_set(book_name_copy, nil)
-          
-          FileUtils.rm(p send("#{basename_downcase}_copy_path"))
-          instance_variable_set("@#{basename_downcase}_copy_path", nil)
+        book_copy_name = "@#{basename_downcase}_copy"
+        if instance_variable_get(book_copy_name)
+          instance_variable_get(book_copy_name).close
+          instance_variable_set(book_copy_name, nil)
+        end
+        book_copy_path_name = "@#{basename_downcase}_copy_path"
+        if instance_variable_get(book_copy_path_name)
+          FileUtils.rm(send("#{basename_downcase}_copy_path"))
+          instance_variable_set(book_copy_path_name, nil)
         end
       end
     end

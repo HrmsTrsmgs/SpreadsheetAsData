@@ -24,7 +24,7 @@ describe SharedStrings do
       subject[1].should == 'かきくけこ'
     end
     
-    it 'は追加した共有文字列を取得できます' do
+    it 'は追加した共有文字列を取得できます。' do
       i = subject << 'さしすせそ'
       subject[i].should == 'さしすせそ'
     end
