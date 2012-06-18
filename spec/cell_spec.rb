@@ -16,61 +16,61 @@ describe Cell do
   end
 
   describe '#sheet' do
-    it 'で所属するシートが取得できる' do
+    it 'で所属するシートが取得できます。' do
       subject.sheet.should equal sheet
     end
   end
 
   describe '#book' do
-    it 'で所属するシートが取得できる' do
+    it 'で所属するシートが取得できます。' do
       subject.book.should equal book
     end
   end
 
   describe '#value' do
-    it 'が数値を取得できる。' do
+    it 'が数値を取得できます。' do
       subject.value.should == 1.1
       sheet.cell(:B1).value.should == 2.2
     end
 
-    it 'がtrueを取得できる。' do
+    it 'がtrueを取得できます。' do
       sheet.cell(:A2).value.should == true
     end
 
-    it 'がfalseを取得できる。' do
+    it 'がfalseを取得できます。' do
       sheet.cell(:B2).value.should == false
     end
 
-    it 'が文字列を取得できる。' do
+    it 'が文字列を取得できます。' do
       sheet.cell(:A3).value.should == 'あいうえお'
       sheet.cell(:B3).value.should == 'かきくけこ'
     end
   end
 
   describe '#value=' do
-    it 'が数値を設定できる。' do
+    it 'が数値を設定できます。' do
       written_cell.value = 3.3
       written_cell.value.should == 3.3
     end
 
-    it 'がtrueを設定できる。' do
+    it 'がtrueを設定できます。' do
       written_cell.value = true
       written_cell.value.should == true
     end
 
-    it 'がfalseを設定できる。' do
+    it 'がfalseを設定できます。' do
       written_cell.value = false
       written_cell.value.should == false
     end
     
-    it 'が文字列を設定できる。' do
+    it 'が文字列を設定できます。' do
       written_cell.value = 'abcde'
       written_cell.value.should == 'abcde'
     end
   end
 
   describe '#ref' do
-    it 'がセル参照の名称を取得できる。' do
+    it 'がセル参照の名称を取得できます。' do
       subject.ref.should == 'A1'
       sheet.cell(:B1).ref.should == 'B1'
     end

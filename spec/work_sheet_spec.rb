@@ -3,67 +3,67 @@
 require 'spec_helper'
 
 describe WorkSheet do
-  let(:book) { WorkBook.open(test_file('Book1')) }
+  let(:book) { TestFile.book1 }
   let(:sheet1) { book.Sheet1 }
   let(:sheet2) { book.Sheet2 }
   let(:data) { book.いろいろなデータ } 
 
   after do
-    book.close
+    TestFile.close
   end
 
   describe '#name' do
-    it 'がシート名が取得する。' do
+    it 'がシート名となります。' do
       sheet1.name.should == 'Sheet1'
       sheet2.name.should == 'Sheet2'
     end
 
-    it 'で日本語で指定したシート名が、呼び出した（ファイル名を記述した）コードのエンコードで取得できる。' do
+    it 'で日本語で指定したシート名が、呼び出した（ファイル名を記述した）コードのエンコードで取得できます。' do
       data.name.should == 'いろいろなデータ'
     end
   end
 
   describe '#book' do
-    it 'が所属するブックを取得する。' do
+    it 'が所属するブックを取得します。' do
       sheet1.book.should equal book
     end
   end
 
   describe '#cell_value' do
-    it 'はセルの値を取得する。' do
+    it 'はセルの値を取得します。' do
       sheet1.cell_value('C3').should == 4
     end
 
-    it 'はシンボルを渡しても動作する。' do
+    it 'はシンボルを渡しても動作します。' do
       sheet1.cell_value(:C3).should == 4
     end
 
-    it 'は存在しないセル名を指定した時にnilを返す' do
+    it 'は存在しないセル名を指定した時にnilを返します。' do
       sheet1.cell_value('a1').should be_nil
     end
   end
 
   describe '#cell' do
-    it 'はセルを取得する。' do
+    it 'はセルを取得します。' do
       sheet1.cell('C3').value.should == 4
     end
-    it 'はシンボルを渡しても動作する。' do
+    it 'はシンボルを渡しても動作します。' do
       sheet1.cell(:C3).value.should == 4
     end
 
-    it 'は空のセルも取得する。' do
+    it 'は空のセルも取得します。' do
       sheet1.cell('B1').ref.should == 'B1'
     end
 
-    it 'は存在しないセル名を指定した時にnilを返す' do
+    it 'は存在しないセル名を指定した時にnilを返します。' do
       sheet1.cell('a1').should be_nil
     end
 
-    it 'は同じセルの場合は同じオブジェクトを取得する。' do
+    it 'は同じセルの場合は同じオブジェクトを取得します。' do
       sheet1.cell('C3').should equal sheet1.cell('C3')
     end                                                                                                                                                           
 
-    it 'は空のセルの場合も同じセルの場合は同じオブジェクトを取得する。' do
+    it 'は空のセルの場合も同じセルの場合は同じオブジェクトを取得します。' do
       sheet1.cell('B1').should equal sheet1.cell('B1')
     end                                                                                                                                                           
   end
