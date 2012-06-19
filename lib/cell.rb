@@ -45,7 +45,6 @@ class Cell
     @value = value
     if not @xml
       v = REXML::Element.new('v')
-      v.text = value.to_s
       c = REXML::Element.new('c')
       c.attributes['r'] = @ref
       c.add_element(v)
@@ -54,18 +53,18 @@ class Cell
       row.add_element(c)
       @xml = sheet.xml.elements.to_a('//c').find{|c| c.attributes['r'] == @ref.to_s}
     end
-    
     case value
       when Numeric
-        @xml.elements['//v'].text = value.to_s
+        @xml.elements['.//v'].text = value.to_s
         @xml.attributes['t'] = nil
       when true, false
-        @xml.elements['//v'].text = value ? 1 : 0
+        @xml.elements['.//v'].text = value ? 1 : 0
         @xml.attributes['t'] = 'b'
       else
-        @xml.elements['//v'].text = book.shared_strings << value
+        @xml.elements['.//v'].text = book.shared_strings << value
         @xml.attributes['t'] = 's'
     end
+    
   end
 
   def ref

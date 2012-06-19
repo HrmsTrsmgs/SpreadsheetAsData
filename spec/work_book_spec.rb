@@ -187,11 +187,13 @@ describe WorkBook do
   context 'に保存するデータとして' do
     it '整数値の書き込みは保存されています。' do
       book = WorkBook.open(TestFile.book1_copy_path) do |book|
-        book.Sheet1.A1 = 999
+        book.Sheet1.A1 = 666
+        book.Sheet1.C3 = 999
       end
       
       WorkBook.open(TestFile.book1_copy_path) do |book|
-        book.Sheet1.A1.should == 999
+        book.Sheet1.A1.should == 666
+        book.Sheet1.C3.should == 999
       end
     end
     
@@ -218,10 +220,12 @@ describe WorkBook do
     it '文字列の書き込みは保存されています。' do
       book = WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.A1 = 'abcde'
+        book.Sheet1.C3 = 'fghi'
       end
       
       WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.A1.should == 'abcde'
+        book.Sheet1.C3.should == 'fghi'
       end
     end
   end
