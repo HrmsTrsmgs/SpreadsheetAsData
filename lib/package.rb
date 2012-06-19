@@ -22,8 +22,11 @@ class Package
   def self.open(file_path)
     if block_given?
       package = Package.new(file_path)
-      yield package
-      package.close
+      begin
+        yield package
+      ensure
+        package.close
+      end
     else
       Package.new(file_path)
     end

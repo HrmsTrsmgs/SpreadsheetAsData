@@ -18,10 +18,39 @@ describe Package do
       end
     end
     
-    it 'は終了時にファイルを開放します。' do
+    it 'はブロック終了時にファイルを開放します。' do
       Package.open(TestFile.book1_copy_path) do |package|
       end
-      File.delete(TestFile.book1_copy_path)
+      expect { File.delete(TestFile.book1_copy_path) }.should_not raise_error
+    end
+    
+    it 'はファイルを束縛します。' do
+      package = Package.open(TestFile.book1_copy_path)
+      expect { File.delete(TestFile.book1_copy_path) }.should raise_error Errno::EACCES
+      package.close
+    end
+    
+    it 'はブロック内でファイルを束縛します。' do
+      Package.open(TestFile.book1_copy_path) do |package|
+        expect { File.delete(TestFile.book1_copy_path) }.should raise_error Errno::EACCES
+      end
+    end
+    
+    it 'は例外発生時もブロック終了時にファイルを開放します。' do
+      begin
+        Package.open(TestFile.book1_copy_path) do |package|
+          raise Exception
+        end
+      rescue Exception
+      end
+      expect { File.delete(TestFile.book1_copy_path) }.should_not raise_error
+    end
+  end
+  
+  describe '#close' do
+    it 'はファイルを開放します。' do
+      subject.close
+      expect { File.delete(TestFile.book1_copy_path) }.should_not raise_error
     end
   end
   
