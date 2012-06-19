@@ -27,8 +27,11 @@ class WorkBook
   def self.open(file_path, encoding = file_path.encoding)
       book = WorkBook.new(file_path, encoding)
       if block_given?
-        yield book
-        book.close
+        begin
+          yield book
+        ensure
+          book.close
+        end
       else
         book
       end

@@ -20,15 +20,15 @@ class Package
   end
 
   def self.open(file_path)
+    package = Package.new(file_path)
     if block_given?
-      package = Package.new(file_path)
       begin
         yield package
       ensure
         package.close
       end
     else
-      Package.new(file_path)
+      package
     end
   end
 

@@ -26,6 +26,34 @@ describe WorkBook do
         book.class.should == WorkBook
       end
     end
+    
+    it 'はファイルを束縛します。' do
+      book = WorkBook.open(TestFile.book1_copy_path)
+      expect { File.delete(TestFile.book1_copy_path) }.should raise_error Errno::EACCES
+      book.close
+    end
+    
+    it 'はブロック内でファイルを束縛します。' do
+      WorkBook.open(TestFile.book1_copy_path) do |book|
+        expect { File.delete(TestFile.book1_copy_path) }.should raise_error Errno::EACCES
+      end
+    end
+    
+    it 'はブロック終了時にファイルを開放します。' do
+      WorkBook.open(TestFile.book1_copy_path) do |book|
+      end
+      expect { File.delete(TestFile.book1_copy_path) }.should_not raise_error
+    end
+    
+    it 'は例外発生時もブロック終了時にファイルを開放します。' do
+      begin
+        WorkBook.open(TestFile.book1_copy_path) do |book|
+          raise Exception
+        end
+      rescue Exception
+      end
+      expect { File.delete(TestFile.book1_copy_path) }.should_not raise_error
+    end
 
     context 'はファイル内のリレーション' do
       it 'が変則的な場合でも動作します。' do
@@ -55,6 +83,13 @@ describe WorkBook do
   end
 
   describe '#close' do
+  
+    it 'はファイルを開放します。' do
+      book = WorkBook.open(TestFile.book1_copy_path)
+      book.close
+      expect { File.delete(TestFile.book1_copy_path) }.should_not raise_error
+    end
+  
     it 'の時に変更は保存されています。' do
       book = WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.cell(:A1).value = 999
