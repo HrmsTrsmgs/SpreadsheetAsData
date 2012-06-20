@@ -25,13 +25,14 @@ class Cell
     if @value.nil?
       @value =
         if @xml
+          text = @xml.elements['./v'].text
           case @xml.attributes['t']
           when nil
-            @xml.elements[1].text.to_f
+            text.to_f
           when 'b'
-            @xml.elements[1].text != '0'
+            text != '0'
           when 's'
-            book.shared_strings[@xml.elements[1].text.to_i].encode(book.encoding)
+            book.shared_strings[text.to_i].encode(book.encoding)
           end
         else
           BlankValue.new
@@ -43,25 +44,17 @@ class Cell
   def value=(value)
     @part.change
     @value = value
-    if not @xml
-      v = REXML::Element.new('v')
-      c = REXML::Element.new('c')
-      c.attributes['r'] = @ref
-      c.add_element(v)
-      @ref =~ /\d+/
-      row = sheet.xml.get_elements('//row').find {|row| row.attributes['r'] == $& }
-      row.add_element(c)
-      @xml = sheet.xml.elements.to_a('//c').find{|c| c.attributes['r'] == @ref.to_s}
-    end
+    @xml ||= sheet.add_cell_xml(@ref)
+    v = @xml.elements['./v']
     case value
       when Numeric
-        @xml.elements['.//v'].text = value.to_s
+        v.text = value.to_s
         @xml.attributes['t'] = nil
       when true, false
-        @xml.elements['.//v'].text = value ? 1 : 0
+        v.text = value ? 1 : 0
         @xml.attributes['t'] = 'b'
       else
-        @xml.elements['.//v'].text = book.shared_strings << value
+        v.text = book.shared_strings << value
         @xml.attributes['t'] = 's'
     end
     
