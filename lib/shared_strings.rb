@@ -6,6 +6,7 @@ class SharedStrings
   # インスタンスを初期化します。
   def initialize(part)
     @part = part
+    @document = part.xml_document
   end
   
   def <<(string)
@@ -27,11 +28,11 @@ class SharedStrings
   
 private
   def sst_tag
-    @part.xml_document.elements['//sst']
+    @document.elements['/sst']
   end
   
   def t_tags
-    @part.xml_document.get_elements('//t')
+    sst_tag.get_elements('./si/t')
   end
   
   def strings
