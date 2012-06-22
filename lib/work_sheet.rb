@@ -7,7 +7,7 @@ require 'blank_value'
 # Excelのシートです。
 class WorkSheet
 
-  attr_reader :book, :xml
+  attr_reader :book
 
   # インスタンスを初期化します。
   def initialize(tag, doc, book, tag_in_book)
@@ -34,6 +34,17 @@ class WorkSheet
       elsif ref =~ /[A-Z]+\d+/
         @cell_hash[ref] = Cell.new(ref, self, @tag_in_book)
       end
+  end
+  
+  def add_cell_xml(ref)
+      v = REXML::Element.new('v')
+      c = REXML::Element.new('c')
+      c.attributes['r'] = ref
+      c.add_element(v)
+      ref =~ /\d+/
+      row = @xml.get_elements('//row').find {|row| row.attributes['r'] == $& }
+      row.add_element(c)
+      @xml.get_elements('//c').find{|c| c.attributes['r'] == ref.to_s}
   end
 
   def method_missing(method_name, *args)

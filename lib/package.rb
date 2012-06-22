@@ -49,11 +49,16 @@ class Package
   end
 
   def xml_document(part)
-    @archive.fopen(part.part_uri){|file| REXML::Document.new(file.read) }
+    archive_as_document(part.part_uri)
   rescue REXML::ParseException
   end
 
   def relation_tags(part)
-    @archive.fopen(part.rels_uri){|file| REXML::Document.new(file.read) }.get_elements('//Relationship')
+    archive_as_document(part.rels_uri).get_elements('/Relationships/Relationship')
+  end
+  
+  private
+  def archive_as_document(path)
+    @archive.fopen(path){|file| REXML::Document.new(file.read) }
   end
 end
