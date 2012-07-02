@@ -25,16 +25,16 @@ class WorkBook
   # ==== <b>[PARAM]file_path</b><br/>
   #  開くファイルのパスを指定します。
   def self.open(file_path, encoding = file_path.encoding)
-      book = WorkBook.new(file_path, encoding)
-      if block_given?
-        begin
-          yield book
-        ensure
-          book.close
-        end
-      else
-        book
+    book = WorkBook.new(file_path, encoding)
+    if block_given?
+      begin
+        yield book
+      ensure
+        book.close
       end
+    else
+      book
+    end
   end
 
   # ファイルの操作を終了し、ファイルを開放します。
@@ -54,7 +54,7 @@ class WorkBook
   # ブックが持つシートを取得します。
   def sheets
     @sheets ||=
-      @part.xml_document.elements.to_a('//sheet')
+      @part.xml_document.root.get_elements('./sheets/sheet')
         .map{ |tag| WorkSheet.new(tag, @part.relation(tag).xml_document, self, @part.relation(tag))}
   end
 
