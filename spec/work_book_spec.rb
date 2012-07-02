@@ -239,4 +239,14 @@ describe WorkBook do
       book.Sheet1.B1.should == 999
     end
   end
+
+  it 'の空白行に書き込みがされています。' do
+    book = WorkBook.open(TestFile.book1_copy_path) do |book|
+      book.Sheet1.B2 = 999
+    end
+    
+    WorkBook.open(TestFile.book1_copy_path) do |book|
+      book.Sheet1.B2.should == 999
+    end
+  end
 end
