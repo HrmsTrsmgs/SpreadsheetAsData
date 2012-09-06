@@ -2,7 +2,7 @@
 
 <html>
 <head>
-<meta content="text/html; charset=Shift_JIS" http-equiv="Content-Type">
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
 
 <title>class PackagePart - RDoc Documentation</title>
 
@@ -47,7 +47,7 @@
     <nav id="file-list-section" class="section">
   <h3 class="section-header">Defined In</h3>
   <ul>
-    <li>lib_tmp/package_part.rb
+    <li>lib/package_part.rb
   </ul>
 </nav>
 
@@ -72,7 +72,13 @@
     
     <li><a href="#method-c-new">::new</a>
     
+    <li><a href="#method-i-change">#change</a>
+    
+    <li><a href="#method-i-changed-3F">#changed?</a>
+    
     <li><a href="#method-i-relation">#relation</a>
+    
+    <li><a href="#method-i-rels_uri">#rels_uri</a>
     
     <li><a href="#method-i-xml_document">#xml_document</a>
     
@@ -90,15 +96,7 @@
   
     <li><a href="./BlankValue.html">BlankValue</a>
   
-    <li><a href="./Cell.html">Cell</a>
-  
-    <li><a href="./Package.html">Package</a>
-  
     <li><a href="./PackagePart.html">PackagePart</a>
-  
-    <li><a href="./WorkBook.html">WorkBook</a>
-  
-    <li><a href="./WorkSheet.html">WorkSheet</a>
   
   </ul>
 </nav>
@@ -167,10 +165,11 @@
 
           
           <div class="method-source-code" id="new-source">
-            <pre><span class="ruby-comment"># File lib_tmp/package_part.rb, line 7</span>
+            <pre><span class="ruby-comment"># File lib/package_part.rb, line 8</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">package</span>, <span class="ruby-identifier">part_uri</span>)
   <span class="ruby-ivar">@package</span> = <span class="ruby-identifier">package</span>
-  <span class="ruby-ivar">@part_uri</span> = <span class="ruby-identifier">part_uri</span>
+  <span class="ruby-identifier">package</span>.<span class="ruby-identifier">initialized_parts</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword">self</span>
+  <span class="ruby-ivar">@part_uri</span> = <span class="ruby-identifier">part_uri</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">%r^\.\/?/</span>, <span class="ruby-string">''</span>)
   <span class="ruby-ivar">@cache</span> = {}
 <span class="ruby-keyword">end</span></pre>
           </div><!-- new-source -->
@@ -189,6 +188,66 @@
       <h3 class="section-header">Public Instance Methods</h3>
 
     
+      <div id="method-i-change" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">change</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="change-source">
+            <pre><span class="ruby-comment"># File lib/package_part.rb, line 23</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">change</span>
+  <span class="ruby-ivar">@changed</span> = <span class="ruby-keyword">true</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- change-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- change-method -->
+
+    
+      <div id="method-i-changed-3F" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">changed?</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="changed-3F-source">
+            <pre><span class="ruby-comment"># File lib/package_part.rb, line 19</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">changed?</span>
+  <span class="ruby-ivar">@changed</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- changed-3F-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- changed-3F-method -->
+
+    
       <div id="method-i-relation" class="method-detail ">
         
         <div class="method-heading">
@@ -205,9 +264,10 @@
 
           
           <div class="method-source-code" id="relation-source">
-            <pre><span class="ruby-comment"># File lib_tmp/package_part.rb, line 19</span>
+            <pre><span class="ruby-comment"># File lib/package_part.rb, line 31</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">relation</span>(<span class="ruby-identifier">key</span>)
   <span class="ruby-identifier">tag</span> =
+      
     <span class="ruby-keyword">if</span> <span class="ruby-identifier">key</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:attributes</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">key</span>.<span class="ruby-identifier">attributes</span>[<span class="ruby-string">'r:id'</span>]
       <span class="ruby-identifier">relation_tags</span>.<span class="ruby-identifier">find</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">tag</span><span class="ruby-operator">|</span> <span class="ruby-identifier">tag</span>.<span class="ruby-identifier">attributes</span>[<span class="ruby-string">'Id'</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">key</span>.<span class="ruby-identifier">attributes</span>[<span class="ruby-string">'r:id'</span>] }
     <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">key</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">%r^http://schemas.openxmlformats.org/officeDocument/2006/relationships/!</span>
@@ -217,7 +277,7 @@
     <span class="ruby-keyword">end</span>
     
   <span class="ruby-identifier">tag</span> <span class="ruby-operator">&amp;&amp;</span> 
-    <span class="ruby-ivar">@cache</span>[<span class="ruby-identifier">tag</span>] <span class="ruby-operator">||=</span> <span class="ruby-constant">PackagePart</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@package</span>, <span class="ruby-constant">File</span>.<span class="ruby-identifier">dirname</span>(<span class="ruby-ivar">@part_uri</span>) <span class="ruby-operator">+</span><span class="ruby-string">&quot;/&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">tag</span>.<span class="ruby-identifier">attributes</span>[<span class="ruby-string">'Target'</span>])
+    <span class="ruby-ivar">@cache</span>[<span class="ruby-identifier">tag</span>] <span class="ruby-operator">||=</span> <span class="ruby-constant">PackagePart</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@package</span>, <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">dirname</span>(<span class="ruby-ivar">@part_uri</span>), <span class="ruby-identifier">tag</span>.<span class="ruby-identifier">attributes</span>[<span class="ruby-string">'Target'</span>]))
 <span class="ruby-keyword">end</span></pre>
           </div><!-- relation-source -->
           
@@ -227,6 +287,36 @@
 
         
       </div><!-- relation-method -->
+
+    
+      <div id="method-i-rels_uri" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">rels_uri</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="rels_uri-source">
+            <pre><span class="ruby-comment"># File lib/package_part.rb, line 15</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">rels_uri</span>
+  <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">dirname</span>(<span class="ruby-identifier">part_uri</span>), <span class="ruby-string">'_rels'</span>, <span class="ruby-constant">File</span>.<span class="ruby-identifier">basename</span>(<span class="ruby-identifier">part_uri</span>) <span class="ruby-operator">+</span> <span class="ruby-string">'.rels'</span>).<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">%r^\.\/?/</span>, <span class="ruby-string">''</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- rels_uri-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- rels_uri-method -->
 
     
       <div id="method-i-xml_document" class="method-detail ">
@@ -240,15 +330,14 @@
 
         <div class="method-description">
           
-          <p>ブック情報を記述してあるWorkBook.xmlドキュメントを取得します。</p>
+          
           
 
           
           <div class="method-source-code" id="xml_document-source">
-            <pre><span class="ruby-comment"># File lib_tmp/package_part.rb, line 14</span>
+            <pre><span class="ruby-comment"># File lib/package_part.rb, line 27</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">xml_document</span>
-  <span class="ruby-comment">#workbook.xmlのパスは変更するとExcelでも起動できなくなるため、変更には対応しません。</span>
-  <span class="ruby-ivar">@xml_document</span> <span class="ruby-operator">||=</span> <span class="ruby-ivar">@package</span>.<span class="ruby-identifier">xml_document</span>(<span class="ruby-ivar">@part_uri</span>)
+  <span class="ruby-ivar">@xml_document</span> <span class="ruby-operator">||=</span> <span class="ruby-ivar">@package</span>.<span class="ruby-identifier">xml_document</span>(<span class="ruby-keyword">self</span>)
 <span class="ruby-keyword">end</span></pre>
           </div><!-- xml_document-source -->
           

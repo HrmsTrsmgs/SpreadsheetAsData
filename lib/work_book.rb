@@ -8,22 +8,26 @@ require 'shared_strings'
 # Excelブックを扱うクラスです。
 class WorkBook
 
+  # 共有文字列をさすリレーションのIDです。
   SHARED_STRING_ID = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings'
+  
+  # ブックドキュメントをさすリレーションのIDです。
   DOCUMENT_ID = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument'
 
+  # ブック内の文字列を出力するエンコードです。
   attr_reader :encoding
 
   # 新しいインスタンスの初期化を行います。
+  
   def initialize(file_path, encoding)
     @package = Package.new(file_path)
     @encoding = encoding
     @part = @package.root.relation(DOCUMENT_ID)
   end
 
-  # Excelファイルのパスを指定し、開きます。<br/>
-  # <br/>
-  # ==== <b>[PARAM]file_path</b><br/>
-  #  開くファイルのパスを指定します。
+  # Excelファイルのパスを指定し、開きます。
+  # =[PARAM]file_path
+  # =開くファイルのパスを指定します。
   def self.open(file_path, encoding = file_path.encoding)
     book = WorkBook.new(file_path, encoding)
     if block_given?
@@ -47,6 +51,7 @@ class WorkBook
     @package.file_path
   end
   
+  # このブックで利用する共有文字列を取得します。
   def shared_strings
     @shared_strings ||= SharedStrings.new(@part.relation(SHARED_STRING_ID))
   end

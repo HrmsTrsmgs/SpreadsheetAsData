@@ -2,9 +2,9 @@
 
 <html>
 <head>
-<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+<meta content="text/html; charset=Shift_JIS" http-equiv="Content-Type">
 
-<title>class BlankValue - RDoc Documentation</title>
+<title>class SharedStrings - RDoc Documentation</title>
 
 <link type="text/css" media="screen" href="./rdoc.css" rel="stylesheet">
 
@@ -47,7 +47,7 @@
     <nav id="file-list-section" class="section">
   <h3 class="section-header">Defined In</h3>
   <ul>
-    <li>lib/blank_value.rb
+    <li>lib_tmp/shared_strings.rb
   </ul>
 </nav>
 
@@ -59,7 +59,7 @@
     <nav id="parent-class-section" class="section">
   <h3 class="section-header">Parent</h3>
   
-  <p class="link">Numeric
+  <p class="link">Object
   
 </nav>
 
@@ -70,13 +70,13 @@
 
   <ul class="link-list">
     
-    <li><a href="#method-i-3D-3D">#==</a>
+    <li><a href="#method-c-new">::new</a>
     
-    <li><a href="#method-i-inspect">#inspect</a>
+    <li><a href="#method-i-3C-3C">#&lt;&lt;</a>
     
-    <li><a href="#method-i-method_missing">#method_missing</a>
+    <li><a href="#method-i-5B-5D">#[]</a>
     
-    <li><a href="#method-i-to_s">#to_s</a>
+    <li><a href="#method-i-size">#size</a>
     
   </ul>
 </nav>
@@ -92,7 +92,17 @@
   
     <li><a href="./BlankValue.html">BlankValue</a>
   
+    <li><a href="./Cell.html">Cell</a>
+  
+    <li><a href="./Package.html">Package</a>
+  
     <li><a href="./PackagePart.html">PackagePart</a>
+  
+    <li><a href="./SharedStrings.html">SharedStrings</a>
+  
+    <li><a href="./WorkBook.html">WorkBook</a>
+  
+    <li><a href="./WorkSheet.html">WorkSheet</a>
   
   </ul>
 </nav>
@@ -101,7 +111,7 @@
 </nav>
 
 <div id="documentation">
-  <h1 class="class">class BlankValue</h1>
+  <h1 class="class">class SharedStrings</h1>
 
   <div id="description" class="description">
     
@@ -121,15 +131,52 @@
 
     <!-- Methods -->
     
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Class Methods</h3>
+
+    
+      <div id="method-c-new" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">new</span><span
+            class="method-args">(part)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>インスタンスを初期化します。</p>
+          
+
+          
+          <div class="method-source-code" id="new-source">
+            <pre><span class="ruby-comment"># File lib_tmp/shared_strings.rb, line 6</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">part</span>)
+  <span class="ruby-ivar">@part</span> = <span class="ruby-identifier">part</span>
+  <span class="ruby-ivar">@document</span> = <span class="ruby-identifier">part</span>.<span class="ruby-identifier">xml_document</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- new-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- new-method -->
+
+    
+    </section><!-- public-class-method-details -->
+  
      <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
       <h3 class="section-header">Public Instance Methods</h3>
 
     
-      <div id="method-i-3D-3D" class="method-detail ">
+      <div id="method-i-3C-3C" class="method-detail ">
         
         <div class="method-heading">
-          <span class="method-name">==</span><span
-            class="method-args">(other)</span>
+          <span class="method-name">&lt;&lt;</span><span
+            class="method-args">(string)</span>
           <span class="method-click-advice">click to toggle source</span>
         </div>
         
@@ -140,25 +187,60 @@
           
 
           
-          <div class="method-source-code" id="3D-3D-source">
-            <pre><span class="ruby-comment"># File lib/blank_value.rb, line 3</span>
-<span class="ruby-keyword">def</span> <span class="ruby-operator">==</span>(<span class="ruby-identifier">other</span>)
-  <span class="ruby-identifier">other</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">other</span> <span class="ruby-operator">==</span> <span class="ruby-string">''</span>
+          <div class="method-source-code" id="3C-3C-source">
+            <pre><span class="ruby-comment"># File lib_tmp/shared_strings.rb, line 11</span>
+<span class="ruby-keyword">def</span> <span class="ruby-operator">&lt;&lt;</span>(<span class="ruby-identifier">string</span>)
+  <span class="ruby-identifier">strings</span>.<span class="ruby-identifier">find_index</span>(<span class="ruby-identifier">string</span>) <span class="ruby-operator">||</span>
+    <span class="ruby-keyword">begin</span>
+      <span class="ruby-identifier">sst_tag</span>.<span class="ruby-identifier">add_element</span>(<span class="ruby-identifier">new_t</span>(<span class="ruby-identifier">string</span>))
+      <span class="ruby-ivar">@part</span>.<span class="ruby-identifier">change</span>
+      <span class="ruby-identifier">size</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>
+    <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
-          </div><!-- 3D-3D-source -->
+          </div><!-- 3C-3C-source -->
           
         </div>
 
         
 
         
-      </div><!-- 3D-3D-method -->
+      </div><!-- 3C-3C-method -->
 
     
-      <div id="method-i-inspect" class="method-detail ">
+      <div id="method-i-5B-5D" class="method-detail ">
         
         <div class="method-heading">
-          <span class="method-name">inspect</span><span
+          <span class="method-name">[]</span><span
+            class="method-args">(index)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="5B-5D-source">
+            <pre><span class="ruby-comment"># File lib_tmp/shared_strings.rb, line 20</span>
+<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">index</span>)
+  <span class="ruby-identifier">strings</span>[<span class="ruby-identifier">index</span>]
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- 5B-5D-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- 5B-5D-method -->
+
+    
+      <div id="method-i-size" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">size</span><span
             class="method-args">()</span>
           <span class="method-click-advice">click to toggle source</span>
         </div>
@@ -170,83 +252,19 @@
           
 
           
-          <div class="method-source-code" id="inspect-source">
-            <pre><span class="ruby-comment"># File lib/blank_value.rb, line 7</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">inspect</span>
-  <span class="ruby-string">'{blank}'</span>
+          <div class="method-source-code" id="size-source">
+            <pre><span class="ruby-comment"># File lib_tmp/shared_strings.rb, line 24</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">size</span>
+  <span class="ruby-identifier">sst_tag</span>.<span class="ruby-identifier">elements</span>.<span class="ruby-identifier">size</span>
 <span class="ruby-keyword">end</span></pre>
-          </div><!-- inspect-source -->
+          </div><!-- size-source -->
           
         </div>
 
         
 
         
-      </div><!-- inspect-method -->
-
-    
-      <div id="method-i-method_missing" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">method_missing</span><span
-            class="method-args">(method_name, *args)</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
-
-        <div class="method-description">
-          
-          
-          
-
-          
-          <div class="method-source-code" id="method_missing-source">
-            <pre><span class="ruby-comment"># File lib/blank_value.rb, line 15</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">method_missing</span>(<span class="ruby-identifier">method_name</span>, *<span class="ruby-identifier">args</span>)
-  <span class="ruby-keyword">begin</span>
-    <span class="ruby-value">0</span>.<span class="ruby-identifier">__send__</span>(<span class="ruby-identifier">method_name</span>, *<span class="ruby-identifier">args</span>)
-  <span class="ruby-keyword">rescue</span>
-    <span class="ruby-string">''</span>.<span class="ruby-identifier">__send__</span>(<span class="ruby-identifier">method_name</span>, *<span class="ruby-identifier">args</span>)
-  <span class="ruby-keyword">end</span>
-<span class="ruby-keyword">end</span></pre>
-          </div><!-- method_missing-source -->
-          
-        </div>
-
-        
-
-        
-      </div><!-- method_missing-method -->
-
-    
-      <div id="method-i-to_s" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">to_s</span><span
-            class="method-args">()</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
-
-        <div class="method-description">
-          
-          
-          
-
-          
-          <div class="method-source-code" id="to_s-source">
-            <pre><span class="ruby-comment"># File lib/blank_value.rb, line 11</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_s</span>
-  <span class="ruby-string">''</span>
-<span class="ruby-keyword">end</span></pre>
-          </div><!-- to_s-source -->
-          
-        </div>
-
-        
-
-        
-      </div><!-- to_s-method -->
+      </div><!-- size-method -->
 
     
     </section><!-- public-instance-method-details -->

@@ -82,6 +82,8 @@
     
     <li><a href="#method-i-method_missing">#method_missing</a>
     
+    <li><a href="#method-i-shared_strings">#shared_strings</a>
+    
     <li><a href="#method-i-sheets">#sheets</a>
     
   </ul>
@@ -103,6 +105,8 @@
     <li><a href="./Package.html">Package</a>
   
     <li><a href="./PackagePart.html">PackagePart</a>
+  
+    <li><a href="./SharedStrings.html">SharedStrings</a>
   
     <li><a href="./WorkBook.html">WorkBook</a>
   
@@ -137,9 +141,14 @@
       <h3 class="section-header">Constants</h3>
       <dl>
       
+        <dt id="DOCUMENT_ID">DOCUMENT_ID
+        
+        <dd class="description"><p>ブックドキュメントをさすリレーションのIDです。</p>
+        
+      
         <dt id="SHARED_STRING_ID">SHARED_STRING_ID
         
-        <dd class="description">
+        <dd class="description"><p>共有文字列をさすリレーションのIDです。</p>
         
       
       </dl>
@@ -160,20 +169,7 @@
 
         <div class="method-description">
         
-        
-        
-        </div>
-      </div>
-      
-      <div id="attribute-i-shared_strings" class="method-detail">
-        <div class="method-heading attribute-method-heading">
-          <span class="method-name">shared_strings</span><span
-            class="attribute-access-type">[R]</span>
-        </div>
-
-        <div class="method-description">
-        
-        
+        <p>ブック内の文字列を出力するエンコードです。</p>
         
         </div>
       </div>
@@ -203,14 +199,11 @@
 
           
           <div class="method-source-code" id="new-source">
-            <pre><span class="ruby-comment"># File lib_tmp/work_book.rb, line 20</span>
+            <pre><span class="ruby-comment"># File lib_tmp/work_book.rb, line 21</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">file_path</span>, <span class="ruby-identifier">encoding</span>)
   <span class="ruby-ivar">@package</span> = <span class="ruby-constant">Package</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">file_path</span>)
   <span class="ruby-ivar">@encoding</span> = <span class="ruby-identifier">encoding</span>
-  <span class="ruby-ivar">@part</span> = <span class="ruby-ivar">@package</span>.<span class="ruby-identifier">part</span>(<span class="ruby-string">'/xl/workbook.xml'</span>)
-  <span class="ruby-identifier">shared_strings_xml</span> = <span class="ruby-ivar">@part</span>.<span class="ruby-identifier">relation</span>(<span class="ruby-constant">SHARED_STRING_ID</span>)
-  <span class="ruby-ivar">@shared_strings</span> = 
-    <span class="ruby-identifier">shared_strings_xml</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">shared_strings_xml</span>.<span class="ruby-identifier">xml_document</span>.<span class="ruby-identifier">elements</span>.<span class="ruby-identifier">to_a</span>(<span class="ruby-string">'//t'</span>).<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">t</span><span class="ruby-operator">|</span> <span class="ruby-identifier">t</span>.<span class="ruby-identifier">text</span> } <span class="ruby-operator">:</span> []
+  <span class="ruby-ivar">@part</span> = <span class="ruby-ivar">@package</span>.<span class="ruby-identifier">root</span>.<span class="ruby-identifier">relation</span>(<span class="ruby-constant">DOCUMENT_ID</span>)
 <span class="ruby-keyword">end</span></pre>
           </div><!-- new-source -->
           
@@ -233,24 +226,27 @@
 
         <div class="method-description">
           
-          <p>Excelファイルのパスを指定し、開きます。&lt;br/&gt; &lt;br/&gt;</p>
+          <p>Excelファイルのパスを指定し、開きます。</p>
 
-<h4 id="method-c-open-label-%5BPARAM%5Dfile_path%3Cbr%2F%3E"><strong>[PARAM]<a href="WorkBook.html#method-i-file_path">#file_path</a></strong>&lt;br/&gt;</h4>
+<h1 id="method-c-open-label-%5BPARAM%5Dfile_path">[PARAM]<a href="WorkBook.html#method-i-file_path">#file_path</a></h1>
 
-<pre>開くファイルのパスを指定します。</pre>
+<h1 id="method-c-open-label-%8A%4A%82%AD%83%74%83%40%83%43%83%8B%82%CC%83%70%83%58%82%F0%8E%77%92%E8%82%B5%82%DC%82%B7%81%42">開くファイルのパスを指定します。</h1>
           
 
           
           <div class="method-source-code" id="open-source">
-            <pre><span class="ruby-comment"># File lib_tmp/work_book.rb, line 33</span>
+            <pre><span class="ruby-comment"># File lib_tmp/work_book.rb, line 30</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">file_path</span>, <span class="ruby-identifier">encoding</span> = <span class="ruby-identifier">file_path</span>.<span class="ruby-identifier">encoding</span>)
-    <span class="ruby-identifier">book</span> = <span class="ruby-constant">WorkBook</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">file_path</span>, <span class="ruby-identifier">encoding</span>)
-    <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span>
+  <span class="ruby-identifier">book</span> = <span class="ruby-constant">WorkBook</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">file_path</span>, <span class="ruby-identifier">encoding</span>)
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span>
+    <span class="ruby-keyword">begin</span>
       <span class="ruby-keyword">yield</span> <span class="ruby-identifier">book</span>
+    <span class="ruby-keyword">ensure</span>
       <span class="ruby-identifier">book</span>.<span class="ruby-identifier">close</span>
-    <span class="ruby-keyword">else</span>
-      <span class="ruby-identifier">book</span>
     <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-identifier">book</span>
+  <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
           </div><!-- open-source -->
           
@@ -284,7 +280,7 @@
 
           
           <div class="method-source-code" id="5B-5D-source">
-            <pre><span class="ruby-comment"># File lib_tmp/work_book.rb, line 56</span>
+            <pre><span class="ruby-comment"># File lib_tmp/work_book.rb, line 66</span>
 <span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">name</span>)
   <span class="ruby-identifier">sheets</span>.<span class="ruby-identifier">find</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">sheet</span><span class="ruby-operator">|</span> <span class="ruby-identifier">sheet</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">encode</span>(<span class="ruby-identifier">encoding</span>)}
 <span class="ruby-keyword">end</span></pre>
@@ -344,7 +340,7 @@
 
           
           <div class="method-source-code" id="file_path-source">
-            <pre><span class="ruby-comment"># File lib_tmp/work_book.rb, line 15</span>
+            <pre><span class="ruby-comment"># File lib_tmp/work_book.rb, line 49</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">file_path</span>
   <span class="ruby-ivar">@package</span>.<span class="ruby-identifier">file_path</span>
 <span class="ruby-keyword">end</span></pre>
@@ -362,7 +358,7 @@
         
         <div class="method-heading">
           <span class="method-name">method_missing</span><span
-            class="method-args">(method_name)</span>
+            class="method-args">(method_name, *args)</span>
           <span class="method-click-advice">click to toggle source</span>
         </div>
         
@@ -374,8 +370,8 @@
 
           
           <div class="method-source-code" id="method_missing-source">
-            <pre><span class="ruby-comment"># File lib_tmp/work_book.rb, line 61</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">method_missing</span>(<span class="ruby-identifier">method_name</span>)
+            <pre><span class="ruby-comment"># File lib_tmp/work_book.rb, line 71</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">method_missing</span>(<span class="ruby-identifier">method_name</span>, *<span class="ruby-identifier">args</span>)
   <span class="ruby-keyword">self</span>[<span class="ruby-identifier">method_name</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword">super</span>
 <span class="ruby-keyword">end</span></pre>
           </div><!-- method_missing-source -->
@@ -386,6 +382,36 @@
 
         
       </div><!-- method_missing-method -->
+
+    
+      <div id="method-i-shared_strings" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">shared_strings</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>このブックで利用する共有文字列を取得します。</p>
+          
+
+          
+          <div class="method-source-code" id="shared_strings-source">
+            <pre><span class="ruby-comment"># File lib_tmp/work_book.rb, line 54</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">shared_strings</span>
+  <span class="ruby-ivar">@shared_strings</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">SharedStrings</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@part</span>.<span class="ruby-identifier">relation</span>(<span class="ruby-constant">SHARED_STRING_ID</span>))
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- shared_strings-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- shared_strings-method -->
 
     
       <div id="method-i-sheets" class="method-detail ">
@@ -404,11 +430,11 @@
 
           
           <div class="method-source-code" id="sheets-source">
-            <pre><span class="ruby-comment"># File lib_tmp/work_book.rb, line 49</span>
+            <pre><span class="ruby-comment"># File lib_tmp/work_book.rb, line 59</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">sheets</span>
   <span class="ruby-ivar">@sheets</span> <span class="ruby-operator">||=</span>
-    <span class="ruby-ivar">@part</span>.<span class="ruby-identifier">xml_document</span>.<span class="ruby-identifier">elements</span>.<span class="ruby-identifier">to_a</span>(<span class="ruby-string">'//sheet'</span>)
-      .<span class="ruby-identifier">map</span>{ <span class="ruby-operator">|</span><span class="ruby-identifier">tag</span><span class="ruby-operator">|</span> <span class="ruby-constant">WorkSheet</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">tag</span>, <span class="ruby-ivar">@part</span>.<span class="ruby-identifier">relation</span>(<span class="ruby-identifier">tag</span>).<span class="ruby-identifier">xml_document</span>, <span class="ruby-keyword">self</span>)}
+    <span class="ruby-ivar">@part</span>.<span class="ruby-identifier">xml_document</span>.<span class="ruby-identifier">root</span>.<span class="ruby-identifier">get_elements</span>(<span class="ruby-string">'./sheets/sheet'</span>)
+      .<span class="ruby-identifier">map</span>{ <span class="ruby-operator">|</span><span class="ruby-identifier">tag</span><span class="ruby-operator">|</span> <span class="ruby-constant">WorkSheet</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">tag</span>, <span class="ruby-ivar">@part</span>.<span class="ruby-identifier">relation</span>(<span class="ruby-identifier">tag</span>).<span class="ruby-identifier">xml_document</span>, <span class="ruby-keyword">self</span>, <span class="ruby-ivar">@part</span>.<span class="ruby-identifier">relation</span>(<span class="ruby-identifier">tag</span>))}
 <span class="ruby-keyword">end</span></pre>
           </div><!-- sheets-source -->
           
