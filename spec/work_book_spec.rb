@@ -29,20 +29,20 @@ describe WorkBook do
     
     it 'はファイルを束縛します。' do
       book = WorkBook.open(TestFile.book1_copy_path)
-      expect { File.delete(TestFile.book1_copy_path) }.should raise_error Errno::EACCES
+      expect { File.delete(TestFile.book1_copy_path) }.to raise_error Errno::EACCES
       book.close
     end
     
     it 'はブロック内でファイルを束縛します。' do
       WorkBook.open(TestFile.book1_copy_path) do |book|
-        expect { File.delete(TestFile.book1_copy_path) }.should raise_error Errno::EACCES
+        expect { File.delete(TestFile.book1_copy_path) }.to raise_error Errno::EACCES
       end
     end
     
     it 'はブロック終了時にファイルを開放します。' do
       WorkBook.open(TestFile.book1_copy_path) do |book|
       end
-      expect { File.delete(TestFile.book1_copy_path) }.should_not raise_error
+      expect { File.delete(TestFile.book1_copy_path) }.to_not raise_error
     end
     
     it 'は例外発生時もブロック終了時にファイルを開放します。' do
@@ -52,7 +52,7 @@ describe WorkBook do
         end
       rescue Exception
       end
-      expect { File.delete(TestFile.book1_copy_path) }.should_not raise_error
+      expect { File.delete(TestFile.book1_copy_path) }.to_not raise_error
     end
 
     context 'はファイル内のリレーション' do
@@ -87,7 +87,7 @@ describe WorkBook do
     it 'はファイルを開放します。' do
       book = WorkBook.open(TestFile.book1_copy_path)
       book.close
-      expect { File.delete(TestFile.book1_copy_path) }.should_not raise_error
+      expect { File.delete(TestFile.book1_copy_path) }.to_not raise_error
     end
   
     it 'の時に変更は保存されています。' do
