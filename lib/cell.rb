@@ -60,11 +60,13 @@ class Cell
     
   end
 
-  def ref
+  def to_s
     if @xml
       @xml.attributes['r']
     else
       @ref
     end
   end
+
+  alias ref to_s
 end

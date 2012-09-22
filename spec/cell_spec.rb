@@ -75,4 +75,11 @@ describe Cell do
       sheet.cell(:B1).ref.should == 'B1'
     end
   end
+  
+  describe '#to_s' do
+    it 'がセルの名称を取得できます。' do
+      subject.to_s.should == 'A1'
+      sheet.cell(:B1).to_s.should == 'B1'
+    end
+  end
 end

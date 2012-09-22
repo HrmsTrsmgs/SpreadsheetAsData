@@ -3,6 +3,7 @@ require 'rexml/document'
 
 require 'cell'
 require 'blank_value'
+require 'cell_range'
 
 # Excelのシートです。
 class WorkSheet
@@ -34,6 +35,10 @@ class WorkSheet
       elsif ref =~ /[A-Z]+\d+/
         @cell_hash[ref] = Cell.new(ref, self, @tag_in_book)
       end
+  end
+  
+  def range(corner1, corner2)
+    CellRange.new(corner1, corner2, self)
   end
   
   def add_cell_xml(ref)

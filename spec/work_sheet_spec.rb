@@ -67,6 +67,13 @@ describe WorkSheet do
       sheet1.cell('B1').should equal sheet1.cell('B1')
     end                                                                                                                                                           
   end
+  
+  describe '#range' do
+    it 'は範囲を取得できる。' do
+      sheet1.range('A1', 'C3').to_s.should == 'A1:C3'
+      sheet1.range('B2', 'B2').to_s.should == 'B2:B2' 
+    end
+  end
 
   describe '#セル名' do
     it 'は値を取得できる。' do
