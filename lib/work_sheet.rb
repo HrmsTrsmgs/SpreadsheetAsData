@@ -29,6 +29,7 @@ class WorkSheet
   end
 
   def cell(ref)
+    ref = ref.to_s
     @cell_hash[ref] ||=
       if cell_xml(ref)
         @cell_hash[ref] = Cell.new(cell_xml(ref), self, @tag_in_book)

@@ -5,13 +5,17 @@ class CellRange
   attr_reader :sheet
   
   def initialize(corner1, corner2, sheet)
-    @corner1 = corner1
-    @corner2 = corner2
+    @corner1 = sheet.cell(corner1)
+    @corner2 = sheet.cell(corner2)
     @sheet = sheet
   end
   
   def book
     sheet.book
+  end
+  
+  def left_upper_cell
+    @corner1
   end
   
   def to_s

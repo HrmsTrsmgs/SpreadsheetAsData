@@ -36,4 +36,11 @@ describe CellRange do
       sheet.range('B2', 'B2').to_s.should == 'B2:B2'
     end
   end
+
+  describe '#left_upper_cell' do
+    it 'が左上のセルを取得できます。' do
+      subject.left_upper_cell.should equal sheet.cell(:A1)
+      sheet.range('B2', 'B2').left_upper_cell.should equal sheet.cell(:B2)
+    end
+  end
 end
