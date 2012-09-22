@@ -14,7 +14,7 @@ class CellRange
     sheet.book
   end
   
-  def left_upper_cell
+  def upper_left_cell
     @corner1
   end
   

@@ -37,10 +37,10 @@ describe CellRange do
     end
   end
 
-  describe '#left_upper_cell' do
+  describe '#upper_left_cell' do
     it 'が左上のセルを取得できます。' do
-      subject.left_upper_cell.should equal sheet.cell(:A1)
-      sheet.range('B2', 'B2').left_upper_cell.should equal sheet.cell(:B2)
+      subject.upper_left_cell.should equal sheet.cell(:A1)
+      sheet.range('B2', 'B2').upper_left_cell.should equal sheet.cell(:B2)
     end
   end
 end
