@@ -173,5 +173,9 @@ describe WorkSheet do
     it 'は列の順序が反転していても同じ範囲を取得できます。' do
       sheet1.C1_A3.should equal sheet1.A1_C3
     end
+    
+    it 'は行の順序が反転していても同じ範囲を取得できます。' do
+      sheet1.A3_C1.should equal sheet1.A1_C3
+    end
   end
 end

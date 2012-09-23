@@ -57,8 +57,8 @@ class WorkSheet
     column_name2 = $1
     row_name2 = $2
     
-    top = row_name1
-    bottom = row_name2
+    top = [row_name1, row_name2].min
+    bottom = [row_name1, row_name2].max
     right = [column_name1, column_name2].max
     left = [column_name1, column_name2].min
     @range_cache[[left + top, right + bottom]] ||=
