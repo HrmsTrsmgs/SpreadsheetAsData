@@ -62,7 +62,7 @@ describe WorkSheet do
     it 'は同じセルの場合は同じオブジェクトを取得します。' do
       sheet1.cell('C3').should equal sheet1.cell('C3')
     end                                                                                                                                                           
-    it 'は呼び出し方が違っても同じセルの場合は同じオブジェクトを取得します。' do
+    it 'は文字列で呼び出してもシンボルで呼び出しても同じセルの場合は同じオブジェクトを取得します。' do
       sheet1.cell('C3').should equal sheet1.cell(:C3)
     end
     it 'は空のセルの場合も同じセルの場合は同じオブジェクトを取得します。' do
@@ -74,6 +74,30 @@ describe WorkSheet do
     it 'は範囲を取得できます。' do
       sheet1.range('A1', 'C3').to_s.should == 'A1:C3'
       sheet1.range('B2', 'B2').to_s.should == 'B2:B2' 
+    end
+    
+    it 'は第一引数にシンボルを渡しても動作します。' do
+      sheet1.range(:A1, 'C3').to_s.should == 'A1:C3'
+    end
+    
+    it 'は第二引数にシンボルを渡しても動作します。' do
+      sheet1.range('A1', :C3).to_s.should == 'A1:C3'
+    end
+    
+    it 'は第一引数と第二引数にシンボルを渡しても動作します。' do
+      sheet1.range(:A1, :C3).to_s.should == 'A1:C3'
+    end
+    
+    it 'は同じ範囲を指定した場合に同じセルを返します。' do
+      sheet1.range(:A1, :C3).should equal sheet1.range(:A1, :C3)
+    end
+    
+    it 'は第一引数を文字列で呼び出してもシンボルで呼び出しても同じ範囲を指定した場合に同じセルを返します。' do
+      sheet1.range('A1', :C3).should equal sheet1.range(:A1, :C3)
+    end
+    
+    it 'は第二引数を文字列で呼び出してもシンボルで呼び出しても同じ範囲を指定した場合に同じセルを返します。' do
+      sheet1.range(:A1, 'C3').should equal sheet1.range(:A1, :C3)
     end
   end
 

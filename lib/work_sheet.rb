@@ -16,7 +16,8 @@ class WorkSheet
     @xml = doc.root
     @book = book
     @tag_in_book = tag_in_book
-    @cell_hash = {}
+    @cell_cache = {}
+    @range_cache = {}
   end
 
   # シート名を取得します。
@@ -30,16 +31,17 @@ class WorkSheet
 
   def cell(ref)
     ref = ref.to_s
-    @cell_hash[ref] ||=
+    @cell_cache[ref] ||=
       if cell_xml(ref)
-        @cell_hash[ref] = Cell.new(cell_xml(ref), self, @tag_in_book)
+        @cell_cache[ref] = Cell.new(cell_xml(ref), self, @tag_in_book)
       elsif ref =~ /[A-Z]+\d+/
-        @cell_hash[ref] = Cell.new(ref, self, @tag_in_book)
+        @cell_cache[ref] = Cell.new(ref, self, @tag_in_book)
       end
   end
   
   def range(corner1, corner2)
-    CellRange.new(corner1, corner2, self)
+    @range_cache[[corner1.to_s, corner2.to_s]] ||=
+      CellRange.new(corner1, corner2, self)
   end
   
   def add_cell_xml(ref)
