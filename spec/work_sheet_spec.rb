@@ -169,5 +169,9 @@ describe WorkSheet do
       sheet1.A1_C3.should equal sheet1.range('A1:C3')
       sheet1.B2_B2.should equal sheet1.range('B2:B2')
     end
+    
+    it 'は列の順序が反転していても同じ範囲を取得できます。' do
+      sheet1.C1_A3.should equal sheet1.A1_C3
+    end
   end
 end
