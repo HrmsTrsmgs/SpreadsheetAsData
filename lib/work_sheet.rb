@@ -42,7 +42,7 @@ class WorkSheet
   def range(*corner)
     case corner.size
       when 1
-        corner1, corner2 = corner.first.split ':'
+        corner1, corner2 = corner.first.to_s.split /:|_/
       when 2
         corner1, corner2 = *corner
       else

@@ -106,6 +106,16 @@ describe WorkSheet do
         sheet1.range('A1:C3').to_s.should == 'A1:C3'
         sheet1.range('B2:B2').to_s.should == 'B2:B2' 
       end
+      
+      it 'にA1_A1形式の文字列を渡して範囲を取得できます。' do
+        sheet1.range('A1_C3').to_s.should == 'A1:C3'
+        sheet1.range('B2_B2').to_s.should == 'B2:B2' 
+      end
+      
+      it 'にシンボルを渡しても取得できます。' do
+        sheet1.range(:A1_C3).to_s.should == 'A1:C3'
+        sheet1.range(:B2_B2).to_s.should == 'B2:B2' 
+      end
     end
     
     describe 'の呼び出し引数が多かった場合にArgumentErrorが発生します。' do
