@@ -18,6 +18,10 @@ class CellRange
     @corner1
   end
   
+  def lower_right_cell
+    @corner2
+  end
+  
   def to_s
     "#@corner1:#@corner2"
   end

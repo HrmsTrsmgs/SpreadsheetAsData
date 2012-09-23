@@ -43,4 +43,11 @@ describe CellRange do
       sheet.range('B2', 'B2').upper_left_cell.should equal sheet.cell(:B2)
     end
   end
+
+  describe '#lower_right_cell' do
+    it 'が右下のセルを取得できます。' do
+      subject.lower_right_cell.should equal sheet.cell(:C3)
+      sheet.range('B2', 'B2').lower_right_cell.should equal sheet.cell(:B2)
+    end
+  end
 end
