@@ -69,15 +69,20 @@ class WorkSheet
   end
 
   def method_missing(method_name, *args)
-    if method_name =~ /.*(?=\=$)/
+    case method_name
+    when /.*(?=\=$)/
       cell($&).value = args.first
-    else
+    when /^[A-Z]\d_[A-Z]\d$/
+      range(method_name)
+    when /^[A-Z]\d$/
       value = cell_value(method_name)
       if value.nil?
         super
       else
         value
       end
+    else
+      super
     end
   end
 

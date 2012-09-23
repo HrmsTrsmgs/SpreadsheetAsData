@@ -106,22 +106,24 @@ describe WorkSheet do
         sheet1.range('A1:C3').to_s.should == 'A1:C3'
         sheet1.range('B2:B2').to_s.should == 'B2:B2' 
       end
-      
       it 'にA1_A1形式の文字列を渡して範囲を取得できます。' do
         sheet1.range('A1_C3').to_s.should == 'A1:C3'
         sheet1.range('B2_B2').to_s.should == 'B2:B2' 
       end
-      
       it 'にシンボルを渡しても取得できます。' do
         sheet1.range(:A1_C3).to_s.should == 'A1:C3'
         sheet1.range(:B2_B2).to_s.should == 'B2:B2' 
       end
+      it 'に同じ範囲を指定した場合に同じセルを返します。' do
+        sheet1.range('A1:C3').should equal sheet1.range('A1:C3')
+      end
+      it 'に文字列で呼び出してもシンボルで呼び出しても同じ範囲を指定した場合に同じセルを返します。' do
+        sheet1.range('A1:C3').should equal sheet1.range(:A1_C3)
+      end
     end
     
-    describe 'の呼び出し引数が多かった場合にArgumentErrorが発生します。' do
-      it '' do
-        ->{ sheet1.range('', '', '') }.should raise_error ArgumentError, 'wrong number of arguments (3 for 1..2)'
-      end
+    it 'の呼び出し引数が多かった場合にArgumentErrorが発生します。' do
+      ->{ sheet1.range('', '', '') }.should raise_error ArgumentError, 'wrong number of arguments (3 for 1..2)'
     end
   end
 
@@ -160,6 +162,12 @@ describe WorkSheet do
 
     it 'で文字列を取得する場合、同じセルの場合は同じオブジェクトを取得します。' do
       data.A3.should equal data.A3
+    end
+  end
+  describe '#範囲名称' do
+    it 'は範囲を取得できます。' do
+      sheet1.A1_C3.should equal sheet1.range('A1:C3')
+      sheet1.B2_B2.should equal sheet1.range('B2:B2')
     end
   end
 end
