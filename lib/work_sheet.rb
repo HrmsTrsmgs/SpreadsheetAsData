@@ -39,7 +39,15 @@ class WorkSheet
       end
   end
   
-  def range(corner1, corner2)
+  def range(*corner)
+    case corner.size
+      when 1
+        corner1, corner2 = corner.first.split ':'
+      when 2
+        corner1, corner2 = *corner
+      else
+        raise ArgumentError, "wrong number of arguments (#{corner.size} for 1..2)"
+    end
     @range_cache[[corner1.to_s, corner2.to_s]] ||=
       CellRange.new(corner1, corner2, self)
   end

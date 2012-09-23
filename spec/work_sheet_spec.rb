@@ -71,33 +71,47 @@ describe WorkSheet do
   end
   
   describe '#range' do
-    it 'は範囲を取得できます。' do
-      sheet1.range('A1', 'C3').to_s.should == 'A1:C3'
-      sheet1.range('B2', 'B2').to_s.should == 'B2:B2' 
+    describe 'を２引数で呼び出した場合' do
+      it 'に範囲を取得できます。' do
+        sheet1.range('A1', 'C3').to_s.should == 'A1:C3'
+        sheet1.range('B2', 'B2').to_s.should == 'B2:B2' 
+      end
+      
+      it 'に第一引数にシンボルを渡しても動作します。' do
+        sheet1.range(:A1, 'C3').to_s.should == 'A1:C3'
+      end
+      
+      it 'に第二引数にシンボルを渡しても動作します。' do
+        sheet1.range('A1', :C3).to_s.should == 'A1:C3'
+      end
+      
+      it 'に第一引数と第二引数にシンボルを渡しても動作します。' do
+        sheet1.range(:A1, :C3).to_s.should == 'A1:C3'
+      end
+      
+      it 'に同じ範囲を指定した場合に同じセルを返します。' do
+        sheet1.range(:A1, :C3).should equal sheet1.range(:A1, :C3)
+      end
+      
+      it 'に第一引数を文字列で呼び出してもシンボルで呼び出しても同じ範囲を指定した場合に同じセルを返します。' do
+        sheet1.range('A1', :C3).should equal sheet1.range(:A1, :C3)
+      end
+      
+      it 'に第二引数を文字列で呼び出してもシンボルで呼び出しても同じ範囲を指定した場合に同じセルを返します。' do
+        sheet1.range(:A1, 'C3').should equal sheet1.range(:A1, :C3)
+      end
+    end
+    describe 'を１引数で呼び出した場合' do
+      it 'に範囲を取得できます。' do
+        sheet1.range('A1:C3').to_s.should == 'A1:C3'
+        sheet1.range('B2:B2').to_s.should == 'B2:B2' 
+      end
     end
     
-    it 'は第一引数にシンボルを渡しても動作します。' do
-      sheet1.range(:A1, 'C3').to_s.should == 'A1:C3'
-    end
-    
-    it 'は第二引数にシンボルを渡しても動作します。' do
-      sheet1.range('A1', :C3).to_s.should == 'A1:C3'
-    end
-    
-    it 'は第一引数と第二引数にシンボルを渡しても動作します。' do
-      sheet1.range(:A1, :C3).to_s.should == 'A1:C3'
-    end
-    
-    it 'は同じ範囲を指定した場合に同じセルを返します。' do
-      sheet1.range(:A1, :C3).should equal sheet1.range(:A1, :C3)
-    end
-    
-    it 'は第一引数を文字列で呼び出してもシンボルで呼び出しても同じ範囲を指定した場合に同じセルを返します。' do
-      sheet1.range('A1', :C3).should equal sheet1.range(:A1, :C3)
-    end
-    
-    it 'は第二引数を文字列で呼び出してもシンボルで呼び出しても同じ範囲を指定した場合に同じセルを返します。' do
-      sheet1.range(:A1, 'C3').should equal sheet1.range(:A1, :C3)
+    describe 'の呼び出し引数が多かった場合にArgumentErrorが発生します。' do
+      it '' do
+        ->{ sheet1.range('', '', '') }.should raise_error ArgumentError, 'wrong number of arguments (3 for 1..2)'
+      end
     end
   end
 
