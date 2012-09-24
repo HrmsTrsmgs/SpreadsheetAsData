@@ -49,22 +49,12 @@ class WorkSheet
         raise ArgumentError, "wrong number of arguments (#{corner.size} for 1..2)"
     end
     
-    corner_name1.to_s =~ /([A-Z])(\d)/
-    column_name1 = $1
-    row_name1 = $2
-    
-    corner_name2.to_s =~ /([A-Z])(\d)/
-    column_name2 = $1
-    row_name2 = $2
-    
-    top = [row_name1, row_name2].min
-    bottom = [row_name1, row_name2].max
-    right = [column_name1, column_name2].max
-    left = [column_name1, column_name2].min
-    @range_cache[[left + top, right + bottom]] ||=
-      CellRange.new(left + top, right + bottom, self)
+    corner_names = upper_left_and_lower_right(corner_name1, corner_name2)
+
+    @range_cache[corner_names] ||=
+      CellRange.new(*corner_names, self)
   end
-  
+
   def add_cell_xml(ref)
       v = REXML::Element.new('v')
       c = REXML::Element.new('c')
@@ -81,26 +71,44 @@ class WorkSheet
       @xml.get_elements('//c').find{|c| c.attributes['r'] == ref.to_s}
   end
 
-  def method_missing(method_name, *args)
-    case method_name
-    when /.*(?=\=$)/
-      cell($&).value = args.first
-    when /^[A-Z]\d_[A-Z]\d$/
-      range(method_name)
-    when /^[A-Z]\d$/
-      value = cell_value(method_name)
-      if value.nil?
-        super
-      else
-        value
-      end
-    else
-      super
-    end
-  end
-
 private
+  def ref_split(ref)
+    ref.to_s =~/([A-Z])(\d)/
+    [$1, $2]
+  end
+  
+  def upper_left_and_lower_right(corner_name1, corner_name2)
+    column_name1, row_name1 = ref_split(corner_name1)
+    column_name2, row_name2 = ref_split(corner_name2)
+    
+    column_names = [column_name1, column_name2]
+    row_names = [row_name1, row_name2]
+    
+    upper_left = column_names.min + row_names.min
+    lower_right = column_names.max + row_names.max
+    
+    [upper_left, lower_right]
+  end
+  
   def cell_xml(ref)
     @xml.elements["./sheetData/row/c[@r='#{ref.to_s}']"]
+  end
+
+  def method_missing(method_name, *args)
+    case method_name
+      when /.*(?=\=$)/
+        cell($&).value = args.first
+      when /^[A-Z]\d_[A-Z]\d$/
+        range(method_name)
+      when /^[A-Z]\d$/
+        value = cell_value(method_name)
+        if value.nil?
+          super
+        else
+          value
+        end
+      else
+        super
+    end
   end
 end
