@@ -45,10 +45,10 @@ describe WorkSheet do
 
   describe '#cell' do
     it 'はセルを取得します。' do
-      sheet1.cell('C3').value.should == 4
+      sheet1.cell('C3').ref.should == 'C3'
     end
     it 'はシンボルを渡しても動作します。' do
-      sheet1.cell(:C3).value.should == 4
+      sheet1.cell(:C3).ref.should == 'C3'
     end
 
     it 'は空のセルも取得します。' do
@@ -68,6 +68,18 @@ describe WorkSheet do
     it 'は空のセルの場合も同じセルの場合は同じオブジェクトを取得します。' do
       sheet1.cell('B1').should equal sheet1.cell('B1')
     end                                                                                                                                                           
+    it 'は一文字の列名称の列を取得します。' do
+      sheet1.cell('A1').ref.should == 'A1'
+      sheet1.cell('Z1').ref.should == 'Z1'
+    end
+    it 'は2文字の列名称の列を取得します。' do
+      sheet1.cell('AA1').ref.should == 'AA1'
+      sheet1.cell('ZZ1').ref.should == 'ZZ1'
+    end
+    it 'は3文字の列名称の列を取得します。' do
+      sheet1.cell('AAA1').ref.should == 'AAA1'
+      sheet1.cell('XFD1').ref.should == 'XFD1'
+    end
   end
   
   describe '#range' do
