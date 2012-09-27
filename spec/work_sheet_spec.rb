@@ -80,6 +80,20 @@ describe WorkSheet do
       sheet1.cell('AAA1').ref.should == 'AAA1'
       sheet1.cell('XFD1').ref.should == 'XFD1'
     end
+    
+    it 'は大きすぎる列名を指定した場合にnilを返します。' do
+     sheet1.cell('XFE1').should be_nil
+     sheet1.cell('ZZZ1').should be_nil
+     sheet1.cell('AAAA1').should be_nil
+    end
+    
+    it 'は存在する大きな行番号のの行を取得します。' do
+      sheet1.cell('A1048576').ref.should == 'A1048576'
+    end
+    
+    it 'は大きすぎる行番号を指定した場合にnilを返します。' do
+     sheet1.cell('A1048577').should be_nil
+    end
   end
   
   describe '#range' do
@@ -112,6 +126,30 @@ describe WorkSheet do
       it 'に第二引数を文字列で呼び出してもシンボルで呼び出しても同じ範囲を指定した場合に同じセルを返します。' do
         sheet1.range(:A1, 'C3').should equal sheet1.range(:A1, :C3)
       end
+      
+      it 'は存在する大きな列名の列を取得します。' do
+        sheet1.range('XFD1', 'XFD1').ref.should == 'XFD1:XFD1'
+      end
+      
+      it 'は第一引数に大きすぎる列名を指定した場合にnilを返します。' do
+       sheet1.range('XFE1', 'A1').should be_nil
+      end
+      
+      it 'は第二引数大きすぎる列名を指定した場合にnilを返します。' do
+       sheet1.range('A1', 'XFE1').should be_nil
+      end
+      
+      it 'は存在する大きな行番号のの行を取得します。' do
+        sheet1.range('A1048576', 'A1048576').ref.should == 'A1048576:A1048576'
+      end
+      
+      it 'は第一引数に大きすぎる行番号を指定した場合にnilを返します。' do
+       sheet1.range('A1048577', 'A1').should be_nil
+      end
+      
+      it 'は第二引数大きすぎる行番号を指定した場合にnilを返します。' do
+       sheet1.range('A1', 'A1048577').should be_nil
+      end
     end
     describe 'を１引数で呼び出した場合' do
       it 'に範囲を取得できます。' do
@@ -131,6 +169,29 @@ describe WorkSheet do
       end
       it 'に文字列で呼び出してもシンボルで呼び出しても同じ範囲を指定した場合に同じセルを返します。' do
         sheet1.range('A1:C3').should equal sheet1.range(:A1_C3)
+      end
+      it 'は存在する大きな列名の列を取得します。' do
+        sheet1.range('XFD1:XFD1').ref.should == 'XFD1:XFD1'
+      end
+      
+      it 'は一つ目のセル指定に大きすぎる列名を指定した場合にnilを返します。' do
+       sheet1.range('XFE1:A1').should be_nil
+      end
+      
+      it 'は二つ目のセル指定大きすぎる列名を指定した場合にnilを返します。' do
+       sheet1.range('A1:XFE1').should be_nil
+      end
+      
+      it 'は存在する大きな行番号のの行を取得します。' do
+        sheet1.range('A1048576:A1048576').ref.should == 'A1048576:A1048576'
+      end
+      
+      it 'は一つ目のセル指定に大きすぎる行番号を指定した場合にnilを返します。' do
+       sheet1.range('A1048577:A1').should be_nil
+      end
+      
+      it 'は二つ目のセル指定に大きすぎる行番号を指定した場合にnilを返します。' do
+       sheet1.range('A1:A1048577').should be_nil
       end
     end
     

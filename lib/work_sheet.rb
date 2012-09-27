@@ -33,22 +33,24 @@ class WorkSheet
     ref = ref.to_s
     @cell_cache[ref] ||=
       if cell_xml(ref)
-        @cell_cache[ref] = Cell.new(cell_xml(ref), self, @tag_in_book)
-      elsif ref =~ /[A-Z]+\d+/
-        @cell_cache[ref] = Cell.new(ref, self, @tag_in_book)
+         Cell.new(cell_xml(ref), self, @tag_in_book)
+      elsif is_ref(ref)
+        Cell.new(ref, self, @tag_in_book)
       end
   end
   
   def range(*corner)
     case corner.size
-      when 1
-        corner_name1, corner_name2 = corner.first.to_s.split /:|_/
-      when 2
-        corner_name1, corner_name2 = *corner
-      else
-        raise ArgumentError, "wrong number of arguments (#{corner.size} for 1..2)"
+    when 1
+      corner_name1, corner_name2 = corner.first.to_s.split /:|_/
+    when 2
+      corner_name1, corner_name2 = *corner
+    else
+      raise ArgumentError, "wrong number of arguments (#{corner.size} for 1..2)"
     end
-    
+
+    return nil if !is_ref(corner_name1) || !is_ref(corner_name2)
+
     corner_names = upper_left_and_lower_right(corner_name1, corner_name2)
 
     @range_cache[corner_names] ||=
@@ -72,11 +74,18 @@ class WorkSheet
   end
 
 private
-  def ref_split(ref)
-    ref.to_s =~/([A-Z])(\d)/
-    [$1, $2]
+  
+  CELL_REGEXP = /^([A-Z]+)(\d+)$/
+  
+  def is_ref(ref)
+    ref =~ CELL_REGEXP && [*'A'..$1].size <= 2**14 && $2.to_i <= 2**20
   end
   
+  def ref_split(ref)
+    ref.to_s =~ CELL_REGEXP
+    [$1, $2]
+  end
+
   def upper_left_and_lower_right(corner_name1, corner_name2)
     column_name1, row_name1 = ref_split(corner_name1)
     column_name2, row_name2 = ref_split(corner_name2)
@@ -89,26 +98,22 @@ private
     
     [upper_left, lower_right]
   end
-  
+
   def cell_xml(ref)
     @xml.elements["./sheetData/row/c[@r='#{ref.to_s}']"]
   end
 
   def method_missing(method_name, *args)
     case method_name
-      when /.*(?=\=$)/
-        cell($&).value = args.first
-      when /^[A-Z]\d_[A-Z]\d$/
-        range(method_name)
-      when /^[A-Z]\d$/
-        value = cell_value(method_name)
-        if value.nil?
-          super
-        else
-          value
-        end
-      else
-        super
+    when /.*(?=\=$)/
+      cell($&).value = args.first
+    when /^[A-Z]\d_[A-Z]\d$/
+      range(method_name)
+    when /^[A-Z]\d$/
+      value = cell_value(method_name)
+      value.nil? ? super : value
+    else
+      super
     end
   end
 end
