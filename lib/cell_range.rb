@@ -22,6 +22,11 @@ class CellRange
     @corner2
   end
   
+  def all
+    /^[A-Z]+(\d+):[A-Z]+(\d+)$/ =~ to_s
+    Array.new($2.to_i - $1.to_i)
+  end
+  
   def to_s
     "#@corner1:#@corner2"
   end
