@@ -27,6 +27,13 @@ class CellRange
     Array.new($2.to_i - $1.to_i)
   end
   
+  def column_names
+    /^([A-Z]+)(\d+):([A-Z]+)\d+$/ =~ to_s
+    ($1..$3).map do |column|
+      sheet.cell_value(column + $2)
+    end
+  end
+  
   def to_s
     "#@corner1:#@corner2"
   end

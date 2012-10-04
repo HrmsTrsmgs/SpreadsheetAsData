@@ -14,9 +14,14 @@ describe CellRange do
   end
 
   describe '#all' do
-    it 'でデータが取得されています。' do
+    it 'でデータの行が取得されています。' do
       table1.all.size.should == 2
       table2.all.size.should == 3
+    end
+  end
+  describe '#column_names' do
+    it 'で列名が取得されています' do
+      table1.column_names.should == ['float', 'string', 'bool']
     end
   end
 end
