@@ -59,6 +59,11 @@ class Cell
     end
     
   end
+  
+  def row_num
+    /^[A-Z]+(\d+)$/ =~ to_s
+    $1.to_i
+  end
 
   def to_s
     if @xml

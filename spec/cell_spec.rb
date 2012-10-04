@@ -76,6 +76,13 @@ describe Cell do
     end
   end
   
+  describe '#row_num' do
+    it 'がセルの行番号を取得できます。' do
+      subject.row_num.should == 1
+      sheet.cell(:A3).row_num.should == 3
+    end
+  end
+  
   describe '#to_s' do
     it 'がセルの名称を取得できます。' do
       subject.to_s.should == 'A1'
