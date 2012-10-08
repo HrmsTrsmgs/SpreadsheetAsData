@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe DataRow do
-  let(:book) { TestFile.データ }
+  let(:book) { TestFile.テーブル }
   subject { book.Sheet1.A1_C3.all.first }
 
   after do

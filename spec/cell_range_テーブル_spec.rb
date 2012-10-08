@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe CellRange do
-  let(:book) { TestFile.データ }
+  let(:book) { TestFile.テーブル }
   let(:sheet) { book.Sheet1 }
   
   subject { sheet.A1_C3 }

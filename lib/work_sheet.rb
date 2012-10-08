@@ -39,6 +39,10 @@ class WorkSheet
       end
   end
   
+  def tables
+    Array.new(@xml.get_elements('//tableParts/tablePart').size)
+  end
+  
   def range(*corner)
     case corner.size
     when 1
