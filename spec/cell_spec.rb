@@ -83,6 +83,20 @@ describe Cell do
     end
   end
   
+  describe '#column_name' do
+    it 'がセルの列名を取得できます。' do
+      subject.column_name.should == 'A'
+      sheet.cell(:C1).column_name.should == 'C'
+    end
+  end
+  
+    describe '#column_num' do
+    it 'がセルの列番号を取得できます。' do
+      subject.column_num.should == 1
+      sheet.cell(:C1).column_num.should == 3
+    end
+  end
+  
   describe '#to_s' do
     it 'がセルの名称を取得できます。' do
       subject.to_s.should == 'A1'

@@ -1,5 +1,7 @@
 # coding: UTF-8
 
+require 'data_row'
+
 class CellRange
   
   attr_reader :sheet
@@ -24,13 +26,21 @@ class CellRange
   
   def all
     /^[A-Z]+(\d+):[A-Z]+(\d+)$/ =~ to_s
-    Array.new($2.to_i - $1.to_i)
+    ($1.to_i + 1).upto($2.to_i).map{ |row_num| DataRow.new(self, row_num, @corner1.column_num) }
+  end
+  
+  def where(exp)
+    result = nil
+    exp.each do |key, value|
+      result = all.select{ |row| row.cell_value(key.to_s) == value }
+    end
+    result
   end
   
   def column_names
     /^([A-Z]+)(\d+):([A-Z]+)\d+$/ =~ to_s
     ($1..$3).map do |column|
-      sheet.cell_value(column + $2)
+      sheet.cell_value(column + $2).to_sym
     end
   end
   

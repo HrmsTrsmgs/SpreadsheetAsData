@@ -64,6 +64,15 @@ class Cell
     /^[A-Z]+(\d+)$/ =~ to_s
     $1.to_i
   end
+  
+  def column_name
+    /^([A-Z]+)\d+$/ =~ to_s
+    $1
+  end
+  
+  def column_num
+    [*'A'..column_name].size
+  end
 
   def to_s
     if @xml
