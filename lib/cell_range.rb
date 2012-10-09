@@ -32,7 +32,7 @@ class CellRange
   def where(exp)
     result = nil
     exp.each do |key, value|
-      result = all.select{ |row| row.cell_value(key.to_s) == value }
+      result = all.select{ |row| value === row.cell_value(key.to_s) }
     end
     result
   end

@@ -24,9 +24,13 @@ describe CellRange do
   end
   
   describe '#where' do
-    it 'でデータの検索ができています。' do
-      subject.where(int: 2).size.should == 1
-      subject.where(int: 2).first.int.should == 2
+    it 'で値を指定してデータの検索ができています。' do
+      subject.where(int: 5).size.should == 2
+      subject.where(int: 5).should be_all{ |row| row.int == 5 }
+    end
+   it 'で範囲を指定してデータの検索ができています。' do
+      subject.where(int: 2..4).size.should == 3
+      subject.where(int: 2..4).should be_all{ |row| 2 <= row.int && row.int <= 4 }
     end
   end
   
