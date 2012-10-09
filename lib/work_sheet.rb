@@ -39,7 +39,7 @@ class WorkSheet
       end
   end
   
-  def tables
+  def defined_name
     Array.new(@xml.get_elements('//tableParts/tablePart').size)
   end
   

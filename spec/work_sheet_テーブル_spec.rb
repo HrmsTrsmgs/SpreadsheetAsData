@@ -11,10 +11,10 @@ describe WorkSheet do
     TestFile.close
   end
 
-  describe '#tables' do
+  describe '#defined_name' do
     it 'は参照しているすべてのテーブルを取得できます。' do
-      subject.tables.size.should == 2
-      sheet2.tables.size.should == 3
+      subject.defined_name.size.should == 2
+      sheet2.defined_name.size.should == 3
     end
   end
 end
