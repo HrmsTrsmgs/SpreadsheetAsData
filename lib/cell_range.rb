@@ -32,7 +32,14 @@ class CellRange
   def where(exp)
     result = nil
     exp.each do |key, value|
-      result = all.select{ |row| value === row.cell_value(key.to_s) }
+      result = all.select do |row|
+        case value
+        when Array
+          value.include? row.cell_value(key.to_s)
+        else
+          value === row.cell_value(key.to_s)
+        end
+      end
     end
     result
   end
