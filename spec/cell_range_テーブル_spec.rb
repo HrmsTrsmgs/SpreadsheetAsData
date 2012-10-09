@@ -24,13 +24,43 @@ describe CellRange do
   end
   
   describe '#where' do
-    it 'で値を指定してデータの検索ができています。' do
-      subject.where(int: 5).size.should == 2
-      subject.where(int: 5).should be_all{ |row| row.int == 5 }
+    describe 'で整数列に対して' do
+      it '値を指定してデータの検索ができています。' do
+        subject.where(int: 5).size.should == 2
+        subject.where(int: 5).should be_all{ |row| row.int == 5 }
+      end
+     it '範囲を指定してデータの検索ができています。' do
+        subject.where(int: 2..4).size.should == 3
+        subject.where(int: 2..4).should be_all{ |row| 2 <= row.int && row.int <= 4 }
+      end
+      
+      it '値を指定してデータの検索ができています。' do
+        subject.where(int: 5).size.should == 2
+        subject.where(int: 5).should be_all{ |row| row.int == 5 }
+      end
+     it '範囲を指定してデータの検索ができています。' do
+        subject.where(int: 2..4).size.should == 3
+        subject.where(int: 2..4).should be_all{ |row| 2 <= row.int && row.int <= 4 }
+      end
     end
-   it 'で範囲を指定してデータの検索ができています。' do
-      subject.where(int: 2..4).size.should == 3
-      subject.where(int: 2..4).should be_all{ |row| 2 <= row.int && row.int <= 4 }
+    describe 'で実数列に対して' do
+      it '値を指定してデータの検索ができています。' do
+        subject.where(float: 6.6).size.should == 2
+        subject.where(float: 6.6).should be_all{ |row| row.float == 6.6 }
+      end
+     it '範囲を指定してデータの検索ができています。' do
+        subject.where(float: 2..5).size.should == 3
+        subject.where(float: 2..5).should be_all{ |row| 2 <= row.float && row.float <= 5 }
+      end
+      
+      it '値を指定してデータの検索ができています。' do
+        subject.where(float: 6.6).size.should == 2
+        subject.where(float: 6.6).should be_all{ |row| row.float == 6.6 }
+      end
+     it '範囲を指定してデータの検索ができています。' do
+        subject.where(float: 2..5).size.should == 3
+        subject.where(float: 2..5).should be_all{ |row| 2 <= row.float && row.float <= 5 }
+      end
     end
   end
   
