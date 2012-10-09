@@ -111,8 +111,9 @@ private
     case method_name
     when /.*(?=\=$)/
       cell($&).value = args.first
-    when /^[A-Z]\d_[A-Z]\d$/
-      range(method_name)
+    when /^[A-Z]+\d+_[A-Z]+\d+$/
+      value = range(method_name)
+      value.nil? ? super : value
     when /^[A-Z]\d$/
       value = cell_value(method_name)
       value.nil? ? super : value

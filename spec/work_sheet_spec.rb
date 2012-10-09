@@ -250,5 +250,29 @@ describe WorkSheet do
     it 'は行の順序が反転していても同じ範囲を取得できます。' do
       sheet1.A3_C1.should equal sheet1.A1_C3
     end
+    
+    it 'は存在する大きな列名の列を取得します。' do
+      sheet1.XFD1_XFD1.ref.should == 'XFD1:XFD1'
+    end
+    
+    it 'は一つ目のセル指定に大きすぎる列名を指定した場合にNoMethodErrorを返します。' do
+     ->{ sheet1.XFE1_A1 }.should raise_error NoMethodError
+    end
+    
+    it 'は二つ目のセル指定大きすぎる列名を指定した場合にNoMethodErrorを返します。' do
+     ->{ sheet1.A1_XFE1 }.should raise_error NoMethodError
+    end
+    
+    it 'は存在する大きな行番号のの行を取得します。' do
+      sheet1.A1048576_A1048576.ref.should == 'A1048576:A1048576'
+    end
+    
+    it 'は一つ目のセル指定に大きすぎる行番号を指定した場合にNoMethodErrorを返します。' do
+     ->{ sheet1.A1048577_A1 }.should raise_error NoMethodError
+    end
+    
+    it 'は二つ目のセル指定に大きすぎる行番号を指定した場合にNoMethodErrorを返します。' do
+     ->{ sheet1.A1_A1048577 }.should raise_error NoMethodError
+    end
   end
 end
