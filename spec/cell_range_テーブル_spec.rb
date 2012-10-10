@@ -51,6 +51,13 @@ describe CellRange do
         result.size.should == 4
         result.should be_all{ |row| [1, 3, 5].include? row.int }
       end
+      
+      it '複数の条件を指定してデータの検索ができています。' do
+        result = subject.where(int: 5, float: 6.6)
+        result.size.should == 1
+        result.first.int.should == 5
+        result.first.float.should == 6.6
+      end
     end
     describe 'で実数列に対して' do
       it '値を指定してデータの検索ができています。' do
