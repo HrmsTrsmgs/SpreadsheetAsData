@@ -83,23 +83,23 @@ private
   CELL_REGEXP = /^([A-Z]+)(\d+)$/
   
   def is_ref(ref)
-    CellName.new(ref).is_cell_name
+    CellName.new(ref).valid?
   end
   
   def ref_split(ref)
-    ref.to_s =~ CELL_REGEXP
-    [$1, $2]
+    name = CellName.new(ref)
+    [name.column_name, name.row_num]
   end
 
   def upper_left_and_lower_right(corner_name1, corner_name2)
-    column_name1, row_name1 = ref_split(corner_name1)
-    column_name2, row_name2 = ref_split(corner_name2)
+    column_name1, row_num1 = ref_split(corner_name1)
+    column_name2, row_num2 = ref_split(corner_name2)
     
     column_names = [column_name1, column_name2]
-    row_names = [row_name1, row_name2]
+    row_nums = [row_num1, row_num2]
     
-    upper_left = column_names.min + row_names.min
-    lower_right = column_names.max + row_names.max
+    upper_left = column_names.min + row_nums.min.to_s
+    lower_right = column_names.max + row_nums.max.to_s
     
     [upper_left, lower_right]
   end
