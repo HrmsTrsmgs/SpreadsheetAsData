@@ -4,7 +4,7 @@ class BlankValue < Numeric
   def ==(other)
     other == 0 || other == ''
   end
-
+  
   def inspect
     '{blank}'
   end

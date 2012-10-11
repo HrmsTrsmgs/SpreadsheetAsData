@@ -13,8 +13,8 @@ describe WorkSheet do
 
   describe '#defined_name' do
     it 'は参照しているすべてのテーブルを取得できます。' do
-      subject.defined_name.size.should == 2
-      sheet2.defined_name.size.should == 3
+      subject.defined_name.size.should == 3
+      sheet2.defined_name.size.should == 4
     end
   end
 end

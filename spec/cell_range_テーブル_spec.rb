@@ -4,8 +4,10 @@ require 'spec_helper'
 
 describe CellRange do
   let(:book) { TestFile.テーブル }
-  subject { book.Sheet3.A1_C12 }
-  let(:table2) { book.Sheet1.A1_C3 }
+  let(:sheet1) { book.Sheet1 }
+  let(:sheet3) { book.Sheet3 }
+  subject { sheet3.A1_C12 }
+  let(:table2) { sheet1.A1_C3 }
 
   after do
     TestFile.close
@@ -20,6 +22,14 @@ describe CellRange do
     it 'で取得したデータ行からセルのデータが取得されています。' do
       subject.all.first.float.should == 1.1
       subject.all.first.string.should == 'あ'
+    end
+
+    it 'で空行は取得されません。' do
+      sheet1.A1_C5.all.size.should == 2
+    end
+    
+     it 'で空行の次の有効行は取得されます。' do
+      sheet1.A1_C6.all.size.should == 3
     end
   end
   

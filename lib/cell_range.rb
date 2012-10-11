@@ -26,7 +26,12 @@ class CellRange
   
   def all
     /^[A-Z]+(\d+):[A-Z]+(\d+)$/ =~ to_s
-    ($1.to_i + 1).upto($2.to_i).map{ |row_num| DataRow.new(self, row_num) }
+    ($1.to_i + 1).upto($2.to_i).select do |row_num|
+      (upper_left_cell.column_name..lower_right_cell.column_name).any? do |column_name|
+        sheet.cell_value(column_name + row_num.to_s).class != BlankValue
+      end
+    end.
+    map{ |row_num| DataRow.new(self, row_num) }
   end
   
   def where(exp)
