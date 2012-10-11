@@ -26,7 +26,7 @@ class CellRange
   
   def all
     /^[A-Z]+(\d+):[A-Z]+(\d+)$/ =~ to_s
-    ($1.to_i + 1).upto($2.to_i).map{ |row_num| DataRow.new(self, row_num, @corner1.column_num) }
+    ($1.to_i + 1).upto($2.to_i).map{ |row_num| DataRow.new(self, row_num) }
   end
   
   def where(exp)

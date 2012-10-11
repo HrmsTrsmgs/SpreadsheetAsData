@@ -4,6 +4,7 @@ require 'rexml/document'
 require 'cell'
 require 'blank_value'
 require 'cell_range'
+require 'cell_name'
 
 # Excelのシートです。
 class WorkSheet
@@ -82,7 +83,7 @@ private
   CELL_REGEXP = /^([A-Z]+)(\d+)$/
   
   def is_ref(ref)
-    ref =~ CELL_REGEXP && [*'A'..$1].size <= 2**14 && $2.to_i <= 2**20
+    CellName.new(ref).is_cell_name
   end
   
   def ref_split(ref)
