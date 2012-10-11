@@ -236,6 +236,22 @@ describe WorkSheet do
     it 'で文字列を取得する場合、同じセルの場合は同じオブジェクトを取得します。' do
       data.A3.should equal data.A3
     end
+    
+    it 'は存在する大きな列名のセルを取得します。' do
+      sheet1.XFD1.class.should == BlankValue
+    end
+    
+    it 'は大きすぎる列名を指定した場合にNoMethodErrorを返します。' do
+     ->{ sheet1.XFE1 }.should raise_error NoMethodError
+    end
+    
+    it 'は存在する大きな行番号の行を取得します。' do
+      sheet1.A1048576.class.should == BlankValue
+    end
+    
+    it 'は大きすぎる行番号を指定した場合にNoMethodErrorを返します。' do
+     ->{ sheet1.A10485771 }.should raise_error NoMethodError
+    end
   end
   describe '#範囲名称' do
     it 'は範囲を取得できます。' do

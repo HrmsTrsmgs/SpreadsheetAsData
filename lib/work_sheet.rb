@@ -34,7 +34,7 @@ class WorkSheet
     ref = ref.to_s
     @cell_cache[ref] ||=
       if cell_xml(ref)
-         Cell.new(cell_xml(ref), self, @tag_in_book)
+        Cell.new(cell_xml(ref), self, @tag_in_book)
       elsif is_ref(ref)
         Cell.new(ref, self, @tag_in_book)
       end
@@ -115,7 +115,7 @@ private
     when /^[A-Z]+\d+_[A-Z]+\d+$/
       value = range(method_name)
       value.nil? ? super : value
-    when /^[A-Z]\d$/
+    when /^[A-Z]+\d+$/
       value = cell_value(method_name)
       value.nil? ? super : value
     else
