@@ -8,17 +8,15 @@ class RangeName
 
   attr_reader :upper_left, :lower_right
 
-  def initialize(*name)
-    case name.size
+  def initialize(*names)
+    case names.size
     when 1
-      name[0] =~ /^([A-Z]+)(\d+)(:|_)([A-Z]+)(\d+)$/
+      names[0] =~ /^([A-Z]+)(\d+)(:|_)([A-Z]+)(\d+)$/
       column_names = [$1, $4]
       row_nums = [$2.to_i, $5.to_i]
     when 2
-      name1 = CellName.new(name[0])
-      name2 = CellName.new(name[1])
-      column_names = [name1.column_name, name2.column_name]
-      row_nums = [name1.row_num, name2.row_num]
+      column_names = names.map{|name| CellName.new(name).column_name }
+      row_nums = names.map{|name| CellName.new(name).row_num }
     end
     if column_names.all?
       @valid = true
