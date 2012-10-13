@@ -2,8 +2,8 @@
 
 class CellName
 
-  def self.valid?(name)
-    self.new(name).valid?
+  def self.valid?(name = nil)
+     name ? self.new(name).valid? : CellNameValidator.new
   end
 
   attr_reader :column_name, :row_num
@@ -38,10 +38,16 @@ class CellName
     [column_name, row_num].hash
   end
   
-  private
-    def invalid!
-      @valid = false
-      @column_name = nil
-      @row_num = nil
+private
+  def invalid!
+    @valid = false
+    @column_name = nil
+    @row_num = nil
+  end
+  
+  class CellNameValidator
+    def ===(other)
+      CellName.valid?(other)
     end
+  end
 end

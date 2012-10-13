@@ -11,6 +11,10 @@ describe CellName do
       CellName.valid?('A').should be_false
       CellName.valid?('1').should be_false
     end
+      it 'はメソッド呼び出しではなく、when句に利用しても使えます。' do
+      CellName.valid?.should === 'A1'
+      CellName.valid?.should_not === 'A'
+    end
   end
   describe 'をハッシュのキーとして利用する時に、CellName' do
     let(:hash) { { CellName.new('A1') => 1 } }

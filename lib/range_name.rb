@@ -2,9 +2,9 @@
 
 class RangeName
 
-  def self.valid?(name)
-    self.new(name).valid?
-  end
+  def self.valid?(name = nil)
+    name ? self.new(name).valid? : RangeNameValidator.new
+  end  
 
   attr_reader :upper_left, :lower_right
 
@@ -46,5 +46,11 @@ private
     @valid = false
     @start_cell = nil
     @end_cell = nil
+  end
+  
+  class RangeNameValidator
+    def ===(other)
+      RangeName.valid?(other)
+    end
   end
 end

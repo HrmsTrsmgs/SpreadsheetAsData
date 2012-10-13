@@ -4,12 +4,17 @@ require 'spec_helper'
 
 describe RangeName do
   describe '::valid?' do
-    it 'は有効な範囲ではtrueとなる' do
+    it 'は有効な範囲ではtrueとなります。' do
       RangeName.valid?('A1:A1').should be_true
     end
-    it 'は無効な範囲ではfalseとなる' do
+    it 'は無効な範囲ではfalseとなります。' do
       RangeName.valid?('A1:').should be_false
       RangeName.valid?(':B2').should be_false
+    end
+    
+    it 'はメソッド呼び出しではなく、when句に利用しても使えます。' do
+      RangeName.valid?.should === 'A1:A1'
+      RangeName.valid?.should_not === 'A1:'
     end
   end
   describe 'をハッシュのキーとして利用する時に、RangeName' do
