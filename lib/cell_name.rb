@@ -30,6 +30,14 @@ class CellName
     @column_name + @row_num.to_s
   end
   
+  def eql?(other)
+    column_name == other.column_name && row_num == other.row_num
+  end
+  
+  def hash
+    [column_name, row_num].hash
+  end
+  
   private
     def invalid!
       @valid = false

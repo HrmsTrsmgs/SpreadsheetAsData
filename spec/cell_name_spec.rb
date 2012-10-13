@@ -12,6 +12,18 @@ describe CellName do
       CellName.valid?('1').should be_false
     end
   end
+  describe 'をハッシュのキーとして利用する時に、CellName' do
+    let(:hash) { { CellName.new('A1') => 1 } }
+    it 'は位置が同じ時に同値と判定されます。' do      
+      hash[CellName.new('A1')].should == 1
+    end
+    it 'は列が違うときにに同値ではないと判定されます。' do      
+      hash[CellName.new('B1')].should be_nil
+    end
+    it 'は行が違うときにに同値ではないと判定されます。' do      
+      hash[CellName.new('A2')].should be_nil
+    end
+  end
   describe '#initialize' do
     it 'は文字列を受け取ります。' do
       CellName.new('A1').to_s.should == 'A1'
