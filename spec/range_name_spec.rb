@@ -25,13 +25,25 @@ describe RangeName do
     end
   end
   describe '#initialize' do
-    it 'は文字列を受け取ります。' do
-      RangeName.new('A1:A1').to_s.should == 'A1:A1'
-      RangeName.new('B2:C3').to_s.should == 'B2:C3'
+    describe 'は一つの引数で使われた時に' do
+      it 'は文字列を受け取ります。' do
+        RangeName.new('A1:A1').to_s.should == 'A1:A1'
+        RangeName.new('B2:C3').to_s.should == 'B2:C3'
+      end
+      it 'はシンボルを受け取ります。' do
+        RangeName.new(:A1_A1).to_s.should == 'A1:A1'
+        RangeName.new(:B2_C3).to_s.should == 'B2:C3'
+      end
     end
-    it 'はシンボルを受け取ります。' do
-      RangeName.new(:A1_A1).to_s.should == 'A1:A1'
-      RangeName.new(:B2_C3).to_s.should == 'B2:C3'
+    describe 'は二つの引数で使われた時に' do
+      it 'は文字列を受け取ります。' do
+        RangeName.new('A1','A1').to_s.should == 'A1:A1'
+        RangeName.new('B2','C3').to_s.should == 'B2:C3'
+      end
+      it 'はシンボルを受け取ります。' do
+        RangeName.new(:A1,:A1).to_s.should == 'A1:A1'
+        RangeName.new(:B2,:C3).to_s.should == 'B2:C3'
+      end
     end
   end
   describe '#upper_left' do
