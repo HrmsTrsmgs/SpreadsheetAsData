@@ -23,7 +23,11 @@ class CellName
   end
   
   def column_num
-    [*'A'..column_name].size
+    [*'A'..column_name].size if valid?
+  end
+  
+  def to_s
+    @column_name + @row_num.to_s
   end
   
   private
