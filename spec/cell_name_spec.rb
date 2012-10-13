@@ -3,6 +3,15 @@
 require 'spec_helper'
 
 describe CellName do
+  describe '::valid?' do
+    it 'は有効なセルではtrueとなる' do
+      CellName.valid?('A1').should be_true
+    end
+    it 'は無効なセルではfalseとなる' do
+      CellName.valid?('A').should be_false
+      CellName.valid?('1').should be_false
+    end
+  end
   describe '#initialize' do
     it 'は文字列を受け取ります。' do
       CellName.new('A1').to_s.should == 'A1'
