@@ -26,6 +26,14 @@ class RangeName
     @valid
   end
   
+  def eql?(other)
+    upper_left.eql?(other.upper_left) && lower_right.eql?(other.lower_right)
+  end
+  
+  def hash
+    [upper_left, lower_right].hash
+  end
+  
   def to_s
     valid? ? "#@upper_left:#@lower_right" : '{invalid range}'
   end

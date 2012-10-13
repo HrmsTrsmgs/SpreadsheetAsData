@@ -12,6 +12,18 @@ describe RangeName do
       RangeName.valid?(':B2').should be_false
     end
   end
+  describe 'をハッシュのキーとして利用する時に、RangeName' do
+    let(:hash) { { RangeName.new('A1:B2') => 1 } }
+    it 'は位置が同じ時に同値と判定されます。' do
+      hash[RangeName.new('A1:B2')].should == 1
+    end
+    it 'は左上セルが違うときにに同値ではないと判定されます。' do      
+      hash[RangeName.new('B2:B2')].should be_nil
+    end
+    it 'は右下セルが違うときにに同値ではないと判定されます。' do      
+      hash[RangeName.new('A1:A1')].should be_nil
+    end
+  end
   describe '#initialize' do
     it 'は文字列を受け取ります。' do
       RangeName.new('A1:A1').to_s.should == 'A1:A1'
