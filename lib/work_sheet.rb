@@ -26,8 +26,12 @@ class WorkSheet
     @tag.attributes['name'].encode(book.encoding)
   end
 
-  def cell_value(ref)
-    cell(ref).value if cell(ref)
+  def cell_value(cell_name)
+    cell(cell_name).value if cell(cell_name)
+  end
+
+  def blank?(cell_name)
+    cell_value(cell_name).class == BlankValue
   end
 
   def cell(ref)
@@ -35,7 +39,7 @@ class WorkSheet
     @cell_cache[ref] ||=
       if cell_xml(ref)
         Cell.new(cell_xml(ref), self, @tag_in_book)
-      elsif is_ref(ref)
+      elsif CellName.valid?(ref)
         Cell.new(ref, self, @tag_in_book)
       end
   end
@@ -54,7 +58,7 @@ class WorkSheet
       raise ArgumentError, "wrong number of arguments (#{corner.size} for 1..2)"
     end
 
-    return nil if !is_ref(corner_name1) || !is_ref(corner_name2)
+    return nil if !CellName.valid?(corner_name1) || !CellName.valid?(corner_name2)
 
     corner_names = upper_left_and_lower_right(corner_name1, corner_name2)
 
@@ -68,24 +72,16 @@ class WorkSheet
       c.attributes['r'] = ref
       c.add_element(v)
       ref =~ /\d+/
-      row = @xml.get_elements('//row').find {|row| row.attributes['r'] == $& }
+      row = @xml.get_elements('./sheetdata/row').find {|row| row.attributes['r'] == $& }
       unless row
         row = REXML::Element.new('row')
         row.attributes['r'] = $&
-        @xml.elements['//sheetData'].add_element(row)
+        @xml.elements['./sheetData'].add_element(row)
       end
       row.add_element(c)
-      @xml.get_elements('//c').find{|c| c.attributes['r'] == ref.to_s}
   end
 
-private
-  
-  CELL_REGEXP = /^([A-Z]+)(\d+)$/
-  
-  def is_ref(ref)
-    CellName.new(ref).valid?
-  end
-  
+private  
   def ref_split(ref)
     name = CellName.new(ref)
     [name.column_name, name.row_num]
@@ -115,11 +111,9 @@ private
     when /^[A-Z]+\d+_[A-Z]+\d+$/
       value = range(method_name)
       value.nil? ? super : value
-    when /^[A-Z]+\d+$/
+    else
       value = cell_value(method_name)
       value.nil? ? super : value
-    else
-      super
     end
   end
 end

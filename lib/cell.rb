@@ -1,24 +1,29 @@
 # coding: UTF-8
 
 require 'rexml/document'
+require 'forwardable'
+
+require 'cell_name'
 
 class Cell
-
+  extend Forwardable
+  
   attr_reader :sheet
+  
+  def_delegator(:sheet, :book)
+  def_delegator(:name, :row_num)
+  def_delegator(:name, :column_num)
+  def_delegator(:name, :column_name)
 
   # インスタンスを初期化します。
   def initialize(xml_or_ref, sheet, part)
-    if xml_or_ref =~ /[A-Z]+[0-9]+/
+    if CellName.valid? xml_or_ref
       @ref = xml_or_ref
     else
       @xml = xml_or_ref
     end
     @sheet = sheet
     @part = part
-  end
-
-  def book
-    sheet.book
   end
 
   def value
@@ -59,20 +64,6 @@ class Cell
     end
     
   end
-  
-  def row_num
-    /^[A-Z]+(\d+)$/ =~ to_s
-    $1.to_i
-  end
-  
-  def column_name
-    /^([A-Z]+)\d+$/ =~ to_s
-    $1
-  end
-  
-  def column_num
-    [*'A'..column_name].size
-  end
 
   def to_s
     if @xml
@@ -83,4 +74,9 @@ class Cell
   end
 
   alias ref to_s
+  
+private
+  def name
+    CellName.new(to_s)
+  end
 end

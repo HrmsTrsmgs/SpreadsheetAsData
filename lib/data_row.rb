@@ -13,7 +13,7 @@ class DataRow
   private
   
   def column_name(table_column_name)
-    i_to_column_name(@cell_range.upper_left_cell.column_num + column_index(table_column_name))
+    column_num_to_name(@cell_range.upper_left_cell.column_num + column_index(table_column_name))
   end
   
   def column_index(table_column_name)
@@ -21,7 +21,7 @@ class DataRow
   end
   
   
-  def i_to_column_name(i)
+  def column_num_to_name(i)
     cell_column_name = 'A'
     (i - 1).times { cell_column_name.succ! }
     cell_column_name
