@@ -6,26 +6,33 @@ class RangeName
     self.new(name).valid?
   end
 
-  attr_reader :start_cell, :end_cell
+  attr_reader :upper_left, :lower_right
 
   def initialize(name)
-    if name =~ /^([A-Z]+\d+):([A-Z]+\d+)$/
+    if name =~ /^([A-Z]+)(\d+)(:|_)([A-Z]+)(\d+)$/
       @valid = true
-      @start_cell = CellName.new($1)
-      @end_cell = CellName.new($2)
       
-      invalid! unless @start_cell.valid? && @end_cell.valid?
+      column_names = [$1, $4]
+      row_nums = [$2.to_i, $5.to_i]
+      
+      @upper_left = CellName.new(column_names.min + row_nums.min.to_s)
+      @lower_right = CellName.new(column_names.max + row_nums.max.to_s)
+      
+      invalid! unless @upper_left.valid? && @lower_right.valid?
     end
   end
-  
+
   def valid?
     @valid
   end
   
-  private
-    def invalid!
-      @valid = false
-      @start_cell = nil
-      @end_cell = nil
-    end
+  def to_s
+    valid? ? "#@upper_left:#@lower_right" : '{invalid range}'
+  end
+private
+  def invalid!
+    @valid = false
+    @start_cell = nil
+    @end_cell = nil
+  end
 end
