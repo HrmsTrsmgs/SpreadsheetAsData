@@ -51,21 +51,17 @@ class WorkSheet
   def range(*corner)
     case corner.size
     when 1
-      corner_name1, corner_name2 = corner.first.to_s.split /:|_/
+      name = RangeName.new(corner[0])
     when 2
-      corner_name1, corner_name2 = *corner
+      name = RangeName.new(corner[0].to_s + ':' + corner[1].to_s)
     else
       raise ArgumentError, "wrong number of arguments (#{corner.size} for 1..2)"
     end
-    
-    name = RangeName.new(corner_name1.to_s + ':' + corner_name2.to_s)
 
     return nil if !name.valid?
-
-    corner_names = [name.upper_left.to_s, name.lower_right.to_s]
-
-    @range_cache[corner_names] ||=
-      CellRange.new(*corner_names, self)
+    
+    @range_cache[name] ||=
+      CellRange.new(name.upper_left, name.lower_right.to_s, self)
   end
 
   def add_cell_xml(ref)
