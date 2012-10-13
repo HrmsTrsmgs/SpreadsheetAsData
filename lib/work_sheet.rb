@@ -57,10 +57,12 @@ class WorkSheet
     else
       raise ArgumentError, "wrong number of arguments (#{corner.size} for 1..2)"
     end
+    
+    name = RangeName.new(corner_name1.to_s + ':' + corner_name2.to_s)
 
-    return nil if !CellName.valid?(corner_name1) || !CellName.valid?(corner_name2)
+    return nil if !name.valid?
 
-    corner_names = upper_left_and_lower_right(corner_name1, corner_name2)
+    corner_names = [name.upper_left.to_s, name.lower_right.to_s]
 
     @range_cache[corner_names] ||=
       CellRange.new(*corner_names, self)
@@ -85,19 +87,6 @@ private
   def ref_split(ref)
     name = CellName.new(ref)
     [name.column_name, name.row_num]
-  end
-
-  def upper_left_and_lower_right(corner_name1, corner_name2)
-    column_name1, row_num1 = ref_split(corner_name1)
-    column_name2, row_num2 = ref_split(corner_name2)
-    
-    column_names = [column_name1, column_name2]
-    row_nums = [row_num1, row_num2]
-    
-    upper_left = column_names.min + row_nums.min.to_s
-    lower_right = column_names.max + row_nums.max.to_s
-    
-    [upper_left, lower_right]
   end
 
   def cell_xml(ref)
