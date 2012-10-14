@@ -292,10 +292,10 @@ describe WorkSheet do
     end
   end
   
-  describe '#real_lines' do
+  describe '#real_rows' do
     it 'は値が存在するすべての行番号を取得します。' do
-      sheet1.real_lines.should == [1, 3]
-      data.real_lines.should == [1, 2, 3]
+      sheet1.real_rows.should == [1, 3]
+      data.real_rows.should == [1, 2, 3]
     end
   end
 end
