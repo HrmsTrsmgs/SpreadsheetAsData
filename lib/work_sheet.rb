@@ -63,7 +63,7 @@ class WorkSheet
       c.attributes['r'] = ref
       c.add_element(v)
       ref =~ /\d+/
-      row = @xml.get_elements('./sheetdata/row').find {|row| row.attributes['r'] == $& }
+      row = @xml.get_elements('./sheetData/row').find {|row| row.attributes['r'] == $& }
       unless row
         row = REXML::Element.new('row')
         row.attributes['r'] = $&

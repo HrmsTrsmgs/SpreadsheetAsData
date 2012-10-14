@@ -249,4 +249,16 @@ describe WorkBook do
       book.Sheet1.B2.should == 999
     end
   end
+  
+  it 'の空白セルに書き込みがされた時に、行の整合性が取れています。' do
+    book = WorkBook.open(TestFile.book1_copy_path) do |book|
+      book.Sheet1.B1 = 999
+    end
+    
+    WorkBook.open(TestFile.book1_copy_path) do |book|
+      book.Sheet1.B1.should == 999
+      book.Sheet1.A1.should == 1
+      book.Sheet1.real_lines.should == [1, 3]
+    end
+  end
 end
