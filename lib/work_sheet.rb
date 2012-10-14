@@ -63,7 +63,7 @@ class WorkSheet
       c.attributes['r'] = ref
       c.add_element(v)
       ref =~ /\d+/
-      row = @xml.get_elements('./sheetData/row').find {|row| row.attributes['r'] == $& }
+      row = rows_xml.find {|row| row.attributes['r'] == $& }
       unless row
         row = REXML::Element.new('row')
         row.attributes['r'] = $&
@@ -73,9 +73,13 @@ class WorkSheet
   end
   
   def real_rows
-    @xml.get_elements('./sheetData/row').map{|row| row.attributes['r'].to_i  }
+    rows_xml.map{|row| row.attributes['r'].to_i  }
   end
-private  
+private
+
+  def rows_xml
+    @xml.get_elements('./sheetData/row')
+  end
   def ref_split(ref)
     name = CellName.new(ref)
     [name.column_name, name.row_num]
