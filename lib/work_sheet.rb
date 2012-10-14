@@ -71,7 +71,10 @@ class WorkSheet
       end
       row.add_element(c)
   end
-
+  
+  def real_lines
+    @xml.get_elements('./sheetData/row').map{|row| row.attributes['r'].to_i  }
+  end
 private  
   def ref_split(ref)
     name = CellName.new(ref)
