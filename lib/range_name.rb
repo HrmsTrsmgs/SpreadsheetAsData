@@ -11,10 +11,20 @@ class RangeName
   def initialize(*names)
     case names.size
     when 1
-      names[0] =~ /^([A-Z]+)(\d+)(:|_)([A-Z]+)(\d+)$/
-      column_names = [$1, $4]
-      row_nums = [$2.to_i, $5.to_i]
+      case names[0]
+      when /^([A-Z]+)(\d+)(:|_)([A-Z]+)(\d+)$/
+        @columns = false
+        column_names = [$1, $4]
+        row_nums = [$2.to_i, $5.to_i]
+      when /^([A-Z]+)(:|_)([A-Z]+)$/
+        @columns = true
+        column_names = [$1, $3]
+        row_nums = [1, 1]
+      else
+        column_names = [nil]
+      end
     when 2
+      @columns = false
       column_names = names.map{|name| CellName.new(name).column_name }
       row_nums = names.map{|name| CellName.new(name).row_num }
     end
@@ -24,6 +34,10 @@ class RangeName
       @lower_right = CellName.new(column_names.max + row_nums.max.to_s)
       invalid! unless @upper_left.valid? && @lower_right.valid?
     end
+  end
+  
+  def columns?
+    @columns
   end
 
   def valid?

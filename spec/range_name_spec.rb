@@ -100,6 +100,14 @@ describe RangeName do
       RangeName.new('XFE1:A1').should_not be_valid
     end
   end
+  describe '#columns?' do
+    it 'は行のみの指定の時にtrueとなります。' do
+      RangeName.new('A:A').columns?.should be_true
+    end
+    it 'は行のみの指定ではない時にfalseとなります。' do
+      RangeName.new('A1:A1').columns?.should be_false
+    end
+  end
   describe '#to_s' do
     it 'はA1:A1形式で文字列を返します。' do
       RangeName.new('A1:A1').to_s.should == 'A1:A1'
