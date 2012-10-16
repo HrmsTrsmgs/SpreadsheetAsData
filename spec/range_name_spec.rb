@@ -94,20 +94,31 @@ describe RangeName do
         RangeName.new('A1:A1').upper_left.to_s.should == 'A1'
         RangeName.new('B2:C3').upper_left.to_s.should == 'B2'
       end
-      it 'は無効な範囲名を指定したときnilとなります。' do
-        RangeName.new('A').upper_left.should be_nil
-      end
       describe 'は指定時の順番ではなく位置関係で、' do
-        it '左右を判別します' do
+        it '上下を判別します' do
           RangeName.new('A2:A1').upper_left.to_s.should == 'A1'
         end
-        it '上下を判別します' do
+        it '左右を判別します' do
           RangeName.new('B1:A1').upper_left.to_s.should == 'A1'
         end
       end
       it '文字列比較ではなく数値比較で左右を判別します' do
         RangeName.new('A10:A2').upper_left.to_s.should == 'A2'
       end
+    end
+    context 'は列指定の場合' do
+      it 'で左上のセルを取得できます。' do
+        RangeName.new('A:A').upper_left.to_s.should == 'A1'
+        RangeName.new('B:C').upper_left.to_s.should == 'B1'
+      end
+      describe 'は指定時の順番ではなく位置関係で、' do
+        it '左右を判別します' do
+          RangeName.new('B:A').upper_left.to_s.should == 'A1'
+        end
+      end
+    end
+    it 'は無効な範囲名を指定したときnilとなります。' do
+      RangeName.new('*').upper_left.should be_nil
     end
   end
   describe '#lower_right' do
