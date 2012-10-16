@@ -53,9 +53,10 @@ class RangeName
   end
   
   def to_s
-    if columns?
+    case
+    when columns?
       "#{upper_left.column_name}:#{lower_right.column_name}"
-    elsif valid?
+    when valid?
      "#@upper_left:#@lower_right"
     else
       '{invalid range}'
