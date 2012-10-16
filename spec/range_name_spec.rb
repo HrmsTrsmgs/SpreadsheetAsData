@@ -136,7 +136,7 @@ describe RangeName do
         end
       end
     end
-    context 'はセル指定の場合' do
+    context 'は列指定の場合' do
       it 'で左下のセルを取得できます' do
         RangeName.new('A:A').lower_right.to_s.should == 'A1048576'
         RangeName.new('B:C').lower_right.to_s.should == 'C1048576'
@@ -162,6 +162,14 @@ describe RangeName do
       end
       it 'は左上のセルが無効な位置なら無効とします。' do
         RangeName.new('XFE1:A1').should_not be_valid
+      end
+    end
+    context 'は列指定の場合' do
+      it 'は有効な範囲ではtrueとなります。' do
+        RangeName.new('A:B').valid?.should be_true
+      end
+      it 'は左の列が無効な位置なら無効とします。' do
+        RangeName.new('XFE:A').should_not be_valid
       end
     end
   end
