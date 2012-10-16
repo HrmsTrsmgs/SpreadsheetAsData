@@ -17,7 +17,7 @@ class RangeName
     when /^([A-Z]+)(:|_)([A-Z]+)$/
       @columns = true
       column_names = [$1, $3]
-      row_nums = [1, 1]
+      row_nums = [1, 1048576]
     else
       column_names = [nil]
     end

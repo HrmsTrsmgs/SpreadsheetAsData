@@ -127,18 +127,29 @@ describe RangeName do
         RangeName.new('A1:A1').lower_right.to_s.should == 'A1'
         RangeName.new('B2:C3').lower_right.to_s.should == 'C3'
       end
-      it 'は無効な範囲名を指定したときnilとなります。' do
-        RangeName.new('A').lower_right.should be_nil
-      end
       describe 'は指定時の順番ではなく位置関係で、' do
-        it '左右を判別します' do
+        it '上下を判別します' do
           RangeName.new('A2:A1').lower_right.to_s.should == 'A2'
         end
-        it '上下を判別します' do
+        it '左右を判別します' do
           RangeName.new('B1:A1').lower_right.to_s.should == 'B1'
         end
       end
     end
+    context 'はセル指定の場合' do
+      it 'で左下のセルを取得できます' do
+        RangeName.new('A:A').lower_right.to_s.should == 'A1048576'
+        RangeName.new('B:C').lower_right.to_s.should == 'C1048576'
+      end
+      describe 'は指定時の順番ではなく位置関係で、' do
+        it '上下を判別します' do
+          RangeName.new('B:A').lower_right.to_s.should == 'B1048576'
+        end
+      end
+    end
+    it 'は無効な範囲名を指定したときnilとなります。' do
+        RangeName.new('A').lower_right.should be_nil
+      end
   end
   describe '#valid?' do
     context 'はセル指定の場合' do
