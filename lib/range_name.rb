@@ -53,7 +53,13 @@ class RangeName
   end
   
   def to_s
-    valid? ? "#@upper_left:#@lower_right" : '{invalid range}'
+    if columns?
+      "#{upper_left.column_name}:#{lower_right.column_name}"
+    elsif valid?
+     "#@upper_left:#@lower_right"
+    else
+      '{invalid range}'
+    end
   end
 private
   def invalid!

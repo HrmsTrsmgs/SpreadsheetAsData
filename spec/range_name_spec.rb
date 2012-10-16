@@ -113,6 +113,10 @@ describe RangeName do
       RangeName.new('A1:A1').to_s.should == 'A1:A1'
       RangeName.new('B2:C3').to_s.should == 'B2:C3'
     end
+    it 'は列指定した場合はA:A形式で返します。' do
+      RangeName.new('A:A').to_s.should == 'A:A'
+      RangeName.new('B:C').to_s.should == 'B:C'
+    end
     it 'は無効な場合は"{invalid range}"を返します。' do
       RangeName.new('A1:').to_s.should == '{invalid range}'
     end
