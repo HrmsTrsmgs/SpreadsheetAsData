@@ -16,6 +16,11 @@ describe RangeName do
       RangeName.valid?.should === 'A1:A1'
       RangeName.valid?.should_not === 'A1:'
     end
+    
+    it 'はメソッド呼び出しではなく、when句に利用した時に列指定に対応します。' do
+      RangeName.valid?.should === 'A:A'
+      RangeName.valid?.should === 'B:C'
+    end
   end
   describe 'をハッシュのキーとして利用する時に、RangeName' do
     let(:hash) { { RangeName.new('A1:B2') => 1 } }
@@ -30,7 +35,7 @@ describe RangeName do
     end
   end
   describe '#initialize' do
-    describe 'は一つの引数で使われた時に' do
+    context 'は一つの引数で使われた時に' do
       it 'は文字列を受け取ります。' do
         RangeName.new('A1:A1').to_s.should == 'A1:A1'
         RangeName.new('B2:C3').to_s.should == 'B2:C3'
@@ -40,7 +45,7 @@ describe RangeName do
         RangeName.new(:B2_C3).to_s.should == 'B2:C3'
       end
     end
-    describe 'は二つの引数で使われた時に' do
+    context 'は二つの引数で使われた時に' do
       it 'は文字列を受け取ります。' do
         RangeName.new('A1','A1').to_s.should == 'A1:A1'
         RangeName.new('B2','C3').to_s.should == 'B2:C3'
@@ -48,6 +53,36 @@ describe RangeName do
       it 'はシンボルを受け取ります。' do
         RangeName.new(:A1,:A1).to_s.should == 'A1:A1'
         RangeName.new(:B2,:C3).to_s.should == 'B2:C3'
+      end
+      it 'は文字列とシンボルを受け取ります。' do
+        RangeName.new('A1',:A1).to_s.should == 'A1:A1'
+        RangeName.new(:B2,'C3').to_s.should == 'B2:C3'
+      end
+    end
+    context 'は列指定の場合' do
+      context 'は一つの引数で使われた時に' do
+        it 'は文字列を受け取ります。' do
+          RangeName.new('A:A').to_s.should == 'A:A'
+          RangeName.new('B:C').to_s.should == 'B:C'
+        end
+        it 'はシンボルを受け取ります。' do
+          RangeName.new(:A_A).to_s.should == 'A:A'
+          RangeName.new(:B_C).to_s.should == 'B:C'
+        end
+      end
+      context 'は二つの引数で使われた時に' do
+        it 'は文字列を受け取ります。' do
+          RangeName.new('A','A').to_s.should == 'A:A'
+          RangeName.new('B','C').to_s.should == 'B:C'
+        end
+        it 'はシンボルを受け取ります。' do
+          RangeName.new(:A,:A).to_s.should == 'A:A'
+          RangeName.new(:B,:C).to_s.should == 'B:C'
+        end
+        it 'は文字列とシンボルを受け取ります。' do
+          RangeName.new('A',:B).to_s.should == 'A:B'
+          RangeName.new(:B,'C').to_s.should == 'B:C'
+        end
       end
     end
   end
