@@ -31,6 +31,9 @@ describe CellRange do
      it 'で空行の次の有効行は取得されます。' do
       sheet1.A1_C6.all.size.should == 3
     end
+    it 'で列として指定したデータの行が取得されています。' do
+      sheet3.A_C.all.size.should == 11
+    end
   end
   
   describe '#where' do
