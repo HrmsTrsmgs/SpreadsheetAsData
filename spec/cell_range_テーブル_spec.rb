@@ -105,6 +105,24 @@ describe CellRange do
   describe '#order' do
     it 'で並べ替えができます。' do
       subject.order('float').map{|row| row.float }.should == subject.all.map{|row| row.float }.sort
+      subject.order('string').map{|row| row.string }.should == subject.all.map{|row| row.string }.sort
+    end
+    
+     it 'でaskを指定して並べ替えができます。' do
+      subject.order('float asc').map{|row| row.float }.should == subject.all.map{|row| row.float }.sort
+      subject.order('string asc').map{|row| row.string }.should == subject.all.map{|row| row.string }.sort
+    end
+    it 'でaskの指定は大文字でもできます。' do
+      subject.order('float ASC').map{|row| row.float }.should == subject.all.map{|row| row.float }.sort
+      subject.order('string ASC').map{|row| row.string }.should == subject.all.map{|row| row.string }.sort
+    end
+    it 'で逆順に並べ替えができます。' do
+      subject.order('float desc').map{|row| row.float }.should == subject.all.map{|row| row.float }.sort.reverse
+      subject.order('string desc').map{|row| row.string }.should == subject.all.map{|row| row.string }.sort.reverse
+    end
+    it 'でdescの指定は大文字でもできますできます。' do
+      subject.order('float DESC').map{|row| row.float }.should == subject.all.map{|row| row.float }.sort.reverse
+      subject.order('string DESC').map{|row| row.string }.should == subject.all.map{|row| row.string }.sort.reverse
     end
   end
   

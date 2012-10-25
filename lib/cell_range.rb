@@ -43,8 +43,15 @@ class CellRange
     result
   end
   
-  def order(key)
-    all.sort_by{|row| row.cell_value(key) }
+  def order(sort)
+    key, order = sort.split
+    result = all.sort_by{|row| row.cell_value(key) }
+    
+    if order && order.downcase == 'desc'
+      result.reverse
+    else
+      result
+    end
   end
   
   def column_names
