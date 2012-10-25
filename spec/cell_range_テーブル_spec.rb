@@ -20,8 +20,8 @@ describe CellRange do
     end
     
     it 'で取得したデータ行からセルのデータが取得されています。' do
-      subject.all.first.float.should == 1.1
-      subject.all.first.string.should == 'あ'
+      subject.all.first.float.should == 4.4
+      subject.all.first.string.should == 'か'
     end
 
     it 'で空行は取得されません。' do
@@ -99,6 +99,12 @@ describe CellRange do
         result.size.should == 4
         result.should be_all{ |row| [1.1, 3.3, 6.6].include? row.float }
       end
+    end
+  end
+  
+  describe '#order' do
+    it 'で並べ替えができます。' do
+      subject.order('float').map{|row| row.float }.should == subject.all.map{|row| row.float }.sort
     end
   end
   

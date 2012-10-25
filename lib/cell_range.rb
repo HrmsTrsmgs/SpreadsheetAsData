@@ -43,6 +43,10 @@ class CellRange
     result
   end
   
+  def order(key)
+    all.sort_by{|row| row.cell_value(key) }
+  end
+  
   def column_names
     column_name_range.map do |column|
       sheet.cell_value(column + upper_left_cell.row_num.to_s).to_sym
