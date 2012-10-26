@@ -72,7 +72,7 @@ class WorkSheet
       row.add_element(c)
   end
   
-  def real_rows
+  def real_row_nums
     rows_xml.map{|row| row.attributes['r'].to_i  }
   end
 private

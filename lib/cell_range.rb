@@ -20,7 +20,7 @@ class CellRange
   end
   
   def all
-    ((upper_left_cell.row_num + 1).upto(lower_right_cell.row_num).to_a & sheet.real_rows).
+    ((upper_left_cell.row_num + 1).upto(lower_right_cell.row_num).to_a & sheet.real_row_nums).
       select do |row_num|
         column_name_range.any?{|column_name| !sheet.blank?(column_name + row_num.to_s) }
       end.

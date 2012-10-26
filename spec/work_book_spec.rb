@@ -258,7 +258,7 @@ describe WorkBook do
     WorkBook.open(TestFile.book1_copy_path) do |book|
       book.Sheet1.B1.should == 999
       book.Sheet1.A1.should == 1
-      book.Sheet1.real_rows.should == [1, 3]
+      book.Sheet1.real_row_nums.should == [1, 3]
     end
   end
 end
