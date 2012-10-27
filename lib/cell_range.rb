@@ -24,7 +24,7 @@ class CellRange
       select do |row_num|
         column_name_range.any?{|column_name| !sheet.blank?(column_name + row_num.to_s) }
       end.
-      map{ |row_num| DataRow.new(self, row_num) }
+    map{ |row_num| DataRow.new(self, row_num) }
   end
   
   def where(exp)

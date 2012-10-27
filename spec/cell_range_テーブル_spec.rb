@@ -120,7 +120,7 @@ describe CellRange do
       subject.order('float desc').map{|row| row.float }.should == subject.all.map{|row| row.float }.sort.reverse
       subject.order('string desc').map{|row| row.string }.should == subject.all.map{|row| row.string }.sort.reverse
     end
-    it 'でdescの指定は大文字でもできますできます。' do
+    it 'でdescの指定は大文字でもできます。' do
       subject.order('float DESC').map{|row| row.float }.should == subject.all.map{|row| row.float }.sort.reverse
       subject.order('string DESC').map{|row| row.string }.should == subject.all.map{|row| row.string }.sort.reverse
     end
