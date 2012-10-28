@@ -8,17 +8,6 @@ require 'package_part'
 
 class Package
 
-  # 開いたファイルのパスです。
-  attr_reader :file_path, :initialized_parts
-
-  # 新しいインスタンスの初期化を行います。
-  def initialize(file_path)
-    @file_path = file_path
-    @archive = Zip::Archive.open(file_path.encode('Shift_JIS'))
-    @initialized_parts = []
-    @parts = {}
-  end
-
   def self.open(file_path)
     package = Package.new(file_path)
     if block_given?
@@ -30,6 +19,17 @@ class Package
     else
       package
     end
+  end
+  
+  # 開いたファイルのパスです。
+  attr_reader :file_path, :initialized_parts
+
+  # 新しいインスタンスの初期化を行います。
+  def initialize(file_path)
+    @file_path = file_path
+    @archive = Zip::Archive.open(file_path.encode('Shift_JIS'))
+    @initialized_parts = []
+    @parts = {}
   end
 
   # ファイルの操作を終了し、ファイルを開放します。
