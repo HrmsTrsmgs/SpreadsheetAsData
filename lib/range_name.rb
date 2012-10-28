@@ -9,23 +9,23 @@ class RangeName
   attr_reader :sheet, :upper_left, :lower_right
 
   def initialize(*names)
-    case names.join(':')
-    when /^(?:(.*?)!)?([A-Z]+)(\d+)(?::|_)([A-Z]+)(\d+)$/
+    
+    match = names.join(':') =~ /^(?:(.*?)!)?([A-Z]+)(\d+)?(?::|_)([A-Z]+)(\d+)?$/
+    if match && $3 && $5
+      @valid = true
       @columns = false
-      @sheet = $1
-      column_names = [$2, $4]
       row_nums = [$3.to_i, $5.to_i]
-    when /^(?:(.*?)!)?([A-Z]+)(?::|_)([A-Z]+)$/
+    elsif match && !$3 && !$5
+      @valid = true
       @columns = true
-      @sheet = $1
-      column_names = [$2, $3]
       row_nums = [1, 1048576]
     else
-      column_names = [nil]
+      @valid == false
     end
-
-    if column_names.all?
-      @valid = true
+    @sheet = $1
+    column_names = [$2, $4]
+    
+    if @valid
       @upper_left = CellName.new(column_names.min + row_nums.min.to_s)
       @lower_right = CellName.new(column_names.max + row_nums.max.to_s)
       invalid! unless @upper_left.valid? && @lower_right.valid?
