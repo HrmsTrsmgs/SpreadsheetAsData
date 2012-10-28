@@ -45,6 +45,10 @@ class WorkSheet
   end
   
   def defined_name
+    sheet_tables
+  end
+  
+  def sheet_tables
     Array.new(@xml.get_elements('//tableParts/tablePart').size)
   end
   
