@@ -1,7 +1,8 @@
 # coding: UTF-8
 
 require 'spec_helper'
-class Table end
+class Table 
+end
 describe Table do
   let(:book) { TestFile.テーブル }
   let(:sheet) { book.Sheet2 }
