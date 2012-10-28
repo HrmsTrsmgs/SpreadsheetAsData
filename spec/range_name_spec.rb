@@ -185,6 +185,26 @@ describe RangeName do
       end
     end
   end
+  describe '#sheet' do
+    context 'はセル指定の場合' do
+      it 'はシート名を取得できます。' do
+        RangeName.new('Sheet1!A1:A1').sheet.should == 'Sheet1'
+        RangeName.new('Sheet2!A1:A1').sheet.should == 'Sheet2'
+      end
+      it 'はシート名の指定がない場合にnilを取得しますす。' do
+        RangeName.new('A1:A1').sheet.should be_nil
+      end
+    end
+    context 'は列指定の場合' do
+      it 'はシート名を取得できます。' do
+        RangeName.new('Sheet1!A:A').sheet.should == 'Sheet1'
+        RangeName.new('Sheet2!A:A').sheet.should == 'Sheet2'
+      end
+      it 'はシート名の指定がない場合にnilを取得しますす。' do
+        RangeName.new('A:A').sheet.should be_nil
+      end
+    end
+  end
   describe '#to_s' do
     context 'はセル指定の場合' do
       it 'はA1:A1形式で文字列を返します。' do

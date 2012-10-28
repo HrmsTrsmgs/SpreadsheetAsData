@@ -6,17 +6,19 @@ class RangeName
     name ? self.new(name).valid? : RangeNameValidator.new
   end  
 
-  attr_reader :upper_left, :lower_right
+  attr_reader :sheet, :upper_left, :lower_right
 
   def initialize(*names)
     case names.join(':')
-    when /^([A-Z]+)(\d+)(:|_)([A-Z]+)(\d+)$/
+    when /^(?:(.*?)!)?([A-Z]+)(\d+)(?::|_)([A-Z]+)(\d+)$/
       @columns = false
-      column_names = [$1, $4]
-      row_nums = [$2.to_i, $5.to_i]
-    when /^([A-Z]+)(:|_)([A-Z]+)$/
+      @sheet = $1
+      column_names = [$2, $4]
+      row_nums = [$3.to_i, $5.to_i]
+    when /^(?:(.*?)!)?([A-Z]+)(?::|_)([A-Z]+)$/
       @columns = true
-      column_names = [$1, $3]
+      @sheet = $1
+      column_names = [$2, $3]
       row_nums = [1, 1048576]
     else
       column_names = [nil]
@@ -29,6 +31,7 @@ class RangeName
       invalid! unless @upper_left.valid? && @lower_right.valid?
     end
   end
+  
   
   def columns?
     @columns
@@ -45,7 +48,7 @@ class RangeName
   def hash
     [upper_left, lower_right].hash
   end
-  
+
   def to_s
     case
     when columns?
