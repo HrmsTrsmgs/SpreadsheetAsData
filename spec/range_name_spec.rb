@@ -5,11 +5,11 @@ require 'spec_helper'
 describe RangeName do
   describe '::valid?' do
     it 'は有効な範囲ではtrueとなります。' do
-      RangeName.valid?('A1:A1').should be_true
+      RangeName.valid?('A1:A1').should be_truthy
     end
     it 'は無効な範囲ではfalseとなります。' do
-      RangeName.valid?('A1:').should be_false
-      RangeName.valid?(':B2').should be_false
+      RangeName.valid?('A1:').should be_falsey
+      RangeName.valid?(':B2').should be_falsey
     end
     
     it 'はメソッド呼び出しではなく、when句に利用しても使えます。' do
@@ -154,11 +154,11 @@ describe RangeName do
   describe '#valid?' do
     context 'はセル指定の場合' do
       it 'は有効な範囲ではtrueとなります。' do
-        RangeName.new('A1:A1').valid?.should be_true
+        RangeName.new('A1:A1').valid?.should be_truthy
       end
       it 'は無効な範囲ではfalseとなります。' do
-        RangeName.new('A1:').valid?.should be_false
-        RangeName.new(':A1').valid?.should be_false
+        RangeName.new('A1:').valid?.should be_falsey
+        RangeName.new(':A1').valid?.should be_falsey
       end
       it 'は左上のセルが無効な位置なら無効とします。' do
         RangeName.new('XFE1:A1').should_not be_valid
@@ -166,7 +166,7 @@ describe RangeName do
     end
     context 'は列指定の場合' do
       it 'は有効な範囲ではtrueとなります。' do
-        RangeName.new('A:B').valid?.should be_true
+        RangeName.new('A:B').valid?.should be_truthy
       end
       it 'は左の列が無効な位置なら無効とします。' do
         RangeName.new('XFE:A').should_not be_valid
@@ -176,12 +176,12 @@ describe RangeName do
   describe '#columns?' do
     context 'はセル指定の場合' do
       it 'にtrueとなります。' do
-        RangeName.new('A:A').columns?.should be_true
+        RangeName.new('A:A').columns?.should be_truthy
       end
     end
     context 'は列指定の場合' do
       it 'は行のみの指定ではない時にfalseとなります。' do
-        RangeName.new('A1:A1').columns?.should be_false
+        RangeName.new('A1:A1').columns?.should be_falsey
       end
     end
   end

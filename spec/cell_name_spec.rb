@@ -5,11 +5,11 @@ require 'spec_helper'
 describe CellName do
   describe '::valid?' do
     it 'は有効なセルではtrueとなる' do
-      CellName.valid?('A1').should be_true
+      CellName.valid?('A1').should be_truthy
     end
     it 'は無効なセルではfalseとなる' do
-      CellName.valid?('A').should be_false
-      CellName.valid?('1').should be_false
+      CellName.valid?('A').should be_falsey
+      CellName.valid?('1').should be_falsey
     end
       it 'はメソッド呼び出しではなく、when句に利用しても使えます。' do
       CellName.valid?.should === 'A1'
@@ -67,11 +67,11 @@ describe CellName do
   end
   describe '#valid?' do
     it 'は有効なセルではtrueとなる' do
-      CellName.new('A1').valid?.should be_true
+      CellName.new('A1').valid?.should be_truthy
     end
     it 'は無効なセルではfalseとなる' do
-      CellName.new('A').valid?.should be_false
-      CellName.new('1').valid?.should be_false
+      CellName.new('A').valid?.should be_falsey
+      CellName.new('1').valid?.should be_falsey
     end
     describe 'は列の範囲を判定して' do
       it 'は一文字の列名称の列を有効とします。' do
