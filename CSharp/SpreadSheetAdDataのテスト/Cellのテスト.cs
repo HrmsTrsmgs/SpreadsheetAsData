@@ -73,9 +73,14 @@ namespace Marimo.SpreadSheetAdData.Test
         [Test]
         public void Referenceプロパティがセル参照の名称を取得できます()
         {
-            Expect(a1.Reference.ToString(), Is.EqualTo("A1"));
-            Expect(b1.Reference.ToString(), Is.EqualTo("B1"));
+            Expect(a1.Reference, Is.EqualTo("A1"));
+            Expect(b1.Reference, Is.EqualTo("B1"));
         }
-
+        [Test]
+        public void RowIndexプロパティが行番号を取得できます()
+        {
+            Expect(a1.RowIndex, Is.EqualTo(1));
+            Expect(a2.RowIndex, Is.EqualTo(2));
+        }
     }
 }

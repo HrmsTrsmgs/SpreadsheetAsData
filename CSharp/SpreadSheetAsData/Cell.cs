@@ -19,6 +19,14 @@ namespace Marimo.SpreadSheetAsData
 
         internal Spreadsheet.Cell Xml { get;　private set; }
 
+        internal Spreadsheet.Row RowXml
+        {
+            get
+            {
+                return Xml.Parent as Spreadsheet.Row;
+            }
+        }
+
         public string Reference
         {
             get
@@ -52,6 +60,14 @@ namespace Marimo.SpreadSheetAsData
             get
             {
                 return Sheet.Book;
+            }
+        }
+
+        public uint RowIndex
+        {
+            get
+            {
+                return RowXml.RowIndex;
             }
         }
     }
