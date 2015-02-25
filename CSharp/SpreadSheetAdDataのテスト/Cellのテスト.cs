@@ -69,5 +69,13 @@ namespace Marimo.SpreadSheetAdData.Test
             Expect(a3.Value, Is.EqualTo("あいうえお"));
             Expect(b3.Value, Is.EqualTo("かきくけこ"));
         }
+
+        [Test]
+        public void Referenceプロパティがセル参照の名称を取得できます()
+        {
+            Expect(a1.Reference.ToString(), Is.EqualTo("A1"));
+            Expect(b1.Reference.ToString(), Is.EqualTo("B1"));
+        }
+
     }
 }
