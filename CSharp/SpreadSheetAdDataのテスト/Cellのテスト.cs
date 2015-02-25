@@ -82,5 +82,12 @@ namespace Marimo.SpreadSheetAdData.Test
             Expect(a1.RowIndex, Is.EqualTo(1));
             Expect(a2.RowIndex, Is.EqualTo(2));
         }
+
+        [Test]
+        public void ColumnIndexプロパティが列番号を取得できます()
+        {
+            Expect(a1.ColumnIndex, Is.EqualTo(1));
+            Expect(b1.ColumnIndex, Is.EqualTo(2));
+        }
     }
 }
