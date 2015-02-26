@@ -28,29 +28,29 @@ namespace Marimo.SpreadSheetAdData.Test
         [Test]
         public void ColumnNameプロパティで列名を取得できます()
         {
-            Expect(new CellName("A1").ColumnName, Is.EqualTo("A"));
-            Expect(new CellName("B1").ColumnName, Is.EqualTo("B"));
+            Expect(CellName.Parse("A1").ColumnName, Is.EqualTo("A"));
+            Expect(CellName.Parse("B1").ColumnName, Is.EqualTo("B"));
         }
 
         [Test]
         public void ColumnIndexプロパティで列番号を取得できます()
         {
-            Expect(new CellName("A1").ColumnIndex, Is.EqualTo(1));
-            Expect(new CellName("B1").ColumnIndex, Is.EqualTo(2));
+            Expect(CellName.Parse("A1").ColumnIndex, Is.EqualTo(1));
+            Expect(CellName.Parse("B1").ColumnIndex, Is.EqualTo(2));
         }
 
         [Test]
         public void RowIndexプロパティで列番号を取得できます()
         {
-            Expect(new CellName("A1").RowIndex, Is.EqualTo(1));
-            Expect(new CellName("A2").RowIndex, Is.EqualTo(2));
+            Expect(CellName.Parse("A1").RowIndex, Is.EqualTo(1));
+            Expect(CellName.Parse("A2").RowIndex, Is.EqualTo(2));
         }
 
         [Test]
         public void ToStringメソッドはA1形式で文字列を返します()
         {
-            Expect(new CellName("A1").ToString(), Is.EqualTo("A1"));
-            Expect(new CellName("B2").ToString(), Is.EqualTo("B2"));
+            Expect(CellName.Parse("A1").ToString(), Is.EqualTo("A1"));
+            Expect(CellName.Parse("B2").ToString(), Is.EqualTo("B2"));
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Marimo.SpreadSheetAsData
     {
         string name;
 
-        public CellName(string name)
+        private CellName(string name)
         {;
             if(!Regex.IsMatch(name, @"[A-Z]\d"))
             {
