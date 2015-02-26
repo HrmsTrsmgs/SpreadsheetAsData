@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CellNameのテスト.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Cellのテスト.cs" />
     <Compile Include="Worksheetのテスト.cs" />
