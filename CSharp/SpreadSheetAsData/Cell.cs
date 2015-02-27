@@ -76,8 +76,7 @@ namespace Marimo.SpreadSheetAsData
         {
             get
             {
-                var match = Regex.Match(Reference, @"[A-Z]");
-                return (uint)(match.Value.Single() - 'A') + 1 ;
+                return CellName.Parse(Reference).ColumnIndex;
             }
         }
     }
