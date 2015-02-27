@@ -39,7 +39,7 @@ namespace Marimo.SpreadSheetAdData.Test
         }
 
         [Test]
-        public void Nameは日本語でしていたシート名も適切に扱います()
+        public void Nameは日本語で指定したシート名も適切に扱います()
         {
             Expect(data.Name, Is.EqualTo("いろいろなデータ"));
         }
@@ -54,6 +54,12 @@ namespace Marimo.SpreadSheetAdData.Test
         public void Cellsはセルの参照文字列を文字列を指定してセル取得します()
         {
             Expect(sheet1.Cells["C3"].Reference, Is.EqualTo("C3"));
+        }
+
+        [Test]
+        public void Cellsは空のセルも取得します()
+        {
+            Expect(sheet1.Cells["B1"].Reference, Is.EqualTo("B1"));
         }
 
         [Test]

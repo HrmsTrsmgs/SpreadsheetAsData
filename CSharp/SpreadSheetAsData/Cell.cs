@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,16 @@ namespace Marimo.SpreadSheetAsData
         {
             Sheet = sheet;
             Xml = xml;
+        }
+
+        public Cell(Worksheet sheet, string cellReference)
+        {
+            Sheet = sheet;
+            Xml = new Spreadsheet.Cell(
+                new Spreadsheet.Value { })
+            {
+                CellReference = new StringValue(cellReference)
+            };
         }
 
         internal Spreadsheet.Cell Xml { get;　private set; }

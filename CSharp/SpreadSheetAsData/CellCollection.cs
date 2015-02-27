@@ -25,7 +25,14 @@ namespace Marimo.SpreadSheetAsData
                     from cell in sheet.WorksheetPart.Worksheet.Descendants<Spreadsheet.Cell>()
                     where cell.CellReference == cellReference
                     select cell;
-                return new Cell(sheet, cellXml.Single());
+                if (cellXml.Any())
+                {
+                    return new Cell(sheet, cellXml.Single());
+                }
+                else
+                {
+                    return new Cell(sheet, cellReference);
+                }
             }
         }
 
