@@ -16,7 +16,7 @@ namespace Marimo.SpreadSheetAsData
         private CellName(string name)
         {
             this.name = name;
-            if (!Regex.IsMatch(name, @"[A-Z]\d") || MaxRowIndex < RowIndex || MaxColumnIndex <  ColumnIndex)
+            if (!Regex.IsMatch(name, @"^[A-Z]+\d+$") || MaxRowIndex < RowIndex || MaxColumnIndex <  ColumnIndex)
             {
                 throw new FormatException();
             }
@@ -70,6 +70,23 @@ namespace Marimo.SpreadSheetAsData
         public override string ToString()
         {
             return name;
+        }
+
+        public override int GetHashCode()
+        {
+            return name.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            var cellName = obj as CellName;
+
+            if(cellName == null)
+            {
+                return false;
+            }
+
+            return cellName.name == name;
         }
     }
 }

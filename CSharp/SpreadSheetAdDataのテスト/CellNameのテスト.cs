@@ -19,10 +19,44 @@ namespace Marimo.SpreadSheetAdData.Test
         }
 
         [Test]
+        public void 同じセル位置は同一として扱われます()
+        {
+            Expect(CellName.Parse("A1"), Is.EqualTo(CellName.Parse("A1")));
+        }
+
+        [Test]
+        public void 行が違うと同一ではないとして扱われます()
+        {
+            Expect(CellName.Parse("A1"), Is.Not.EqualTo(CellName.Parse("A2")));
+        }
+
+        [Test]
+        public void 列が違うと同一ではないとして扱われます()
+        {
+            Expect(CellName.Parse("A1"), Is.Not.EqualTo(CellName.Parse("B1")));
+        }
+
+        [Test]
+        public void 指定したセルの位置を一意としてハッシュのキーとして使えます()
+        {
+            var set = new HashSet<CellName>();
+
+            set.Add(CellName.Parse("A1"));
+            Expect(set.Count, Is.EqualTo(1));
+            set.Add(CellName.Parse("A1"));
+            Expect(set.Count, Is.EqualTo(1));
+            set.Add(CellName.Parse("B1"));
+            Expect(set.Count, Is.EqualTo(2));
+            set.Add(CellName.Parse("A2"));
+            Expect(set.Count, Is.EqualTo(3));
+        }
+
+        [Test]
         public void Parseメソッドに無効なセル名を指定するとFormatExceptionを投げます()
         {
             Expect(() => CellName.Parse("A"), Throws.InstanceOf<FormatException>());
             Expect(() => CellName.Parse("1"), Throws.InstanceOf<FormatException>());
+            Expect(() => CellName.Parse("A1A1"), Throws.InstanceOf<FormatException>());
         }
 
         [Test]
@@ -85,6 +119,7 @@ namespace Marimo.SpreadSheetAdData.Test
         {
             Expect(CellName.Parse("A1").ToString(), Is.EqualTo("A1"));
             Expect(CellName.Parse("B2").ToString(), Is.EqualTo("B2"));
+            Expect(CellName.Parse("XFD1048576").ToString(), Is.EqualTo("XFD1048576"));
         }
     }
 }
