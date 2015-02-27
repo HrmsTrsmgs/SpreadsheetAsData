@@ -12,7 +12,7 @@ namespace Marimo.SpreadSheetAsData
         string name;
 
         private CellName(string name)
-        {;
+        {
             if(!Regex.IsMatch(name, @"[A-Z]\d"))
             {
                 throw new FormatException();
@@ -24,9 +24,24 @@ namespace Marimo.SpreadSheetAsData
         {
             get
             {
-                return (uint)(ColumnName.First() - 'A') + 1;
+                return GetColumnIndex(ColumnName);
             }
         }
+
+        private uint GetColumnIndex(IEnumerable<char> columnNameChars)
+        {
+            var count = columnNameChars.Count();
+            switch(count)
+            {
+                case 1:
+                    return (uint)(columnNameChars.Single() - 'A') + 1;
+                default:
+                    return 
+                        GetColumnIndex(columnNameChars.Take(count - 1)) * 26
+                          + GetColumnIndex(columnNameChars.Skip(count - 1));
+            }
+        }
+
 
         public static CellName Parse(string name)
         {
@@ -37,7 +52,7 @@ namespace Marimo.SpreadSheetAsData
         {
             get
             {
-                return Regex.Match(name, @"[A-Z]").Value;
+                return Regex.Match(name, @"[A-Z]+").Value;
             }
         }
 

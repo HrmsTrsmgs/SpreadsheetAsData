@@ -33,10 +33,24 @@ namespace Marimo.SpreadSheetAdData.Test
         }
 
         [Test]
-        public void ColumnIndexプロパティで列番号を取得できます()
+        public void ColumnIndexプロパティで一文字の列番号を取得できます()
         {
             Expect(CellName.Parse("A1").ColumnIndex, Is.EqualTo(1));
-            Expect(CellName.Parse("B1").ColumnIndex, Is.EqualTo(2));
+            Expect(CellName.Parse("Z1").ColumnIndex, Is.EqualTo(26));
+        }
+
+        [Test]
+        public void ColumnIndexプロパティで二文字のの列番号を取得できます()
+        {
+            Expect(CellName.Parse("AA1").ColumnIndex, Is.EqualTo(27));
+            Expect(CellName.Parse("ZZ1").ColumnIndex, Is.EqualTo(702));
+        }
+
+        [Test]
+        public void ColumnIndexプロパティで三文字のの列番号を取得できます()
+        {
+            Expect(CellName.Parse("AAA1").ColumnIndex, Is.EqualTo(703));
+            Expect(CellName.Parse("XFD1").ColumnIndex, Is.EqualTo(16384));
         }
 
         [Test]
