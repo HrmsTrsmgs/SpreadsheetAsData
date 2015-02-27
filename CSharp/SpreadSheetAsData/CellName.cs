@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Marimo.SpreadSheetAsData
 {
-    public class CellName
+    public struct CellName
     {
         string name;
 
@@ -70,23 +70,6 @@ namespace Marimo.SpreadSheetAsData
         public override string ToString()
         {
             return name;
-        }
-
-        public override int GetHashCode()
-        {
-            return name.GetHashCode();
-        }
-
-        public override bool Equals(object obj)
-        {
-            var cellName = obj as CellName;
-
-            if(cellName == null)
-            {
-                return false;
-            }
-
-            return cellName.name == name;
         }
     }
 }
