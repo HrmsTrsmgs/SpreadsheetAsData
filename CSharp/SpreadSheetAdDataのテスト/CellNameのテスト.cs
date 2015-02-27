@@ -19,10 +19,24 @@ namespace Marimo.SpreadSheetAdData.Test
         }
 
         [Test]
-        public void Parseメソッドに無効なセル名を指定するとFormatExceptionとなります()
+        public void Parseメソッドに無効なセル名を指定するとFormatExceptionを投げます()
         {
             Expect(() => CellName.Parse("A"), Throws.InstanceOf<FormatException>());
             Expect(() => CellName.Parse("1"), Throws.InstanceOf<FormatException>());
+        }
+
+        [Test]
+        public void Parseメソッドに大きすぎる列名を指定した場合はFormatExceptionを投げます()
+        {
+            Expect(() => CellName.Parse("XFE1"), Throws.InstanceOf<FormatException>());
+            Expect(() => CellName.Parse("AAAA1"), Throws.InstanceOf<FormatException>());
+            Expect(() => CellName.Parse("ZZZZ1"), Throws.InstanceOf<FormatException>());
+        }
+
+        [Test]
+        public void Parseメソッドに大きすぎる行番号を指定した場合はFormatExceptionを投げます()
+        {
+            Expect(() => CellName.Parse("A1048577"), Throws.InstanceOf<FormatException>());
         }
 
         [Test]
@@ -54,10 +68,16 @@ namespace Marimo.SpreadSheetAdData.Test
         }
 
         [Test]
-        public void RowIndexプロパティで列番号を取得できます()
+        public void RowIndexプロパティで行番号を取得できます()
         {
             Expect(CellName.Parse("A1").RowIndex, Is.EqualTo(1));
             Expect(CellName.Parse("A2").RowIndex, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void RowIndexプロパティで大きな行番号を取得できます()
+        {
+            Expect(CellName.Parse("A1048576").RowIndex, Is.EqualTo(1048576));
         }
 
         [Test]

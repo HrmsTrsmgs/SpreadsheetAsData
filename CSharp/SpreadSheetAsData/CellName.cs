@@ -11,13 +11,16 @@ namespace Marimo.SpreadSheetAsData
     {
         string name;
 
+        public const uint MaxRowIndex = 1048576;
+        public const uint MaxColumnIndex = 16384;
         private CellName(string name)
         {
-            if(!Regex.IsMatch(name, @"[A-Z]\d"))
+            this.name = name;
+            if (!Regex.IsMatch(name, @"[A-Z]\d") || MaxRowIndex < RowIndex || MaxColumnIndex <  ColumnIndex)
             {
                 throw new FormatException();
             }
-            this.name = name;
+
         }
 
         public uint ColumnIndex
@@ -60,7 +63,7 @@ namespace Marimo.SpreadSheetAsData
         {
             get
             {
-                return uint.Parse(Regex.Match(name, @"\d").Value);
+                return uint.Parse(Regex.Match(name, @"\d+").Value);
             }
         }
 
