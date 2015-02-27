@@ -9,42 +9,30 @@ namespace Marimo.SpreadSheetAsData
 {
     public struct CellName
     {
-        string name;
-
         public const uint MaxRowIndex = 1048576;
         public const uint MaxColumnIndex = 16384;
+        private const uint alphabetCount = 26;
+        private static readonly Regex regex = new Regex(@"^(?<column>[A-Z]+)(?<row>\d+)$");
+
+        public uint ColumnIndex { get; private set; }
+
+        public uint RowIndex { get; private set; }
+
         private CellName(string name)
         {
-            this.name = name;
-            if (!Regex.IsMatch(name, @"^[A-Z]+\d+$") || MaxRowIndex < RowIndex || MaxColumnIndex <  ColumnIndex)
+            var match = regex.Match(name);
+            if(!match.Success)
             {
                 throw new FormatException();
             }
+            ColumnIndex = GetColumnIndex(match.Groups["column"].Value);
+            RowIndex = uint.Parse(match.Groups["row"].Value);
 
-        }
-
-        public uint ColumnIndex
-        {
-            get
+            if (MaxRowIndex < RowIndex || MaxColumnIndex <  ColumnIndex)
             {
-                return GetColumnIndex(ColumnName);
+                throw new FormatException();
             }
         }
-
-        private uint GetColumnIndex(IEnumerable<char> columnNameChars)
-        {
-            var count = columnNameChars.Count();
-            switch(count)
-            {
-                case 1:
-                    return (uint)(columnNameChars.Single() - 'A') + 1;
-                default:
-                    return 
-                        GetColumnIndex(columnNameChars.Take(count - 1)) * 26
-                          + GetColumnIndex(columnNameChars.Skip(count - 1));
-            }
-        }
-
 
         public static CellName Parse(string name)
         {
@@ -55,21 +43,39 @@ namespace Marimo.SpreadSheetAsData
         {
             get
             {
-                return Regex.Match(name, @"[A-Z]+").Value;
-            }
-        }
-
-        public uint RowIndex
-        {
-            get
-            {
-                return uint.Parse(Regex.Match(name, @"\d+").Value);
+                return GetColumnName(ColumnIndex);
             }
         }
 
         public override string ToString()
         {
-            return name;
+            return GetColumnName(ColumnIndex) + RowIndex;
+        }
+
+        private static uint GetColumnIndex(IEnumerable<char> columnNameChars)
+        {
+            var count = columnNameChars.Count();
+            switch(count)
+            {
+                case 1:
+                    return (uint)(columnNameChars.Single() - 'A') + 1;
+                default:
+                    return 
+                        GetColumnIndex(columnNameChars.Take(count - 1)) * alphabetCount
+                          + GetColumnIndex(columnNameChars.Skip(count - 1));
+            }
+        }
+
+        private static string GetColumnName(uint columnIndex)
+        {
+            if (columnIndex <= alphabetCount)
+            {
+                return ((char)('A' + columnIndex - 1)).ToString();
+            }
+            else
+            {
+                return GetColumnName(columnIndex / alphabetCount) + GetColumnName(columnIndex % alphabetCount);
+            }
         }
     }
 }

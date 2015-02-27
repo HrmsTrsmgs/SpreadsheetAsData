@@ -119,6 +119,8 @@ namespace Marimo.SpreadSheetAdData.Test
         {
             Expect(CellName.Parse("A1").ToString(), Is.EqualTo("A1"));
             Expect(CellName.Parse("B2").ToString(), Is.EqualTo("B2"));
+            Expect(CellName.Parse("AA1").ToString(), Is.EqualTo("AA1"));
+            Expect(CellName.Parse("AAA1").ToString(), Is.EqualTo("AAA1"));
             Expect(CellName.Parse("XFD1048576").ToString(), Is.EqualTo("XFD1048576"));
         }
     }
