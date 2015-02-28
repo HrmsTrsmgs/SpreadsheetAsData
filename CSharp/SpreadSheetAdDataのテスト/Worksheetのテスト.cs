@@ -69,6 +69,12 @@ namespace Marimo.SpreadSheetAdData.Test
         }
 
         [Test]
+        public void Cellsはは同じセルの場合は同じオブジェクトを取得します()
+        {
+            Expect(sheet1.Cells["A1"], Is.SameAs(sheet1.Cells["A1"]));
+        }
+
+        [Test]
         public void Cellsはセルの座標を数値で指定してセル取得します()
         {
             Expect(sheet1.Cells[3, 3].Reference, Is.EqualTo("C3"));

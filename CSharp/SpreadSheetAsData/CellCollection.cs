@@ -17,37 +17,38 @@ namespace Marimo.SpreadSheetAsData
             this.sheet = sheet;
         }
 
+        private Dictionary<CellName, Cell> cache = new Dictionary<CellName, Cell>();
+
         public Cell this[string cellReference]
         {
             get
             {
-                CheckCellReference(cellReference);
+                var cellName = CellName.Parse(cellReference);
 
-                var cellXml =
-                    from cell in sheet.WorksheetPart.Worksheet.Descendants<Spreadsheet.Cell>()
-                    where cell.CellReference == cellReference
-                    select cell;
-                if (cellXml.Any())
+                if (!cache.ContainsKey(cellName))
                 {
-                    return new Cell(sheet, cellXml.Single());
+                    var cellXml =
+                        from cell in sheet.WorksheetPart.Worksheet.Descendants<Spreadsheet.Cell>()
+                        where cell.CellReference == cellReference
+                        select cell;
+                    if (cellXml.Any())
+                    {
+                        cache[cellName] = new Cell(sheet, cellXml.Single());
+                    }
+                    else
+                    {
+                        cache[cellName] = new Cell(sheet, cellReference);
+                    }
                 }
-                else
-                {
-                    return new Cell(sheet, cellReference);
-                }
+                return cache[cellName];
             }
         }
 
-        private static void CheckCellReference(string cellReference)
-        {
-            CellName.Parse(cellReference);
-        }
-
-        public Cell this[int columnNumber, int rowNumber]
+        public Cell this[int columnIndex, int rowIndex]
         {
             get
             {
-                return this[GetCellReference(columnNumber, rowNumber)];
+                return this[GetCellReference(columnIndex, rowIndex)];
             }
         }
 
