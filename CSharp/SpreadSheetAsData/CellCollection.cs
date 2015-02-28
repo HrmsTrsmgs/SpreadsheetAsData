@@ -21,6 +21,8 @@ namespace Marimo.SpreadSheetAsData
         {
             get
             {
+                CheckCellReference(cellReference);
+
                 var cellXml =
                     from cell in sheet.WorksheetPart.Worksheet.Descendants<Spreadsheet.Cell>()
                     where cell.CellReference == cellReference
@@ -34,6 +36,11 @@ namespace Marimo.SpreadSheetAsData
                     return new Cell(sheet, cellReference);
                 }
             }
+        }
+
+        private static void CheckCellReference(string cellReference)
+        {
+            CellName.Parse(cellReference);
         }
 
         public Cell this[int columnNumber, int rowNumber]

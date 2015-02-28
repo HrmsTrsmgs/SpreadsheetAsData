@@ -57,6 +57,12 @@ namespace Marimo.SpreadSheetAdData.Test
         }
 
         [Test]
+        public void Cellsはセルの参照文字列に存在しないセル名を指定した時にFormatExceptionを投げます()
+        {
+            Expect(()=> sheet1.Cells["a1"], Throws.InstanceOf<FormatException>());
+        }
+
+        [Test]
         public void Cellsは空のセルも取得します()
         {
             Expect(sheet1.Cells["B1"].Reference, Is.EqualTo("B1"));
