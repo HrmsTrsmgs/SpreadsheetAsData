@@ -34,6 +34,16 @@ namespace Marimo.SpreadSheetAsData
             }
         }
 
+        public CellName(uint columnIndex, uint rowIndex)
+        {
+            ColumnIndex = columnIndex;
+            RowIndex = rowIndex;
+            if (MaxRowIndex < RowIndex || MaxColumnIndex < ColumnIndex)
+            {
+                throw new FormatException();
+            }
+        }
+
         public static CellName Parse(string name)
         {
             return new CellName(name);

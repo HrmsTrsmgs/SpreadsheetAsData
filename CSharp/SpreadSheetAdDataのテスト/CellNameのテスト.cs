@@ -19,6 +19,12 @@ namespace Marimo.SpreadSheetAdData.Test
         }
 
         [Test]
+        public void 列番号と行番号を指定してCellNameがせいせいできます()
+        {
+            Expect(() => new CellName(1,1), Throws.Nothing);
+        }
+
+        [Test]
         public void 同じセル位置は同一として扱われます()
         {
             Expect(CellName.Parse("A1"), Is.EqualTo(CellName.Parse("A1")));
@@ -68,9 +74,21 @@ namespace Marimo.SpreadSheetAdData.Test
         }
 
         [Test]
+        public void コンストラクタに大きすぎる列番号を指定した場合はFormatExceptionを投げます()
+        {
+            Expect(() => new CellName(16385, 1), Throws.InstanceOf<FormatException>());
+        }
+
+        [Test]
         public void Parseメソッドに大きすぎる行番号を指定した場合はFormatExceptionを投げます()
         {
             Expect(() => CellName.Parse("A1048577"), Throws.InstanceOf<FormatException>());
+        }
+
+        [Test]
+        public void コンストラクタに大きすぎる行番号を指定した場合はFormatExceptionを投げます()
+        {
+            Expect(() => new CellName(1, 1048577), Throws.InstanceOf<FormatException>());
         }
 
         [Test]
@@ -78,6 +96,13 @@ namespace Marimo.SpreadSheetAdData.Test
         {
             Expect(CellName.Parse("A1").ColumnName, Is.EqualTo("A"));
             Expect(CellName.Parse("B1").ColumnName, Is.EqualTo("B"));
+        }
+
+        [Test]
+        public void 行列番号で生成した場合にColumnNameプロパティで列名を取得できます()
+        {
+            Expect(new CellName(1, 1).ColumnName, Is.EqualTo("A"));
+            Expect(new CellName(2, 1).ColumnName, Is.EqualTo("B"));
         }
 
         [Test]
@@ -102,6 +127,12 @@ namespace Marimo.SpreadSheetAdData.Test
         }
 
         [Test]
+        public void コンストラクタで生成した場合にColumnIndexプロパティで大きな行番号を取得できます()
+        {
+            Expect(new CellName(16384, 1).ColumnIndex, Is.EqualTo(16384));
+        }
+
+        [Test]
         public void RowIndexプロパティで行番号を取得できます()
         {
             Expect(CellName.Parse("A1").RowIndex, Is.EqualTo(1));
@@ -109,9 +140,22 @@ namespace Marimo.SpreadSheetAdData.Test
         }
 
         [Test]
-        public void RowIndexプロパティで大きな行番号を取得できます()
+        public void 行列番号で生成した場合にRowIndexプロパティで行番号を取得できます()
+        {
+            Expect(new CellName(1, 1).RowIndex, Is.EqualTo(1));
+            Expect(new CellName(1, 2).RowIndex, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void Parseメソッドで生成した場合にRowIndexプロパティで大きな行番号を取得できます()
         {
             Expect(CellName.Parse("A1048576").RowIndex, Is.EqualTo(1048576));
+        }
+
+        [Test]
+        public void コンストラクタで生成した場合にRowIndexプロパティで大きな行番号を取得できます()
+        {
+            Expect(new CellName(1, 1048576).RowIndex, Is.EqualTo(1048576));
         }
 
         [Test]
