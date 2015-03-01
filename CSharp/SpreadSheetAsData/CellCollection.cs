@@ -44,7 +44,7 @@ namespace Marimo.SpreadSheetAsData
             }
         }
 
-        public Cell this[int columnIndex, int rowIndex]
+        public Cell this[uint columnIndex, uint rowIndex]
         {
             get
             {
@@ -52,9 +52,9 @@ namespace Marimo.SpreadSheetAsData
             }
         }
 
-        private string GetCellReference(int columnNumber, int rowNumber)
+        private string GetCellReference(uint columnIndex, uint rowIndex)
         {
-            return ((char)('A' - 1 + columnNumber)).ToString() + rowNumber;
+            return new CellName(columnIndex, rowIndex).ToString();
         }
     }
 }

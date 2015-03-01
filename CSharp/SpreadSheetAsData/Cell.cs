@@ -62,11 +62,8 @@ namespace Marimo.SpreadSheetAsData
             }
         }
 
-        public Worksheet Sheet
-        {
-            get;
-            private set;
-        }
+        public Worksheet Sheet { get; private set; }
+
         public Workbook Book
         {
             get
