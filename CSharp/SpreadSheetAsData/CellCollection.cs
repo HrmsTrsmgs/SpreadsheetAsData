@@ -23,24 +23,7 @@ namespace Marimo.SpreadSheetAsData
         {
             get
             {
-                var cellName = CellName.Parse(cellReference);
-
-                if (!cache.ContainsKey(cellName))
-                {
-                    var cellXml =
-                        from cell in sheet.WorksheetPart.Worksheet.Descendants<Spreadsheet.Cell>()
-                        where cell.CellReference == cellReference
-                        select cell;
-                    if (cellXml.Any())
-                    {
-                        cache[cellName] = new Cell(sheet, cellXml.Single());
-                    }
-                    else
-                    {
-                        cache[cellName] = new Cell(sheet, cellReference);
-                    }
-                }
-                return cache[cellName];
+                return GetItem(CellName.Parse(cellReference));
             }
         }
 
@@ -48,13 +31,28 @@ namespace Marimo.SpreadSheetAsData
         {
             get
             {
-                return this[GetCellReference(columnIndex, rowIndex)];
+                return GetItem(new CellName(columnIndex, rowIndex));
             }
         }
 
-        private string GetCellReference(uint columnIndex, uint rowIndex)
+        private Cell GetItem(CellName cellName)
         {
-            return new CellName(columnIndex, rowIndex).ToString();
+            if (!cache.ContainsKey(cellName))
+            {
+                var cellXml =
+                    from cell in sheet.WorksheetPart.Worksheet.Descendants<Spreadsheet.Cell>()
+                    where cell.CellReference == cellName.ToString()
+                    select cell;
+                if (cellXml.Any())
+                {
+                    cache[cellName] = new Cell(sheet, cellXml.Single());
+                }
+                else
+                {
+                    cache[cellName] = new Cell(sheet, cellName.ToString());
+                }
+            }
+            return cache[cellName];
         }
     }
 }
