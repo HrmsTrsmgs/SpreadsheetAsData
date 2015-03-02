@@ -85,5 +85,11 @@ namespace Marimo.SpreadSheetAdData.Test
         {
             Expect(sheet1.Cells[1, 1], Is.SameAs(sheet1.Cells["A1"]));
         }
+
+        [Test]
+        public void Rangeは2引数を指定して範囲を取得します()
+        {
+            Expect(sheet1.Range["A1", "C3"].ToString() , Is.EqualTo("A1:C3"));
+        }
     }
 }

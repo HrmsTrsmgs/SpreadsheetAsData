@@ -12,12 +12,15 @@ namespace Marimo.SpreadSheetAsData
     {
         public Worksheet()
         {
-            Cells = new CellCollection(this); 
+            Cells = new CellCollection(this);
+            Range = new CellRangeCollection();
         }
+
 
         public Workbook Book { get; internal set; }
         public string Name { get; internal set; }
         public CellCollection Cells { get;private set; }
+        public CellRangeCollection Range { get; private set; }
 
         internal Spreadsheet.Sheet SheetTag
         {
