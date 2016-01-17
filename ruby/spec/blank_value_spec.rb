@@ -13,7 +13,9 @@ describe BlankValue do
 
   describe '#==' do
     it 'で比較すると""と同じとされます。' do
-      subject.should == ''
+
+      puts TestFile.book1
+      expect(subject).to eq ''
     end
 
     it 'で比較すると0と同じとされます。' do

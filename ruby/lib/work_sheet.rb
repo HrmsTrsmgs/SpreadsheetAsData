@@ -1,10 +1,10 @@
 # coding: UTF-8
 require 'rexml/document'
 
-require 'cell'
-require 'blank_value'
-require 'cell_range'
-require 'cell_name'
+require_relative 'cell'
+require_relative 'blank_value'
+require_relative 'cell_range'
+require_relative 'cell_name'
 
 # Excelのシートです。
 class WorkSheet

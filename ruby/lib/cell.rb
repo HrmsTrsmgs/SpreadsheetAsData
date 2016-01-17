@@ -3,7 +3,7 @@
 require 'rexml/document'
 require 'forwardable'
 
-require 'cell_name'
+require_relative 'cell_name'
 
 class Cell
   extend Forwardable

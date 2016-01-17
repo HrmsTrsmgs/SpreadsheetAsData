@@ -2,8 +2,8 @@
 
 require 'forwardable'
 
-require 'data_row'
-require 'range_name'
+require_relative 'data_row'
+require_relative 'range_name'
 
 
 class CellRange

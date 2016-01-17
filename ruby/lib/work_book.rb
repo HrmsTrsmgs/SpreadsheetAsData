@@ -1,9 +1,9 @@
 # coding: UTF-8
 require 'rexml/document'
 
-require 'work_sheet'
-require 'package'
-require 'shared_strings'
+require_relative 'work_sheet'
+require_relative 'package'
+require_relative 'shared_strings'
 
 # Excelブックを扱うクラスです。
 class WorkBook

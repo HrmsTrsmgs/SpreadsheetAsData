@@ -1,6 +1,6 @@
-# coding: UTF-8
+# Coding: utf-8
 
-require 'spec_helper'
+require_relative 'spec_helper'
 require 'package'
 
 describe Package do

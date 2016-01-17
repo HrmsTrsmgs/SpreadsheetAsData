@@ -1,9 +1,9 @@
-﻿require 'fileutils'
+require 'fileutils'
 
-require 'zip/zipfilesystem'
+require 'zip'
 require 'rexml/document'
 
-require 'package_part'
+require_relative 'package_part'
 
 class Package
 
@@ -68,14 +68,14 @@ class Package
   end
   # ファイルのzip圧縮を解凍し、編集可能とします。
   def unzip_file
-    Zip::ZipInputStream.open(slashed_file_path) do |stream|
-      while ziped_file = stream.get_next_entry()
-        dir_name = File.dirname(ziped_file.name)
+    Zip::File.open(slashed_file_path) do |zip|
+      zip.each do |file|
+        dir_name = File.dirname(file.name)
         FileUtils.makedirs(unziped_dir_path + dir_name)
-        ziped_file_name =  unziped_dir_path + ziped_file.name
+        ziped_file_name =  unziped_dir_path + file.name
         unless ziped_file_name.match(/\/$/)
           File.open(ziped_file_name, "w+b") do |written|
-            written.puts(stream.read())
+            written.puts(file.get_input_stream.read)
           end
         end
       end

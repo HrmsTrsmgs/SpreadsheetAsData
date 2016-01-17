@@ -16,7 +16,7 @@ describe WorkBook do
 
   describe '::open' do
     it 'の戻り値はWorkBookです。' do
-      subject.class.should == WorkBook
+      subject.class.should === WorkBook
     end
 
     it 'のブロック引数はWorkBookです。' do

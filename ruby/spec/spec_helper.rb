@@ -1,6 +1,7 @@
 # coding: UTF-8
 
 $: << File.dirname(__FILE__) + '/../lib'
+Encoding.default_external = Encoding::UTF_8
 
 require 'work_book'
 
@@ -13,7 +14,6 @@ end
 class TestFile
   class << self
     basenames = Dir.glob("#{TEST_FILE_DIRECTORY}*.xlsx").map{|file| File.basename(file, '.xlsx') }
-    
     basenames.each do |basename|
       basename_downcase = basename.downcase.gsub('-', '_')
       define_method basename_downcase do
