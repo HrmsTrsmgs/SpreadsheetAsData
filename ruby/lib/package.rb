@@ -75,7 +75,9 @@ class Package
         ziped_file_name =  unziped_dir_path + file.name
         unless ziped_file_name.match(/\/$/)
           File.open(ziped_file_name, "w+b") do |written|
-            written.puts(file.get_input_stream.read)
+            stream = file.get_input_stream
+            written.puts(stream.read)
+            stream.close
           end
         end
       end

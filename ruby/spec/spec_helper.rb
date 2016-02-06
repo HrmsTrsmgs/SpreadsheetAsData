@@ -60,7 +60,10 @@ class TestFile
         book_copy_path_name = "@#{basename_downcase}_copy_path"
         if instance_variable_get(book_copy_path_name)
           copy_path = send("#{basename_downcase}_copy_path")
-          File.delete(copy_path) if File.exist?(copy_path)
+          begin
+            File.delete(copy_path) if File.exist?(copy_path)
+          rescue
+          end
           instance_variable_set(book_copy_path_name, nil)
         end
       end
