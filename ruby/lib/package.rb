@@ -38,8 +38,10 @@ class Package
     @initialized_parts.select(&:changed?).each do |part|
       File.write(unziped_dir_path + part.part_uri, part.xml_document.to_s)
     end
-    FileUtils.remove_entry(unziped_dir_path.encode("Shift_JIS")) if Dir.exist?(unziped_dir_path)
     @file.close
+    File.delete(slashed_file_path)
+    zip_file
+    FileUtils.remove_entry(unziped_dir_path.encode("Shift_JIS")) if Dir.exist?(unziped_dir_path)
     @closed = true
   end
   
@@ -85,12 +87,17 @@ class Package
   end
   
   def zip_file
-    Zip::ZipFile.open(slashed_file_path, Zip::ZipFile::CREATE) do |zip_file|
-    	src_paths.each do |src_path|
-      	src_path = File.expand_path(src_path)
-      zip_file.add(File.basename(src_path), src_path)
+    
+    Zip::File.open(slashed_file_path, Zip::File::CREATE) do |zip_file|
+    	Dir::glob(unziped_dir_path + "**/*").each do |src_path|
+        p src_path
+        if File.file?(src_path)
+          zip_file.add(File.basename(src_path), src_path)
+        else
+          zip_file.mkdir(src_path)
+        end
+      end
     end
-  end
   end
 
   # 編集用に解凍されたフォルダのパスを取得します。

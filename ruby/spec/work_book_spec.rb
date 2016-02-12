@@ -185,7 +185,6 @@ describe WorkBook do
   end
 
   context 'に保存するデータとして' do
-    before { skip }
     it '整数値の書き込みは保存されています。' do
       book = WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.A1 = 666
