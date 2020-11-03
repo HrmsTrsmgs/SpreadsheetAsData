@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,11 +51,11 @@ namespace Marimo.SpreadSheetAsData
         {
             get
             {
-                switch (Xml.DataType)
+                switch (Xml.DataType?.Value)
                 {
-                    case "b":
+                    case CellValues.Boolean:
                         return Xml.CellValue.Text != "0";
-                    case "s":
+                    case CellValues.SharedString:
                         return Book.Document.WorkbookPart.SharedStringTablePart.SharedStringTable.Elements<Spreadsheet.SharedStringItem>().ElementAt(int.Parse(Xml.CellValue.Text)).Text.Text;
                     default:
                         return double.Parse(Xml.CellValue.Text);
