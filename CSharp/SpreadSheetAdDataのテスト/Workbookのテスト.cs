@@ -11,7 +11,7 @@ using NUnit.Framework.Constraints;
 namespace Marimo.SpreadSheetAdData.Test
 {
     [TestFixture]
-    public class Workbookのテスト : AssertionHelper
+    public class Workbookのテスト
     {
 
         Workbook book1;
@@ -38,7 +38,7 @@ namespace Marimo.SpreadSheetAdData.Test
         public void Openはファイルを束縛します()
         {
             var tested = Workbook.Open(コピーパス);
-            Expect(() => File.Delete(コピーパス), Throws.InstanceOf<IOException>());
+            Assert.That(() => File.Delete(コピーパス), Throws.InstanceOf<IOException>());
         }
 
         [Test]
@@ -47,7 +47,7 @@ namespace Marimo.SpreadSheetAdData.Test
             var tested = Workbook.Open(コピーパス);
 
             tested.Close();
-            Expect(() => File.Delete(コピーパス), Throws.Nothing);
+            Assert.That(() => File.Delete(コピーパス), Throws.Nothing);
         }
 
         [Test]
@@ -56,25 +56,25 @@ namespace Marimo.SpreadSheetAdData.Test
             using (var tested = Workbook.Open(コピーパス))
             {
             }
-            Expect(() => File.Delete(コピーパス), Throws.Nothing);
+            Assert.That(() => File.Delete(コピーパス), Throws.Nothing);
         }
 
         [Test]
         public void Sheetsでシートが取得できます()
         {
-            Expect(book1.Sheets.Count, Is.EqualTo(3));
+            Assert.That(book1.Sheets.Count, Is.EqualTo(3));
         }
 
         [Test]
         public void Sheetsに数字を指定してシートが取得できます()
         {
-            Expect(book1.Sheets[0].Name, Is.EqualTo("Sheet1"));
+            Assert.That(book1.Sheets[0].Name, Is.EqualTo("Sheet1"));
         }
 
         [Test]
         public void Sheetsにシート名を指定してシートが取得できます()
         {
-            Expect(book1.Sheets["Sheet1"].Name, Is.EqualTo("Sheet1"));
+            Assert.That(book1.Sheets["Sheet1"].Name, Is.EqualTo("Sheet1"));
         }
 
     }

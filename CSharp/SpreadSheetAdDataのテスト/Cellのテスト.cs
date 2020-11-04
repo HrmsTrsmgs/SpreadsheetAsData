@@ -5,7 +5,7 @@ using System.IO;
 namespace Marimo.SpreadSheetAdData.Test
 {
     [TestFixture]
-    public class Cellのテスト : AssertionHelper
+    public class Cellのテスト
     {
         Worksheet いろいろなデータ;
         Cell a1;
@@ -39,54 +39,54 @@ namespace Marimo.SpreadSheetAdData.Test
         [Test]
         public void Bookプロパティはブックを取得できます()
         {
-            Expect(a1.Book, Is.SameAs(いろいろなデータ.Book));
+            Assert.That(a1.Book, Is.SameAs(いろいろなデータ.Book));
         }
 
         [Test]
         public void Sheetプロパティはシートを取得できます()
         {
-            Expect(a1.Sheet, Is.SameAs(いろいろなデータ));
+            Assert.That(a1.Sheet, Is.SameAs(いろいろなデータ));
         }
 
         [Test]
         public void Valueプロパティは数字の値を取得できます()
         {
-            Expect(a1.Value, Is.EqualTo(1.1));
-            Expect(b1.Value, Is.EqualTo(2.2));
+            Assert.That(a1.Value, Is.EqualTo(1.1));
+            Assert.That(b1.Value, Is.EqualTo(2.2));
         }
 
         [Test]
         public void Valueプロパティはboolの値を取得できます()
         {
-            Expect(a2.Value, Is.True);
-            Expect(b2.Value, Is.False);
+            Assert.That(a2.Value, Is.True);
+            Assert.That(b2.Value, Is.False);
         }
 
         [Test]
         public void Valueプロパティは文字列の値を取得できます()
         {
-            Expect(a3.Value, Is.EqualTo("あいうえお"));
-            Expect(b3.Value, Is.EqualTo("かきくけこ"));
+            Assert.That(a3.Value, Is.EqualTo("あいうえお"));
+            Assert.That(b3.Value, Is.EqualTo("かきくけこ"));
         }
 
         [Test]
         public void Referenceプロパティがセル参照の名称を取得できます()
         {
-            Expect(a1.Reference, Is.EqualTo("A1"));
-            Expect(b1.Reference, Is.EqualTo("B1"));
+            Assert.That(a1.Reference, Is.EqualTo("A1"));
+            Assert.That(b1.Reference, Is.EqualTo("B1"));
         }
         [Test]
         public void RowIndexプロパティが行番号を取得できます()
         {
-            Expect(a1.RowIndex, Is.EqualTo(1));
-            Expect(a2.RowIndex, Is.EqualTo(2));
+            Assert.That(a1.RowIndex, Is.EqualTo(1));
+            Assert.That(a2.RowIndex, Is.EqualTo(2));
         }
 
         [Test]
         public void ColumnIndexプロパティが列番号を取得できます()
         {
-            Expect(a1.ColumnIndex, Is.EqualTo(1));
-            Expect(b1.ColumnIndex, Is.EqualTo(2));
+            Assert.That(a1.ColumnIndex, Is.EqualTo(1));
+            Assert.That(b1.ColumnIndex, Is.EqualTo(2));
         }
     }
 }

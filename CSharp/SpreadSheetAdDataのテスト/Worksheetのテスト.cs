@@ -11,7 +11,7 @@ using NUnit.Framework.Constraints;
 namespace Marimo.SpreadSheetAdData.Test
 {
     [TestFixture]
-    public class Worksheetのテスト : AssertionHelper
+    public class Worksheetのテスト
     {
 
         Workbook book;
@@ -35,68 +35,68 @@ namespace Marimo.SpreadSheetAdData.Test
         [Test]
         public void Nameはシート名を返します()
         {
-            Expect(sheet1.Name, Is.EqualTo("Sheet1"));
+            Assert.That(sheet1.Name, Is.EqualTo("Sheet1"));
         }
 
         [Test]
         public void Nameは日本語で指定したシート名も適切に扱います()
         {
-            Expect(data.Name, Is.EqualTo("いろいろなデータ"));
+            Assert.That(data.Name, Is.EqualTo("いろいろなデータ"));
         }
 
         [Test]
         public void Bookは所属しているWorkbookを取得します()
         {
-            Expect(sheet1.Book, Is.SameAs(book));
+            Assert.That(sheet1.Book, Is.SameAs(book));
         }
 
         [Test]
         public void Cellsはセルの参照文字列を文字列を指定してセル取得します()
         {
-            Expect(sheet1.Cells["C3"].Reference, Is.EqualTo("C3"));
+            Assert.That(sheet1.Cells["C3"].Reference, Is.EqualTo("C3"));
         }
 
         [Test]
         public void Cellsはセルの参照文字列に存在しないセル名を指定した時にFormatExceptionを投げます()
         {
-            Expect(()=> sheet1.Cells["a1"], Throws.InstanceOf<FormatException>());
+            Assert.That(()=> sheet1.Cells["a1"], Throws.InstanceOf<FormatException>());
         }
 
         [Test]
         public void Cellsは空のセルも取得します()
         {
-            Expect(sheet1.Cells["B1"].Reference, Is.EqualTo("B1"));
+            Assert.That(sheet1.Cells["B1"].Reference, Is.EqualTo("B1"));
         }
 
         [Test]
         public void Cellsはは同じセルの場合は同じオブジェクトを取得します()
         {
-            Expect(sheet1.Cells["A1"], Is.SameAs(sheet1.Cells["A1"]));
+            Assert.That(sheet1.Cells["A1"], Is.SameAs(sheet1.Cells["A1"]));
         }
 
         [Test]
         public void Cellsはセルの座標を数値で指定してセル取得します()
         {
-            Expect(sheet1.Cells[3, 3].Reference, Is.EqualTo("C3"));
+            Assert.That(sheet1.Cells[3, 3].Reference, Is.EqualTo("C3"));
         }
 
         [Test]
         public void Cellsは指定方法が違っても同じセルの場合は同じオブジェクトを取得します()
         {
-            Expect(sheet1.Cells[1, 1], Is.SameAs(sheet1.Cells["A1"]));
+            Assert.That(sheet1.Cells[1, 1], Is.SameAs(sheet1.Cells["A1"]));
         }
 
         [Test]
         public void Rangeは2引数を指定して範囲を取得します()
         {
-            Expect(sheet1.Range["A1", "C3"].ToString(), Is.EqualTo("A1:C3"));
-            Expect(sheet1.Range["B2", "B2"].ToString(), Is.EqualTo("B2:B2"));
+            Assert.That(sheet1.Range["A1", "C3"].ToString(), Is.EqualTo("A1:C3"));
+            Assert.That(sheet1.Range["B2", "B2"].ToString(), Is.EqualTo("B2:B2"));
         }
 
         [Test]
         public void Rangeは2引数を指定して同じ範囲を指定した場合に同じセルを返します()
         {
-            Expect(sheet1.Range["A1", "C3"], Is.SameAs(sheet1.Range["A1", "C3"]));
+            Assert.That(sheet1.Range["A1", "C3"], Is.SameAs(sheet1.Range["A1", "C3"]));
         }
     }
 }

@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace Marimo.SpreadSheetAdData.Test
 {
     [TestFixture]
-    public class WorkSheetCollectionのテスト : AssertionHelper
+    public class WorkSheetCollectionのテスト
     {
         WorksheetCollection tested;
 
@@ -26,49 +26,49 @@ namespace Marimo.SpreadSheetAdData.Test
         [Test]
         public void インデクサに数字でアクセスできます()
         {
-            Expect(tested[0].Name, Is.EqualTo("Sheet1"));
+            Assert.That(tested[0].Name, Is.EqualTo("Sheet1"));
         }
 
         [Test]
         public void インデクサにシート名でアクセスできます()
         {
-            Expect(tested["Sheet1"], Is.SameAs(tested[0]));
+            Assert.That(tested["Sheet1"], Is.SameAs(tested[0]));
         }
 
         [Test]
         public void Countで個数を取得できます()
         {
-            Expect(tested.Count, Is.EqualTo(3));
+            Assert.That(tested.Count, Is.EqualTo(3));
         }
 
         [Test]
         public void Keysでシート名の一覧が取得できます()
         {
-            Expect(tested.Keys, Has.Member("Sheet1"));
-            Expect(tested.Keys, Has.Member("Sheet2"));
+            Assert.That(tested.Keys, Has.Member("Sheet1"));
+            Assert.That(tested.Keys, Has.Member("Sheet2"));
         }
 
         [Test]
         public void Valuesでシートの一覧が取得できます()
         {
-            Expect(tested.Values, Has.Member(tested[0]));
-            Expect(tested.Values, Has.Member(tested[1]));
+            Assert.That(tested.Values, Has.Member(tested[0]));
+            Assert.That(tested.Values, Has.Member(tested[1]));
         }
 
         [Test]
         public void ContainsKeyでシート名の有無が確認できます()
         {
-            Expect(tested.ContainsKey("Sheet1"), Is.True);
-            Expect(tested.ContainsKey(""), Is.False);
+            Assert.That(tested.ContainsKey("Sheet1"), Is.True);
+            Assert.That(tested.ContainsKey(""), Is.False);
         }
 
         [Test]
         public void TryGetValueでシート名の有無が確認しつつシートの取得ができます()
         {
             Worksheet sheet;
-            Expect(tested.TryGetValue("Sheet1", out sheet), Is.True);
-            Expect(sheet, Is.SameAs(tested[0]));
-            Expect(tested.TryGetValue("", out sheet), Is.False);
+            Assert.That(tested.TryGetValue("Sheet1", out sheet), Is.True);
+            Assert.That(sheet, Is.SameAs(tested[0]));
+            Assert.That(tested.TryGetValue("", out sheet), Is.False);
         }
 
         [Test]
@@ -78,7 +78,7 @@ namespace Marimo.SpreadSheetAdData.Test
             foreach (var item in tested)
             {
 
-                Expect(item, Is.EqualTo(tested[i++]));
+                Assert.That(item, Is.EqualTo(tested[i++]));
             }
         }
 
@@ -88,7 +88,7 @@ namespace Marimo.SpreadSheetAdData.Test
             int i = 0;
             foreach (var item in (IEnumerable)tested)
             {
-                Expect(item, Is.EqualTo(tested[i++]));
+                Assert.That(item, Is.EqualTo(tested[i++]));
             }
         }
 
@@ -98,8 +98,8 @@ namespace Marimo.SpreadSheetAdData.Test
             int i = 0;
             foreach (var item in (IReadOnlyDictionary<string, Worksheet>)tested)
             {
-                Expect(item.Key, Is.EqualTo(tested[i].Name));
-                Expect(item.Value, Is.EqualTo(tested[i++]));
+                Assert.That(item.Key, Is.EqualTo(tested[i].Name));
+                Assert.That(item.Value, Is.EqualTo(tested[i++]));
             }
         }
     }
