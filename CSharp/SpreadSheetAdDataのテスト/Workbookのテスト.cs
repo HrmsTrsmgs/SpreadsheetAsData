@@ -77,5 +77,17 @@ namespace Marimo.SpreadSheetAdData.Test
             Assert.That(book1.Sheets["Sheet1"].Name, Is.EqualTo("Sheet1"));
         }
 
+        [Test]
+        public void インデクサに数字を指定してシートが取得できます()
+        {
+            Assert.That(book1[0].Name, Is.EqualTo("Sheet1"));
+        }
+
+        [Test]
+        public void インデクサにシート名を指定してシートが取得できます()
+        {
+            Assert.That(book1["Sheet1"].Name, Is.EqualTo("Sheet1"));
+        }
+
     }
 }

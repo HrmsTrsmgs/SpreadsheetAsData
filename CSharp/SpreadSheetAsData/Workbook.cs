@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Packaging =  DocumentFormat.OpenXml.Packaging;
@@ -32,6 +33,10 @@ namespace Marimo.SpreadSheetAsData
                 return sheets;
             }
         }
+
+        public Worksheet this[int index] => Sheets[index];
+
+        public Worksheet this[string sheetName] => Sheets[sheetName];
 
         public void Close()
         {
