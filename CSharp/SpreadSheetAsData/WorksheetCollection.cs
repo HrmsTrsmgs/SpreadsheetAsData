@@ -2,8 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Marimo.SpreadSheetAsData
 {
@@ -11,55 +9,23 @@ namespace Marimo.SpreadSheetAsData
     {
         internal WorksheetCollection(IEnumerable<Worksheet> collection)
         {
-            items = collection.ToList();
+            items = collection.ToArray();
         }
 
-        List<Worksheet> items;
+        IEnumerable<Worksheet> items { get; }
 
-        public Worksheet this[string sheetName]
-        {
-            get
-            {
-                return items.Where(_ => _.Name == sheetName).SingleOrDefault();
-            }
-        }
+        public Worksheet this[string sheetName] =>
+            items.Where(_ => _.Name == sheetName).SingleOrDefault();
 
-        public Worksheet this[int index]
-        {
-            get
-            {
-                return items[index];
-            }
-        }
+        public Worksheet this[int index] => items.ElementAt(index);
 
-        public int Count
-        {
-            get
-            {
-                return items.Count;
-            }
-        }
+        public int Count => items.Count();
 
-        public IEnumerable<string> Keys
-        {
-            get
-            {
-                return items.Select(_ => _.Name);
-            }
-        }
+        public IEnumerable<string> Keys => items.Select(_ => _.Name);
 
-        public IEnumerable<Worksheet> Values
-        {
-            get
-            {
-                return items;
-            }
-        }
+        public IEnumerable<Worksheet> Values => items;
 
-        public bool ContainsKey(string key)
-        {
-            return Keys.Contains(key);
-        }
+        public bool ContainsKey(string key) => Keys.Contains(key);
 
         public bool TryGetValue(string key, out Worksheet value)
         {
@@ -67,19 +33,11 @@ namespace Marimo.SpreadSheetAsData
             return value != null;
         }
 
-        public IEnumerator<Worksheet> GetEnumerator()
-        {
-            return items.GetEnumerator();
-        }
+        public IEnumerator<Worksheet> GetEnumerator() => items.GetEnumerator();
 
-        IEnumerator<KeyValuePair<string, Worksheet>> IEnumerable<KeyValuePair<string, Worksheet>>.GetEnumerator()
-        {
-            return items.ToDictionary(_ => _.Name, _ => _).GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return items.GetEnumerator();
-        }
+        IEnumerator<KeyValuePair<string, Worksheet>> IEnumerable<KeyValuePair<string, Worksheet>>.GetEnumerator() =>
+            items.ToDictionary(_ => _.Name, _ => _).GetEnumerator();
+        
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
