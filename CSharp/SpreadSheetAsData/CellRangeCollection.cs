@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Marimo.SpreadSheetAsData
 {
     public class CellRangeCollection
     {
-        Dictionary<Tuple<string, string>, CellRange> cache = new Dictionary<Tuple<string, string>, CellRange>();
+        Dictionary<(string, string), CellRange> cache = new Dictionary<(string, string), CellRange>();
 
         public CellRange this[string topLeft, string bottomRight]
         {
             get
             {
-                if(!cache.ContainsKey(Tuple.Create(topLeft, bottomRight)))
+                if(!cache.ContainsKey((topLeft, bottomRight)))
                 {
-                    cache[Tuple.Create(topLeft, bottomRight)] = new CellRange(topLeft, bottomRight);
+                    cache[(topLeft, bottomRight)] = new CellRange(topLeft, bottomRight);
                 }
 
-                return cache[Tuple.Create(topLeft, bottomRight)];
+                return cache[(topLeft, bottomRight)];
             }
         }
     }
