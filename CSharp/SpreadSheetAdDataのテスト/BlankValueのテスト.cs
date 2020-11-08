@@ -52,5 +52,11 @@ namespace SpreadSheetAdDataのテスト
         {
             Assert.That(tested == 1, Is.False);
         }
+
+        [Test]
+        public void 比較すると0以外の少数とは同じとされません()
+        {
+            Assert.That(tested == 0.01, Is.False);
+        }
     }
 }
