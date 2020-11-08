@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Packaging = DocumentFormat.OpenXml.Packaging;
 using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Marimo.SpreadSheetAsData
@@ -19,21 +14,11 @@ namespace Marimo.SpreadSheetAsData
 
         private Dictionary<CellName, Cell> cache = new Dictionary<CellName, Cell>();
 
-        public Cell this[string cellReference]
-        {
-            get
-            {
-                return GetItem(CellName.Parse(cellReference));
-            }
-        }
+        public Cell this[string cellReference] =>
+            GetItem(CellName.Parse(cellReference));
 
-        public Cell this[uint columnIndex, uint rowIndex]
-        {
-            get
-            {
-                return GetItem(new CellName(columnIndex, rowIndex));
-            }
-        }
+        public Cell this[uint columnIndex, uint rowIndex] =>
+            GetItem(new CellName(columnIndex, rowIndex));
 
         private Cell GetItem(CellName cellName)
         {
@@ -43,6 +28,7 @@ namespace Marimo.SpreadSheetAsData
                     from cell in sheet.WorksheetPart.Worksheet.Descendants<Spreadsheet.Cell>()
                     where cell.CellReference == cellName.ToString()
                     select cell;
+
                 if (cellXml.Any())
                 {
                     cache[cellName] = new Cell(sheet, cellXml.Single());
