@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Marimo.SpreadSheetAsData
 {
@@ -21,14 +19,14 @@ namespace Marimo.SpreadSheetAsData
         private CellName(string name)
         {
             var match = regex.Match(name);
-            if(!match.Success)
+            if (!match.Success)
             {
                 throw new FormatException();
             }
             ColumnIndex = GetColumnIndex(match.Groups["column"].Value);
             RowIndex = uint.Parse(match.Groups["row"].Value);
 
-            if (MaxRowIndex < RowIndex || MaxColumnIndex <  ColumnIndex)
+            if (MaxRowIndex < RowIndex || MaxColumnIndex < ColumnIndex)
             {
                 throw new FormatException();
             }
@@ -44,48 +42,25 @@ namespace Marimo.SpreadSheetAsData
             }
         }
 
-        public static CellName Parse(string name)
-        {
-            return new CellName(name);
-        }
+        public static CellName Parse(string name) => new CellName(name);
 
-        public string ColumnName
-        {
-            get
-            {
-                return GetColumnName(ColumnIndex);
-            }
-        }
+        public string ColumnName => GetColumnName(ColumnIndex);
 
-        public override string ToString()
-        {
-            return GetColumnName(ColumnIndex) + RowIndex;
-        }
+        public override string ToString() =>
+            GetColumnName(ColumnIndex) + RowIndex;
 
-        private static uint GetColumnIndex(IEnumerable<char> columnNameChars)
-        {
-            var count = columnNameChars.Count();
-            switch(count)
+        private static uint GetColumnIndex(IEnumerable<char> columnNameChars) =>
+            columnNameChars.Any() switch
             {
-                case 1:
-                    return (uint)(columnNameChars.Single() - 'A') + 1;
-                default:
-                    return 
-                        GetColumnIndex(columnNameChars.Take(count - 1)) * alphabetCount
-                          + GetColumnIndex(columnNameChars.Skip(count - 1));
-            }
-        }
-
-        private static string GetColumnName(uint columnIndex)
-        {
-            if (columnIndex <= alphabetCount)
+                true => (uint)(columnNameChars.Single() - 'A') + 1,
+                false => GetColumnIndex(columnNameChars.Take(columnNameChars.Count() - 1)) * alphabetCount
+                          + GetColumnIndex(columnNameChars.Skip(columnNameChars.Count() - 1))
+            };
+        private static string GetColumnName(uint columnIndex) =>
+            (columnIndex <= alphabetCount) switch
             {
-                return ((char)('A' + columnIndex - 1)).ToString();
-            }
-            else
-            {
-                return GetColumnName(columnIndex / alphabetCount) + GetColumnName(columnIndex % alphabetCount);
-            }
-        }
+                true => ((char)('A' + columnIndex - 1)).ToString(),
+                false => GetColumnName(columnIndex / alphabetCount) + GetColumnName(columnIndex % alphabetCount)
+            };
     }
 }
