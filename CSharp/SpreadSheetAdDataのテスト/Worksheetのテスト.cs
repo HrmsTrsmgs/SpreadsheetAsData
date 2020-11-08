@@ -92,6 +92,12 @@ namespace Marimo.SpreadSheetAdData.Test
         }
 
         [Test]
+        public void Cellsは大きな行番号のセルを取得します()
+        {
+            Assert.That(sheet1.Cells["A1048576"].Reference, Is.EqualTo("A1048576"));
+        }
+
+        [Test]
         public void Cellsは空のセルも取得します()
         {
             Assert.That(sheet1.Cells["B1"].Reference, Is.EqualTo("B1"));
