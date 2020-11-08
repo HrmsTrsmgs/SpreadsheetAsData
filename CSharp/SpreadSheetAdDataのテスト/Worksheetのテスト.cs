@@ -63,6 +63,20 @@ namespace Marimo.SpreadSheetAdData.Test
         }
 
         [Test]
+        public void Cellsは一文字の列名称の列を取得します()
+        {
+            Assert.That(sheet1.Cells["A1"].Reference, Is.EqualTo("A1"));
+            Assert.That(sheet1.Cells["Z1"].Reference, Is.EqualTo("Z1"));
+        }
+
+        [Test]
+        public void Cellsは二文字の列名称の列を取得します()
+        {
+            Assert.That(sheet1.Cells["AA1"].Reference, Is.EqualTo("AA1"));
+            Assert.That(sheet1.Cells["ZZ1"].Reference, Is.EqualTo("ZZ1"));
+        }
+
+        [Test]
         public void Cellsは空のセルも取得します()
         {
             Assert.That(sheet1.Cells["B1"].Reference, Is.EqualTo("B1"));

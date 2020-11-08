@@ -50,17 +50,17 @@ namespace Marimo.SpreadSheetAsData
             GetColumnName(ColumnIndex) + RowIndex;
 
         private static uint GetColumnIndex(IEnumerable<char> columnNameChars) =>
-            columnNameChars.Any() switch
+            columnNameChars.Count() switch
             {
-                true => (uint)(columnNameChars.Single() - 'A') + 1,
-                false => GetColumnIndex(columnNameChars.Take(columnNameChars.Count() - 1)) * alphabetCount
+                1 => (uint)(columnNameChars.Single() - 'A') + 1,
+                _ => GetColumnIndex(columnNameChars.Take(columnNameChars.Count() - 1)) * alphabetCount
                           + GetColumnIndex(columnNameChars.Skip(columnNameChars.Count() - 1))
             };
         private static string GetColumnName(uint columnIndex) =>
             (columnIndex <= alphabetCount) switch
             {
                 true => ((char)('A' + columnIndex - 1)).ToString(),
-                false => GetColumnName(columnIndex / alphabetCount) + GetColumnName(columnIndex % alphabetCount)
+                false => GetColumnName((columnIndex - 1) / alphabetCount) + GetColumnName((columnIndex - 1) % alphabetCount + 1)
             };
     }
 }
