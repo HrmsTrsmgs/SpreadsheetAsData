@@ -42,6 +42,12 @@ namespace SpreadSheetAdDataのテスト
         }
 
         [Test]
+        public void 比較すると少数の0と同じとされます()
+        {
+            Assert.That(tested == .0, Is.True);
+        }
+
+        [Test]
         public void 比較すると空白以外の文字列とは同じとされません()
         {
             Assert.That(tested == "a", Is.False);
