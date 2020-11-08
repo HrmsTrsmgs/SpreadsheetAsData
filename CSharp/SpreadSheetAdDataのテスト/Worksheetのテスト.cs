@@ -98,6 +98,12 @@ namespace Marimo.SpreadSheetAdData.Test
         }
 
         [Test]
+        public void Cellsは大きすぎる行番号を指定した時にFormatExceptionを投げます()
+        {
+            Assert.That(() => sheet1.Cells["A1048577"], Throws.InstanceOf<FormatException>());
+        }
+
+        [Test]
         public void Cellsは空のセルも取得します()
         {
             Assert.That(sheet1.Cells["B1"].Reference, Is.EqualTo("B1"));

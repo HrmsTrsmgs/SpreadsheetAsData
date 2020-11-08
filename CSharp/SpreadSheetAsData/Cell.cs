@@ -31,6 +31,7 @@ namespace Marimo.SpreadSheetAsData
         public dynamic Value =>
             Xml.DataType?.Value switch
             {
+                null => new BlankValue(),
                 CellValues.Boolean =>
                     Xml.CellValue.Text != "0",
                 CellValues.SharedString =>
