@@ -84,6 +84,14 @@ namespace Marimo.SpreadSheetAdData.Test
         }
 
         [Test]
+        public void Cellsは大きすぎる列名を指定した時にFormatExceptionを投げます()
+        {
+            Assert.That(() => sheet1.Cells["XFE1"], Throws.InstanceOf<FormatException>());
+            Assert.That(() => sheet1.Cells["ZZZ1"], Throws.InstanceOf<FormatException>());
+            Assert.That(() => sheet1.Cells["AAAA1"], Throws.InstanceOf<FormatException>());
+        }
+
+        [Test]
         public void Cellsは空のセルも取得します()
         {
             Assert.That(sheet1.Cells["B1"].Reference, Is.EqualTo("B1"));
