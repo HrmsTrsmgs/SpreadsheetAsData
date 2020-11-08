@@ -29,12 +29,12 @@ namespace Marimo.SpreadSheetAsData
         public string Reference => Xml.CellReference;
 
         public dynamic Value =>
-            Xml.DataType?.Value switch
+            (Xml.DataType?.Value, Xml.CellValue.Text) switch
             {
-                null => new BlankValue(),
-                CellValues.Boolean =>
-                    Xml.CellValue.Text != "0",
-                CellValues.SharedString =>
+                (null, "") => new BlankValue(),
+                (CellValues.Boolean, "0") => false,
+                (CellValues.Boolean, _) => true,
+                (CellValues.SharedString, _) =>
                     Book.Document.WorkbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(int.Parse(Xml.CellValue.Text)).Text.Text,
                 _ => double.Parse(Xml.CellValue.Text)
             };

@@ -23,10 +23,22 @@ namespace SpreadSheetAdDataのテスト
             tested = cell.Value;
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            book.Close();
+        }
+
+        [Test]
+        public void 比較すると空白と同じとされます()
+        {
+            Assert.That(tested == "", Is.True);
+        }
+
         [Test]
         public void 比較すると0と同じとされます()
         {
-            Assert.That(tested == 0, Is.EqualTo(true));
+            Assert.That(tested == 0, Is.True);
         }
     }
 }

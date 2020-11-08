@@ -6,11 +6,15 @@ namespace Marimo.SpreadSheetAsData
     {
         public override bool Equals(object obj)
         {
-            return obj is int && (int)obj == 0;
+            return obj is int && (int)obj == 0 || obj is string && (string)obj == "";
         }
 
         public static bool operator ==(BlankValue a, int b) => a.Equals(b);
 
         public static bool operator !=(BlankValue a, int b) => !(a == b);
+
+        public static bool operator ==(BlankValue a, string b) => a.Equals(b);
+
+        public static bool operator !=(BlankValue a, string b) => !(a == b);
     }
 }
