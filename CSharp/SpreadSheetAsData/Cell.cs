@@ -29,9 +29,9 @@ namespace Marimo.SpreadSheetAsData
         public string Reference => Xml.CellReference;
 
         public dynamic Value =>
-            (Xml.DataType?.Value, Xml.CellValue.Text) switch
+            (Xml.DataType?.Value, Xml.CellValue?.Text) switch
             {
-                (null, "") => new BlankValue(),
+                (null, null) => new BlankValue(),
                 (CellValues.Boolean, "0") => false,
                 (CellValues.Boolean, _) => true,
                 (CellValues.SharedString, _) =>
