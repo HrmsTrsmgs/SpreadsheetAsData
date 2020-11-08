@@ -8,8 +8,8 @@ namespace Marimo.SpreadSheetAsData
 {
     public class CellRange
     {
-        private string bottomRight;
-        private string topLeft;
+        private readonly string bottomRight;
+        private readonly string topLeft;
 
         public CellRange(string topLeft, string bottomRight)
         {
@@ -17,9 +17,6 @@ namespace Marimo.SpreadSheetAsData
             this.bottomRight = bottomRight;
         }
 
-        public override string ToString()
-        {
-            return topLeft + ":" + bottomRight;
-        }
+        public override string ToString() => topLeft + ":" + bottomRight;
     }
 }
