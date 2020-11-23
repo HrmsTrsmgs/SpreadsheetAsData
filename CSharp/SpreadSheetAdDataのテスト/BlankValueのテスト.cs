@@ -71,6 +71,12 @@ namespace SpreadSheetAdDataのテスト
         }
 
         [Test]
+        public void 逆順で否定の比較するとintの0と同じとされます()
+        {
+            Assert.That(0 != tested, Is.False);
+        }
+
+        [Test]
         public void 比較するとdoubleの0と同じとされます()
         {
             Assert.That(tested == .0, Is.True);
