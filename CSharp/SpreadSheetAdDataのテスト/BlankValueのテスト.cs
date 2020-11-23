@@ -95,6 +95,12 @@ namespace SpreadSheetAdDataのテスト
         }
 
         [Test]
+        public void 否定で比較するとlongの0と同じとされます()
+        {
+            Assert.That(tested != 0L, Is.False);
+        }
+
+        [Test]
         public void 比較するとfloatの0と同じとされます()
         {
             Assert.That(tested == 0f, Is.True);
