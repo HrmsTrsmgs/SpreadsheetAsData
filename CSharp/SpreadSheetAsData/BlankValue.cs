@@ -29,10 +29,12 @@ namespace Marimo.SpreadSheetAsData
 
         public static bool operator !=(string left, BlankValue right) => !(left == right);
 
-
-
         public static bool operator ==(BlankValue left, double right) => right == 0;
 
         public static bool operator !=(BlankValue left, double right) => !(left == right);
+
+        public static bool operator ==(double left, BlankValue right) => left == 0;
+
+        public static bool operator !=(double left, BlankValue right) => !(left == right);
     }
 }
