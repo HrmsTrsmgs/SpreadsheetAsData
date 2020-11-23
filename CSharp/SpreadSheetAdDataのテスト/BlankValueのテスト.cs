@@ -36,13 +36,13 @@ namespace SpreadSheetAdDataのテスト
         }
 
         [Test]
-        public void 比較すると0と同じとされます()
+        public void 比較するとintの0と同じとされます()
         {
             Assert.That(tested == 0, Is.True);
         }
 
         [Test]
-        public void 比較すると少数の0と同じとされます()
+        public void 比較するとdoubleの0と同じとされます()
         {
             Assert.That(tested == .0, Is.True);
         }
@@ -54,13 +54,13 @@ namespace SpreadSheetAdDataのテスト
         }
 
         [Test]
-        public void 比較すると0以外の整数とは同じとされません()
+        public void 比較すると0以外のintとは同じとされません()
         {
             Assert.That(tested == 1, Is.False);
         }
 
         [Test]
-        public void 比較すると0以外の少数とは同じとされません()
+        public void 比較すると0以外のdoubleとは同じとされません()
         {
             Assert.That(tested == 0.01, Is.False);
         }
