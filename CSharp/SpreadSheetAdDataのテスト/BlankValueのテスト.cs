@@ -72,6 +72,12 @@ namespace SpreadSheetAdDataのテスト
         }
 
         [Test]
+        public void 逆順で比較すると空白以外の文字列とは同じとされません()
+        {
+            Assert.That("a" == tested, Is.False);
+        }
+
+        [Test]
         public void 比較すると0以外のintとは同じとされません()
         {
             Assert.That(tested == 1, Is.False);
