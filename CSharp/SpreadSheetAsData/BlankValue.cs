@@ -14,21 +14,25 @@ namespace Marimo.SpreadSheetAsData
             };
         
 
-        public static bool operator ==(BlankValue a, int b) => b == 0;
+        public static bool operator ==(BlankValue left, int right) => right == 0;
 
-        public static bool operator !=(BlankValue a, int b) => !(a == b);
+        public static bool operator !=(BlankValue left, int right) => !(left == right);
 
-        public static bool operator ==(BlankValue a, string b) => b == "";
+        public static bool operator ==(int left, BlankValue right) => right == 0;
 
-        public static bool operator !=(BlankValue a, string b) => !(a == b);
-        public static bool operator ==(string a, BlankValue b) => a == "";
+        public static bool operator !=(int left, BlankValue right) => !(left == right);
 
-        public static bool operator !=(string a, BlankValue b) => !(a == b);
+        public static bool operator ==(BlankValue left, string right) => right == "";
+
+        public static bool operator !=(BlankValue left, string right) => !(left == right);
+        public static bool operator ==(string left, BlankValue right) => left == "";
+
+        public static bool operator !=(string left, BlankValue right) => !(left == right);
 
 
 
-        public static bool operator ==(BlankValue a, double b) => b == 0;
+        public static bool operator ==(BlankValue left, double right) => right == 0;
 
-        public static bool operator !=(BlankValue a, double b) => !(a == b);
+        public static bool operator !=(BlankValue left, double right) => !(left == right);
     }
 }
