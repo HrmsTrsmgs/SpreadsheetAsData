@@ -155,6 +155,12 @@ namespace SpreadSheetAdDataのテスト
         }
 
         [Test]
+        public void 否定で比較すると0以外のlongとは同じとされません()
+        {
+            Assert.That(tested != 1L, Is.True);
+        }
+
+        [Test]
         public void 比較すると0以外のdoubleとは同じとされません()
         {
             Assert.That(tested == 0.01, Is.False);
