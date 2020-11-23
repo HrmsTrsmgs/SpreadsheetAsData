@@ -46,6 +46,11 @@ namespace SpreadSheetAdDataのテスト
         {
             Assert.That("" == tested, Is.True);
         }
+        [Test]
+        public void 逆順で否定の比較すると空白と同じとされます()
+        {
+            Assert.That("" != tested, Is.False);
+        }
 
         [Test]
         public void 比較するとintの0と同じとされます()
