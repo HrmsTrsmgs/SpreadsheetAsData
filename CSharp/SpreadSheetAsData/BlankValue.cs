@@ -18,7 +18,7 @@ namespace Marimo.SpreadSheetAsData
 
         public static bool operator !=(BlankValue left, int right) => !(left == right);
 
-        public static bool operator ==(int left, BlankValue right) => right == 0;
+        public static bool operator ==(int left, BlankValue right) => left == 0;
 
         public static bool operator !=(int left, BlankValue right) => !(left == right);
 
