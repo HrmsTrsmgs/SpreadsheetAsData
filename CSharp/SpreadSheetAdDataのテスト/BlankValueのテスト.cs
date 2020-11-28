@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 
-namespace SpreadSheetAdDataのテスト
+namespace Marimo.SpreadSheetAdData.Test
 {
     [TestFixture]
     public class BlankValueのテスト
