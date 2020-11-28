@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="CellNameのテスト.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="TestData\Book1.xlsx" />
     <None Remove="TestData\Book2.xlsx" />
     <None Remove="TestData\テーブル.xlsx" />
@@ -34,12 +30,6 @@
     <Content Include="TestData\逐次開かれるBook.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Include="CellNameのテスト.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Page>
   </ItemGroup>
 
   <ItemGroup>
