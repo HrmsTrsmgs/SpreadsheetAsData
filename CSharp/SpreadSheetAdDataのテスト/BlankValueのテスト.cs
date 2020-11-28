@@ -58,5 +58,11 @@ namespace SpreadSheetAdDataのテスト
         {
             Assert.That(tested * 3, Is.EqualTo(0));
         }
+
+        [Test]
+        public void ToStringで中かっこに囲まれたBlankとなります()
+        {
+            Assert.That(tested.ToString(), Is.EqualTo("{Blank}"));
+        }
     }
 }
