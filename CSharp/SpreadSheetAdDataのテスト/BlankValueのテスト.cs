@@ -48,5 +48,15 @@ namespace SpreadSheetAdDataのテスト
             Assert.That(tested + "A", Is.EqualTo("A"));
         }
 
+        [Test]
+        public void 数値として加算すると0と同じとされます()
+        {
+            Assert.That(tested + 3, Is.EqualTo(3));
+        }
+        [Test]
+        public void 数値として乗算すると0と同じとされます()
+        {
+            Assert.That(tested * 3, Is.EqualTo(0));
+        }
     }
 }
