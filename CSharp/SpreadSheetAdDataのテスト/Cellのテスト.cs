@@ -58,6 +58,7 @@ namespace Marimo.SpreadSheetAdData.Test
         [Test]
         public void Valueプロパティはboolの値を取得できます()
         {
+            
             Assert.That(a2.Value, Is.True);
             Assert.That(b2.Value, Is.False);
         }
