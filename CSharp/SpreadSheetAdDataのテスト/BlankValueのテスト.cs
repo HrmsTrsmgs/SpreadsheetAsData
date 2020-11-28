@@ -41,5 +41,12 @@ namespace SpreadSheetAdDataのテスト
         {
             Assert.That(tested == .0, Is.True);
         }
+
+        [Test]
+        public void 文字列として演算すると空白と同じとされます()
+        {
+            Assert.That(tested + "A", Is.EqualTo("A"));
+        }
+
     }
 }
