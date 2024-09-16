@@ -4,4 +4,4 @@
 APIがVBAライクではなく、コレクション操作に近い感覚で扱えるようになっている。
 
 Ruby版の解説
-[https://www.slideshare.net/potimarimo/spreadsheet-as-dataruby](https://speakerdeck.com/hrmstrsmgs/spreadsheetasdata?slide=14)
+[Ruby版の解説](https://speakerdeck.com/hrmstrsmgs/spreadsheetasdata)
