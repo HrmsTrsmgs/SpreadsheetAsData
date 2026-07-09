@@ -1,3 +1,7 @@
 *.xml
 *.rels
 *.bin
+
+# Visual Studio local workspace files
+.vs/
+CSharp/.vs/
