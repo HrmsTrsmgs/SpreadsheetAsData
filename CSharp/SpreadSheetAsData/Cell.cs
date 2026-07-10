@@ -70,6 +70,9 @@ namespace Marimo.SpreadSheetAsData
                 _ => throw new InvalidOperationException()
             };
 
+        /// <summary>
+        /// Open XML の共有文字列インデックスを実際の文字列へ解決します。
+        /// </summary>
         string SharedStringValue
         {
             get

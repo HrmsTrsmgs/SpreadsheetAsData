@@ -11,6 +11,9 @@ namespace Marimo.SpreadSheetAsData
     /// </summary>
     public class WorksheetCollection : IReadOnlyList<Worksheet>, IReadOnlyDictionary<string, Worksheet>
     {
+        /// <summary>
+        /// 受け取ったワークシート列挙を固定化した読み取り専用リストです。
+        /// </summary>
         readonly IReadOnlyList<Worksheet> items;
 
         /// <summary>

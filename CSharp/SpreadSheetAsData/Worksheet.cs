@@ -13,7 +13,14 @@ namespace Marimo.SpreadSheetAsData
     /// </summary>
     public class Worksheet
     {
+        /// <summary>
+        /// ブックから作成されたワークシートだけが保持する親ブックです。
+        /// </summary>
         readonly Workbook? book;
+
+        /// <summary>
+        /// ブックから作成されたワークシートだけが保持するシート名です。
+        /// </summary>
         readonly string? name;
 
         /// <summary>

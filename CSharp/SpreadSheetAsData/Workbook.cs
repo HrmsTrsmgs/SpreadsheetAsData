@@ -10,6 +10,9 @@ namespace Marimo.SpreadSheetAsData
     /// </summary>
     public class Workbook : IDisposable
     {
+        /// <summary>
+        /// <see cref="Dispose(bool)"/> の多重実行を防ぐための状態です。
+        /// </summary>
         bool disposedValue;
 
         /// <summary>
@@ -20,6 +23,10 @@ namespace Marimo.SpreadSheetAsData
         public static Workbook Open(string filePath) =>
             new Workbook(Packaging.SpreadsheetDocument.Open(filePath, true));
 
+        /// <summary>
+        /// 既に開かれた Open XML ドキュメントを所有するブックを作成します。
+        /// </summary>
+        /// <param name="document">ブックとして扱う Open XML ドキュメント。</param>
         Workbook(Packaging.SpreadsheetDocument document)
         {
             Document = document;
@@ -36,6 +43,9 @@ namespace Marimo.SpreadSheetAsData
         internal Packaging.WorkbookPart WorkbookPart =>
             Document.WorkbookPart ?? throw new InvalidOperationException();
 
+        /// <summary>
+        /// Open XML のシート一覧から遅延作成したワークシートコレクションです。
+        /// </summary>
         WorksheetCollection? sheets { get; set; }
 
         /// <summary>

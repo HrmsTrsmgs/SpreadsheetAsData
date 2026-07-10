@@ -11,7 +11,14 @@ namespace Marimo.SpreadSheetAsData
     /// </summary>
     public class CellRange
     {
+        /// <summary>
+        /// <see cref="ToString"/> で A1 形式の範囲を復元するための右下セル参照です。
+        /// </summary>
         readonly string bottomRight;
+
+        /// <summary>
+        /// <see cref="ToString"/> で A1 形式の範囲を復元するための左上セル参照です。
+        /// </summary>
         readonly string topLeft;
 
         /// <summary>

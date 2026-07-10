@@ -9,7 +9,14 @@ namespace Marimo.SpreadSheetAsData
     /// </summary>
     public class CellCollection
     {
+        /// <summary>
+        /// Open XML のセル探索と空白セル作成に使用するワークシートです。
+        /// </summary>
         readonly Worksheet sheet;
+
+        /// <summary>
+        /// 同じセル参照に対して同じ <see cref="Cell"/> インスタンスを返すためのキャッシュです。
+        /// </summary>
         readonly Dictionary<CellName, Cell> cache = new();
 
         /// <summary>
@@ -38,6 +45,11 @@ namespace Marimo.SpreadSheetAsData
         public Cell this[uint columnIndex, uint rowIndex] =>
             GetItem(new CellName(columnIndex, rowIndex));
 
+        /// <summary>
+        /// キャッシュ、既存の Open XML セル、空白セルの順でセルを解決します。
+        /// </summary>
+        /// <param name="cellName">取得するセル参照。</param>
+        /// <returns>指定したセル。</returns>
         Cell GetItem(CellName cellName)
         {
             if (cache.TryGetValue(cellName, out var cachedCell))
