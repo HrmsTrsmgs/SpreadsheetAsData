@@ -5,3 +5,6 @@
 # Visual Studio local workspace files
 .vs/
 CSharp/.vs/
+
+# NuGet package restore output
+CSharp/packages/
