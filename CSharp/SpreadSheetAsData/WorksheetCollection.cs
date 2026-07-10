@@ -83,7 +83,7 @@ namespace Marimo.SpreadSheetAsData
         /// <inheritdoc />
         IEnumerator<KeyValuePair<string, Worksheet>> IEnumerable<KeyValuePair<string, Worksheet>>.GetEnumerator() =>
             items.ToDictionary(_ => _.Name, _ => _).GetEnumerator();
-        
+
         /// <inheritdoc />
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

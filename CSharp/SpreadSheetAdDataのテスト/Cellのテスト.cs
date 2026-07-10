@@ -1,8 +1,8 @@
-using Marimo.SpreadSheetAsData;
-using FluentAssertions;
-using System;
-using Xunit;
+﻿using System;
 using System.IO;
+using FluentAssertions;
+using Marimo.SpreadSheetAsData;
+using Xunit;
 
 namespace Marimo.SpreadSheetAdData.Test
 {
@@ -19,7 +19,7 @@ namespace Marimo.SpreadSheetAdData.Test
         public Cellのテスト()
         {
             var book = Workbook.Open(@"TestData\Book1.xlsx");
-            
+
             いろいろなデータ = book.Sheets["いろいろなデータ"];
 
             a1 = いろいろなデータ.Cells["A1"];
@@ -28,7 +28,7 @@ namespace Marimo.SpreadSheetAdData.Test
             b2 = いろいろなデータ.Cells["B2"];
             a3 = いろいろなデータ.Cells["A3"];
             b3 = いろいろなデータ.Cells["B3"];
-            
+
         }
         public void Dispose()
         {

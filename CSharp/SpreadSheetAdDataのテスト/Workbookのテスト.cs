@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Marimo.SpreadSheetAsData;
 using FluentAssertions;
+using Marimo.SpreadSheetAsData;
 using Xunit;
 
 namespace Marimo.SpreadSheetAdData.Test
@@ -30,7 +30,7 @@ namespace Marimo.SpreadSheetAdData.Test
         {
             book1.Close();
         }
-        
+
         [Fact]
         public void Openはファイルを束縛します()
         {

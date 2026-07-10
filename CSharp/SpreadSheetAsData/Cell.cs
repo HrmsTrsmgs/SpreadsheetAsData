@@ -1,6 +1,6 @@
-﻿using DocumentFormat.OpenXml;
+﻿using System.Linq;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
-using System.Linq;
 using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Marimo.SpreadSheetAsData
@@ -38,7 +38,7 @@ namespace Marimo.SpreadSheetAsData
         /// <summary>
         /// このセルに対応する Open XML のセル要素を取得します。
         /// </summary>
-        internal Spreadsheet.Cell Xml { get;　private set; }
+        internal Spreadsheet.Cell Xml { get; private set; }
 
         /// <summary>
         /// このセルを含む Open XML の行要素を取得します。

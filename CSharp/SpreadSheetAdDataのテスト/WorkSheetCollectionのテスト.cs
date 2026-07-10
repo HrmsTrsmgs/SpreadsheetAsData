@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Marimo.SpreadSheetAsData;
 using FluentAssertions;
+using Marimo.SpreadSheetAsData;
 using Xunit;
 
 namespace Marimo.SpreadSheetAdData.Test
@@ -16,7 +16,7 @@ namespace Marimo.SpreadSheetAdData.Test
 
         public WorkSheetCollectionのテスト()
         {
-            using(var book = Workbook.Open(@"TestData\Book1.xlsx"))
+            using (var book = Workbook.Open(@"TestData\Book1.xlsx"))
             {
                 tested = book.Sheets;
             }
