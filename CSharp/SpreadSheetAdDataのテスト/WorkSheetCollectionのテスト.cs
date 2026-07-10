@@ -1,21 +1,19 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Marimo.SpreadSheetAsData;
-using NUnit.Framework;
+using Xunit;
 
 namespace Marimo.SpreadSheetAdData.Test
 {
-    [TestFixture]
     public class WorkSheetCollectionのテスト
     {
         WorksheetCollection tested;
 
-        [SetUp]
-        public void SetUp()
+        public WorkSheetCollectionのテスト()
         {
             using(var book = Workbook.Open(@"TestData\Book1.xlsx"))
             {
@@ -23,83 +21,83 @@ namespace Marimo.SpreadSheetAdData.Test
             }
         }
 
-        [Test]
+        [Fact]
         public void インデクサに数字でアクセスできます()
         {
-            Assert.That(tested[0].Name, Is.EqualTo("Sheet1"));
+            Assert.Equal("Sheet1", tested[0].Name);
         }
 
-        [Test]
+        [Fact]
         public void インデクサにシート名でアクセスできます()
         {
-            Assert.That(tested["Sheet1"], Is.SameAs(tested[0]));
+            Assert.Same(tested[0], tested["Sheet1"]);
         }
 
-        [Test]
+        [Fact]
         public void Countで個数を取得できます()
         {
-            Assert.That(tested.Count, Is.EqualTo(3));
+            Assert.Equal(3, tested.Count);
         }
 
-        [Test]
+        [Fact]
         public void Keysでシート名の一覧が取得できます()
         {
-            Assert.That(tested.Keys, Has.Member("Sheet1"));
-            Assert.That(tested.Keys, Has.Member("Sheet2"));
+            Assert.Contains("Sheet1", tested.Keys);
+            Assert.Contains("Sheet2", tested.Keys);
         }
 
-        [Test]
+        [Fact]
         public void Valuesでシートの一覧が取得できます()
         {
-            Assert.That(tested.Values, Has.Member(tested[0]));
-            Assert.That(tested.Values, Has.Member(tested[1]));
+            Assert.Contains(tested[0], tested.Values);
+            Assert.Contains(tested[1], tested.Values);
         }
 
-        [Test]
+        [Fact]
         public void ContainsKeyでシート名の有無が確認できます()
         {
-            Assert.That(tested.ContainsKey("Sheet1"), Is.True);
-            Assert.That(tested.ContainsKey(""), Is.False);
+            Assert.True((bool)(tested.ContainsKey("Sheet1")));
+            Assert.False((bool)(tested.ContainsKey("")));
         }
 
-        [Test]
+        [Fact]
         public void TryGetValueでシート名の有無が確認しつつシートの取得ができます()
         {
             Worksheet sheet;
-            Assert.That(tested.TryGetValue("Sheet1", out sheet), Is.True);
-            Assert.That(sheet, Is.SameAs(tested[0]));
-            Assert.That(tested.TryGetValue("", out sheet), Is.False);
+            Assert.True((bool)(tested.TryGetValue("Sheet1", out sheet)));
+            Assert.Same(tested[0], sheet);
+            Assert.False((bool)(tested.TryGetValue("", out sheet)));
         }
 
-        [Test]
+        [Fact]
         public void foreachでシートが取得できます()
         {
             int i = 0;
             foreach (var item in tested)
             {
 
-                Assert.That(item, Is.EqualTo(tested[i++]));
+                Assert.Equal(tested[i++], item);
             }
         }
 
-        [Test]
+        [Fact]
         public void 非ジェネリックのforeachでがシートが取得できます()
         {
             int i = 0;
             foreach (var item in (IEnumerable)tested)
             {
-                Assert.That(item, Is.EqualTo(tested[i++]));
+                Assert.Equal(tested[i++], item);
             }
         }
 
-        [Test]
+        [Fact]
         public void Dictionaryに対するのforeachでがシートが取得できます()
         {
             int i = 0;
             foreach (var item in (IReadOnlyDictionary<string, Worksheet>)tested)
             {
-                Assert.That(item.Key, Is.EqualTo(tested[i].Name));
-                Assert.That(item.Value, Is.EqualTo(tested[i++]));
+                Assert.Equal(tested[i].Name, item.Key);
+                Assert.Equal(tested[i++], item.Value);
             }
         }
     }

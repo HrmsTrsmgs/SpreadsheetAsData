@@ -1,5 +1,5 @@
-﻿using Marimo.SpreadSheetAsData;
-using NUnit.Framework;
+using Marimo.SpreadSheetAsData;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -7,16 +7,14 @@ using System.Text;
 
 namespace Marimo.SpreadSheetAdData.Test
 {
-    [TestFixture]
-    public class BlankValueのテスト
+    public class BlankValueのテスト : IDisposable
     {
         Workbook book;
         Worksheet sheet1;
         Cell cell;
         dynamic tested;
 
-        [SetUp]
-        public void SetUp()
+        public BlankValueのテスト()
         {
             book = Workbook.Open(@"TestData\Book1.xlsx");
             sheet1 = book.Sheets["Sheet1"];
@@ -24,45 +22,44 @@ namespace Marimo.SpreadSheetAdData.Test
             tested = cell.Value;
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             book.Close();
         }
 
-        [Test]
+        [Fact]
         public void 比較すると空白と同じとされます()
         {
-            Assert.That(tested == "", Is.True);
+            Assert.True((bool)(tested == ""));
         }
 
-        [Test]
+        [Fact]
         public void 比較するとdoubleの0と同じとされます()
         {
-            Assert.That(tested == .0, Is.True);
+            Assert.True((bool)(tested == .0));
         }
 
-        [Test]
+        [Fact]
         public void 文字列として演算すると空白と同じとされます()
         {
-            Assert.That(tested + "A", Is.EqualTo("A"));
+            Assert.Equal("A", tested + "A");
         }
 
-        [Test]
+        [Fact]
         public void 数値として加算すると0と同じとされます()
         {
-            Assert.That(tested + 3, Is.EqualTo(3));
+            Assert.Equal(3, tested + 3);
         }
-        [Test]
+        [Fact]
         public void 数値として乗算すると0と同じとされます()
         {
-            Assert.That(tested * 3, Is.EqualTo(0));
+            Assert.Equal(0, tested * 3);
         }
 
-        [Test]
+        [Fact]
         public void ToStringで中かっこに囲まれたBlankとなります()
         {
-            Assert.That(tested.ToString(), Is.EqualTo("{Blank}"));
+            Assert.Equal("{Blank}", tested.ToString());
         }
     }
 }

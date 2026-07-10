@@ -1,11 +1,11 @@
-﻿using Marimo.SpreadSheetAsData;
-using NUnit.Framework;
+using Marimo.SpreadSheetAsData;
+using System;
+using Xunit;
 using System.IO;
 
 namespace Marimo.SpreadSheetAdData.Test
 {
-    [TestFixture]
-    public class Cellのテスト
+    public class Cellのテスト : IDisposable
     {
         Worksheet いろいろなデータ;
         Cell a1;
@@ -15,8 +15,7 @@ namespace Marimo.SpreadSheetAdData.Test
         Cell a3;
         Cell b3;
 
-        [SetUp]
-        public void SetUp()
+        public Cellのテスト()
         {
             var book = Workbook.Open(@"TestData\Book1.xlsx");
             
@@ -30,64 +29,63 @@ namespace Marimo.SpreadSheetAdData.Test
             b3 = いろいろなデータ.Cells["B3"];
             
         }
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             いろいろなデータ.Book.Close();
         }
 
-        [Test]
+        [Fact]
         public void Bookプロパティはブックを取得できます()
         {
-            Assert.That(a1.Book, Is.SameAs(いろいろなデータ.Book));
+            Assert.Same(いろいろなデータ.Book, a1.Book);
         }
 
-        [Test]
+        [Fact]
         public void Sheetプロパティはシートを取得できます()
         {
-            Assert.That(a1.Sheet, Is.SameAs(いろいろなデータ));
+            Assert.Same(いろいろなデータ, a1.Sheet);
         }
 
-        [Test]
+        [Fact]
         public void Valueプロパティは数字の値を取得できます()
         {
-            Assert.That(a1.Value, Is.EqualTo(1.1));
-            Assert.That(b1.Value, Is.EqualTo(2.2));
+            Assert.Equal(1.1, a1.Value);
+            Assert.Equal(2.2, b1.Value);
         }
 
-        [Test]
+        [Fact]
         public void Valueプロパティはboolの値を取得できます()
         {
             
-            Assert.That(a2.Value, Is.True);
-            Assert.That(b2.Value, Is.False);
+            Assert.True((bool)(a2.Value));
+            Assert.False((bool)(b2.Value));
         }
 
-        [Test]
+        [Fact]
         public void Valueプロパティは文字列の値を取得できます()
         {
-            Assert.That(a3.Value, Is.EqualTo("あいうえお"));
-            Assert.That(b3.Value, Is.EqualTo("かきくけこ"));
+            Assert.Equal("あいうえお", a3.Value);
+            Assert.Equal("かきくけこ", b3.Value);
         }
 
-        [Test]
+        [Fact]
         public void Referenceプロパティがセル参照の名称を取得できます()
         {
-            Assert.That(a1.Reference, Is.EqualTo("A1"));
-            Assert.That(b1.Reference, Is.EqualTo("B1"));
+            Assert.Equal("A1", a1.Reference);
+            Assert.Equal("B1", b1.Reference);
         }
-        [Test]
+        [Fact]
         public void RowIndexプロパティが行番号を取得できます()
         {
-            Assert.That(a1.RowIndex, Is.EqualTo(1));
-            Assert.That(a2.RowIndex, Is.EqualTo(2));
+            Assert.Equal((uint)1, a1.RowIndex);
+            Assert.Equal((uint)2, a2.RowIndex);
         }
 
-        [Test]
+        [Fact]
         public void ColumnIndexプロパティが列番号を取得できます()
         {
-            Assert.That(a1.ColumnIndex, Is.EqualTo(1));
-            Assert.That(b1.ColumnIndex, Is.EqualTo(2));
+            Assert.Equal((uint)1, a1.ColumnIndex);
+            Assert.Equal((uint)2, b1.ColumnIndex);
         }
     }
 }
