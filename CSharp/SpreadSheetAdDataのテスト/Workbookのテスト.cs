@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Marimo.SpreadSheetAsData;
+using FluentAssertions;
 using Xunit;
 
 namespace Marimo.SpreadSheetAdData.Test
@@ -36,7 +37,9 @@ namespace Marimo.SpreadSheetAdData.Test
             var tested = Workbook.Open(コピーパス);
             try
             {
-                Assert.ThrowsAny<IOException>(() => File.Delete(コピーパス));
+                FluentActions.Invoking(
+                    () => File.Delete(コピーパス)
+                ).Should().Throw<IOException>();
             }
             finally
             {
@@ -50,7 +53,9 @@ namespace Marimo.SpreadSheetAdData.Test
             var tested = Workbook.Open(コピーパス);
 
             tested.Close();
-            Assert.Null(Record.Exception(() => File.Delete(コピーパス)));
+            FluentActions.Invoking(
+                () => File.Delete(コピーパス)
+            ).Should().NotThrow();
         }
 
         [Fact]
@@ -59,37 +64,39 @@ namespace Marimo.SpreadSheetAdData.Test
             using (var tested = Workbook.Open(コピーパス))
             {
             }
-            Assert.Null(Record.Exception(() => File.Delete(コピーパス)));
+            FluentActions.Invoking(
+                () => File.Delete(コピーパス)
+            ).Should().NotThrow();
         }
 
         [Fact]
         public void Sheetsでシートが取得できます()
         {
-            Assert.Equal(3, book1.Sheets.Count);
+            book1.Sheets.Count.Should().Be(3);
         }
 
         [Fact]
         public void Sheetsに数字を指定してシートが取得できます()
         {
-            Assert.Equal("Sheet1", book1.Sheets[0].Name);
+            book1.Sheets[0].Name.Should().Be("Sheet1");
         }
 
         [Fact]
         public void Sheetsにシート名を指定してシートが取得できます()
         {
-            Assert.Equal("Sheet1", book1.Sheets["Sheet1"].Name);
+            book1.Sheets["Sheet1"].Name.Should().Be("Sheet1");
         }
 
         [Fact]
         public void インデクサに数字を指定してシートが取得できます()
         {
-            Assert.Equal("Sheet1", book1[0].Name);
+            book1[0].Name.Should().Be("Sheet1");
         }
 
         [Fact]
         public void インデクサにシート名を指定してシートが取得できます()
         {
-            Assert.Equal("Sheet1", book1["Sheet1"].Name);
+            book1["Sheet1"].Name.Should().Be("Sheet1");
         }
 
     }

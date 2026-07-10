@@ -1,4 +1,5 @@
 using Marimo.SpreadSheetAsData;
+using FluentAssertions;
 using Xunit;
 using System;
 using System.Collections.Generic;
@@ -27,39 +28,46 @@ namespace Marimo.SpreadSheetAdData.Test
             book.Close();
         }
 
+        private BlankValue TestedBlankValue =>
+            (tested as object).Should().BeOfType<BlankValue>().Which;
+
         [Fact]
         public void 比較すると空白と同じとされます()
         {
-            Assert.True((bool)(tested == ""));
+            bool stringと比較した結果 = TestedBlankValue == "";
+
+            stringと比較した結果.Should().BeTrue();
         }
 
         [Fact]
         public void 比較するとdoubleの0と同じとされます()
         {
-            Assert.True((bool)(tested == .0));
+            bool doubleと比較した結果 = TestedBlankValue == .0;
+
+            doubleと比較した結果.Should().BeTrue();
         }
 
         [Fact]
         public void 文字列として演算すると空白と同じとされます()
         {
-            Assert.Equal("A", tested + "A");
+            (TestedBlankValue + "A").Should().Be("A");
         }
 
         [Fact]
         public void 数値として加算すると0と同じとされます()
         {
-            Assert.Equal(3, tested + 3);
+            (TestedBlankValue + 3).Should().Be(3);
         }
         [Fact]
         public void 数値として乗算すると0と同じとされます()
         {
-            Assert.Equal(0, tested * 3);
+            (TestedBlankValue * 3).Should().Be(0);
         }
 
         [Fact]
         public void ToStringで中かっこに囲まれたBlankとなります()
         {
-            Assert.Equal("{Blank}", tested.ToString());
+            TestedBlankValue.ToString().Should().Be("{Blank}");
         }
     }
 }

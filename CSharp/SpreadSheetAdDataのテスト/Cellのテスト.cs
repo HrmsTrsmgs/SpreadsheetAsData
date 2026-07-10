@@ -1,4 +1,5 @@
 using Marimo.SpreadSheetAsData;
+using FluentAssertions;
 using System;
 using Xunit;
 using System.IO;
@@ -37,55 +38,54 @@ namespace Marimo.SpreadSheetAdData.Test
         [Fact]
         public void Bookプロパティはブックを取得できます()
         {
-            Assert.Same(いろいろなデータ.Book, a1.Book);
+            a1.Book.Should().BeSameAs(いろいろなデータ.Book);
         }
 
         [Fact]
         public void Sheetプロパティはシートを取得できます()
         {
-            Assert.Same(いろいろなデータ, a1.Sheet);
+            a1.Sheet.Should().BeSameAs(いろいろなデータ);
         }
 
         [Fact]
         public void Valueプロパティは数字の値を取得できます()
         {
-            Assert.Equal(1.1, a1.Value);
-            Assert.Equal(2.2, b1.Value);
+            (a1.Value as object).Should().BeOfType<double>().Which.Should().Be(1.1);
+            (b1.Value as object).Should().BeOfType<double>().Which.Should().Be(2.2);
         }
 
         [Fact]
         public void Valueプロパティはboolの値を取得できます()
         {
-            
-            Assert.True((bool)(a2.Value));
-            Assert.False((bool)(b2.Value));
+            (a2.Value as object).Should().BeOfType<bool>().Which.Should().BeTrue();
+            (b2.Value as object).Should().BeOfType<bool>().Which.Should().BeFalse();
         }
 
         [Fact]
         public void Valueプロパティは文字列の値を取得できます()
         {
-            Assert.Equal("あいうえお", a3.Value);
-            Assert.Equal("かきくけこ", b3.Value);
+            (a3.Value as object).Should().BeOfType<string>().Which.Should().Be("あいうえお");
+            (b3.Value as object).Should().BeOfType<string>().Which.Should().Be("かきくけこ");
         }
 
         [Fact]
         public void Referenceプロパティがセル参照の名称を取得できます()
         {
-            Assert.Equal("A1", a1.Reference);
-            Assert.Equal("B1", b1.Reference);
+            a1.Reference.Should().Be("A1");
+            b1.Reference.Should().Be("B1");
         }
         [Fact]
         public void RowIndexプロパティが行番号を取得できます()
         {
-            Assert.Equal((uint)1, a1.RowIndex);
-            Assert.Equal((uint)2, a2.RowIndex);
+            a1.RowIndex.Should().Be(1U);
+            a2.RowIndex.Should().Be(2U);
         }
 
         [Fact]
         public void ColumnIndexプロパティが列番号を取得できます()
         {
-            Assert.Equal((uint)1, a1.ColumnIndex);
-            Assert.Equal((uint)2, b1.ColumnIndex);
+            a1.ColumnIndex.Should().Be(1U);
+            b1.ColumnIndex.Should().Be(2U);
         }
     }
 }

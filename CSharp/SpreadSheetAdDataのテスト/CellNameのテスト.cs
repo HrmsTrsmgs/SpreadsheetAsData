@@ -1,4 +1,5 @@
 using Marimo.SpreadSheetAsData;
+using FluentAssertions;
 using Xunit;
 using System;
 using System.Collections.Generic;
@@ -13,31 +14,35 @@ namespace Marimo.SpreadSheetAdData.Test
         [Fact]
         public void ParseメソッドでCellNameが生成できます()
         {
-            Assert.Null(Record.Exception(() => CellName.Parse("A1")));
+            FluentActions.Invoking(
+                () => CellName.Parse("A1")
+            ).Should().NotThrow();
         }
 
         [Fact]
         public void 列番号と行番号を指定してCellNameがせいせいできます()
         {
-            Assert.Null(Record.Exception(() => new CellName(1,1)));
+            FluentActions.Invoking(
+                () => new CellName(1, 1)
+            ).Should().NotThrow();
         }
 
         [Fact]
         public void 同じセル位置は同一として扱われます()
         {
-            Assert.Equal(CellName.Parse("A1"), CellName.Parse("A1"));
+            CellName.Parse("A1").Should().Be(CellName.Parse("A1"));
         }
 
         [Fact]
         public void 行が違うと同一ではないとして扱われます()
         {
-            Assert.NotEqual(CellName.Parse("A2"), CellName.Parse("A1"));
+            CellName.Parse("A2").Should().NotBe(CellName.Parse("A1"));
         }
 
         [Fact]
         public void 列が違うと同一ではないとして扱われます()
         {
-            Assert.NotEqual(CellName.Parse("B1"), CellName.Parse("A1"));
+            CellName.Parse("B1").Should().NotBe(CellName.Parse("A1"));
         }
 
         [Fact]
@@ -46,124 +51,142 @@ namespace Marimo.SpreadSheetAdData.Test
             var set = new HashSet<CellName>();
 
             set.Add(CellName.Parse("A1"));
-            Assert.Single(set);
+            set.Should().ContainSingle();
             set.Add(CellName.Parse("A1"));
-            Assert.Single(set);
+            set.Should().ContainSingle();
             set.Add(CellName.Parse("B1"));
-            Assert.Equal(2, set.Count);
+            set.Should().HaveCount(2);
             set.Add(CellName.Parse("A2"));
-            Assert.Equal(3, set.Count);
+            set.Should().HaveCount(3);
         }
 
         [Fact]
         public void Parseメソッドに無効なセル名を指定するとFormatExceptionを投げます()
         {
-            Assert.ThrowsAny<FormatException>(() => CellName.Parse("A"));
-            Assert.ThrowsAny<FormatException>(() => CellName.Parse("1"));
-            Assert.ThrowsAny<FormatException>(() => CellName.Parse("A1A1"));
+            FluentActions.Invoking(
+                () => CellName.Parse("A")
+            ).Should().Throw<FormatException>();
+            FluentActions.Invoking(
+                () => CellName.Parse("1")
+            ).Should().Throw<FormatException>();
+            FluentActions.Invoking(
+                () => CellName.Parse("A1A1")
+            ).Should().Throw<FormatException>();
         }
 
         [Fact]
         public void Parseメソッドに大きすぎる列名を指定した場合はFormatExceptionを投げます()
         {
-            Assert.ThrowsAny<FormatException>(() => CellName.Parse("XFE1"));
-            Assert.ThrowsAny<FormatException>(() => CellName.Parse("AAAA1"));
-            Assert.ThrowsAny<FormatException>(() => CellName.Parse("ZZZZ1"));
+            FluentActions.Invoking(
+                () => CellName.Parse("XFE1")
+            ).Should().Throw<FormatException>();
+            FluentActions.Invoking(
+                () => CellName.Parse("AAAA1")
+            ).Should().Throw<FormatException>();
+            FluentActions.Invoking(
+                () => CellName.Parse("ZZZZ1")
+            ).Should().Throw<FormatException>();
         }
 
         [Fact]
         public void コンストラクタに大きすぎる列番号を指定した場合はFormatExceptionを投げます()
         {
-            Assert.ThrowsAny<FormatException>(() => new CellName(16385, 1));
+            FluentActions.Invoking(
+                () => new CellName(16385, 1)
+            ).Should().Throw<FormatException>();
         }
 
         [Fact]
         public void Parseメソッドに大きすぎる行番号を指定した場合はFormatExceptionを投げます()
         {
-            Assert.ThrowsAny<FormatException>(() => CellName.Parse("A1048577"));
+            FluentActions.Invoking(
+                () => CellName.Parse("A1048577")
+            ).Should().Throw<FormatException>();
         }
 
         [Fact]
         public void コンストラクタに大きすぎる行番号を指定した場合はFormatExceptionを投げます()
         {
-            Assert.ThrowsAny<FormatException>(() => new CellName(1, 1048577));
+            FluentActions.Invoking(
+                () => new CellName(1, 1048577)
+            ).Should().Throw<FormatException>();
         }
 
         [Fact]
         public void ColumnNameプロパティで列名を取得できます()
         {
-            Assert.Equal("A", CellName.Parse("A1").ColumnName);
-            Assert.Equal("B", CellName.Parse("B1").ColumnName);
+            CellName.Parse("A1").ColumnName.Should().Be("A");
+            CellName.Parse("B1").ColumnName.Should().Be("B");
         }
 
         [Fact]
         public void 行列番号で生成した場合にColumnNameプロパティで列名を取得できます()
         {
-            Assert.Equal("A", new CellName(1, 1).ColumnName);
-            Assert.Equal("B", new CellName(2, 1).ColumnName);
+            new CellName(1, 1).ColumnName.Should().Be("A");
+            new CellName(2, 1).ColumnName.Should().Be("B");
         }
 
         [Fact]
         public void ColumnIndexプロパティで一文字の列番号を取得できます()
         {
-            Assert.Equal((uint)1, CellName.Parse("A1").ColumnIndex);
-            Assert.Equal((uint)26, CellName.Parse("Z1").ColumnIndex);
+            CellName.Parse("A1").ColumnIndex.Should().Be(1U);
+            CellName.Parse("Z1").ColumnIndex.Should().Be(26U);
         }
 
         [Fact]
         public void ColumnIndexプロパティで二文字のの列番号を取得できます()
         {
-            Assert.Equal((uint)27, CellName.Parse("AA1").ColumnIndex);
-            Assert.Equal((uint)702, CellName.Parse("ZZ1").ColumnIndex);
+            CellName.Parse("AA1").ColumnIndex.Should().Be(27U);
+            CellName.Parse("ZZ1").ColumnIndex.Should().Be(702U);
         }
 
         [Fact]
         public void ColumnIndexプロパティで三文字のの列番号を取得できます()
         {
-            Assert.Equal((uint)703, CellName.Parse("AAA1").ColumnIndex);
-            Assert.Equal((uint)16384, CellName.Parse("XFD1").ColumnIndex);
+            CellName.Parse("AAA1").ColumnIndex.Should().Be(703U);
+            CellName.Parse("XFD1").ColumnIndex.Should().Be(16384U);
         }
 
         [Fact]
         public void コンストラクタで生成した場合にColumnIndexプロパティで大きな行番号を取得できます()
         {
-            Assert.Equal((uint)16384, new CellName(16384, 1).ColumnIndex);
+            new CellName(16384, 1).ColumnIndex.Should().Be(16384U);
         }
 
         [Fact]
         public void RowIndexプロパティで行番号を取得できます()
         {
-            Assert.Equal((uint)1, CellName.Parse("A1").RowIndex);
-            Assert.Equal((uint)2, CellName.Parse("A2").RowIndex);
+            CellName.Parse("A1").RowIndex.Should().Be(1U);
+            CellName.Parse("A2").RowIndex.Should().Be(2U);
         }
 
         [Fact]
         public void 行列番号で生成した場合にRowIndexプロパティで行番号を取得できます()
         {
-            Assert.Equal((uint)1, new CellName(1, 1).RowIndex);
-            Assert.Equal((uint)2, new CellName(1, 2).RowIndex);
+            new CellName(1, 1).RowIndex.Should().Be(1U);
+            new CellName(1, 2).RowIndex.Should().Be(2U);
         }
 
         [Fact]
         public void Parseメソッドで生成した場合にRowIndexプロパティで大きな行番号を取得できます()
         {
-            Assert.Equal((uint)1048576, CellName.Parse("A1048576").RowIndex);
+            CellName.Parse("A1048576").RowIndex.Should().Be(1048576U);
         }
 
         [Fact]
         public void コンストラクタで生成した場合にRowIndexプロパティで大きな行番号を取得できます()
         {
-            Assert.Equal((uint)1048576, new CellName(1, 1048576).RowIndex);
+            new CellName(1, 1048576).RowIndex.Should().Be(1048576U);
         }
 
         [Fact]
         public void ToStringメソッドはA1形式で文字列を返します()
         {
-            Assert.Equal("A1", CellName.Parse("A1").ToString());
-            Assert.Equal("B2", CellName.Parse("B2").ToString());
-            Assert.Equal("AA1", CellName.Parse("AA1").ToString());
-            Assert.Equal("AAA1", CellName.Parse("AAA1").ToString());
-            Assert.Equal("XFD1048576", CellName.Parse("XFD1048576").ToString());
+            CellName.Parse("A1").ToString().Should().Be("A1");
+            CellName.Parse("B2").ToString().Should().Be("B2");
+            CellName.Parse("AA1").ToString().Should().Be("AA1");
+            CellName.Parse("AAA1").ToString().Should().Be("AAA1");
+            CellName.Parse("XFD1048576").ToString().Should().Be("XFD1048576");
         }
     }
 }
