@@ -11,11 +11,11 @@ namespace Marimo.SpreadSheetAsData
     public class Cell
     {
         /// <summary>
-        /// Open XML のセル要素からセルを作成します。
+        /// Open XML から見つけた既存セルをラップします。
         /// </summary>
         /// <param name="sheet">セルが属するワークシート。</param>
         /// <param name="xml">セルを表す Open XML 要素。</param>
-        public Cell(Worksheet sheet, Spreadsheet.Cell xml)
+        internal Cell(Worksheet sheet, Spreadsheet.Cell xml)
         {
             Sheet = sheet;
             Xml = xml;
