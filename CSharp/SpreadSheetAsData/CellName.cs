@@ -5,15 +5,31 @@ using System.Text.RegularExpressions;
 
 namespace Marimo.SpreadSheetAsData
 {
+    /// <summary>
+    /// A1 形式のセル参照を表します。
+    /// </summary>
     public partial struct CellName
     {
+        /// <summary>
+        /// Excel ワークシートで使用できる最大行番号です。
+        /// </summary>
         public const uint MaxRowIndex = 1048576;
+
+        /// <summary>
+        /// Excel ワークシートで使用できる最大列番号です。
+        /// </summary>
         public const uint MaxColumnIndex = 16384;
         const uint alphabetCount = 26;
         static Regex CellNamePattern => GeneratedCellNameRegex();
 
+        /// <summary>
+        /// 1 始まりの列番号を取得します。
+        /// </summary>
         public uint ColumnIndex { get; private set; }
 
+        /// <summary>
+        /// 1 始まりの行番号を取得します。
+        /// </summary>
         public uint RowIndex { get; private set; }
 
         CellName(string name)
@@ -32,6 +48,12 @@ namespace Marimo.SpreadSheetAsData
             }
         }
 
+        /// <summary>
+        /// 列番号と行番号からセル参照を作成します。
+        /// </summary>
+        /// <param name="columnIndex">1 始まりの列番号。</param>
+        /// <param name="rowIndex">1 始まりの行番号。</param>
+        /// <exception cref="FormatException">列番号または行番号が使用可能範囲を超えています。</exception>
         public CellName(uint columnIndex, uint rowIndex)
         {
             ColumnIndex = columnIndex;
@@ -42,10 +64,23 @@ namespace Marimo.SpreadSheetAsData
             }
         }
 
+        /// <summary>
+        /// A1 形式の文字列をセル参照に変換します。
+        /// </summary>
+        /// <param name="name">A1 形式のセル参照。</param>
+        /// <returns>変換したセル参照。</returns>
+        /// <exception cref="FormatException">文字列がA1形式でない、または使用可能範囲を超えています。</exception>
         public static CellName Parse(string name) => new CellName(name);
 
+        /// <summary>
+        /// 列名を取得します。
+        /// </summary>
         public string ColumnName => GetColumnName(ColumnIndex);
 
+        /// <summary>
+        /// A1 形式のセル参照を返します。
+        /// </summary>
+        /// <returns>A1 形式のセル参照。</returns>
         public override string ToString() =>
             $"{GetColumnName(ColumnIndex)}{RowIndex}";
 
