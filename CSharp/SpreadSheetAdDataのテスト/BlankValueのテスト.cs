@@ -28,7 +28,7 @@ namespace Marimo.SpreadSheetAdData.Test
             book.Close();
         }
 
-        private BlankValue TestedBlankValue =>
+        BlankValue TestedBlankValue =>
             (tested as object).Should().BeOfType<BlankValue>().Which;
 
         [Fact]

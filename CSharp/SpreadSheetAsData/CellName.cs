@@ -5,20 +5,20 @@ using System.Text.RegularExpressions;
 
 namespace Marimo.SpreadSheetAsData
 {
-    public struct CellName
+    public partial struct CellName
     {
         public const uint MaxRowIndex = 1048576;
         public const uint MaxColumnIndex = 16384;
-        private const uint alphabetCount = 26;
-        private static readonly Regex regex = new Regex(@"^(?<column>[A-Z]+)(?<row>\d+)$");
+        const uint alphabetCount = 26;
+        static Regex CellNamePattern => GeneratedCellNameRegex();
 
         public uint ColumnIndex { get; private set; }
 
         public uint RowIndex { get; private set; }
 
-        private CellName(string name)
+        CellName(string name)
         {
-            var match = regex.Match(name);
+            var match = CellNamePattern.Match(name);
             if (!match.Success)
             {
                 throw new FormatException();
@@ -47,20 +47,23 @@ namespace Marimo.SpreadSheetAsData
         public string ColumnName => GetColumnName(ColumnIndex);
 
         public override string ToString() =>
-            GetColumnName(ColumnIndex) + RowIndex;
+            $"{GetColumnName(ColumnIndex)}{RowIndex}";
 
-        private static uint GetColumnIndex(IEnumerable<char> columnNameChars) =>
+        static uint GetColumnIndex(IEnumerable<char> columnNameChars) =>
             columnNameChars.Count() switch
             {
                 1 => (uint)(columnNameChars.Single() - 'A') + 1,
                 _ => GetColumnIndex(columnNameChars.Take(columnNameChars.Count() - 1)) * alphabetCount
                           + GetColumnIndex(columnNameChars.Skip(columnNameChars.Count() - 1))
             };
-        private static string GetColumnName(uint columnIndex) =>
+        static string GetColumnName(uint columnIndex) =>
             (columnIndex <= alphabetCount) switch
             {
                 true => ((char)('A' + columnIndex - 1)).ToString(),
-                false => GetColumnName((columnIndex - 1) / alphabetCount) + GetColumnName((columnIndex - 1) % alphabetCount + 1)
+                false => $"{GetColumnName((columnIndex - 1) / alphabetCount)}{GetColumnName((columnIndex - 1) % alphabetCount + 1)}"
             };
+
+        [GeneratedRegex(@"^(?<column>[A-Z]+)(?<row>\d+)$")]
+        private static partial Regex GeneratedCellNameRegex();
     }
 }

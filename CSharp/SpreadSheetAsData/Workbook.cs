@@ -7,11 +7,11 @@ namespace Marimo.SpreadSheetAsData
 {
     public class Workbook : IDisposable
     {
-        private bool disposedValue;
+        bool disposedValue;
         public static Workbook Open(string filePath) =>
             new Workbook(Packaging.SpreadsheetDocument.Open(filePath, true));
 
-        private Workbook(Packaging.SpreadsheetDocument document)
+        Workbook(Packaging.SpreadsheetDocument document)
         {
             Document = document;
         }

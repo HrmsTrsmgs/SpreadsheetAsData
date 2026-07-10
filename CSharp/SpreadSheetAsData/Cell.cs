@@ -41,7 +41,7 @@ namespace Marimo.SpreadSheetAsData
                 _ => throw new InvalidOperationException()
             };
 
-        private string SharedStringValue
+        string SharedStringValue
         {
             get
             {

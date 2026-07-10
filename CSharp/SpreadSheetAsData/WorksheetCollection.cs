@@ -8,20 +8,20 @@ namespace Marimo.SpreadSheetAsData
 {
     public class WorksheetCollection : IReadOnlyList<Worksheet>, IReadOnlyDictionary<string, Worksheet>
     {
+        readonly IReadOnlyList<Worksheet> items;
+
         internal WorksheetCollection(IEnumerable<Worksheet> collection)
         {
             items = collection.ToArray();
         }
 
-        IEnumerable<Worksheet> items { get; }
-
         public Worksheet this[string sheetName] =>
             items.Where(_ => _.Name == sheetName).SingleOrDefault()
                 ?? throw new KeyNotFoundException();
 
-        public Worksheet this[int index] => items.ElementAt(index);
+        public Worksheet this[int index] => items[index];
 
-        public int Count => items.Count();
+        public int Count => items.Count;
 
         public IEnumerable<string> Keys => items.Select(_ => _.Name);
 

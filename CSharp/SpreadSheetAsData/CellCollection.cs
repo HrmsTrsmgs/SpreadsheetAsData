@@ -6,13 +6,13 @@ namespace Marimo.SpreadSheetAsData
 {
     public class CellCollection
     {
-        Worksheet sheet;
+        readonly Worksheet sheet;
+        readonly Dictionary<CellName, Cell> cache = new();
+
         public CellCollection(Worksheet sheet)
         {
             this.sheet = sheet;
         }
-
-        private Dictionary<CellName, Cell> cache = new Dictionary<CellName, Cell>();
 
         public Cell this[string cellReference] =>
             GetItem(CellName.Parse(cellReference));
@@ -20,25 +20,25 @@ namespace Marimo.SpreadSheetAsData
         public Cell this[uint columnIndex, uint rowIndex] =>
             GetItem(new CellName(columnIndex, rowIndex));
 
-        private Cell GetItem(CellName cellName)
+        Cell GetItem(CellName cellName)
         {
-            if (!cache.ContainsKey(cellName))
+            if (cache.TryGetValue(cellName, out var cachedCell))
             {
-                var cellXml =
-                    from cell in sheet.WorksheetPart.Worksheet.Descendants<Spreadsheet.Cell>()
-                    where cell.CellReference == cellName.ToString()
-                    select cell;
-
-                if (cellXml.Any())
-                {
-                    cache[cellName] = new Cell(sheet, cellXml.Single());
-                }
-                else
-                {
-                    cache[cellName] = new Cell(sheet, cellName.ToString());
-                }
+                return cachedCell;
             }
-            return cache[cellName];
+
+            var cellReference = cellName.ToString();
+            var cellXml =
+                from xml in sheet.WorksheetPart.Worksheet.Descendants<Spreadsheet.Cell>()
+                where xml.CellReference == cellReference
+                select xml;
+
+            var cell = cellXml.Any()
+                ? new Cell(sheet, cellXml.Single())
+                : new Cell(sheet, cellReference);
+
+            cache[cellName] = cell;
+            return cell;
         }
     }
 }

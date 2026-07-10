@@ -10,8 +10,8 @@ namespace Marimo.SpreadSheetAsData
 {
     public class Worksheet
     {
-        private readonly Workbook? book;
-        private readonly string? name;
+        readonly Workbook? book;
+        readonly string? name;
 
         public Worksheet()
         {

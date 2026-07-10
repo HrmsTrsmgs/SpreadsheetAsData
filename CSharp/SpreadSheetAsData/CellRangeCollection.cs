@@ -4,18 +4,20 @@ namespace Marimo.SpreadSheetAsData
 {
     public class CellRangeCollection
     {
-        Dictionary<(string, string), CellRange> cache = new Dictionary<(string, string), CellRange>();
+        readonly Dictionary<(string TopLeft, string BottomRight), CellRange> cache = new();
 
         public CellRange this[string topLeft, string bottomRight]
         {
             get
             {
-                if(!cache.ContainsKey((topLeft, bottomRight)))
+                var key = (topLeft, bottomRight);
+                if (!cache.TryGetValue(key, out var range))
                 {
-                    cache[(topLeft, bottomRight)] = new CellRange(topLeft, bottomRight);
+                    range = new CellRange(topLeft, bottomRight);
+                    cache[key] = range;
                 }
 
-                return cache[(topLeft, bottomRight)];
+                return range;
             }
         }
     }
