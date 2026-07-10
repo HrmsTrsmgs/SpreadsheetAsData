@@ -9,16 +9,24 @@ namespace Marimo.SpreadSheetAsData
     {
         private bool disposedValue;
         public static Workbook Open(string filePath) =>
-            new Workbook { Document = Packaging.SpreadsheetDocument.Open(filePath, true) };
+            new Workbook(Packaging.SpreadsheetDocument.Open(filePath, true));
 
-        internal Packaging.SpreadsheetDocument Document { get; set; }
+        private Workbook(Packaging.SpreadsheetDocument document)
+        {
+            Document = document;
+        }
 
-        WorksheetCollection sheets { get; set; }
+        internal Packaging.SpreadsheetDocument Document { get; }
+
+        internal Packaging.WorkbookPart WorkbookPart =>
+            Document.WorkbookPart ?? throw new InvalidOperationException();
+
+        WorksheetCollection? sheets { get; set; }
 
         public WorksheetCollection Sheets =>
             sheets ??= new WorksheetCollection(
-                        from sheet in Document.WorkbookPart.Workbook.Sheets.Elements<Spreadsheet.Sheet>()
-                        select new Worksheet { Book = this, Name = sheet.Name.Value });
+                        from sheet in (WorkbookPart.Workbook.Sheets ?? throw new InvalidOperationException()).Elements<Spreadsheet.Sheet>()
+                        select new Worksheet(this, sheet.Name?.Value ?? throw new InvalidOperationException()));
         
         public Worksheet this[int index] => Sheets[index];
 

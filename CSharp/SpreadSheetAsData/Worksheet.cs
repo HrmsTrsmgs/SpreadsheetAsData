@@ -10,20 +10,34 @@ namespace Marimo.SpreadSheetAsData
 {
     public class Worksheet
     {
+        private readonly Workbook? book;
+        private readonly string? name;
+
         public Worksheet()
         {
             Cells = new CellCollection(this);
         }
 
-        public Workbook Book { get; internal set; }
-        public string Name { get; internal set; }
+        internal Worksheet(Workbook book, string name) : this()
+        {
+            this.book = book;
+            this.name = name;
+        }
+
+        public Workbook Book =>
+            book ?? throw new InvalidOperationException();
+
+        public string Name =>
+            name ?? throw new InvalidOperationException();
+
         public CellCollection Cells { get; }
         public CellRangeCollection Range { get; } = new CellRangeCollection();
 
         internal Spreadsheet.Sheet SheetTag =>
-            Book.Document.WorkbookPart.Workbook.Descendants<Spreadsheet.Sheet>().Where(_ => _.Name == Name).Single();
+            Book.WorkbookPart.Workbook.Descendants<Spreadsheet.Sheet>().Where(_ => _.Name == Name).Single();
 
         internal Packaging.WorksheetPart WorksheetPart =>
-            Book.Document.WorkbookPart.GetPartById(SheetTag.Id) as Packaging.WorksheetPart;
+            Book.WorkbookPart.GetPartById(SheetTag.Id?.Value ?? throw new InvalidOperationException()) as Packaging.WorksheetPart
+                ?? throw new InvalidOperationException();
     }
 }

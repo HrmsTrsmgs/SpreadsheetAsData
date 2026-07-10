@@ -64,10 +64,9 @@ namespace Marimo.SpreadSheetAdData.Test
         [Fact]
         public void TryGetValueでシート名の有無が確認しつつシートの取得ができます()
         {
-            Worksheet sheet;
-            tested.TryGetValue("Sheet1", out sheet).Should().BeTrue();
+            tested.TryGetValue("Sheet1", out var sheet).Should().BeTrue();
             sheet.Should().BeSameAs(tested[0]);
-            tested.TryGetValue("", out sheet).Should().BeFalse();
+            tested.TryGetValue("", out _).Should().BeFalse();
         }
 
         [Fact]

@@ -24,9 +24,11 @@ namespace Marimo.SpreadSheetAsData
 
         internal Spreadsheet.Cell Xml { get;　private set; }
 
-        internal Spreadsheet.Row RowXml => Xml.Parent as Row;
+        internal Spreadsheet.Row RowXml =>
+            Xml.Parent as Row ?? throw new InvalidOperationException();
 
-        public string Reference => Xml.CellReference;
+        public string Reference =>
+            Xml.CellReference?.Value ?? throw new InvalidOperationException();
 
         public dynamic Value =>
             (Xml.DataType?.Value, Xml.CellValue?.Text) switch
@@ -34,10 +36,23 @@ namespace Marimo.SpreadSheetAsData
                 (null, null) => new BlankValue(),
                 (CellValues.Boolean, "0") => false,
                 (CellValues.Boolean, _) => true,
-                (CellValues.SharedString, _) =>
-                    Book.Document.WorkbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(int.Parse(Xml.CellValue.Text)).Text.Text,
-                _ => double.Parse(Xml.CellValue.Text)
+                (CellValues.SharedString, _) => SharedStringValue,
+                (_, string text) => double.Parse(text),
+                _ => throw new InvalidOperationException()
             };
+
+        private string SharedStringValue
+        {
+            get
+            {
+                var text = Xml.CellValue?.Text ?? throw new InvalidOperationException();
+                var sharedStringTable =
+                    Book.WorkbookPart.SharedStringTablePart?.SharedStringTable ?? throw new InvalidOperationException();
+
+                return sharedStringTable.Elements<SharedStringItem>().ElementAt(int.Parse(text)).Text?.Text
+                    ?? throw new InvalidOperationException();
+            }
+        }
         
         public Worksheet Sheet { get; private set; }
 

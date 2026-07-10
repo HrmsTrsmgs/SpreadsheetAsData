@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Marimo.SpreadSheetAsData
@@ -15,7 +16,8 @@ namespace Marimo.SpreadSheetAsData
         IEnumerable<Worksheet> items { get; }
 
         public Worksheet this[string sheetName] =>
-            items.Where(_ => _.Name == sheetName).SingleOrDefault();
+            items.Where(_ => _.Name == sheetName).SingleOrDefault()
+                ?? throw new KeyNotFoundException();
 
         public Worksheet this[int index] => items.ElementAt(index);
 
@@ -27,10 +29,11 @@ namespace Marimo.SpreadSheetAsData
 
         public bool ContainsKey(string key) => Keys.Contains(key);
 
-        public bool TryGetValue(string key, out Worksheet value)
+        public bool TryGetValue(string key, [MaybeNullWhen(false)] out Worksheet value)
         {
-            value = items.Where(_ => _.Name == key).SingleOrDefault();
-            return value != null;
+            var sheet = items.Where(_ => _.Name == key).SingleOrDefault();
+            value = sheet;
+            return sheet != null;
         }
 
         public IEnumerator<Worksheet> GetEnumerator() => items.GetEnumerator();
