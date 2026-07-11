@@ -50,7 +50,13 @@ Console.WriteLine(cell.ColumnIndex);
 * 実装、テスト、READMEの内容を矛盾させない
 * 変更しやすい小さな単位で機能を追加する
 
-詳細な設計方針は [docs/design.md](docs/design.md) を参照してください。
+## ドキュメント
+
+* [プロジェクト概要](docs/project-overview.md)
+* [設計方針](docs/design.md)
+* [初回公開版の範囲](docs/public-release-scope.md)
+* [ロードマップ](docs/roadmap.md)
+* [型付き読み取り](docs/typed-reading.md)
 
 ## ビルドとテスト
 
