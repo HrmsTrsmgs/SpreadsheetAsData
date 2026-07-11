@@ -30,7 +30,7 @@ namespace Marimo.SpreadSheetAsData
         Workbook(Packaging.SpreadsheetDocument document)
         {
             Document = document;
-            Range = new CellRangeCollection(this);
+            Range = new(this);
         }
 
         /// <summary>
@@ -56,6 +56,23 @@ namespace Marimo.SpreadSheetAsData
             sheets ??= new WorksheetCollection(
                         from sheet in (WorkbookPart.Workbook.Sheets ?? throw new InvalidOperationException()).Elements<Spreadsheet.Sheet>()
                         select new Worksheet(this, sheet.Name?.Value ?? throw new InvalidOperationException()));
+
+        /// <summary>
+        /// ブックスコープの定義名をセル範囲として解決します。
+        /// </summary>
+        /// <param name="name">解決する定義名。</param>
+        /// <returns>定義名が表すセル範囲。</returns>
+        internal CellRange GetWorkbookNamedRange(string name)
+        {
+            var definedName = WorkbookPart.Workbook.DefinedNames?.Elements<Spreadsheet.DefinedName>()
+                .Where(_ => _.Name == name && _.LocalSheetId == null)
+                .SingleOrDefault()
+                ?? throw new NotImplementedException();
+
+            var rangeReference = CellRangeReference.Parse(definedName.Text);
+            var targetSheet = Sheets[rangeReference.SheetName ?? throw new NotImplementedException()];
+            return new(targetSheet, rangeReference.TopLeft, rangeReference.BottomRight);
+        }
 
         /// <summary>
         /// ブック上で有効な範囲参照を解決するコレクションを取得します。

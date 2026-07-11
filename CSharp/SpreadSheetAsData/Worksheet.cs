@@ -29,7 +29,7 @@ namespace Marimo.SpreadSheetAsData
         public Worksheet()
         {
             Cells = new CellCollection(this);
-            Range = new CellRangeCollection(this);
+            Range = new(this);
         }
 
         /// <summary>

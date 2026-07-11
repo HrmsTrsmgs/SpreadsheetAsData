@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using System.Linq;
-using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
-
 namespace Marimo.SpreadSheetAsData
 {
     /// <summary>
@@ -80,46 +77,21 @@ namespace Marimo.SpreadSheetAsData
         {
             get
             {
-                var cellReferences = reference.Split(':');
-                if (cellReferences.Length != 2)
+                if (CellRangeReference.TryParse(reference) is not { } rangeReference)
                 {
-                    return GetWorkbookNamedRange(reference);
+                    return book?.GetWorkbookNamedRange(reference)
+                        ?? throw new NotImplementedException();
                 }
 
-                var topLeft = cellReferences[0];
-                var bottomRight = cellReferences[1];
-                return this[topLeft, bottomRight];
+                if (rangeReference.SheetName != null)
+                {
+                    return book != null
+                        ? new(book.Sheets[rangeReference.SheetName], rangeReference.TopLeft, rangeReference.BottomRight)
+                        : throw new NotImplementedException();
+                }
+
+                return this[rangeReference.TopLeft, rangeReference.BottomRight];
             }
-        }
-
-        /// <summary>
-        /// ブックスコープの定義名をセル範囲として解決します。
-        /// </summary>
-        /// <param name="name">解決する定義名。</param>
-        /// <returns>定義名が表すセル範囲。</returns>
-        CellRange GetWorkbookNamedRange(string name)
-        {
-            var definedName = book?.WorkbookPart.Workbook.DefinedNames?.Elements<Spreadsheet.DefinedName>()
-                .Where(_ => _.Name == name && _.LocalSheetId == null)
-                .SingleOrDefault()
-                ?? throw new NotImplementedException();
-
-            var reference = definedName.Text.Split('!');
-            if (reference.Length != )
-            {
-                throw new NotImplementedException();
-            }
-
-            var targetSheet = book.Sheets[reference[0]];
-            var cellReferences = reference[1].Replace("$", "").Split(':');
-            if (cellReferences.Length != 2)
-            {
-                throw new NotImplementedException();
-            }
-
-            var topLeft = cellReferences[0];
-            var bottomRight = cellReferences[1];
-            return new(targetSheet, topLeft, bottomRight);
         }
     }
 }
