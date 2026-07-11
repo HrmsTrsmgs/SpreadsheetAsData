@@ -57,6 +57,11 @@ namespace Marimo.SpreadSheetAsData
                         select new Worksheet(this, sheet.Name?.Value ?? throw new InvalidOperationException()));
 
         /// <summary>
+        /// ブック上で有効な範囲参照を解決するコレクションを取得します。
+        /// </summary>
+        public CellRangeCollection Range { get; } = new CellRangeCollection();
+
+        /// <summary>
         /// 指定した位置のワークシートを取得します。
         /// </summary>
         /// <param name="index">取得するワークシートの 0 始まりの位置。</param>

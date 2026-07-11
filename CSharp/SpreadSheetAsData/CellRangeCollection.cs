@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Marimo.SpreadSheetAsData
 {
@@ -32,5 +33,13 @@ namespace Marimo.SpreadSheetAsData
                 return range;
             }
         }
+
+        /// <summary>
+        /// A1形式または名前による範囲参照からセル範囲を取得します。
+        /// </summary>
+        /// <param name="reference">解決する範囲参照。</param>
+        /// <returns>指定した範囲参照が表すセル範囲。</returns>
+        public CellRange this[string reference] =>
+            throw new NotImplementedException();
     }
 }

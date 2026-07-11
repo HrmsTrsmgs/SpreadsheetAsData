@@ -33,6 +33,23 @@ namespace Marimo.SpreadSheetAsData
         }
 
         /// <summary>
+        /// 名前付き範囲として取得された場合の名前を取得します。
+        /// </summary>
+        public string? Name => null;
+
+        /// <summary>
+        /// 範囲の左上セルを取得します。
+        /// </summary>
+        public Cell TopLeftCell =>
+            throw new NotImplementedException();
+
+        /// <summary>
+        /// 範囲の右下セルを取得します。
+        /// </summary>
+        public Cell BottomRightCell =>
+            throw new NotImplementedException();
+
+        /// <summary>
         /// A1 形式のセル範囲を返します。
         /// </summary>
         /// <returns>A1 形式のセル範囲。</returns>
