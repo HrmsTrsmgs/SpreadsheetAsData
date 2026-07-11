@@ -11,6 +11,9 @@ namespace Marimo.SpreadSheetAdData.Test
 {
     public class CellNameのテスト
     {
+        const string セル参照のゼロ行列検証保留理由 =
+            "CellNameが1始まりの行番号と列番号を保証する実装時に解除する。";
+
         [Fact]
         public void ParseメソッドでCellNameが生成できます()
         {
@@ -74,6 +77,14 @@ namespace Marimo.SpreadSheetAdData.Test
             ).Should().Throw<FormatException>();
         }
 
+        [Fact(Skip = セル参照のゼロ行列検証保留理由)]
+        public void Parseは行番号が0のセル参照を変換しません()
+        {
+            var action = () => CellName.Parse("A0");
+
+            action.Should().Throw<FormatException>();
+        }
+
         [Fact]
         public void Parseメソッドに大きすぎる列名を指定した場合はFormatExceptionを投げます()
         {
@@ -96,6 +107,14 @@ namespace Marimo.SpreadSheetAdData.Test
             ).Should().Throw<FormatException>();
         }
 
+        [Fact(Skip = セル参照のゼロ行列検証保留理由)]
+        public void コンストラクターは列番号が0の場合に失敗します()
+        {
+            var action = () => new CellName(0, 1);
+
+            action.Should().Throw<FormatException>();
+        }
+
         [Fact]
         public void Parseメソッドに大きすぎる行番号を指定した場合はFormatExceptionを投げます()
         {
@@ -110,6 +129,14 @@ namespace Marimo.SpreadSheetAdData.Test
             FluentActions.Invoking(
                 () => new CellName(1, 1048577)
             ).Should().Throw<FormatException>();
+        }
+
+        [Fact(Skip = セル参照のゼロ行列検証保留理由)]
+        public void コンストラクターは行番号が0の場合に失敗します()
+        {
+            var action = () => new CellName(1, 0);
+
+            action.Should().Throw<FormatException>();
         }
 
         [Fact]
