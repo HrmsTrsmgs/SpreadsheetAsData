@@ -30,7 +30,7 @@ namespace Marimo.SpreadSheetAdData.Test
             tested.Should().BeSameAs(sheet2.Range["C32", "D36"]);
         }
 
-        [Fact(Skip = 範囲参照API仕様保留理由)]
+        [Fact]
         public void Rangeはブックスコープの名前参照から名前付き範囲を取得します()
         {
             CellRange tested = book.Range["book_range"];

@@ -17,6 +17,11 @@ namespace Marimo.SpreadSheetAsData
         readonly string bottomRight;
 
         /// <summary>
+        /// 範囲のセル解決に使用するワークシートです。
+        /// </summary>
+        readonly Worksheet? sheet;
+
+        /// <summary>
         /// <see cref="ToString"/> で A1 形式の範囲を復元するための左上セル参照です。
         /// </summary>
         readonly string topLeft;
@@ -26,8 +31,18 @@ namespace Marimo.SpreadSheetAsData
         /// </summary>
         /// <param name="topLeft">範囲の左上セル参照。</param>
         /// <param name="bottomRight">範囲の右下セル参照。</param>
-        public CellRange(string topLeft, string bottomRight)
+        public CellRange(string topLeft, string bottomRight) : this(null, topLeft, bottomRight)
+        { }
+
+        /// <summary>
+        /// 指定したワークシート上の左上セルと右下セルでセル範囲を作成します。
+        /// </summary>
+        /// <param name="sheet">範囲が属するワークシート。</param>
+        /// <param name="topLeft">範囲の左上セル参照。</param>
+        /// <param name="bottomRight">範囲の右下セル参照。</param>
+        internal CellRange(Worksheet? sheet, string topLeft, string bottomRight)
         {
+            this.sheet = sheet;
             this.topLeft = topLeft;
             this.bottomRight = bottomRight;
         }
@@ -41,13 +56,13 @@ namespace Marimo.SpreadSheetAsData
         /// 範囲の左上セルを取得します。
         /// </summary>
         public Cell TopLeftCell =>
-            throw new NotImplementedException();
+            (sheet ?? throw new NotImplementedException()).Cells[topLeft];
 
         /// <summary>
         /// 範囲の右下セルを取得します。
         /// </summary>
         public Cell BottomRightCell =>
-            throw new NotImplementedException();
+            (sheet ?? throw new NotImplementedException()).Cells[bottomRight];
 
         /// <summary>
         /// A1 形式のセル範囲を返します。

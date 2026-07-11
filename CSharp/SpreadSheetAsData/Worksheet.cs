@@ -29,6 +29,7 @@ namespace Marimo.SpreadSheetAsData
         public Worksheet()
         {
             Cells = new CellCollection(this);
+            Range = new CellRangeCollection(this);
         }
 
         /// <summary>
@@ -62,7 +63,7 @@ namespace Marimo.SpreadSheetAsData
         /// <summary>
         /// ワークシート上のセル範囲を取得するコレクションを取得します。
         /// </summary>
-        public CellRangeCollection Range { get; } = new CellRangeCollection();
+        public CellRangeCollection Range { get; }
 
         /// <summary>
         /// このワークシートに対応する Open XML のシート要素を取得します。

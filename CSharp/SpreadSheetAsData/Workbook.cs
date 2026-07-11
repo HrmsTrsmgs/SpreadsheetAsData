@@ -30,6 +30,7 @@ namespace Marimo.SpreadSheetAsData
         Workbook(Packaging.SpreadsheetDocument document)
         {
             Document = document;
+            Range = new CellRangeCollection(this);
         }
 
         /// <summary>
@@ -59,7 +60,7 @@ namespace Marimo.SpreadSheetAsData
         /// <summary>
         /// ブック上で有効な範囲参照を解決するコレクションを取得します。
         /// </summary>
-        public CellRangeCollection Range { get; } = new CellRangeCollection();
+        public CellRangeCollection Range { get; }
 
         /// <summary>
         /// 指定した位置のワークシートを取得します。
