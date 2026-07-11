@@ -43,10 +43,15 @@ namespace Marimo.SpreadSheetAsData
         {
             get
             {
-                var range = reference.Split(':');
-                return range.Length == 2
-                    ? this[range[0], range[1]]
-                    : throw new NotImplementedException();
+                var cellReferences = reference.Split(':');
+                if (cellReferences.Length != 2)
+                {
+                    throw new NotImplementedException();
+                }
+
+                var topLeft = cellReferences[0];
+                var bottomRight = cellReferences[1];
+                return this[topLeft, bottomRight];
             }
         }
     }
