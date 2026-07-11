@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FBC883
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadSheetAsData", "SpreadSheetAsData\SpreadSheetAsData.csproj", "{29008293-DAFF-4192-96BA-17F0AEC7F4F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadSheetAdDataのテスト", "SpreadSheetAdDataのテスト\SpreadSheetAdDataのテスト.csproj", "{69F7627F-F401-42CA-BA08-0C399750D140}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadSheetAsDataのテスト", "SpreadSheetAsDataのテスト\SpreadSheetAsDataのテスト.csproj", "{69F7627F-F401-42CA-BA08-0C399750D140}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

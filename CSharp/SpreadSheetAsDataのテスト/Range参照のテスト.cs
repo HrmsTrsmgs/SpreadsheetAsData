@@ -2,7 +2,7 @@
 using Marimo.SpreadSheetAsData;
 using Xunit;
 
-namespace Marimo.SpreadSheetAdData.Test;
+namespace Marimo.SpreadSheetAsData.Test;
 
 public class Range参照のテスト : IDisposable
 {
