@@ -10,7 +10,7 @@ public class WorksheetCollection : IReadOnlyList<Worksheet>, IReadOnlyDictionary
     /// <summary>
     /// 受け取ったワークシート列挙を固定化した読み取り専用リストです。
     /// </summary>
-    readonly IReadOnlyList<Worksheet> items;
+    readonly Worksheet[] items;
 
     /// <summary>
     /// 指定したワークシート列挙からコレクションを作成します。
@@ -41,7 +41,7 @@ public class WorksheetCollection : IReadOnlyList<Worksheet>, IReadOnlyDictionary
     /// <summary>
     /// コレクション内のワークシート数を取得します。
     /// </summary>
-    public int Count => items.Count;
+    public int Count => items.Length;
 
     /// <summary>
     /// ワークシート名の一覧を取得します。
@@ -77,7 +77,8 @@ public class WorksheetCollection : IReadOnlyList<Worksheet>, IReadOnlyDictionary
     /// ワークシートを列挙する列挙子を返します。
     /// </summary>
     /// <returns>ワークシートを列挙する列挙子。</returns>
-    public IEnumerator<Worksheet> GetEnumerator() => items.GetEnumerator();
+    public IEnumerator<Worksheet> GetEnumerator() =>
+        ((IEnumerable<Worksheet>)items).GetEnumerator();
 
     /// <inheritdoc />
     IEnumerator<KeyValuePair<string, Worksheet>> IEnumerable<KeyValuePair<string, Worksheet>>.GetEnumerator() =>

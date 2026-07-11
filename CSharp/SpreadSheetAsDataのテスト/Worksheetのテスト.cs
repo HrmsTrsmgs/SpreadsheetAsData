@@ -21,6 +21,7 @@ public class Worksheetのテスト : IDisposable
     public void Dispose()
     {
         book.Close();
+        GC.SuppressFinalize(this);
     }
 
     [Fact]

@@ -22,6 +22,7 @@ public class BlankValueのテスト : IDisposable
     public void Dispose()
     {
         book.Close();
+        GC.SuppressFinalize(this);
     }
 
     BlankValue TestedBlankValue =>

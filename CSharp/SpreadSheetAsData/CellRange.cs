@@ -11,6 +11,11 @@ public class CellRange
     readonly string bottomRight;
 
     /// <summary>
+    /// 名前付き範囲として取得された場合の名前です。
+    /// </summary>
+    readonly string? name;
+
+    /// <summary>
     /// 範囲のセル解決に使用するワークシートです。
     /// </summary>
     readonly Worksheet? sheet;
@@ -39,12 +44,13 @@ public class CellRange
         this.sheet = sheet;
         this.topLeft = topLeft;
         this.bottomRight = bottomRight;
+        name = null;
     }
 
     /// <summary>
     /// 名前付き範囲として取得された場合の名前を取得します。
     /// </summary>
-    public string? Name => null;
+    public string? Name => name;
 
     /// <summary>
     /// 範囲の左上セルを取得します。

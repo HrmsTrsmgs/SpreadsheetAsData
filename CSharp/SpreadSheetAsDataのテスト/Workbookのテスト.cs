@@ -23,6 +23,7 @@ public class Workbookのテスト : IDisposable
     public void Dispose()
     {
         book1.Close();
+        GC.SuppressFinalize(this);
     }
 
     [Fact]

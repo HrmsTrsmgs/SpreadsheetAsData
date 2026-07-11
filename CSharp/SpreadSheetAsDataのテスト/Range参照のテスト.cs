@@ -20,6 +20,7 @@ public class Range参照のテスト : IDisposable
     public void Dispose()
     {
         book.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     [Fact]

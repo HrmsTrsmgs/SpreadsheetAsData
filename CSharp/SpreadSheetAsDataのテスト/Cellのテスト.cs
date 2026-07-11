@@ -31,6 +31,7 @@ public class Cellのテスト : IDisposable
     public void Dispose()
     {
         いろいろなデータ.Book.Close();
+        GC.SuppressFinalize(this);
     }
 
     [Fact]
