@@ -70,6 +70,30 @@ dotnet test .\CSharp\SpreadSheetAsData.sln
 dotnet format .\CSharp\SpreadSheetAsData.sln --verify-no-changes --no-restore --severity warn
 ```
 
+## APIドキュメント
+
+C#版のAPIドキュメントは、XMLドキュメントコメントからDocFXで生成します。
+生成には、リポジトリに含めているローカル.NETツール設定を使用します。
+
+ローカルでブラウザ表示まで行う場合は、次のスクリプトを使用します。
+
+```powershell
+.\scripts\serve-csharp-api-docs.ps1
+```
+
+スクリプトは必要な.NETローカルツールを復元し、DocFXでHTMLを生成してからローカルWebサーバーを起動します。
+コンソールに表示されたURLをブラウザで開くと、生成されたAPIドキュメントを確認できます。
+確認を終えるときは、コマンドを実行しているターミナルで `Ctrl+C` を押してサーバーを停止します。
+
+HTML生成だけを確認する場合は、次のように実行します。
+
+```powershell
+.\scripts\serve-csharp-api-docs.ps1 -BuildOnly
+```
+
+生成されたHTMLは `docs/api/csharp/_site/` に出力されます。
+DocFXが生成する `docs/api/csharp/metadata/` と `docs/api/csharp/_site/` は、再生成できる成果物としてGit管理に含めません。
+
 ## 現在の確認状況
 
 直近の再整備では、次を確認しています。

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://dotnet.github.io/docfx/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../../../",
+          "files": [
+            "CSharp/SpreadSheetAsData/SpreadSheetAsData.csproj"
+          ]
+        }
+      ],
+      "dest": "metadata"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "metadata/**.yml",
+          "metadata/index.md",
+          "toc.yml",
+          "*.md"
+        ]
+      }
+    ],
+    "dest": "_site",
+    "globalMetadata": {
+      "_appName": "SpreadsheetAsData C# API",
+      "_appTitle": "SpreadsheetAsData C# API",
+      "_enableSearch": true
+    },
+    "template": [
+      "default",
+      "modern"
+    ]
+  }
+}
