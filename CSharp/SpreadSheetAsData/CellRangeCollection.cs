@@ -39,7 +39,15 @@ namespace Marimo.SpreadSheetAsData
         /// </summary>
         /// <param name="reference">解決する範囲参照。</param>
         /// <returns>指定した範囲参照が表すセル範囲。</returns>
-        public CellRange this[string reference] =>
-            throw new NotImplementedException();
+        public CellRange this[string reference]
+        {
+            get
+            {
+                var range = reference.Split(':');
+                return range.Length == 2
+                    ? this[range[0], range[1]]
+                    : throw new NotImplementedException();
+            }
+        }
     }
 }

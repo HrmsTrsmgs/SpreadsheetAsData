@@ -22,7 +22,7 @@ namespace Marimo.SpreadSheetAdData.Test
             book.Dispose();
         }
 
-        [Fact(Skip = 範囲参照API仕様保留理由)]
+        [Fact]
         public void RangeはA1形式の範囲参照から名前なし範囲を取得します()
         {
             var tested = sheet2.Range["C32:D36"];
