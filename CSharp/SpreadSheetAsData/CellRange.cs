@@ -74,8 +74,8 @@ public class CellRange
         (sheet ?? throw new NotImplementedException()).Cells[bottomRight];
 
     /// <summary>
-    /// A1 形式のセル範囲を返します。
+    /// 名前付き範囲では名前を返し、名前なし範囲では A1 形式のセル範囲を返します。
     /// </summary>
-    /// <returns>A1 形式のセル範囲。</returns>
-    public override string ToString() => $"{topLeft}:{bottomRight}";
+    /// <returns>名前または A1 形式のセル範囲。</returns>
+    public override string ToString() => name ?? $"{topLeft}:{bottomRight}";
 }

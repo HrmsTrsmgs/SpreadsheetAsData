@@ -109,7 +109,7 @@ public class Range参照のテスト : IDisposable
         cell.Name.Should().Be("cell_name");
     }
 
-    [Fact(Skip = 範囲参照API仕様保留理由)]
+    [Fact]
     public void ToStringは名前なし範囲ではA1形式の範囲参照を返します()
     {
         var tested = sheet2.Range["C32", "D36"];
@@ -117,7 +117,7 @@ public class Range参照のテスト : IDisposable
         tested.ToString().Should().Be("C32:D36");
     }
 
-    [Fact(Skip = 範囲参照API仕様保留理由)]
+    [Fact]
     public void ToStringは名前付き範囲では名前を返します()
     {
         var tested = book.Range["book_range"];
