@@ -39,12 +39,13 @@ public class CellRange
     /// <param name="sheet">範囲が属するワークシート。</param>
     /// <param name="topLeft">範囲の左上セル参照。</param>
     /// <param name="bottomRight">範囲の右下セル参照。</param>
-    internal CellRange(Worksheet? sheet, string topLeft, string bottomRight)
+    /// <param name="name">名前付き範囲として取得された場合の名前。</param>
+    internal CellRange(Worksheet? sheet, string topLeft, string bottomRight, string? name = null)
     {
         this.sheet = sheet;
         this.topLeft = topLeft;
         this.bottomRight = bottomRight;
-        name = null;
+        this.name = name;
     }
 
     /// <summary>

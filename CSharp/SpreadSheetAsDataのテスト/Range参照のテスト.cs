@@ -89,7 +89,7 @@ public class Range参照のテスト : IDisposable
         tested.Name.Should().BeNull();
     }
 
-    [Fact(Skip = 範囲参照API仕様保留理由)]
+    [Fact]
     public void Nameはブックスコープの名前参照から取得した範囲では名前を返します()
     {
         var range = book.Range["book_range"];

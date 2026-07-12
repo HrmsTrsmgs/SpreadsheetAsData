@@ -83,7 +83,11 @@ public class Workbook : IDisposable
 
         var rangeReference = CellRangeReference.Parse(definedName.Text);
         var targetSheet = Sheets[rangeReference.SheetName ?? throw new NotImplementedException()];
-        return new(targetSheet, rangeReference.TopLeft, rangeReference.BottomRight);
+        return new(
+            targetSheet,
+            rangeReference.TopLeft,
+            rangeReference.BottomRight,
+            name: localSheetId == null ? name : null);
     }
 
     static bool HasLocalSheetId(Spreadsheet.DefinedName definedName, uint? localSheetId)
