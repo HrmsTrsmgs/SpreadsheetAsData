@@ -76,7 +76,7 @@ public class CellCollection
                 }
                 catch (FormatException)
                 {
-                    return sheet.ResolveNamedRange(cellReference).SingleCell;
+                    return sheet.ResolveNamedRange(cellReference).TopLeftCell;
                 }
             }
 
