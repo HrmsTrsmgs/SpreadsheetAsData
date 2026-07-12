@@ -59,7 +59,7 @@ public class Workbook : IDisposable
     /// </summary>
     /// <param name="name">解決する定義名。</param>
     /// <returns>定義名が表すセル範囲。</returns>
-    internal CellRange GetWorkbookNamedRange(string name)
+    internal CellRange ResolveNamedRange(string name)
     {
         var definedName = WorkbookPart.Workbook.DefinedNames?.Elements<Spreadsheet.DefinedName>()
             .Where(_ => _.Name == name && _.LocalSheetId == null)
