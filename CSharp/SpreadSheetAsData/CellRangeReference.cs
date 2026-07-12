@@ -46,6 +46,10 @@ readonly partial struct CellRangeReference
 @"^(?:(?<sheet>[^!]*)!)?(?<startCell>[^!:]*):(?<endCell>[^!:]*)$")]
     private static partial Regex CellRangeReferencePattern();
 
+    [GeneratedRegex(
+@"^(?<sheet>[^!]*)!(?<cell>[^!:]*)$")]
+    private static partial Regex SingleCellReferencePattern();
+
     /// <summary>
     /// A1形式の範囲参照をセル範囲参照へ変換できる場合は変換します。
     /// </summary>
@@ -54,21 +58,32 @@ readonly partial struct CellRangeReference
     public static CellRangeReference? TryParse(string reference)
     {
         var match = CellRangeReferencePattern().Match(reference);
-        if (!match.Success)
+        if (match.Success)
+        {
+            var sheetName = match.Groups["sheet"].Success
+                ? match.Groups["sheet"].Value
+                : null;
+
+            var startCellReference = match.Groups["startCell"].Value.Replace("$", "");
+            var endCellReference = match.Groups["endCell"].Value.Replace("$", "");
+
+            return new(
+                sheetName,
+                startCellReference,
+                endCellReference);
+        }
+
+        var singleCellMatch = SingleCellReferencePattern().Match(reference);
+        if (!singleCellMatch.Success)
         {
             return null;
         }
 
-        var sheetName = match.Groups["sheet"].Success
-            ? match.Groups["sheet"].Value
-            : null;
-
-        var startCellReference = match.Groups["startCell"].Value.Replace("$", "");
-        var endCellReference = match.Groups["endCell"].Value.Replace("$", "");
+        var singleCellReference = singleCellMatch.Groups["cell"].Value.Replace("$", "");
 
         return new(
-            sheetName,
-            startCellReference,
-            endCellReference);
+            singleCellMatch.Groups["sheet"].Value,
+            singleCellReference,
+            singleCellReference);
     }
 }

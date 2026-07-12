@@ -40,7 +40,7 @@ public class Range参照のテスト : IDisposable
         tested.BottomRightCell.Should().BeSameAs(sheet2.Cells["D36"]);
     }
 
-    [Fact(Skip = 範囲参照API仕様保留理由)]
+    [Fact]
     public void Rangeはブックスコープの単一セル名を名前付き範囲として取得します()
     {
         CellRange tested = book.Range["book_cell"];
