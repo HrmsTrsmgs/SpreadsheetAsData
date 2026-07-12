@@ -18,7 +18,7 @@ public class WorksheetCollection : IReadOnlyList<Worksheet>, IReadOnlyDictionary
     /// <param name="collection">コレクションに含めるワークシート。</param>
     internal WorksheetCollection(IEnumerable<Worksheet> collection)
     {
-        items = collection.ToArray();
+        items = [.. collection];
     }
 
     /// <summary>

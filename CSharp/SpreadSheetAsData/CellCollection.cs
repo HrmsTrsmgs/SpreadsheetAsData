@@ -14,7 +14,7 @@ public class CellCollection
     /// <summary>
     /// 同じセル参照に対して同じ <see cref="Cell"/> インスタンスを返すためのキャッシュです。
     /// </summary>
-    readonly Dictionary<CellName, Cell> cache = new();
+    readonly Dictionary<CellName, Cell> cache = [];
 
     /// <summary>
     /// ワークシートスコープの名前参照を解決するかどうかを表します。

@@ -79,18 +79,18 @@ public partial struct CellName
     /// <param name="name">A1 形式のセル参照。</param>
     /// <returns>変換したセル参照。</returns>
     /// <exception cref="FormatException">文字列がA1形式でない、または使用可能範囲を超えています。</exception>
-    public static CellName Parse(string name) => new CellName(name);
+    public static CellName Parse(string name) => new(name);
 
     /// <summary>
     /// 列名を取得します。
     /// </summary>
-    public string ColumnName => GetColumnName(ColumnIndex);
+    public readonly string ColumnName => GetColumnName(ColumnIndex);
 
     /// <summary>
     /// A1 形式のセル参照を返します。
     /// </summary>
     /// <returns>A1 形式のセル参照。</returns>
-    public override string ToString() =>
+    public override readonly string ToString() =>
         $"{GetColumnName(ColumnIndex)}{RowIndex}";
 
     /// <summary>

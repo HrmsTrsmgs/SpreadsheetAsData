@@ -6,10 +6,10 @@ namespace Marimo.SpreadSheetAsData.Test;
 
 public class BlankValueのテスト : IDisposable
 {
-    Workbook book;
-    Worksheet sheet1;
-    Cell cell;
-    dynamic tested;
+    readonly Workbook book;
+    readonly Worksheet sheet1;
+    readonly Cell cell;
+    readonly dynamic tested;
 
     public BlankValueのテスト()
     {

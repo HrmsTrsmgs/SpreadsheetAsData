@@ -6,13 +6,13 @@ namespace Marimo.SpreadSheetAsData.Test;
 
 public class Cellのテスト : IDisposable
 {
-    Worksheet いろいろなデータ;
-    Cell a1;
-    Cell b1;
-    Cell a2;
-    Cell b2;
-    Cell a3;
-    Cell b3;
+    readonly Worksheet いろいろなデータ;
+    readonly Cell a1;
+    readonly Cell b1;
+    readonly Cell a2;
+    readonly Cell b2;
+    readonly Cell a3;
+    readonly Cell b3;
 
     public Cellのテスト()
     {

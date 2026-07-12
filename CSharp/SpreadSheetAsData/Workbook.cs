@@ -18,7 +18,7 @@ public class Workbook : IDisposable
     /// <param name="filePath">開く Spreadsheet ファイルのパス。</param>
     /// <returns>開いたブック。</returns>
     public static Workbook Open(string filePath) =>
-        new Workbook(Packaging.SpreadsheetDocument.Open(filePath, true));
+        new(Packaging.SpreadsheetDocument.Open(filePath, true));
 
     /// <summary>
     /// 既に開かれた Open XML ドキュメントを所有するブックを作成します。
@@ -45,7 +45,7 @@ public class Workbook : IDisposable
     /// <summary>
     /// Open XML のシート一覧から遅延作成したワークシートコレクションです。
     /// </summary>
-    WorksheetCollection? sheets { get; set; }
+    WorksheetCollection? sheets;
 
     /// <summary>
     /// ブックに含まれるワークシートの一覧を取得します。

@@ -7,9 +7,9 @@ namespace Marimo.SpreadSheetAsData.Test;
 public class Worksheetのテスト : IDisposable
 {
 
-    Workbook book;
-    Worksheet sheet1;
-    Worksheet data;
+    readonly Workbook book;
+    readonly Worksheet sheet1;
+    readonly Worksheet data;
 
     public Worksheetのテスト()
     {

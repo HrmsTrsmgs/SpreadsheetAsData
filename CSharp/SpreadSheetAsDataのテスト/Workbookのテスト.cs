@@ -7,7 +7,7 @@ namespace Marimo.SpreadSheetAsData.Test;
 public class Workbookのテスト : IDisposable
 {
 
-    Workbook book1;
+    readonly Workbook book1;
 
     public const string コピーパス = @"TestData\Book1-Copy.xlsx";
 

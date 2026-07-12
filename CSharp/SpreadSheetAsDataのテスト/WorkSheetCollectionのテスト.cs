@@ -7,14 +7,12 @@ namespace Marimo.SpreadSheetAsData.Test;
 
 public class WorkSheetCollectionのテスト
 {
-    WorksheetCollection tested;
+    readonly WorksheetCollection tested;
 
     public WorkSheetCollectionのテスト()
     {
-        using (var book = Workbook.Open(@"TestData\Book1.xlsx"))
-        {
-            tested = book.Sheets;
-        }
+        using var book = Workbook.Open(@"TestData\Book1.xlsx");
+        tested = book.Sheets;
     }
 
     [Fact]
@@ -65,7 +63,7 @@ public class WorkSheetCollectionのテスト
     }
 
     [Fact]
-    public void foreachでシートが取得できます()
+    public void シートはforeachで取得できます()
     {
         int i = 0;
         foreach (var item in tested)

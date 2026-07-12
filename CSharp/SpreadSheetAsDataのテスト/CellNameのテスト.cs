@@ -46,9 +46,10 @@ public class CellNameのテスト
     [Fact]
     public void 指定したセルの位置を一意としてハッシュのキーとして使えます()
     {
-        var set = new HashSet<CellName>();
-
-        set.Add(CellName.Parse("A1"));
+        var set = new HashSet<CellName>
+        {
+            CellName.Parse("A1")
+        };
         set.Should().ContainSingle();
         set.Add(CellName.Parse("A1"));
         set.Should().ContainSingle();

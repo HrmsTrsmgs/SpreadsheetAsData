@@ -13,12 +13,12 @@ public class CellRangeCollection
     /// <summary>
     /// 同じ範囲指定に対して同じ <see cref="CellRange"/> インスタンスを返すためのキャッシュです。
     /// </summary>
-    readonly Dictionary<(string TopLeft, string BottomRight), CellRange> cache = new();
+    readonly Dictionary<(string TopLeft, string BottomRight), CellRange> cache = [];
 
     /// <summary>
     /// 同じ名前参照に対して同じ <see cref="CellRange"/> インスタンスを返すためのキャッシュです。
     /// </summary>
-    readonly Dictionary<string, CellRange> namedRangeCache = new();
+    readonly Dictionary<string, CellRange> namedRangeCache = [];
 
     /// <summary>
     /// セル範囲が属するワークシートです。

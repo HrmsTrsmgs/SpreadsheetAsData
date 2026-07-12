@@ -23,5 +23,5 @@ public struct BlankValue
     /// 空白値を表す文字列を返します。
     /// </summary>
     /// <returns>空白値を表す文字列。</returns>
-    public override string ToString() => "{Blank}";
+    public override readonly string ToString() => "{Blank}";
 }
