@@ -98,6 +98,11 @@ public class Workbook : IDisposable
     public CellRangeCollection Range { get; }
 
     /// <summary>
+    /// ブック上で有効なセル参照を解決するコレクションを取得します。
+    /// </summary>
+    public CellCollection Cell => throw new NotImplementedException();
+
+    /// <summary>
     /// 指定した位置のワークシートを取得します。
     /// </summary>
     /// <param name="index">取得するワークシートの 0 始まりの位置。</param>

@@ -55,6 +55,11 @@ public class Worksheet
     public CellCollection Cells { get; }
 
     /// <summary>
+    /// ワークシート上で有効なセル参照を解決するコレクションを取得します。
+    /// </summary>
+    public CellCollection Cell => throw new NotImplementedException();
+
+    /// <summary>
     /// ワークシート上のセル範囲を取得するコレクションを取得します。
     /// </summary>
     public CellRangeCollection Range { get; }
