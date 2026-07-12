@@ -23,6 +23,7 @@ public class Worksheet
     public Worksheet()
     {
         Cells = new CellCollection(this);
+        Cell = new(this, resolvesWorksheetNames: true);
         Range = new(this);
     }
 
@@ -57,7 +58,7 @@ public class Worksheet
     /// <summary>
     /// ワークシート上で有効なセル参照を解決するコレクションを取得します。
     /// </summary>
-    public CellCollection Cell => throw new NotImplementedException();
+    public CellCollection Cell { get; }
 
     /// <summary>
     /// ワークシート上のセル範囲を取得するコレクションを取得します。
@@ -76,6 +77,24 @@ public class Worksheet
     internal Packaging.WorksheetPart WorksheetPart =>
         Book.WorkbookPart.GetPartById(SheetTag.Id?.Value ?? throw new InvalidOperationException()) as Packaging.WorksheetPart
             ?? throw new InvalidOperationException();
+
+    /// <summary>
+    /// キャッシュに存在しないセルを、既存の Open XML セルまたは空白セルとして解決します。
+    /// </summary>
+    /// <param name="cellName">取得するセル参照。</param>
+    /// <returns>指定したセル。</returns>
+    internal Cell ResolveCell(CellName cellName)
+    {
+        var cellReference = cellName.ToString();
+        var cellXml =
+            from xml in WorksheetPart.Worksheet.Descendants<Spreadsheet.Cell>()
+            where xml.CellReference == cellReference
+            select xml;
+
+        return cellXml.Any()
+            ? new Cell(this, cellXml.Single())
+            : new Cell(this, cellReference);
+    }
 
     /// <summary>
     /// ワークシートスコープの定義名をセル範囲として解決します。

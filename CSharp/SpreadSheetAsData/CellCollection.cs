@@ -17,7 +17,12 @@ public class CellCollection
     readonly Dictionary<CellName, Cell> cache = new();
 
     /// <summary>
-    /// Open XML のセル探索と空白セル作成に使用するワークシートです。
+    /// ワークシートスコープの名前参照を解決するかどうかを表します。
+    /// </summary>
+    readonly bool resolvesWorksheetNames;
+
+    /// <summary>
+    /// セル参照とワークシートスコープの名前参照を解決するためのワークシートです。
     /// </summary>
     readonly Worksheet? sheet;
 
@@ -40,6 +45,16 @@ public class CellCollection
     }
 
     /// <summary>
+    /// 指定したワークシートのセルコレクションを作成します。
+    /// </summary>
+    /// <param name="sheet">対象のワークシート。</param>
+    /// <param name="resolvesWorksheetNames">ワークシートスコープの名前参照を解決する場合は true。</param>
+    internal CellCollection(Worksheet sheet, bool resolvesWorksheetNames) : this(sheet)
+    {
+        this.resolvesWorksheetNames = resolvesWorksheetNames;
+    }
+
+    /// <summary>
     /// A1 形式のセル参照でセルを取得します。
     /// </summary>
     /// <param name="cellReference">A1 形式のセル参照。</param>
@@ -51,6 +66,18 @@ public class CellCollection
             if (book != null)
             {
                 return book.ResolveNamedRange(cellReference).TopLeftCell;
+            }
+
+            if (resolvesWorksheetNames && sheet != null)
+            {
+                try
+                {
+                    return GetItem(CellName.Parse(cellReference));
+                }
+                catch (FormatException)
+                {
+                    return sheet.ResolveNamedRange(cellReference).TopLeftCell;
+                }
             }
 
             return GetItem(CellName.Parse(cellReference));
@@ -67,7 +94,7 @@ public class CellCollection
         GetItem(new CellName(columnIndex, rowIndex));
 
     /// <summary>
-    /// キャッシュ、既存の Open XML セル、空白セルの順でセルを解決します。
+    /// キャッシュを確認してから、ワークシートへセル解決を委譲します。
     /// </summary>
     /// <param name="cellName">取得するセル参照。</param>
     /// <returns>指定したセル。</returns>
@@ -78,16 +105,7 @@ public class CellCollection
             return cachedCell;
         }
 
-        var cellReference = cellName.ToString();
-        var cellXml =
-            from xml in (sheet ?? throw new NotImplementedException()).WorksheetPart.Worksheet.Descendants<Spreadsheet.Cell>()
-            where xml.CellReference == cellReference
-            select xml;
-
-        var cell = cellXml.Any()
-            ? new Cell(sheet, cellXml.Single())
-            : new Cell(sheet, cellReference);
-
+        var cell = (sheet ?? throw new NotImplementedException()).ResolveCell(cellName);
         cache[cellName] = cell;
         return cell;
     }

@@ -32,7 +32,7 @@ public class Cell参照のテスト : IDisposable
         tested.Should().BeSameAs(sheet2.Cells["F33"]);
     }
 
-    [Fact(Skip = セル名参照API仕様保留理由)]
+    [Fact]
     public void Cellはワークシートスコープの単一セル名からセルを取得します()
     {
         Cell tested = sheet2.Cell["cell_name"];
