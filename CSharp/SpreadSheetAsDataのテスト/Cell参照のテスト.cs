@@ -48,7 +48,7 @@ public class Cell参照のテスト : IDisposable
         action.Should().Throw<InvalidOperationException>();
     }
 
-    [Fact(Skip = セル名参照API仕様保留理由)]
+    [Fact]
     public void Cellはワークシートスコープの複数セル名では失敗します()
     {
         var action = () => sheet2.Cell["range_name"];
