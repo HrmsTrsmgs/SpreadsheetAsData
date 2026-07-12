@@ -59,6 +59,14 @@ public class CellRange
         (sheet ?? throw new NotImplementedException()).Cells[topLeft];
 
     /// <summary>
+    /// 範囲が単一セルを表す場合に、そのセルを取得します。
+    /// </summary>
+    internal Cell SingleCell =>
+        topLeft == bottomRight
+            ? TopLeftCell
+            : throw new InvalidOperationException();
+
+    /// <summary>
     /// 範囲の右下セルを取得します。
     /// </summary>
     public Cell BottomRightCell =>

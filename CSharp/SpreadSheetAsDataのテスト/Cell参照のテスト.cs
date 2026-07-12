@@ -40,7 +40,7 @@ public class Cell参照のテスト : IDisposable
         tested.Should().BeSameAs(sheet2.Cells["E25"]);
     }
 
-    [Fact(Skip = セル名参照API仕様保留理由)]
+    [Fact]
     public void Cellはブックスコープの複数セル名では失敗します()
     {
         var action = () => book.Cell["book_range"];

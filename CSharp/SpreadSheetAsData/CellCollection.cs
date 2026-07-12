@@ -65,7 +65,7 @@ public class CellCollection
         {
             if (book != null)
             {
-                return book.ResolveNamedRange(cellReference).TopLeftCell;
+                return book.ResolveNamedRange(cellReference).SingleCell;
             }
 
             if (resolvesWorksheetNames && sheet != null)
@@ -76,7 +76,7 @@ public class CellCollection
                 }
                 catch (FormatException)
                 {
-                    return sheet.ResolveNamedRange(cellReference).TopLeftCell;
+                    return sheet.ResolveNamedRange(cellReference).SingleCell;
                 }
             }
 
