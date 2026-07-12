@@ -16,6 +16,11 @@ public class CellRangeCollection
     readonly Dictionary<(string TopLeft, string BottomRight), CellRange> cache = new();
 
     /// <summary>
+    /// 同じ名前参照に対して同じ <see cref="CellRange"/> インスタンスを返すためのキャッシュです。
+    /// </summary>
+    readonly Dictionary<string, CellRange> namedRangeCache = new();
+
+    /// <summary>
     /// セル範囲が属するワークシートです。
     /// </summary>
     readonly Worksheet? sheet;
@@ -76,9 +81,15 @@ public class CellRangeCollection
         {
             if (CellRangeReference.TryParse(reference) is not { } rangeReference)
             {
-                return sheet?.ResolveNamedRange(reference)
-                    ?? book?.ResolveNamedRange(reference)
-                    ?? throw new NotImplementedException();
+                if (!namedRangeCache.TryGetValue(reference, out var namedRange))
+                {
+                    namedRange = sheet?.ResolveNamedRange(reference)
+                        ?? book?.ResolveNamedRange(reference)
+                        ?? throw new NotImplementedException();
+                    namedRangeCache[reference] = namedRange;
+                }
+
+                return namedRange;
             }
 
             if (rangeReference.SheetName != null)

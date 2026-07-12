@@ -61,7 +61,7 @@ public class Range参照のテスト : IDisposable
         cell.BottomRightCell.Should().BeSameAs(sheet2.Cells["E25"]);
     }
 
-    [Fact(Skip = 範囲参照API仕様保留理由)]
+    [Fact]
     public void Rangeは同じ名前参照から取得した範囲を同一オブジェクトとして扱います()
     {
         book.Range["book_range"].Should().BeSameAs(book.Range["book_range"]);
