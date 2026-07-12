@@ -61,14 +61,35 @@ public class Workbook : IDisposable
     /// <returns>定義名が表すセル範囲。</returns>
     internal CellRange ResolveNamedRange(string name)
     {
+        return ResolveNamedRange(name, localSheetId: null);
+    }
+
+    /// <summary>
+    /// 指定したワークシートスコープの定義名をセル範囲として解決します。
+    /// </summary>
+    /// <param name="name">解決する定義名。</param>
+    /// <param name="localSheetId">定義名が属するワークシートの 0 始まりの位置。</param>
+    /// <returns>定義名が表すセル範囲。</returns>
+    internal CellRange ResolveNamedRange(string name, uint localSheetId) =>
+        ResolveNamedRange(name, (uint?)localSheetId);
+
+    CellRange ResolveNamedRange(string name, uint? localSheetId)
+    {
         var definedName = WorkbookPart.Workbook.DefinedNames?.Elements<Spreadsheet.DefinedName>()
-            .Where(_ => _.Name == name && _.LocalSheetId == null)
+            .Where(it => it.Name == name && HasLocalSheetId(it, localSheetId))
             .SingleOrDefault()
             ?? throw new NotImplementedException();
 
         var rangeReference = CellRangeReference.Parse(definedName.Text);
         var targetSheet = Sheets[rangeReference.SheetName ?? throw new NotImplementedException()];
         return new(targetSheet, rangeReference.TopLeft, rangeReference.BottomRight);
+    }
+
+    static bool HasLocalSheetId(Spreadsheet.DefinedName definedName, uint? localSheetId)
+    {
+        return localSheetId.HasValue
+            ? definedName.LocalSheetId?.Value == localSheetId.Value
+            : definedName.LocalSheetId == null;
     }
 
     /// <summary>

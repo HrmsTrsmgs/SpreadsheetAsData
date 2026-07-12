@@ -63,7 +63,7 @@ public class Worksheet
     /// このワークシートに対応する Open XML のシート要素を取得します。
     /// </summary>
     internal Spreadsheet.Sheet SheetTag =>
-        Book.WorkbookPart.Workbook.Descendants<Spreadsheet.Sheet>().Where(_ => _.Name == Name).Single();
+        Book.WorkbookPart.Workbook.Descendants<Spreadsheet.Sheet>().Where(it => it.Name == Name).Single();
 
     /// <summary>
     /// このワークシートに対応する Open XML のワークシートパートを取得します。
@@ -71,4 +71,17 @@ public class Worksheet
     internal Packaging.WorksheetPart WorksheetPart =>
         Book.WorkbookPart.GetPartById(SheetTag.Id?.Value ?? throw new InvalidOperationException()) as Packaging.WorksheetPart
             ?? throw new InvalidOperationException();
+
+    /// <summary>
+    /// ワークシートスコープの定義名をセル範囲として解決します。
+    /// </summary>
+    /// <param name="name">解決する定義名。</param>
+    /// <returns>定義名が表すセル範囲。</returns>
+    internal CellRange ResolveNamedRange(string name)
+    {
+        var localSheetId = (uint)Enumerable.Range(0, Book.Sheets.Count)
+            .Single(it => Book.Sheets[it].Name == Name);
+
+        return Book.ResolveNamedRange(name, localSheetId);
+    }
 }

@@ -49,7 +49,7 @@ public class Range参照のテスト : IDisposable
         tested.BottomRightCell.Should().BeSameAs(sheet2.Cells["F33"]);
     }
 
-    [Fact(Skip = 範囲参照API仕様保留理由)]
+    [Fact]
     public void Rangeはワークシートスコープの名前参照から名前付き範囲を取得します()
     {
         CellRange range = sheet2.Range["range_name"];

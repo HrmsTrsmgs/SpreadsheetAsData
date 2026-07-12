@@ -76,7 +76,8 @@ public class CellRangeCollection
         {
             if (CellRangeReference.TryParse(reference) is not { } rangeReference)
             {
-                return book?.ResolveNamedRange(reference)
+                return sheet?.ResolveNamedRange(reference)
+                    ?? book?.ResolveNamedRange(reference)
                     ?? throw new NotImplementedException();
             }
 
