@@ -98,15 +98,8 @@ public class CellCollection
     /// </summary>
     /// <param name="cellName">取得するセル参照。</param>
     /// <returns>指定したセル。</returns>
-    Cell GetItem(CellName cellName)
-    {
-        if (cache.TryGetValue(cellName, out var cachedCell))
-        {
-            return cachedCell;
-        }
-
-        var cell = (sheet ?? throw new NotImplementedException()).ResolveCell(cellName);
-        cache[cellName] = cell;
-        return cell;
-    }
+    Cell GetItem(CellName cellName) =>
+        cache.GetValue(
+            cellName,
+            () => (sheet ?? throw new NotImplementedException()).ResolveCell(cellName));
 }

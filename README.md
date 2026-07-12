@@ -47,6 +47,8 @@ Console.WriteLine(cell.ColumnIndex);
 * Open XML SDKの型や要素構造を、公開APIへできるだけ露出させない
 * Excelの全機能対応を先回りして目指さない
 * 利用側コードの意図が読み取れるAPIを優先する
+* C#/.NETの新しい安定版機能を積極的に採用する
+* 古い.NET環境への対応は、実利用や公開上の必要が明確になった時点で検討する
 * 実装、テスト、READMEの内容を矛盾させない
 * 変更しやすい小さな単位で機能を追加する
 
@@ -61,9 +63,10 @@ Console.WriteLine(cell.ColumnIndex);
 ## ビルドとテスト
 
 C#版は `CSharp/SpreadSheetAsData.sln` に含まれています。
-ライブラリ本体とテストプロジェクトは `net8.0` を対象にしています。
+ライブラリ本体とテストプロジェクトは `net10.0` を対象にしています。
+現在のコードはC# 14の構文を使用します。
 
-.NET 8 SDKが入っている環境では、次のコマンドでビルドとテストを実行できます。
+.NET 10 SDKが入っている環境では、次のコマンドでビルドとテストを実行できます。
 
 ```powershell
 dotnet build .\CSharp\SpreadSheetAsData.sln
@@ -105,7 +108,7 @@ DocFXが生成する `docs/api/csharp/metadata/` と `docs/api/csharp/_site/` �
 直近の再整備では、次を確認しています。
 
 * ビルド: 成功
-* テスト: 成功、71件成功
+* テスト: 成功、78件成功
 * XMLドキュメント生成: 成功、警告なし
 * `dotnet format --verify-no-changes`: 成功
 

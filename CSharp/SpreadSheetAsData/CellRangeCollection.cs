@@ -55,20 +55,10 @@ public class CellRangeCollection
     /// <param name="topLeft">範囲の左上セル参照。</param>
     /// <param name="bottomRight">範囲の右下セル参照。</param>
     /// <returns>指定したセル範囲。</returns>
-    public CellRange this[string topLeft, string bottomRight]
-    {
-        get
-        {
-            var key = (topLeft, bottomRight);
-            if (!cache.TryGetValue(key, out var range))
-            {
-                range = new CellRange(sheet, topLeft, bottomRight);
-                cache[key] = range;
-            }
-
-            return range;
-        }
-    }
+    public CellRange this[string topLeft, string bottomRight] =>
+        cache.GetValue(
+            (topLeft, bottomRight),
+            () => new CellRange(sheet, topLeft, bottomRight));
 
     /// <summary>
     /// A1形式または名前による範囲参照からセル範囲を取得します。
@@ -81,15 +71,11 @@ public class CellRangeCollection
         {
             if (CellRangeReference.TryParse(reference) is not { } rangeReference)
             {
-                if (!namedRangeCache.TryGetValue(reference, out var namedRange))
-                {
-                    namedRange = sheet?.ResolveNamedRange(reference)
+                return namedRangeCache.GetValue(
+                    reference,
+                    () => sheet?.ResolveNamedRange(reference)
                         ?? book?.ResolveNamedRange(reference)
-                        ?? throw new NotImplementedException();
-                    namedRangeCache[reference] = namedRange;
-                }
-
-                return namedRange;
+                        ?? throw new NotImplementedException());
             }
 
             if (rangeReference.SheetName != null)
