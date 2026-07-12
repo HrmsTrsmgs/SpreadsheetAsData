@@ -28,6 +28,7 @@ public class Workbook : IDisposable
     {
         Document = document;
         Range = new(this);
+        Cell = new(this);
     }
 
     /// <summary>
@@ -100,7 +101,7 @@ public class Workbook : IDisposable
     /// <summary>
     /// ブック上で有効なセル参照を解決するコレクションを取得します。
     /// </summary>
-    public CellCollection Cell => throw new NotImplementedException();
+    public CellCollection Cell { get; }
 
     /// <summary>
     /// 指定した位置のワークシートを取得します。

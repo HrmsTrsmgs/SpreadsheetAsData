@@ -7,14 +7,19 @@ namespace Marimo.SpreadSheetAsData;
 public class CellCollection
 {
     /// <summary>
-    /// Open XML のセル探索と空白セル作成に使用するワークシートです。
+    /// ブックスコープの名前参照を解決するためのブックです。
     /// </summary>
-    readonly Worksheet sheet;
+    readonly Workbook? book;
 
     /// <summary>
     /// 同じセル参照に対して同じ <see cref="Cell"/> インスタンスを返すためのキャッシュです。
     /// </summary>
     readonly Dictionary<CellName, Cell> cache = new();
+
+    /// <summary>
+    /// Open XML のセル探索と空白セル作成に使用するワークシートです。
+    /// </summary>
+    readonly Worksheet? sheet;
 
     /// <summary>
     /// 指定したワークシートのセルコレクションを作成します。
@@ -26,12 +31,31 @@ public class CellCollection
     }
 
     /// <summary>
+    /// 指定したブックのセルコレクションを作成します。
+    /// </summary>
+    /// <param name="book">名前参照を解決するブック。</param>
+    internal CellCollection(Workbook book)
+    {
+        this.book = book;
+    }
+
+    /// <summary>
     /// A1 形式のセル参照でセルを取得します。
     /// </summary>
     /// <param name="cellReference">A1 形式のセル参照。</param>
     /// <returns>指定したセル。</returns>
-    public Cell this[string cellReference] =>
-        GetItem(CellName.Parse(cellReference));
+    public Cell this[string cellReference]
+    {
+        get
+        {
+            if (book != null)
+            {
+                return book.ResolveNamedRange(cellReference).TopLeftCell;
+            }
+
+            return GetItem(CellName.Parse(cellReference));
+        }
+    }
 
     /// <summary>
     /// 列番号と行番号でセルを取得します。
@@ -56,7 +80,7 @@ public class CellCollection
 
         var cellReference = cellName.ToString();
         var cellXml =
-            from xml in sheet.WorksheetPart.Worksheet.Descendants<Spreadsheet.Cell>()
+            from xml in (sheet ?? throw new NotImplementedException()).WorksheetPart.Worksheet.Descendants<Spreadsheet.Cell>()
             where xml.CellReference == cellReference
             select xml;
 

@@ -24,7 +24,7 @@ public class Cell参照のテスト : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    [Fact(Skip = セル名参照API仕様保留理由)]
+    [Fact]
     public void Cellはブックスコープの単一セル名からセルを取得します()
     {
         Cell tested = book.Cell["book_cell"];
