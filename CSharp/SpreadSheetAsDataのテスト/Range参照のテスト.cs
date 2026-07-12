@@ -68,20 +68,20 @@ public class Range参照のテスト : IDisposable
         sheet2.Range["range_name"].Should().BeSameAs(sheet2.Range["range_name"]);
     }
 
-    [Fact(Skip = 範囲参照API仕様保留理由)]
+    [Fact]
     public void Rangeは同じA1形式の範囲参照から取得した範囲を同一オブジェクトとして扱います()
     {
         sheet2.Range["C32:D36"].Should().BeSameAs(sheet2.Range["C32:D36"]);
     }
 
-    [Fact(Skip = 範囲参照API仕様保留理由)]
+    [Fact]
     public void Rangeは名前参照と同じ位置を指すA1形式の範囲参照を別オブジェクトとして扱います()
     {
         book.Range["book_range"].Should().NotBeSameAs(sheet2.Range["C32", "D36"]);
         sheet2.Range["range_name"].Should().NotBeSameAs(sheet2.Range["B23", "C27"]);
     }
 
-    [Fact(Skip = 範囲参照API仕様保留理由)]
+    [Fact]
     public void NameはA1形式の範囲参照から取得した範囲ではnullを返します()
     {
         var tested = sheet2.Range["C32:D36"];
@@ -99,7 +99,7 @@ public class Range参照のテスト : IDisposable
         cell.Name.Should().Be("book_cell");
     }
 
-    [Fact(Skip = 範囲参照API仕様保留理由)]
+    [Fact]
     public void Nameはワークシートスコープの名前参照から取得した範囲では名前を返します()
     {
         var range = sheet2.Range["range_name"];

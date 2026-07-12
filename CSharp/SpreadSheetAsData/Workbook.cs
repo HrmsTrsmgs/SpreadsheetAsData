@@ -87,7 +87,7 @@ public class Workbook : IDisposable
             targetSheet,
             rangeReference.TopLeft,
             rangeReference.BottomRight,
-            name: localSheetId == null ? name : null);
+            name);
     }
 
     static bool HasLocalSheetId(Spreadsheet.DefinedName definedName, uint? localSheetId)
