@@ -14,7 +14,7 @@ public class Cell参照のテスト : IDisposable
 
     public Cell参照のテスト()
     {
-        book = Workbook.Open(@"TestData\テーブル.xlsx");
+        book = Workbook.Open(@"TestData\定義名.xlsx");
         sheet2 = book.Sheets["Sheet2"];
     }
 

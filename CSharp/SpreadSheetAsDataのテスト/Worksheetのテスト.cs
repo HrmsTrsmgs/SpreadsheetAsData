@@ -149,6 +149,12 @@ public class Worksheetのテスト : IDisposable
     }
 
     [Fact]
+    public void Rangeは単一セル参照を単一セル範囲として取得します()
+    {
+        sheet1.Range["A1"].ToString().Should().Be("A1:A1");
+    }
+
+    [Fact]
     public void Rangeは2引数を指定して同じ範囲を指定した場合に同じセルを返します()
     {
         sheet1.Range["A1", "C3"].Should().BeSameAs(sheet1.Range["A1", "C3"]);

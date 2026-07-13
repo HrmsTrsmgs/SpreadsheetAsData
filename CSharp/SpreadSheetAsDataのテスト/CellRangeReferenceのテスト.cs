@@ -67,11 +67,31 @@ public class CellRangeReferenceのテスト
     }
 
     [Fact]
+    public void TryParseは単一セル参照を単一セル範囲として変換します()
+    {
+        CellRangeReference.TryParse("A1", out var tested).Should().BeTrue();
+
+        tested.SheetName.Should().BeNull();
+        tested.TopLeft.Should().Be(CellName.Parse("A1"));
+        tested.BottomRight.Should().Be(CellName.Parse("A1"));
+    }
+
+    [Fact]
     public void TryParseはシート名付き絶対セル参照を相対参照の単一セル範囲へ正規化します()
     {
         CellRangeReference.TryParse("Sheet1!$A$1", out var tested).Should().BeTrue();
 
         tested.SheetName.Should().Be("Sheet1");
+        tested.TopLeft.Should().Be(CellName.Parse("A1"));
+        tested.BottomRight.Should().Be(CellName.Parse("A1"));
+    }
+
+    [Fact]
+    public void TryParseは絶対セル参照を相対参照の単一セル範囲へ正規化します()
+    {
+        CellRangeReference.TryParse("$A$1", out var tested).Should().BeTrue();
+
+        tested.SheetName.Should().BeNull();
         tested.TopLeft.Should().Be(CellName.Parse("A1"));
         tested.BottomRight.Should().Be(CellName.Parse("A1"));
     }

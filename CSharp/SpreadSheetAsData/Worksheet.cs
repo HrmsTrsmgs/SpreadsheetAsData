@@ -108,4 +108,18 @@ public class Worksheet
 
         return Book.ResolveNamedRange(name, localSheetId);
     }
+
+    /// <summary>
+    /// ワークシートスコープの定義名をセル範囲として解決できるか確認します。
+    /// </summary>
+    /// <param name="name">解決する定義名。</param>
+    /// <param name="range">定義名が見つかった場合のセル範囲。</param>
+    /// <returns>定義名を解決できた場合は true。</returns>
+    internal bool TryResolveNamedRange(string name, out CellRange range)
+    {
+        var localSheetId = (uint)Enumerable.Range(0, Book.Sheets.Count)
+            .Single(it => Book.Sheets[it].Name == Name);
+
+        return Book.TryResolveNamedRange(name, localSheetId, out range);
+    }
 }

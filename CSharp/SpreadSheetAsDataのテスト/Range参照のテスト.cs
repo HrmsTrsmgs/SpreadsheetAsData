@@ -13,7 +13,7 @@ public class Range参照のテスト : IDisposable
 
     public Range参照のテスト()
     {
-        book = Workbook.Open(@"TestData\テーブル.xlsx");
+        book = Workbook.Open(@"TestData\定義名.xlsx");
         sheet2 = book.Sheets["Sheet2"];
     }
 
@@ -38,6 +38,16 @@ public class Range参照のテスト : IDisposable
 
         tested.TopLeftCell.Should().BeSameAs(sheet2.Cells["C32"]);
         tested.BottomRightCell.Should().BeSameAs(sheet2.Cells["D36"]);
+    }
+
+    [Fact]
+    public void RangeはA1形式のセル参照と同じ名前の定義名を優先します()
+    {
+        CellRange tested = book.Range["A1"];
+
+        tested.Name.Should().Be("A1");
+        tested.TopLeftCell.Should().BeSameAs(sheet2.Cells["B23"]);
+        tested.BottomRightCell.Should().BeSameAs(sheet2.Cells["C27"]);
     }
 
     [Fact]

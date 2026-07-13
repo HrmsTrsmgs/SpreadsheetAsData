@@ -80,13 +80,14 @@ public class CellRangeCollection
     {
         get
         {
+            if (TryResolveNamedRange(reference, out var namedRange))
+            {
+                return namedRange;
+            }
+
             if (!CellRangeReference.TryParse(reference, out var rangeReference))
             {
-                return namedRangeCache.GetValue(
-                    reference,
-                    () => sheet?.ResolveNamedRange(reference)
-                        ?? book?.ResolveNamedRange(reference)
-                        ?? throw new NotImplementedException());
+                throw new NotImplementedException();
             }
 
             if (rangeReference.SheetName != null)
@@ -101,5 +102,35 @@ public class CellRangeCollection
 
             return this[rangeReference.TopLeft, rangeReference.BottomRight];
         }
+    }
+
+    /// <summary>
+    /// 名前付き範囲が存在する場合だけ、A1形式の解析より優先して解決します。
+    /// </summary>
+    /// <param name="reference">解決する名前参照。</param>
+    /// <param name="range">名前参照が見つかった場合のセル範囲。</param>
+    /// <returns>名前参照を解決できた場合は true。</returns>
+    bool TryResolveNamedRange(string reference, out CellRange range)
+    {
+        if (namedRangeCache.TryGetValue(reference, out var cachedRange))
+        {
+            range = cachedRange;
+            return true;
+        }
+
+        if (sheet?.TryResolveNamedRange(reference, out var sheetRange) == true)
+        {
+            range = namedRangeCache.GetValue(reference, () => sheetRange);
+            return true;
+        }
+
+        if (book?.TryResolveNamedRange(reference, out var bookRange) == true)
+        {
+            range = namedRangeCache.GetValue(reference, () => bookRange);
+            return true;
+        }
+
+        range = default!;
+        return false;
     }
 }

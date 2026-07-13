@@ -109,7 +109,7 @@ DocFXが生成する `docs/api/csharp/metadata/` と `docs/api/csharp/_site/` �
 直近の再整備では、次を確認しています。
 
 * ビルド: 成功
-* テスト: 成功、114件成功
+* テスト: 成功、118件成功
 * XMLドキュメント生成: 成功、警告なし
 * `dotnet format --verify-no-changes`: 成功
 

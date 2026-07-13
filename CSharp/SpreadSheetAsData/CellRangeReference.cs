@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 namespace Marimo.SpreadSheetAsData;
 /// <summary>
@@ -45,14 +46,6 @@ readonly partial struct CellRangeReference
             : throw new NotImplementedException();
 
     [GeneratedRegex(
-@"^(?:(?<sheet>[^!]*)!)?(?<startCell>[^!:]*):(?<endCell>[^!:]*)$")]
-    private static partial Regex CellRangeReferencePattern();
-
-    [GeneratedRegex(
-@"^(?<sheet>[^!]*)!(?<cell>[^!:]*)$")]
-    private static partial Regex SingleCellReferencePattern();
-
-    [GeneratedRegex(
 @"^\$?[A-Z]+\$?\d+$")]
     private static partial Regex CellReferencePattern();
 
@@ -66,67 +59,105 @@ readonly partial struct CellRangeReference
     {
         result = default;
 
-        var match = CellRangeReferencePattern().Match(reference);
-        if (match.Success)
-        {
-            var sheetName = match.Groups["sheet"].Success
-                ? match.Groups["sheet"].Value
-                : null;
-
-            var startCellReference = match.Groups["startCell"].Value;
-            var endCellReference = match.Groups["endCell"].Value;
-            if (!CellReferencePattern().IsMatch(startCellReference)
-                || !CellReferencePattern().IsMatch(endCellReference))
-            {
-                return false;
-            }
-
-            var normalizedStartCellReference = startCellReference.Replace("$", "");
-            var normalizedEndCellReference = endCellReference.Replace("$", "");
-
-            CellName topLeft;
-            CellName bottomRight;
-            try
-            {
-                topLeft = CellName.Parse(normalizedStartCellReference);
-                bottomRight = CellName.Parse(normalizedEndCellReference);
-            }
-            catch (FormatException)
-            {
-                return false;
-            }
-
-            result = new(
-                sheetName,
-                topLeft,
-                bottomRight);
-            return true;
-        }
-
-        var singleCellMatch = SingleCellReferencePattern().Match(reference);
-        if (!singleCellMatch.Success)
+        if (!CellRangeReferenceText.TryCreate(reference, out var referenceText))
         {
             return false;
         }
 
-        var singleCellReference = singleCellMatch.Groups["cell"].Value;
-        if (!CellReferencePattern().IsMatch(singleCellReference))
+        if (!TryParseCellReference(referenceText.StartCellReference, out var topLeft)
+            || !TryParseCellReference(referenceText.EndCellReference, out var bottomRight))
+        {
+            return false;
+        }
+
+        result = new(
+            referenceText.SheetName,
+            topLeft,
+            bottomRight);
+        return true;
+    }
+
+    static bool TryParseCellReference(string reference, out CellName result)
+    {
+        result = default;
+
+        if (!CellReferencePattern().IsMatch(reference))
         {
             return false;
         }
 
         try
         {
-            var cell = CellName.Parse(singleCellReference.Replace("$", ""));
-            result = new(
-                singleCellMatch.Groups["sheet"].Value,
-                cell,
-                cell);
+            result = CellName.Parse(reference.Replace("$", ""));
             return true;
         }
         catch (FormatException)
         {
             return false;
         }
+    }
+
+    /// <summary>
+    /// 正規表現の一致結果を、範囲参照として扱いやすい文字列へ成形します。
+    /// </summary>
+    sealed partial class CellRangeReferenceText
+    {
+        readonly Match match;
+
+        CellRangeReferenceText(Match match)
+        {
+            this.match = match;
+        }
+
+        /// <summary>
+        /// シート名を取得します。
+        /// </summary>
+        public string? SheetName => OptionalGroupValue("sheet");
+
+        /// <summary>
+        /// 始点セルの参照文字列を取得します。
+        /// </summary>
+        public string StartCellReference => GroupValue("startCell");
+
+        /// <summary>
+        /// 終点セルの参照文字列を取得します。
+        /// </summary>
+        public string EndCellReference => OptionalGroupValue("endCell") ?? StartCellReference;
+
+        /// <summary>
+        /// 参照文字列を正規表現で読み取り、範囲参照の文字列要素として取得します。
+        /// </summary>
+        /// <param name="reference">A1形式の範囲参照。</param>
+        /// <param name="result">読み取れた場合は範囲参照の文字列要素。</param>
+        /// <returns>正規表現で読み取れた場合はtrue。</returns>
+        public static bool TryCreate(
+            string reference,
+            [NotNullWhen(true)] out CellRangeReferenceText? result)
+        {
+            var match = CellRangeReferencePattern().Match(reference);
+
+            if (!match.Success)
+            {
+                result = null;
+                return false;
+            }
+
+            result = new(match);
+            return true;
+        }
+
+        string GroupValue(string groupName) => match.Groups[groupName].Value;
+
+        string? OptionalGroupValue(string groupName)
+        {
+            var group = match.Groups[groupName];
+            return group.Success
+                ? group.Value
+                : null;
+        }
+
+        [GeneratedRegex(
+@"^(?:(?<sheet>[^!]*)!)?(?<startCell>[^!:]*)(?::(?<endCell>[^!:]*))?$")]
+        private static partial Regex CellRangeReferencePattern();
     }
 }

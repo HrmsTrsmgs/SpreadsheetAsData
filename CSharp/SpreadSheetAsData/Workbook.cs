@@ -60,10 +60,17 @@ public class Workbook : IDisposable
     /// </summary>
     /// <param name="name">解決する定義名。</param>
     /// <returns>定義名が表すセル範囲。</returns>
-    internal CellRange ResolveNamedRange(string name)
-    {
-        return ResolveNamedRange(name, localSheetId: null);
-    }
+    internal CellRange ResolveNamedRange(string name) =>
+        ResolveNamedRange(name, localSheetId: null);
+
+    /// <summary>
+    /// ブックスコープの定義名をセル範囲として解決できるか確認します。
+    /// </summary>
+    /// <param name="name">解決する定義名。</param>
+    /// <param name="range">定義名が見つかった場合のセル範囲。</param>
+    /// <returns>定義名を解決できた場合は true。</returns>
+    internal bool TryResolveNamedRange(string name, out CellRange range) =>
+        TryResolveNamedRange(name, localSheetId: null, out range);
 
     /// <summary>
     /// 指定したワークシートスコープの定義名をセル範囲として解決します。
@@ -74,21 +81,47 @@ public class Workbook : IDisposable
     internal CellRange ResolveNamedRange(string name, uint localSheetId) =>
         ResolveNamedRange(name, (uint?)localSheetId);
 
+    /// <summary>
+    /// 指定したワークシートスコープの定義名をセル範囲として解決できるか確認します。
+    /// </summary>
+    /// <param name="name">解決する定義名。</param>
+    /// <param name="localSheetId">定義名が属するワークシートの 0 始まりの位置。</param>
+    /// <param name="range">定義名が見つかった場合のセル範囲。</param>
+    /// <returns>定義名を解決できた場合は true。</returns>
+    internal bool TryResolveNamedRange(string name, uint localSheetId, out CellRange range) =>
+        TryResolveNamedRange(name, (uint?)localSheetId, out range);
+
     CellRange ResolveNamedRange(string name, uint? localSheetId)
     {
-        var definedName = WorkbookPart.Workbook.DefinedNames?.Elements<Spreadsheet.DefinedName>()
-            .Where(it => it.Name == name && HasLocalSheetId(it, localSheetId))
-            .SingleOrDefault()
-            ?? throw new NotImplementedException();
+        return TryResolveNamedRange(name, localSheetId, out var range)
+            ? range
+            : throw new NotImplementedException();
+    }
+
+    bool TryResolveNamedRange(string name, uint? localSheetId, out CellRange range)
+    {
+        var definedName = FindDefinedName(name, localSheetId);
+
+        if (definedName == null)
+        {
+            range = default!;
+            return false;
+        }
 
         var rangeReference = CellRangeReference.Parse(definedName.Text);
         var targetSheet = Sheets[rangeReference.SheetName ?? throw new NotImplementedException()];
-        return new(
+        range = new(
             targetSheet,
             rangeReference.TopLeft,
             rangeReference.BottomRight,
             name);
+        return true;
     }
+
+    Spreadsheet.DefinedName? FindDefinedName(string name, uint? localSheetId) =>
+        WorkbookPart.Workbook.DefinedNames?.Elements<Spreadsheet.DefinedName>()
+            .Where(it => it.Name == name && HasLocalSheetId(it, localSheetId))
+            .SingleOrDefault();
 
     static bool HasLocalSheetId(Spreadsheet.DefinedName definedName, uint? localSheetId)
     {
