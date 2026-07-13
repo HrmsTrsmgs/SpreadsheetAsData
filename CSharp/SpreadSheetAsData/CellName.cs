@@ -69,7 +69,7 @@ public partial struct CellName
         ColumnIndex = columnIndex;
         RowIndex = rowIndex;
         if (ColumnIndex is < 1 or > MaxColumnIndex
-            || RowIndex is > MaxRowIndex)
+            || RowIndex is < 1 or > MaxRowIndex)
         {
             throw new FormatException();
         }
