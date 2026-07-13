@@ -76,10 +76,23 @@ readonly partial struct CellRangeReference
                 return null;
             }
 
+            var normalizedStartCellReference = startCellReference.Replace("$", "");
+            var normalizedEndCellReference = endCellReference.Replace("$", "");
+
+            try
+            {
+                CellName.Parse(normalizedStartCellReference);
+                CellName.Parse(normalizedEndCellReference);
+            }
+            catch (FormatException)
+            {
+                return null;
+            }
+
             return new(
                 sheetName,
-                startCellReference.Replace("$", ""),
-                endCellReference.Replace("$", ""));
+                normalizedStartCellReference,
+                normalizedEndCellReference);
         }
 
         var singleCellMatch = SingleCellReferencePattern().Match(reference);

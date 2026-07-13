@@ -27,7 +27,7 @@ public class CellRangeReferenceのテスト
         CellRangeReference.TryParse(reference).Should().BeNull();
     }
 
-    [Theory(Skip = A1範囲参照の妥当性検証保留理由)]
+    [Theory]
     [InlineData("A0:B1")]
     [InlineData("A1:B0")]
     [InlineData("XFE1:XFE2")]
