@@ -73,7 +73,7 @@ public class CellNameのテスト
         ).Should().Throw<FormatException>();
     }
 
-    [Fact(Skip = セル参照のゼロ行列検証保留理由)]
+    [Fact]
     public void Parseは行番号が0のセル参照を変換しません()
     {
         var action = () => CellName.Parse("A0");
