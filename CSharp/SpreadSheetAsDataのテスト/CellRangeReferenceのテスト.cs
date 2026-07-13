@@ -18,6 +18,15 @@ public class CellRangeReferenceのテスト
         CellRangeReference.TryParse(reference).Should().BeNull();
     }
 
+    [Theory]
+    [InlineData("Sheet1!abc")]
+    [InlineData("Sheet1!A$$1")]
+    public void TryParseはA1形式でない単一セル範囲参照を変換しません(
+        string reference)
+    {
+        CellRangeReference.TryParse(reference).Should().BeNull();
+    }
+
     [Theory(Skip = A1範囲参照の妥当性検証保留理由)]
     [InlineData("A0:B1")]
     [InlineData("A1:B0")]

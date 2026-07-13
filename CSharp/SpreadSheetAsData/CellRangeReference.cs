@@ -88,11 +88,15 @@ readonly partial struct CellRangeReference
             return null;
         }
 
-        var singleCellReference = singleCellMatch.Groups["cell"].Value.Replace("$", "");
+        var singleCellReference = singleCellMatch.Groups["cell"].Value;
+        if (!CellReferencePattern().IsMatch(singleCellReference))
+        {
+            return null;
+        }
 
         return new(
             singleCellMatch.Groups["sheet"].Value,
-            singleCellReference,
-            singleCellReference);
+            singleCellReference.Replace("$", ""),
+            singleCellReference.Replace("$", ""));
     }
 }
