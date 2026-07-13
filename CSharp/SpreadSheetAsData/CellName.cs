@@ -51,7 +51,8 @@ public partial struct CellName
         ColumnIndex = GetColumnIndex(match.Groups["column"].Value);
         RowIndex = uint.Parse(match.Groups["row"].Value);
 
-        if (RowIndex < 1 || MaxRowIndex < RowIndex || MaxColumnIndex < ColumnIndex)
+        if (RowIndex is < 1 or > MaxRowIndex
+            || ColumnIndex is > MaxColumnIndex)
         {
             throw new FormatException();
         }
@@ -67,7 +68,8 @@ public partial struct CellName
     {
         ColumnIndex = columnIndex;
         RowIndex = rowIndex;
-        if (MaxRowIndex < RowIndex || MaxColumnIndex < ColumnIndex)
+        if (ColumnIndex is < 1 or > MaxColumnIndex
+            || RowIndex is > MaxRowIndex)
         {
             throw new FormatException();
         }

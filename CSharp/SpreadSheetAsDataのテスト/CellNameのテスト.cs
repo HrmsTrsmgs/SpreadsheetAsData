@@ -103,7 +103,7 @@ public class CellNameのテスト
         ).Should().Throw<FormatException>();
     }
 
-    [Fact(Skip = セル参照のゼロ行列検証保留理由)]
+    [Fact]
     public void コンストラクターは列番号が0の場合に失敗します()
     {
         var action = () => new CellName(0, 1);
