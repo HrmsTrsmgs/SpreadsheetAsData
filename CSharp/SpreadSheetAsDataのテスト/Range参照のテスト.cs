@@ -6,8 +6,6 @@ namespace Marimo.SpreadSheetAsData.Test;
 
 public class Range参照のテスト : IDisposable
 {
-    const string 範囲参照API仕様保留理由 = "API仕様として先に固定。Greenは範囲参照の実装単位ごとに解除する。";
-
     readonly Workbook book;
     readonly Worksheet sheet2;
 

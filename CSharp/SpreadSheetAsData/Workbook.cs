@@ -141,6 +141,12 @@ public class Workbook : IDisposable
     public CellCollection Cell { get; }
 
     /// <summary>
+    /// ブック内の Excel テーブルを取得するコレクションを取得します。
+    /// </summary>
+    public TableCollection Tables =>
+        throw new NotImplementedException();
+
+    /// <summary>
     /// 指定した位置のワークシートを取得します。
     /// </summary>
     /// <param name="index">取得するワークシートの 0 始まりの位置。</param>

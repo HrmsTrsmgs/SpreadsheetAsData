@@ -6,9 +6,6 @@ namespace Marimo.SpreadSheetAsData.Test;
 
 public class Cell参照のテスト : IDisposable
 {
-    const string セル名参照API仕様保留理由 =
-        "API仕様として先に固定。Greenはセル名参照の実装単位ごとに解除する。";
-
     readonly Workbook book;
     readonly Worksheet sheet2;
 
