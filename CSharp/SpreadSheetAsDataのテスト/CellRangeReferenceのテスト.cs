@@ -9,7 +9,7 @@ public class CellRangeReferenceのテスト
     const string A1範囲参照の妥当性検証保留理由 =
         "A1形式とExcelで使用可能な範囲の検証をCellNameへ集約するときに解除する。";
 
-    [Theory(Skip = A1範囲参照の妥当性検証保留理由)]
+    [Theory]
     [InlineData("abc:def")]
     [InlineData("A$$1:B2")]
     public void TryParseはA1形式でないセルを含む範囲参照を変換しません(
