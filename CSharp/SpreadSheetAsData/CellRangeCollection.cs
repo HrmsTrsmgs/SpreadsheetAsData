@@ -13,7 +13,7 @@ public class CellRangeCollection
     /// <summary>
     /// 同じ範囲指定に対して同じ <see cref="CellRange"/> インスタンスを返すためのキャッシュです。
     /// </summary>
-    readonly Dictionary<(string TopLeft, string BottomRight), CellRange> cache = [];
+    readonly Dictionary<(CellName TopLeft, CellName BottomRight), CellRange> cache = [];
 
     /// <summary>
     /// 同じ名前参照に対して同じ <see cref="CellRange"/> インスタンスを返すためのキャッシュです。
@@ -56,6 +56,17 @@ public class CellRangeCollection
     /// <param name="bottomRight">範囲の右下セル参照。</param>
     /// <returns>指定したセル範囲。</returns>
     public CellRange this[string topLeft, string bottomRight] =>
+        this[
+            CellName.Parse(topLeft),
+            CellName.Parse(bottomRight)];
+
+    /// <summary>
+    /// 左上セルと右下セルを指定してセル範囲を取得します。
+    /// </summary>
+    /// <param name="topLeft">範囲の左上セル参照。</param>
+    /// <param name="bottomRight">範囲の右下セル参照。</param>
+    /// <returns>指定したセル範囲。</returns>
+    public CellRange this[CellName topLeft, CellName bottomRight] =>
         cache.GetValue(
             (topLeft, bottomRight),
             () => new CellRange(sheet, topLeft, bottomRight));
@@ -81,7 +92,10 @@ public class CellRangeCollection
             if (rangeReference.SheetName != null)
             {
                 return book != null
-                    ? new(book.Sheets[rangeReference.SheetName], rangeReference.TopLeft, rangeReference.BottomRight)
+                    ? new(
+                        book.Sheets[rangeReference.SheetName],
+                        rangeReference.TopLeft,
+                        rangeReference.BottomRight)
                     : throw new NotImplementedException();
             }
 

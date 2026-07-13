@@ -94,6 +94,13 @@ public class CellCollection
         GetItem(new CellName(columnIndex, rowIndex));
 
     /// <summary>
+    /// セル参照でセルを取得します。
+    /// </summary>
+    /// <param name="cellName">取得するセル参照。</param>
+    /// <returns>指定したセル。</returns>
+    public Cell this[CellName cellName] => GetItem(cellName);
+
+    /// <summary>
     /// キャッシュを確認してから、ワークシートへセル解決を委譲します。
     /// </summary>
     /// <param name="cellName">取得するセル参照。</param>

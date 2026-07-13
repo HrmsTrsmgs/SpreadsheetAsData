@@ -44,6 +44,30 @@ public class CellNameのテスト
     }
 
     [Fact]
+    public void 同じセル位置は等値演算子で同一として扱われます()
+    {
+        var tested = CellName.Parse("A1") == CellName.Parse("A1");
+
+        tested.Should().BeTrue();
+    }
+
+    [Fact]
+    public void 違うセル位置は等値演算子で同一ではないとして扱われます()
+    {
+        var tested = CellName.Parse("A2") == CellName.Parse("A1");
+
+        tested.Should().BeFalse();
+    }
+
+    [Fact]
+    public void 違うセル位置は非等値演算子で同一ではないとして扱われます()
+    {
+        var tested = CellName.Parse("A2") != CellName.Parse("A1");
+
+        tested.Should().BeTrue();
+    }
+
+    [Fact]
     public void 指定したセルの位置を一意としてハッシュのキーとして使えます()
     {
         var set = new HashSet<CellName>

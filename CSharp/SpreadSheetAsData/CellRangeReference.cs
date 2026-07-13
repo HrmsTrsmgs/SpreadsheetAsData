@@ -14,12 +14,12 @@ readonly partial struct CellRangeReference
     /// <summary>
     /// 左上セル参照を取得します。
     /// </summary>
-    public string TopLeft { get; }
+    public CellName TopLeft { get; }
 
     /// <summary>
     /// 右下セル参照を取得します。
     /// </summary>
-    public string BottomRight { get; }
+    public CellName BottomRight { get; }
 
     /// <summary>
     /// 左上セル参照と右下セル参照からセル範囲参照を作成します。
@@ -27,7 +27,7 @@ readonly partial struct CellRangeReference
     /// <param name="sheetName">シート名。</param>
     /// <param name="topLeft">左上セル参照。</param>
     /// <param name="bottomRight">右下セル参照。</param>
-    CellRangeReference(string? sheetName, string topLeft, string bottomRight)
+    CellRangeReference(string? sheetName, CellName topLeft, CellName bottomRight)
     {
         SheetName = sheetName;
         TopLeft = topLeft;
@@ -84,10 +84,12 @@ readonly partial struct CellRangeReference
             var normalizedStartCellReference = startCellReference.Replace("$", "");
             var normalizedEndCellReference = endCellReference.Replace("$", "");
 
+            CellName topLeft;
+            CellName bottomRight;
             try
             {
-                CellName.Parse(normalizedStartCellReference);
-                CellName.Parse(normalizedEndCellReference);
+                topLeft = CellName.Parse(normalizedStartCellReference);
+                bottomRight = CellName.Parse(normalizedEndCellReference);
             }
             catch (FormatException)
             {
@@ -96,8 +98,8 @@ readonly partial struct CellRangeReference
 
             result = new(
                 sheetName,
-                normalizedStartCellReference,
-                normalizedEndCellReference);
+                topLeft,
+                bottomRight);
             return true;
         }
 
@@ -113,10 +115,18 @@ readonly partial struct CellRangeReference
             return false;
         }
 
-        result = new(
-            singleCellMatch.Groups["sheet"].Value,
-            singleCellReference.Replace("$", ""),
-            singleCellReference.Replace("$", ""));
-        return true;
+        try
+        {
+            var cell = CellName.Parse(singleCellReference.Replace("$", ""));
+            result = new(
+                singleCellMatch.Groups["sheet"].Value,
+                cell,
+                cell);
+            return true;
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
     }
 }

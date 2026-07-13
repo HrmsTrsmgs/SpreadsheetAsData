@@ -47,6 +47,7 @@ Console.WriteLine(cell.ColumnIndex);
 * Open XML SDKの型や要素構造を、公開APIへできるだけ露出させない
 * Excelの全機能対応を先回りして目指さない
 * 利用側コードの意図が読み取れるAPIを優先する
+* v0.1の再整備中は、API互換性より設計の一貫性を優先する
 * C#/.NETの新しい安定版機能を積極的に採用する
 * 古い.NET環境への対応は、実利用や公開上の必要が明確になった時点で検討する
 * 実装、テスト、READMEの内容を矛盾させない
@@ -108,7 +109,7 @@ DocFXが生成する `docs/api/csharp/metadata/` と `docs/api/csharp/_site/` �
 直近の再整備では、次を確認しています。
 
 * ビルド: 成功
-* テスト: 成功、78件成功
+* テスト: 成功、114件成功
 * XMLドキュメント生成: 成功、警告なし
 * `dotnet format --verify-no-changes`: 成功
 

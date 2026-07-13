@@ -4,7 +4,7 @@ namespace Marimo.SpreadSheetAsData;
 /// <summary>
 /// A1 形式のセル参照を表します。
 /// </summary>
-public partial struct CellName
+public partial struct CellName : IEquatable<CellName>
 {
     /// <summary>
     /// Excel ワークシートで使用できる最大行番号です。
@@ -82,6 +82,44 @@ public partial struct CellName
     /// <returns>変換したセル参照。</returns>
     /// <exception cref="FormatException">文字列がA1形式でない、または使用可能範囲を超えています。</exception>
     public static CellName Parse(string name) => new(name);
+
+    /// <summary>
+    /// 2つのセル参照が同じ位置を表すかどうかを返します。
+    /// </summary>
+    /// <param name="left">比較する左辺のセル参照。</param>
+    /// <param name="right">比較する右辺のセル参照。</param>
+    /// <returns>同じ位置を表す場合は true。</returns>
+    public static bool operator ==(CellName left, CellName right) => left.Equals(right);
+
+    /// <summary>
+    /// 2つのセル参照が異なる位置を表すかどうかを返します。
+    /// </summary>
+    /// <param name="left">比較する左辺のセル参照。</param>
+    /// <param name="right">比較する右辺のセル参照。</param>
+    /// <returns>異なる位置を表す場合は true。</returns>
+    public static bool operator !=(CellName left, CellName right) => !left.Equals(right);
+
+    /// <summary>
+    /// 指定したセル参照が同じ位置を表すかどうかを返します。
+    /// </summary>
+    /// <param name="other">比較するセル参照。</param>
+    /// <returns>同じ位置を表す場合は true。</returns>
+    public readonly bool Equals(CellName other) =>
+        ColumnIndex == other.ColumnIndex && RowIndex == other.RowIndex;
+
+    /// <summary>
+    /// 指定したオブジェクトが同じ位置のセル参照かどうかを返します。
+    /// </summary>
+    /// <param name="obj">比較するオブジェクト。</param>
+    /// <returns>同じ位置のセル参照である場合は true。</returns>
+    public override readonly bool Equals(object? obj) =>
+        obj is CellName other && Equals(other);
+
+    /// <summary>
+    /// セル位置からハッシュコードを返します。
+    /// </summary>
+    /// <returns>セル位置を表すハッシュコード。</returns>
+    public override readonly int GetHashCode() => HashCode.Combine(ColumnIndex, RowIndex);
 
     /// <summary>
     /// 列名を取得します。

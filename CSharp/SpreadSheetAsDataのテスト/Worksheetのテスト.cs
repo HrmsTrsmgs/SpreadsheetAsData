@@ -130,6 +130,18 @@ public class Worksheetのテスト : IDisposable
     }
 
     [Fact]
+    public void CellsはCellNameを指定してセル取得します()
+    {
+        sheet1.Cells[CellName.Parse("C3")].Reference.Should().Be("C3");
+    }
+
+    [Fact]
+    public void CellsはCellNameと文字列で同じセルの場合は同じオブジェクトを取得します()
+    {
+        sheet1.Cells[CellName.Parse("A1")].Should().BeSameAs(sheet1.Cells["A1"]);
+    }
+
+    [Fact]
     public void Rangeは2引数を指定して範囲を取得します()
     {
         sheet1.Range["A1", "C3"].ToString().Should().Be("A1:C3");
@@ -140,5 +152,22 @@ public class Worksheetのテスト : IDisposable
     public void Rangeは2引数を指定して同じ範囲を指定した場合に同じセルを返します()
     {
         sheet1.Range["A1", "C3"].Should().BeSameAs(sheet1.Range["A1", "C3"]);
+    }
+
+    [Fact]
+    public void RangeはCellNameを指定して範囲を取得します()
+    {
+        sheet1.Range[CellName.Parse("A1"), CellName.Parse("C3")]
+            .ToString()
+            .Should()
+            .Be("A1:C3");
+    }
+
+    [Fact]
+    public void RangeはCellNameと文字列で同じ範囲の場合に同じオブジェクトを取得します()
+    {
+        sheet1.Range[CellName.Parse("A1"), CellName.Parse("C3")]
+            .Should()
+            .BeSameAs(sheet1.Range["A1", "C3"]);
     }
 }

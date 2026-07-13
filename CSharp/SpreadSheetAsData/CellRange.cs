@@ -8,7 +8,7 @@ public class CellRange
     /// <summary>
     /// <see cref="ToString"/> で A1 形式の範囲を復元するための右下セル参照です。
     /// </summary>
-    readonly string bottomRight;
+    readonly CellName bottomRight;
 
     /// <summary>
     /// 名前付き範囲として取得された場合の名前です。
@@ -23,14 +23,14 @@ public class CellRange
     /// <summary>
     /// <see cref="ToString"/> で A1 形式の範囲を復元するための左上セル参照です。
     /// </summary>
-    readonly string topLeft;
+    readonly CellName topLeft;
 
     /// <summary>
     /// 指定した左上セルと右下セルでセル範囲を作成します。
     /// </summary>
     /// <param name="topLeft">範囲の左上セル参照。</param>
     /// <param name="bottomRight">範囲の右下セル参照。</param>
-    public CellRange(string topLeft, string bottomRight) : this(null, topLeft, bottomRight)
+    public CellRange(CellName topLeft, CellName bottomRight) : this(null, topLeft, bottomRight)
     { }
 
     /// <summary>
@@ -40,7 +40,7 @@ public class CellRange
     /// <param name="topLeft">範囲の左上セル参照。</param>
     /// <param name="bottomRight">範囲の右下セル参照。</param>
     /// <param name="name">名前付き範囲として取得された場合の名前。</param>
-    internal CellRange(Worksheet? sheet, string topLeft, string bottomRight, string? name = null)
+    internal CellRange(Worksheet? sheet, CellName topLeft, CellName bottomRight, string? name = null)
     {
         this.sheet = sheet;
         this.topLeft = topLeft;
@@ -57,7 +57,7 @@ public class CellRange
     /// 範囲の左上セルを取得します。
     /// </summary>
     public Cell TopLeftCell =>
-        (sheet ?? throw new NotImplementedException()).Cells[topLeft];
+        (sheet ?? throw new NotImplementedException()).Cells[topLeft.ToString()];
 
     /// <summary>
     /// 範囲が単一セルを表す場合に、そのセルを取得します。
@@ -71,7 +71,7 @@ public class CellRange
     /// 範囲の右下セルを取得します。
     /// </summary>
     public Cell BottomRightCell =>
-        (sheet ?? throw new NotImplementedException()).Cells[bottomRight];
+        (sheet ?? throw new NotImplementedException()).Cells[bottomRight.ToString()];
 
     /// <summary>
     /// 名前付き範囲では名前を返し、名前なし範囲では A1 形式のセル範囲を返します。
