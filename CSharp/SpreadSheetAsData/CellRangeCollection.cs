@@ -69,7 +69,7 @@ public class CellRangeCollection
     {
         get
         {
-            if (CellRangeReference.TryParse(reference) is not { } rangeReference)
+            if (!CellRangeReference.TryParse(reference, out var rangeReference))
             {
                 return namedRangeCache.GetValue(
                     reference,

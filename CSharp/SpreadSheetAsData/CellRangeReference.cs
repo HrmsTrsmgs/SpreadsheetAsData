@@ -40,7 +40,9 @@ readonly partial struct CellRangeReference
     /// <param name="reference">A1形式の範囲参照。</param>
     /// <returns>変換したセル範囲参照。</returns>
     public static CellRangeReference Parse(string reference) =>
-        TryParse(reference) ?? throw new NotImplementedException();
+        TryParse(reference, out var result)
+            ? result
+            : throw new NotImplementedException();
 
     [GeneratedRegex(
 @"^(?:(?<sheet>[^!]*)!)?(?<startCell>[^!:]*):(?<endCell>[^!:]*)$")]
@@ -58,9 +60,12 @@ readonly partial struct CellRangeReference
     /// A1形式の範囲参照をセル範囲参照へ変換できる場合は変換します。
     /// </summary>
     /// <param name="reference">A1形式の範囲参照。</param>
-    /// <returns>変換できた場合はセル範囲参照。変換できない場合はnull。</returns>
-    public static CellRangeReference? TryParse(string reference)
+    /// <param name="result">変換できた場合はセル範囲参照。変換できない場合は既定値。</param>
+    /// <returns>変換できた場合はtrue。変換できない場合はfalse。</returns>
+    public static bool TryParse(string reference, out CellRangeReference result)
     {
+        result = default;
+
         var match = CellRangeReferencePattern().Match(reference);
         if (match.Success)
         {
@@ -73,7 +78,7 @@ readonly partial struct CellRangeReference
             if (!CellReferencePattern().IsMatch(startCellReference)
                 || !CellReferencePattern().IsMatch(endCellReference))
             {
-                return null;
+                return false;
             }
 
             var normalizedStartCellReference = startCellReference.Replace("$", "");
@@ -86,30 +91,32 @@ readonly partial struct CellRangeReference
             }
             catch (FormatException)
             {
-                return null;
+                return false;
             }
 
-            return new(
+            result = new(
                 sheetName,
                 normalizedStartCellReference,
                 normalizedEndCellReference);
+            return true;
         }
 
         var singleCellMatch = SingleCellReferencePattern().Match(reference);
         if (!singleCellMatch.Success)
         {
-            return null;
+            return false;
         }
 
         var singleCellReference = singleCellMatch.Groups["cell"].Value;
         if (!CellReferencePattern().IsMatch(singleCellReference))
         {
-            return null;
+            return false;
         }
 
-        return new(
+        result = new(
             singleCellMatch.Groups["sheet"].Value,
             singleCellReference.Replace("$", ""),
             singleCellReference.Replace("$", ""));
+        return true;
     }
 }

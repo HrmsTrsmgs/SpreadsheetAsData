@@ -15,7 +15,7 @@ public class CellRangeReferenceのテスト
     public void TryParseはA1形式でないセルを含む範囲参照を変換しません(
         string reference)
     {
-        CellRangeReference.TryParse(reference).Should().BeNull();
+        CellRangeReference.TryParse(reference, out _).Should().BeFalse();
     }
 
     [Theory]
@@ -24,7 +24,7 @@ public class CellRangeReferenceのテスト
     public void TryParseはA1形式でない単一セル範囲参照を変換しません(
         string reference)
     {
-        CellRangeReference.TryParse(reference).Should().BeNull();
+        CellRangeReference.TryParse(reference, out _).Should().BeFalse();
     }
 
     [Theory]
@@ -35,7 +35,7 @@ public class CellRangeReferenceのテスト
     public void TryParseはExcelで使用可能な範囲を超えたセル参照を変換しません(
         string reference)
     {
-        CellRangeReference.TryParse(reference).Should().BeNull();
+        CellRangeReference.TryParse(reference, out _).Should().BeFalse();
     }
 
     [Theory]
@@ -44,6 +44,6 @@ public class CellRangeReferenceのテスト
     public void TryParseは始点または終点がない範囲参照を変換しません(
         string reference)
     {
-        CellRangeReference.TryParse(reference).Should().BeNull();
+        CellRangeReference.TryParse(reference, out _).Should().BeFalse();
     }
 }
