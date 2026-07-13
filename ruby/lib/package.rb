@@ -35,13 +35,16 @@ class Package
   # ファイルの操作を終了し、ファイルを開放します。
   def close
     return if @closed
-    @initialized_parts.select(&:changed?).each do |part|
+    changed_parts = @initialized_parts.select(&:changed?)
+    changed_parts.each do |part|
       File.write(unziped_dir_path + part.part_uri, part.xml_document.to_s)
     end
     @file.close
-    File.delete(slashed_file_path)
-    zip_file
-    FileUtils.remove_entry(unziped_dir_path.encode("Shift_JIS")) if Dir.exist?(unziped_dir_path)
+    if changed_parts.any?
+      File.delete(slashed_file_path)
+      zip_file
+    end
+    FileUtils.remove_entry(unziped_dir_path) if Dir.exist?(unziped_dir_path)
     @closed = true
   end
   
@@ -72,13 +75,14 @@ class Package
   def unzip_file
     Zip::File.open(slashed_file_path) do |zip|
       zip.each do |file|
-        dir_name = File.dirname(file.name)
+        entry_name = file.name.force_encoding(Encoding::UTF_8)
+        dir_name = File.dirname(entry_name)
         FileUtils.makedirs(unziped_dir_path + dir_name)
-        ziped_file_name =  unziped_dir_path + file.name
+        ziped_file_name =  unziped_dir_path + entry_name
         unless ziped_file_name.match(/\/$/)
           File.open(ziped_file_name, "w+b") do |written|
             stream = file.get_input_stream
-            written.puts(stream.read)
+            written.write(stream.read)
             stream.close
           end
         end
@@ -89,12 +93,14 @@ class Package
   def zip_file
     
     Zip::File.open(slashed_file_path, Zip::File::CREATE) do |zip_file|
-    	Dir::glob(unziped_dir_path + "**/*").each do |src_path|
-        p src_path
+    	Dir::glob(unziped_dir_path + "**/*", File::FNM_DOTMATCH).each do |src_path|
+        next if ['.', '..'].include?(File.basename(src_path))
+
+        zip_path = src_path.delete_prefix(unziped_dir_path)
         if File.file?(src_path)
-          zip_file.add(File.basename(src_path), src_path)
+          zip_file.add(zip_path, src_path)
         else
-          zip_file.mkdir(src_path)
+          zip_file.mkdir(zip_path)
         end
       end
     end

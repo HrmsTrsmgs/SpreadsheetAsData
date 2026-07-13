@@ -9,7 +9,7 @@ class CellName
   attr_reader :column_name, :row_num
 
   def initialize(name)
-    if name =~ /^([A-Z]+)(\d+)$/
+    if name.to_s =~ /^([A-Z]+)(\d+)$/
       @valid = true
       @column_name = $1
       @row_num = $2.to_i

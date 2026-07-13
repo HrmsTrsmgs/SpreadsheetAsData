@@ -13,8 +13,6 @@ describe BlankValue do
 
   describe '#==' do
     it 'で比較すると""と同じとされます。' do
-
-      puts TestFile.book1
       expect(subject).to eq ''
     end
 
