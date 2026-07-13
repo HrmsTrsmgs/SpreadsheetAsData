@@ -1,103 +1,186 @@
-﻿using System;
-using System.Linq;
-using Packaging = DocumentFormat.OpenXml.Packaging;
+﻿using Packaging = DocumentFormat.OpenXml.Packaging;
 using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
 
-namespace Marimo.SpreadSheetAsData
+namespace Marimo.SpreadSheetAsData;
+/// <summary>
+/// Spreadsheet ファイルとして開いたブックを表します。
+/// </summary>
+public class Workbook : IDisposable
 {
     /// <summary>
-    /// Spreadsheet ファイルとして開いたブックを表します。
+    /// <see cref="Dispose(bool)"/> の多重実行を防ぐための状態です。
     /// </summary>
-    public class Workbook : IDisposable
+    bool disposedValue;
+
+    /// <summary>
+    /// 指定したファイルをブックとして開きます。
+    /// </summary>
+    /// <param name="filePath">開く Spreadsheet ファイルのパス。</param>
+    /// <returns>開いたブック。</returns>
+    public static Workbook Open(string filePath) =>
+        new(Packaging.SpreadsheetDocument.Open(filePath, true));
+
+    /// <summary>
+    /// 既に開かれた Open XML ドキュメントを所有するブックを作成します。
+    /// </summary>
+    /// <param name="document">ブックとして扱う Open XML ドキュメント。</param>
+    Workbook(Packaging.SpreadsheetDocument document)
     {
-        /// <summary>
-        /// <see cref="Dispose(bool)"/> の多重実行を防ぐための状態です。
-        /// </summary>
-        bool disposedValue;
+        Document = document;
+        Range = new(this);
+        Cell = new(this);
+    }
 
-        /// <summary>
-        /// 指定したファイルをブックとして開きます。
-        /// </summary>
-        /// <param name="filePath">開く Spreadsheet ファイルのパス。</param>
-        /// <returns>開いたブック。</returns>
-        public static Workbook Open(string filePath) =>
-            new Workbook(Packaging.SpreadsheetDocument.Open(filePath, true));
+    /// <summary>
+    /// このブックが保持する Open XML ドキュメントを取得します。
+    /// </summary>
+    internal Packaging.SpreadsheetDocument Document { get; }
 
-        /// <summary>
-        /// 既に開かれた Open XML ドキュメントを所有するブックを作成します。
-        /// </summary>
-        /// <param name="document">ブックとして扱う Open XML ドキュメント。</param>
-        Workbook(Packaging.SpreadsheetDocument document)
+    /// <summary>
+    /// このブックの Open XML ブックパートを取得します。
+    /// </summary>
+    internal Packaging.WorkbookPart WorkbookPart =>
+        Document.WorkbookPart ?? throw new InvalidOperationException();
+
+    /// <summary>
+    /// Open XML のシート一覧から遅延作成したワークシートコレクションです。
+    /// </summary>
+    WorksheetCollection? sheets;
+
+    /// <summary>
+    /// ブックに含まれるワークシートの一覧を取得します。
+    /// </summary>
+    public WorksheetCollection Sheets =>
+        sheets ??= new WorksheetCollection(
+                    from sheet in (WorkbookPart.Workbook.Sheets ?? throw new InvalidOperationException()).Elements<Spreadsheet.Sheet>()
+                    select new Worksheet(this, sheet.Name?.Value ?? throw new InvalidOperationException()));
+
+    /// <summary>
+    /// ブックスコープの定義名をセル範囲として解決します。
+    /// </summary>
+    /// <param name="name">解決する定義名。</param>
+    /// <returns>定義名が表すセル範囲。</returns>
+    internal CellRange ResolveNamedRange(string name) =>
+        ResolveNamedRange(name, localSheetId: null);
+
+    /// <summary>
+    /// ブックスコープの定義名をセル範囲として解決できるか確認します。
+    /// </summary>
+    /// <param name="name">解決する定義名。</param>
+    /// <param name="range">定義名が見つかった場合のセル範囲。</param>
+    /// <returns>定義名を解決できた場合は true。</returns>
+    internal bool TryResolveNamedRange(string name, out CellRange range) =>
+        TryResolveNamedRange(name, localSheetId: null, out range);
+
+    /// <summary>
+    /// 指定したワークシートスコープの定義名をセル範囲として解決します。
+    /// </summary>
+    /// <param name="name">解決する定義名。</param>
+    /// <param name="localSheetId">定義名が属するワークシートの 0 始まりの位置。</param>
+    /// <returns>定義名が表すセル範囲。</returns>
+    internal CellRange ResolveNamedRange(string name, uint localSheetId) =>
+        ResolveNamedRange(name, (uint?)localSheetId);
+
+    /// <summary>
+    /// 指定したワークシートスコープの定義名をセル範囲として解決できるか確認します。
+    /// </summary>
+    /// <param name="name">解決する定義名。</param>
+    /// <param name="localSheetId">定義名が属するワークシートの 0 始まりの位置。</param>
+    /// <param name="range">定義名が見つかった場合のセル範囲。</param>
+    /// <returns>定義名を解決できた場合は true。</returns>
+    internal bool TryResolveNamedRange(string name, uint localSheetId, out CellRange range) =>
+        TryResolveNamedRange(name, (uint?)localSheetId, out range);
+
+    CellRange ResolveNamedRange(string name, uint? localSheetId)
+    {
+        return TryResolveNamedRange(name, localSheetId, out var range)
+            ? range
+            : throw new NotImplementedException();
+    }
+
+    bool TryResolveNamedRange(string name, uint? localSheetId, out CellRange range)
+    {
+        var definedName = FindDefinedName(name, localSheetId);
+
+        if (definedName == null)
         {
-            Document = document;
+            range = default!;
+            return false;
         }
 
-        /// <summary>
-        /// このブックが保持する Open XML ドキュメントを取得します。
-        /// </summary>
-        internal Packaging.SpreadsheetDocument Document { get; }
+        var rangeReference = CellRangeReference.Parse(definedName.Text);
+        var targetSheet = Sheets[rangeReference.SheetName ?? throw new NotImplementedException()];
+        range = new(
+            targetSheet,
+            rangeReference.TopLeft,
+            rangeReference.BottomRight,
+            name);
+        return true;
+    }
 
-        /// <summary>
-        /// このブックの Open XML ブックパートを取得します。
-        /// </summary>
-        internal Packaging.WorkbookPart WorkbookPart =>
-            Document.WorkbookPart ?? throw new InvalidOperationException();
+    Spreadsheet.DefinedName? FindDefinedName(string name, uint? localSheetId) =>
+        WorkbookPart.Workbook.DefinedNames?.Elements<Spreadsheet.DefinedName>()
+            .Where(it => it.Name == name && HasLocalSheetId(it, localSheetId))
+            .SingleOrDefault();
 
-        /// <summary>
-        /// Open XML のシート一覧から遅延作成したワークシートコレクションです。
-        /// </summary>
-        WorksheetCollection? sheets { get; set; }
+    static bool HasLocalSheetId(Spreadsheet.DefinedName definedName, uint? localSheetId)
+    {
+        return localSheetId.HasValue
+            ? definedName.LocalSheetId?.Value == localSheetId.Value
+            : definedName.LocalSheetId == null;
+    }
 
-        /// <summary>
-        /// ブックに含まれるワークシートの一覧を取得します。
-        /// </summary>
-        public WorksheetCollection Sheets =>
-            sheets ??= new WorksheetCollection(
-                        from sheet in (WorkbookPart.Workbook.Sheets ?? throw new InvalidOperationException()).Elements<Spreadsheet.Sheet>()
-                        select new Worksheet(this, sheet.Name?.Value ?? throw new InvalidOperationException()));
+    /// <summary>
+    /// ブック上で有効な範囲参照を解決するコレクションを取得します。
+    /// </summary>
+    public CellRangeCollection Range { get; }
 
-        /// <summary>
-        /// 指定した位置のワークシートを取得します。
-        /// </summary>
-        /// <param name="index">取得するワークシートの 0 始まりの位置。</param>
-        /// <returns>指定した位置のワークシート。</returns>
-        public Worksheet this[int index] => Sheets[index];
+    /// <summary>
+    /// ブック上で有効なセル参照を解決するコレクションを取得します。
+    /// </summary>
+    public CellCollection Cell { get; }
 
-        /// <summary>
-        /// 指定した名前のワークシートを取得します。
-        /// </summary>
-        /// <param name="sheetName">取得するワークシート名。</param>
-        /// <returns>指定した名前のワークシート。</returns>
-        public Worksheet this[string sheetName] => Sheets[sheetName];
+    /// <summary>
+    /// 指定した位置のワークシートを取得します。
+    /// </summary>
+    /// <param name="index">取得するワークシートの 0 始まりの位置。</param>
+    /// <returns>指定した位置のワークシート。</returns>
+    public Worksheet this[int index] => Sheets[index];
 
-        /// <summary>
-        /// ブックが保持しているファイルを閉じます。
-        /// </summary>
-        public void Close() => Document.Close();
+    /// <summary>
+    /// 指定した名前のワークシートを取得します。
+    /// </summary>
+    /// <param name="sheetName">取得するワークシート名。</param>
+    /// <returns>指定した名前のワークシート。</returns>
+    public Worksheet this[string sheetName] => Sheets[sheetName];
 
-        /// <summary>
-        /// ブックが使用しているリソースを解放します。
-        /// </summary>
-        /// <param name="disposing">マネージドリソースを解放する場合は true。</param>
-        protected virtual void Dispose(bool disposing)
+    /// <summary>
+    /// ブックが保持しているファイルを閉じます。
+    /// </summary>
+    public void Close() => Document.Close();
+
+    /// <summary>
+    /// ブックが使用しているリソースを解放します。
+    /// </summary>
+    /// <param name="disposing">マネージドリソースを解放する場合は true。</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
         {
-            if (!disposedValue)
+            if (disposing)
             {
-                if (disposing)
-                {
-                    Close();
-                }
-                disposedValue = true;
+                Close();
             }
+            disposedValue = true;
         }
+    }
 
-        /// <summary>
-        /// ブックが使用しているリソースを解放します。
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
+    /// <summary>
+    /// ブックが使用しているリソースを解放します。
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }
