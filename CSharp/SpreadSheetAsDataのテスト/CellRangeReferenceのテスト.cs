@@ -38,7 +38,7 @@ public class CellRangeReferenceのテスト
         CellRangeReference.TryParse(reference).Should().BeNull();
     }
 
-    [Theory(Skip = A1範囲参照の妥当性検証保留理由)]
+    [Theory]
     [InlineData(":B2")]
     [InlineData("A1:")]
     public void TryParseは始点または終点がない範囲参照を変換しません(
