@@ -23,20 +23,20 @@ public class Tableのテスト : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void NameはExcelテーブル名を返します()
     {
         table.Name.Should().Be("テーブル2");
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void WorksheetはExcelテーブルが属するワークシートを返します()
     {
         table.Worksheet.Should().BeSameAs(
             book.Sheets["Sheet1"]);
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void RangeはExcelテーブル全体の対象範囲を返します()
     {
         table.Range.ToString().Should().Be("B6:E9");

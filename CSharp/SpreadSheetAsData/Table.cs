@@ -43,7 +43,8 @@ public class Table
     /// <summary>
     /// ヘッダー行を含む Excel テーブル全体のセル範囲を取得します。
     /// </summary>
-    public CellRange Range => throw new NotImplementedException();
+    public CellRange Range =>
+        worksheet.Range[TableDefinitionPart.Table.Reference.ToString()];
 
     /// <summary>
     /// Excel テーブルの列定義を取得します。
