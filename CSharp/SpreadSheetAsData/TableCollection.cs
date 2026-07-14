@@ -41,7 +41,6 @@ public class TableCollection : IEnumerable<Table>
     /// </summary>
     /// <param name="name">取得する Excel テーブル名。</param>
     /// <returns>指定した名前の Excel テーブル。</returns>
-    /// <exception cref="KeyNotFoundException">指定した名前の Excel テーブルが存在しない場合。</exception>
     public Table this[string name] =>
-        throw new NotImplementedException();
+        this.Single(it => it.Name == name);
 }

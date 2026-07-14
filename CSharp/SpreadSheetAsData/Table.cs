@@ -24,7 +24,8 @@ public class Table
     /// <summary>
     /// Excel テーブル名を取得します。
     /// </summary>
-    public string Name => throw new NotImplementedException();
+    public string Name =>
+        TableDefinitionPart.Table.Name.ToString();
 
     /// <summary>
     /// この Excel テーブルが属するワークシートを取得します。

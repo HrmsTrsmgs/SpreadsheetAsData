@@ -27,7 +27,7 @@ public class TableCollectionのテスト : IDisposable
         book.Tables.Should().HaveCount(8);
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void Tablesは名前からExcelテーブルを取得します()
     {
         var tested = book.Tables["テーブル2"];
