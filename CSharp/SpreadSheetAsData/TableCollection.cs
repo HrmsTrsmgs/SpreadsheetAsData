@@ -1,5 +1,7 @@
 namespace Marimo.SpreadSheetAsData;
 
+using Packaging = DocumentFormat.OpenXml.Packaging;
+
 /// <summary>
 /// ブック内の Excel テーブルを取得するコレクションを表します。
 /// </summary>
@@ -9,6 +11,11 @@ public class TableCollection : IEnumerable<Table>
     /// テーブルを取得する対象ブックです。
     /// </summary>
     readonly Workbook book;
+
+    /// <summary>
+    /// Open XML のテーブル定義に対応する Table オブジェクトを保持します。
+    /// </summary>
+    readonly Dictionary<Packaging.TableDefinitionPart, Table> cache = [];
 
     /// <summary>
     /// 指定したブック内の Excel テーブルを取得するコレクションを作成します。
@@ -26,7 +33,7 @@ public class TableCollection : IEnumerable<Table>
     public IEnumerator<Table> GetEnumerator() =>
         book.WorkbookPart.WorksheetParts
             .SelectMany(it => it.TableDefinitionParts)
-            .Select(it => new Table(it))
+            .Select(GetTable)
             .GetEnumerator();
 
     /// <summary>
@@ -45,4 +52,9 @@ public class TableCollection : IEnumerable<Table>
     public Table this[string name] =>
         this.SingleOrDefault(it => it.Name == name)
             ?? throw new KeyNotFoundException();
+
+    Table GetTable(Packaging.TableDefinitionPart tableDefinitionPart) =>
+        cache.GetValue(
+            tableDefinitionPart,
+            () => new(tableDefinitionPart));
 }

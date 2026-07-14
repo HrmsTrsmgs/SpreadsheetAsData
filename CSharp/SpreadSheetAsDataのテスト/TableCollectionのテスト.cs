@@ -35,7 +35,7 @@ public class TableCollectionのテスト : IDisposable
         tested.Name.Should().Be("テーブル2");
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void Tablesは列挙したExcelテーブルと名前から取得したExcelテーブルに同じオブジェクトを返します()
     {
         var enumerated = book.Tables.Single(
