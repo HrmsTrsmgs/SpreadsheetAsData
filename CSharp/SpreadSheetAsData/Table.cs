@@ -13,12 +13,19 @@ public class Table
     internal Packaging.TableDefinitionPart TableDefinitionPart { get; }
 
     /// <summary>
+    /// この Excel テーブルが属するワークシートです。
+    /// </summary>
+    readonly Worksheet worksheet;
+
+    /// <summary>
     /// 指定した Open XML テーブル定義からテーブルを作成します。
     /// </summary>
     /// <param name="tableDefinitionPart">テーブル定義を保持する Open XML パート。</param>
-    internal Table(Packaging.TableDefinitionPart tableDefinitionPart)
+    /// <param name="worksheet">Excel テーブルが属するワークシート。</param>
+    internal Table(Packaging.TableDefinitionPart tableDefinitionPart, Worksheet worksheet)
     {
         TableDefinitionPart = tableDefinitionPart;
+        this.worksheet = worksheet;
     }
 
     /// <summary>
@@ -30,7 +37,8 @@ public class Table
     /// <summary>
     /// この Excel テーブルが属するワークシートを取得します。
     /// </summary>
-    public Worksheet Worksheet => throw new NotImplementedException();
+    public Worksheet Worksheet =>
+        worksheet;
 
     /// <summary>
     /// ヘッダー行を含む Excel テーブル全体のセル範囲を取得します。

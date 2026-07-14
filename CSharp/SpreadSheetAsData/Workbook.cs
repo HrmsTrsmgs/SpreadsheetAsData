@@ -119,10 +119,18 @@ public class Workbook : IDisposable
         return true;
     }
 
-    Spreadsheet.DefinedName? FindDefinedName(string name, uint? localSheetId) =>
-        WorkbookPart.Workbook.DefinedNames?.Elements<Spreadsheet.DefinedName>()
-            .Where(it => it.Name == name && HasLocalSheetId(it, localSheetId))
-            .SingleOrDefault();
+    Spreadsheet.DefinedName? FindDefinedName(string name, uint? localSheetId)
+    {
+        var definedNames = WorkbookPart.Workbook.DefinedNames?.Elements<Spreadsheet.DefinedName>();
+
+        return definedNames == null
+            ? null
+            : (
+                from definedName in definedNames
+                where definedName.Name == name && HasLocalSheetId(definedName, localSheetId)
+                select definedName
+            ).SingleOrDefault();
+    }
 
     static bool HasLocalSheetId(Spreadsheet.DefinedName definedName, uint? localSheetId)
     {

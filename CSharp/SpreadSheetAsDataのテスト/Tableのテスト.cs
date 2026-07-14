@@ -45,8 +45,10 @@ public class Tableのテスト : IDisposable
     [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
     public void ColumnsはExcelテーブルの列を定義順に列挙します()
     {
-        table.Columns
-            .Select(column => column.Name)
+        (
+            from column in table.Columns
+            select column.Name
+        )
             .Should()
             .Equal("数値", "数値2", "文字列", "真偽値");
     }
@@ -60,8 +62,10 @@ public class Tableのテスト : IDisposable
     [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
     public void Rowsはデータ行をワークシート上の順序で列挙します()
     {
-        table.Rows
-            .Select(row => row.WorksheetRowIndex)
+        (
+            from row in table.Rows
+            select row.WorksheetRowIndex
+        )
             .Should()
             .Equal(7u, 8u, 9u);
     }

@@ -31,10 +31,11 @@ public class TableCollection : IEnumerable<Table>
     /// </summary>
     /// <returns>Excel テーブルの列挙子。</returns>
     public IEnumerator<Table> GetEnumerator() =>
-        book.WorkbookPart.WorksheetParts
-            .SelectMany(it => it.TableDefinitionParts)
-            .Select(GetTable)
-            .GetEnumerator();
+        (
+            from sheet in book.Sheets.Values
+            from tableDefinitionPart in sheet.WorksheetPart.TableDefinitionParts
+            select GetTable(sheet, tableDefinitionPart)
+        ).GetEnumerator();
 
     /// <summary>
     /// ブック内の Excel テーブルを列挙します。
@@ -50,11 +51,15 @@ public class TableCollection : IEnumerable<Table>
     /// <returns>指定した名前の Excel テーブル。</returns>
     /// <exception cref="KeyNotFoundException">指定した名前の Excel テーブルが存在しない場合。</exception>
     public Table this[string name] =>
-        this.SingleOrDefault(it => it.Name == name)
+        (
+            from table in this
+            where table.Name == name
+            select table
+        ).SingleOrDefault()
             ?? throw new KeyNotFoundException();
 
-    Table GetTable(Packaging.TableDefinitionPart tableDefinitionPart) =>
+    Table GetTable(Worksheet sheet, Packaging.TableDefinitionPart tableDefinitionPart) =>
         cache.GetValue(
             tableDefinitionPart,
-            () => new(tableDefinitionPart));
+            () => new(tableDefinitionPart, sheet));
 }

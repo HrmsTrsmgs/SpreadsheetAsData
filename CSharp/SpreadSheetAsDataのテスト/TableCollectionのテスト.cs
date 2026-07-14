@@ -38,19 +38,25 @@ public class TableCollectionのテスト : IDisposable
     [Fact]
     public void Tablesは列挙したExcelテーブルと名前から取得したExcelテーブルに同じオブジェクトを返します()
     {
-        var enumerated = book.Tables.Single(
-            table => table.Name == "テーブル2");
+        var enumerated = (
+            from table in book.Tables
+            where table.Name == "テーブル2"
+            select table
+        ).Single();
 
         var tested = book.Tables["テーブル2"];
 
         tested.Should().BeSameAs(enumerated);
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void Tablesは異なるワークシートにあるExcelテーブルも列挙します()
     {
-        var tested = book.Tables.Single(
-            table => table.Name == "テーブル6");
+        var tested = (
+            from table in book.Tables
+            where table.Name == "テーブル6"
+            select table
+        ).Single();
 
         tested.Worksheet.Should().BeSameAs(book.Sheets["Sheet3"]);
     }
