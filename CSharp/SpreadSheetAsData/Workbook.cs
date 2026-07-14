@@ -29,6 +29,7 @@ public class Workbook : IDisposable
         Document = document;
         Range = new(this);
         Cell = new(this);
+        Tables = new(this);
     }
 
     /// <summary>
@@ -143,8 +144,7 @@ public class Workbook : IDisposable
     /// <summary>
     /// ブック内の Excel テーブルを取得するコレクションを取得します。
     /// </summary>
-    public TableCollection Tables =>
-        throw new NotImplementedException();
+    public TableCollection Tables { get; }
 
     /// <summary>
     /// 指定した位置のワークシートを取得します。

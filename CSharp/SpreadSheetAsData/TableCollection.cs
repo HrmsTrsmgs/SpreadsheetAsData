@@ -6,11 +6,28 @@ namespace Marimo.SpreadSheetAsData;
 public class TableCollection : IEnumerable<Table>
 {
     /// <summary>
+    /// テーブルを取得する対象ブックです。
+    /// </summary>
+    readonly Workbook book;
+
+    /// <summary>
+    /// 指定したブック内の Excel テーブルを取得するコレクションを作成します。
+    /// </summary>
+    /// <param name="book">テーブルを取得する対象ブック。</param>
+    internal TableCollection(Workbook book)
+    {
+        this.book = book;
+    }
+
+    /// <summary>
     /// ブック内の Excel テーブルを列挙します。
     /// </summary>
     /// <returns>Excel テーブルの列挙子。</returns>
     public IEnumerator<Table> GetEnumerator() =>
-        throw new NotImplementedException();
+        book.WorkbookPart.WorksheetParts
+            .SelectMany(it => it.TableDefinitionParts)
+            .Select(it => new Table(it))
+            .GetEnumerator();
 
     /// <summary>
     /// ブック内の Excel テーブルを列挙します。

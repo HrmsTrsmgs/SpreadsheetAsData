@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Marimo.SpreadSheetAsData;
 using Xunit;
 
@@ -21,7 +21,7 @@ public class TableCollectionのテスト : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void Tablesはブック内のExcelテーブルを列挙します()
     {
         book.Tables.Should().HaveCount(8);
