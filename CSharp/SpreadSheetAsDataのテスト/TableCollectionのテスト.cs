@@ -55,7 +55,7 @@ public class TableCollectionのテスト : IDisposable
         tested.Worksheet.Should().BeSameAs(book.Sheets["Sheet3"]);
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void Tablesは存在しない名前を指定した場合に失敗します()
     {
         var action = () => _ = book.Tables["not_found"];
