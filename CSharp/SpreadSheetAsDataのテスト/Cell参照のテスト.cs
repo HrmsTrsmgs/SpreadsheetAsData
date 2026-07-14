@@ -24,7 +24,7 @@ public class Cell参照のテスト : IDisposable
     [Fact]
     public void Cellはブックスコープの単一セル名からセルを取得します()
     {
-        Cell tested = book.Cell["book_cell"];
+        var tested = book.Cell["book_cell"];
 
         tested.Should().BeSameAs(sheet2.Cells["F33"]);
     }
@@ -32,7 +32,7 @@ public class Cell参照のテスト : IDisposable
     [Fact]
     public void Cellはワークシートスコープの単一セル名からセルを取得します()
     {
-        Cell tested = sheet2.Cell["cell_name"];
+        var tested = sheet2.Cell["cell_name"];
 
         tested.Should().BeSameAs(sheet2.Cells["E25"]);
     }
