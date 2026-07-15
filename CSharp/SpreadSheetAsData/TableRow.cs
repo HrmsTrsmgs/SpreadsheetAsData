@@ -58,7 +58,7 @@ public class TableRow
     /// <returns>指定した列に対応するセル。</returns>
     /// <exception cref="KeyNotFoundException">指定した名前の列が存在しない場合。</exception>
     public Cell this[string columnName] =>
-        throw new NotImplementedException();
+        this[table.Columns[columnName]];
 
     /// <summary>
     /// 指定した列定義に対応するセルを取得します。

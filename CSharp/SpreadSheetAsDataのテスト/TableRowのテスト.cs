@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Marimo.SpreadSheetAsData;
 using Xunit;
 
@@ -45,7 +45,7 @@ public class TableRowのテスト : IDisposable
         firstRow.Table.Should().BeSameAs(table);
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void 列名を指定すると対応するセルを返します()
     {
         firstRow["数値2"]
@@ -69,7 +69,7 @@ public class TableRowのテスト : IDisposable
             .Be("C7");
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void 存在しない列名を指定した場合に失敗します()
     {
         var action = () => _ = firstRow["not_found"];
@@ -77,7 +77,7 @@ public class TableRowのテスト : IDisposable
         action.Should().Throw<KeyNotFoundException>();
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void 別のExcelテーブルに属するTableColumnを指定した場合に失敗します()
     {
         var foreignColumn =
