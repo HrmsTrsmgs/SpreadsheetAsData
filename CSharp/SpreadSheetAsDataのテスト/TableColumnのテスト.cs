@@ -25,13 +25,13 @@ public class TableColumnのテスト : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void NameはExcelテーブルの列名を返します()
     {
         column.Name.Should().Be("数値2");
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void Ordinalはテーブル内の0始まりの列位置を返します()
     {
         column.Ordinal.Should().Be(1);
