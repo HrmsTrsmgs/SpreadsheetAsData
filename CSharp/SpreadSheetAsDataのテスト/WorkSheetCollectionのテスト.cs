@@ -65,32 +65,31 @@ public class WorkSheetCollectionのテスト
     [Fact]
     public void シートはforeachで取得できます()
     {
-        int i = 0;
-        foreach (var item in tested)
+        var index = 0;
+        foreach (var sheet in tested)
         {
-
-            item.Should().Be(tested[i++]);
+            sheet.Should().Be(tested[index++]);
         }
     }
 
     [Fact]
     public void 非ジェネリックのforeachでがシートが取得できます()
     {
-        int i = 0;
-        foreach (var item in (IEnumerable)tested)
+        var index = 0;
+        foreach (var sheet in (IEnumerable)tested)
         {
-            item.Should().Be(tested[i++]);
+            sheet.Should().Be(tested[index++]);
         }
     }
 
     [Fact]
     public void Dictionaryに対するのforeachでがシートが取得できます()
     {
-        int i = 0;
-        foreach (var item in (IReadOnlyDictionary<string, Worksheet>)tested)
+        var index = 0;
+        foreach (var entry in (IReadOnlyDictionary<string, Worksheet>)tested)
         {
-            item.Key.Should().Be(tested[i].Name);
-            item.Value.Should().Be(tested[i++]);
+            entry.Key.Should().Be(tested[index].Name);
+            entry.Value.Should().Be(tested[index++]);
         }
     }
 }

@@ -6,8 +6,6 @@ namespace Marimo.SpreadSheetAsData.Test;
 
 public class Range参照のテスト : IDisposable
 {
-    const string 範囲参照API仕様保留理由 = "API仕様として先に固定。Greenは範囲参照の実装単位ごとに解除する。";
-
     readonly Workbook book;
     readonly Worksheet sheet2;
 
@@ -34,7 +32,7 @@ public class Range参照のテスト : IDisposable
     [Fact]
     public void Rangeはブックスコープの名前参照から名前付き範囲を取得します()
     {
-        CellRange tested = book.Range["book_range"];
+        var tested = book.Range["book_range"];
 
         tested.TopLeftCell.Should().BeSameAs(sheet2.Cells["C32"]);
         tested.BottomRightCell.Should().BeSameAs(sheet2.Cells["D36"]);
@@ -43,7 +41,7 @@ public class Range参照のテスト : IDisposable
     [Fact]
     public void RangeはA1形式のセル参照と同じ名前の定義名を優先します()
     {
-        CellRange tested = book.Range["A1"];
+        var tested = book.Range["A1"];
 
         tested.Name.Should().Be("A1");
         tested.TopLeftCell.Should().BeSameAs(sheet2.Cells["B23"]);
@@ -53,7 +51,7 @@ public class Range参照のテスト : IDisposable
     [Fact]
     public void Rangeはブックスコープの単一セル名を名前付き範囲として取得します()
     {
-        CellRange tested = book.Range["book_cell"];
+        var tested = book.Range["book_cell"];
 
         tested.TopLeftCell.Should().BeSameAs(sheet2.Cells["F33"]);
         tested.BottomRightCell.Should().BeSameAs(sheet2.Cells["F33"]);
@@ -62,8 +60,8 @@ public class Range参照のテスト : IDisposable
     [Fact]
     public void Rangeはワークシートスコープの名前参照から名前付き範囲を取得します()
     {
-        CellRange range = sheet2.Range["range_name"];
-        CellRange cell = sheet2.Range["cell_name"];
+        var range = sheet2.Range["range_name"];
+        var cell = sheet2.Range["cell_name"];
 
         range.TopLeftCell.Should().BeSameAs(sheet2.Cells["B23"]);
         range.BottomRightCell.Should().BeSameAs(sheet2.Cells["C27"]);

@@ -89,7 +89,6 @@ describe WorkBook do
     end
   
     it 'の時に変更は保存されています。' do
-      pending '書き込み機能は一時不可'
       book = WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.cell(:A1).value = 999
       end
@@ -231,7 +230,6 @@ describe WorkBook do
   end
   
   it 'の空白セルに書き込みがされています。' do
-    pending '書き込み機能は一時不可'
     book = WorkBook.open(TestFile.book1_copy_path) do |book|
       book.Sheet1.B1 = 999
     end
@@ -242,7 +240,6 @@ describe WorkBook do
   end
 
   it 'の空白行に書き込みがされています。' do
-    pending '書き込み機能は一時不可'
     book = WorkBook.open(TestFile.book1_copy_path) do |book|
       book.Sheet1.B2 = 999
     end
@@ -253,7 +250,6 @@ describe WorkBook do
   end
   
   it 'の空白セルに書き込みがされた時に、行の整合性が取れています。' do
-    pending '書き込み機能は一時不可'
     book = WorkBook.open(TestFile.book1_copy_path) do |book|
       book.Sheet1.B1 = 999
     end

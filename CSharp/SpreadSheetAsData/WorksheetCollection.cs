@@ -28,7 +28,11 @@ public class WorksheetCollection : IReadOnlyList<Worksheet>, IReadOnlyDictionary
     /// <returns>指定した名前のワークシート。</returns>
     /// <exception cref="KeyNotFoundException">指定した名前のワークシートが存在しません。</exception>
     public Worksheet this[string sheetName] =>
-        items.Where(_ => _.Name == sheetName).SingleOrDefault()
+        (
+            from sheet in items
+            where sheet.Name == sheetName
+            select sheet
+        ).SingleOrDefault()
             ?? throw new KeyNotFoundException();
 
     /// <summary>
@@ -46,7 +50,9 @@ public class WorksheetCollection : IReadOnlyList<Worksheet>, IReadOnlyDictionary
     /// <summary>
     /// ワークシート名の一覧を取得します。
     /// </summary>
-    public IEnumerable<string> Keys => items.Select(_ => _.Name);
+    public IEnumerable<string> Keys =>
+        from sheet in items
+        select sheet.Name;
 
     /// <summary>
     /// ワークシートの一覧を取得します。
@@ -68,7 +74,12 @@ public class WorksheetCollection : IReadOnlyList<Worksheet>, IReadOnlyDictionary
     /// <returns>指定した名前のワークシートが存在する場合は true。</returns>
     public bool TryGetValue(string key, [MaybeNullWhen(false)] out Worksheet value)
     {
-        var sheet = items.Where(_ => _.Name == key).SingleOrDefault();
+        var sheet = (
+            from item in items
+            where item.Name == key
+            select item
+        ).SingleOrDefault();
+
         value = sheet;
         return sheet != null;
     }

@@ -69,7 +69,11 @@ public class Worksheet
     /// このワークシートに対応する Open XML のシート要素を取得します。
     /// </summary>
     internal Spreadsheet.Sheet SheetTag =>
-        Book.WorkbookPart.Workbook.Descendants<Spreadsheet.Sheet>().Where(it => it.Name == Name).Single();
+        (
+            from sheet in Book.WorkbookPart.Workbook.Descendants<Spreadsheet.Sheet>()
+            where sheet.Name == Name
+            select sheet
+        ).Single();
 
     /// <summary>
     /// このワークシートに対応する Open XML のワークシートパートを取得します。
@@ -103,8 +107,11 @@ public class Worksheet
     /// <returns>定義名が表すセル範囲。</returns>
     internal CellRange ResolveNamedRange(string name)
     {
-        var localSheetId = (uint)Enumerable.Range(0, Book.Sheets.Count)
-            .Single(it => Book.Sheets[it].Name == Name);
+        var localSheetId = (uint)(
+            from index in Enumerable.Range(0, Book.Sheets.Count)
+            where Book.Sheets[index].Name == Name
+            select index
+        ).Single();
 
         return Book.ResolveNamedRange(name, localSheetId);
     }
@@ -117,8 +124,11 @@ public class Worksheet
     /// <returns>定義名を解決できた場合は true。</returns>
     internal bool TryResolveNamedRange(string name, out CellRange range)
     {
-        var localSheetId = (uint)Enumerable.Range(0, Book.Sheets.Count)
-            .Single(it => Book.Sheets[it].Name == Name);
+        var localSheetId = (uint)(
+            from index in Enumerable.Range(0, Book.Sheets.Count)
+            where Book.Sheets[index].Name == Name
+            select index
+        ).Single();
 
         return Book.TryResolveNamedRange(name, localSheetId, out range);
     }

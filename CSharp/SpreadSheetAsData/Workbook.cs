@@ -29,6 +29,7 @@ public class Workbook : IDisposable
         Document = document;
         Range = new(this);
         Cell = new(this);
+        Tables = new(this);
     }
 
     /// <summary>
@@ -118,10 +119,18 @@ public class Workbook : IDisposable
         return true;
     }
 
-    Spreadsheet.DefinedName? FindDefinedName(string name, uint? localSheetId) =>
-        WorkbookPart.Workbook.DefinedNames?.Elements<Spreadsheet.DefinedName>()
-            .Where(it => it.Name == name && HasLocalSheetId(it, localSheetId))
-            .SingleOrDefault();
+    Spreadsheet.DefinedName? FindDefinedName(string name, uint? localSheetId)
+    {
+        var definedNames = WorkbookPart.Workbook.DefinedNames?.Elements<Spreadsheet.DefinedName>();
+
+        return definedNames == null
+            ? null
+            : (
+                from definedName in definedNames
+                where definedName.Name == name && HasLocalSheetId(definedName, localSheetId)
+                select definedName
+            ).SingleOrDefault();
+    }
 
     static bool HasLocalSheetId(Spreadsheet.DefinedName definedName, uint? localSheetId)
     {
@@ -139,6 +148,11 @@ public class Workbook : IDisposable
     /// ブック上で有効なセル参照を解決するコレクションを取得します。
     /// </summary>
     public CellCollection Cell { get; }
+
+    /// <summary>
+    /// ブック内の Excel テーブルを取得するコレクションを取得します。
+    /// </summary>
+    public TableCollection Tables { get; }
 
     /// <summary>
     /// 指定した位置のワークシートを取得します。
