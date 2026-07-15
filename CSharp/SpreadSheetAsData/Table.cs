@@ -57,7 +57,7 @@ public class Table
         columns = new(this);
         rows = [
             .. from rowOffset in Enumerable.Range(0, DataRowCount)
-               select new TableRow(rowOffset, FirstDataRowIndex + (uint)rowOffset)
+               select new TableRow(this, rowOffset, FirstDataRowIndex + (uint)rowOffset)
         ];
     }
 
@@ -90,4 +90,16 @@ public class Table
     /// </summary>
     public IEnumerable<TableRow> Rows =>
         rows;
+
+    /// <summary>
+    /// テーブル行と列定義の交点にあるワークシートセルを取得します。
+    /// </summary>
+    /// <param name="row">取得するセルが属するテーブル行。</param>
+    /// <param name="column">取得するセルが属するテーブル列。</param>
+    /// <returns>行と列の交点にあるセル。</returns>
+    internal Cell ResolveCell(TableRow row, TableColumn column) =>
+        worksheet.Cells[
+            new CellName(
+                rangeReference.TopLeft.ColumnIndex + (uint)column.Ordinal,
+                row.WorksheetRowIndex)];
 }

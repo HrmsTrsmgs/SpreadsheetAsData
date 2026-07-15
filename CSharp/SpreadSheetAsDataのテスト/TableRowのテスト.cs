@@ -53,7 +53,7 @@ public class TableRowのテスト : IDisposable
             .Be("C7");
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void TableColumnを指定すると対応するセルを返します()
     {
         firstRow[secondColumn]
@@ -61,7 +61,7 @@ public class TableRowのテスト : IDisposable
             .Be("C7");
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void 列位置を指定すると対応するセルを返します()
     {
         firstRow[1]
