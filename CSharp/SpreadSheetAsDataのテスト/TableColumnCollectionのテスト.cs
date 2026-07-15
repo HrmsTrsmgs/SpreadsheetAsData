@@ -31,7 +31,7 @@ public class TableColumnCollectionのテスト : IDisposable
         tested.Name.Should().Be("数値2");
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void Columnsは0始まりの位置から列を取得します()
     {
         var tested = columns[1];

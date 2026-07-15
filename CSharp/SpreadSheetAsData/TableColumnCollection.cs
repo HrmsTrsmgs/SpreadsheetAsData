@@ -30,7 +30,7 @@ public class TableColumnCollection : IReadOnlyList<TableColumn>
     /// <param name="index">取得する列の 0 始まりの位置。</param>
     /// <returns>指定した位置の列定義。</returns>
     public TableColumn this[int index] =>
-        throw new NotImplementedException();
+        items[index];
 
     /// <summary>
     /// 指定した名前の列定義を取得します。
