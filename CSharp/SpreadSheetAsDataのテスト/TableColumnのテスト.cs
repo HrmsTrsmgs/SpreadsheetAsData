@@ -37,7 +37,7 @@ public class TableColumnのテスト : IDisposable
         column.Ordinal.Should().Be(1);
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void Tableは列が属するExcelテーブルを返します()
     {
         column.Table.Should().BeSameAs(table);

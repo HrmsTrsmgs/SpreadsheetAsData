@@ -23,7 +23,7 @@ public class TableColumnCollection : IReadOnlyList<TableColumn>
                 .Elements<Spreadsheet.TableColumn>()
                 .Zip(
                     Enumerable.Range(0, int.MaxValue),
-                    (column, ordinal) => new TableColumn(column, ordinal))
+                    (column, ordinal) => new TableColumn(table, column, ordinal))
         ];
     }
 

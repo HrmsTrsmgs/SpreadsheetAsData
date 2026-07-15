@@ -8,6 +8,11 @@ using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
 public class TableColumn
 {
     /// <summary>
+    /// この列が属する Excel テーブルです。
+    /// </summary>
+    readonly Table table;
+
+    /// <summary>
     /// Open XML の列定義です。
     /// </summary>
     readonly Spreadsheet.TableColumn xml;
@@ -20,10 +25,12 @@ public class TableColumn
     /// <summary>
     /// 指定した Open XML 列定義からテーブル列を作成します。
     /// </summary>
+    /// <param name="table">列が属する Excel テーブル。</param>
     /// <param name="xml">列名などを保持する Open XML 列定義。</param>
     /// <param name="ordinal">Excel テーブル内での 0 始まりの列位置。</param>
-    internal TableColumn(Spreadsheet.TableColumn xml, int ordinal)
+    internal TableColumn(Table table, Spreadsheet.TableColumn xml, int ordinal)
     {
+        this.table = table;
         this.xml = xml;
         this.ordinal = ordinal;
     }
@@ -43,5 +50,6 @@ public class TableColumn
     /// <summary>
     /// この列が属する Excel テーブルを取得します。
     /// </summary>
-    public Table Table => throw new NotImplementedException();
+    public Table Table =>
+        table;
 }
