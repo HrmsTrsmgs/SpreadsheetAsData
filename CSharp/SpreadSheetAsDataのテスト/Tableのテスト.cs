@@ -42,7 +42,7 @@ public class Tableのテスト : IDisposable
         table.Range.ToString().Should().Be("B6:E9");
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void ColumnsはExcelテーブルの列を定義順に列挙します()
     {
         (

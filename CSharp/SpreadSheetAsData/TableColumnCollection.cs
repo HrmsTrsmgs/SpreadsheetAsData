@@ -1,10 +1,26 @@
 namespace Marimo.SpreadSheetAsData;
 
+using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
+
 /// <summary>
 /// Excel テーブル内の列定義を取得するコレクションを表します。
 /// </summary>
 public class TableColumnCollection : IReadOnlyList<TableColumn>
 {
+    /// <summary>
+    /// 列定義を取得する Excel テーブルです。
+    /// </summary>
+    readonly Table table;
+
+    /// <summary>
+    /// 指定した Excel テーブルの列コレクションを作成します。
+    /// </summary>
+    /// <param name="table">列定義を取得する Excel テーブル。</param>
+    internal TableColumnCollection(Table table)
+    {
+        this.table = table;
+    }
+
     /// <summary>
     /// 指定した位置の列定義を取得します。
     /// </summary>
@@ -32,7 +48,10 @@ public class TableColumnCollection : IReadOnlyList<TableColumn>
     /// </summary>
     /// <returns>列定義の列挙子。</returns>
     public IEnumerator<TableColumn> GetEnumerator() =>
-        throw new NotImplementedException();
+        (
+            from column in table.TableDefinitionPart.Table.TableColumns.Elements<Spreadsheet.TableColumn>()
+            select new TableColumn(column)
+        ).GetEnumerator();
 
     /// <summary>
     /// Excel テーブル内の列定義を列挙します。

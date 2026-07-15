@@ -49,7 +49,8 @@ public class Table
     /// <summary>
     /// Excel テーブルの列定義を取得します。
     /// </summary>
-    public TableColumnCollection Columns => throw new NotImplementedException();
+    public TableColumnCollection Columns =>
+        new(this);
 
     /// <summary>
     /// Excel テーブルのデータ行をワークシート上の順序で取得します。
