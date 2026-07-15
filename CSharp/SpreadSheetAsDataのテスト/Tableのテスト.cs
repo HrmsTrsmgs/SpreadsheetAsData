@@ -55,7 +55,7 @@ public class Tableのテスト : IDisposable
             .Equal("数値", "数値2", "文字列", "真偽値");
     }
 
-    [Fact(Skip = Excelテーブル要素同一性検証保留理由)]
+    [Fact]
     public void Columnsは同じExcelテーブル列を同一オブジェクトとして扱います()
     {
         var firstEnumeration = table.Columns.ToArray();

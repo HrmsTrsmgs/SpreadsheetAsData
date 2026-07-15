@@ -8,9 +8,9 @@ using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
 public class TableColumnCollection : IReadOnlyList<TableColumn>
 {
     /// <summary>
-    /// 列定義を取得する Excel テーブルです。
+    /// 定義順に固定した Excel テーブル列です。
     /// </summary>
-    readonly Table table;
+    readonly TableColumn[] items;
 
     /// <summary>
     /// 指定した Excel テーブルの列コレクションを作成します。
@@ -18,7 +18,10 @@ public class TableColumnCollection : IReadOnlyList<TableColumn>
     /// <param name="table">列定義を取得する Excel テーブル。</param>
     internal TableColumnCollection(Table table)
     {
-        this.table = table;
+        items = [
+            .. from column in table.TableDefinitionPart.Table.TableColumns.Elements<Spreadsheet.TableColumn>()
+               select new TableColumn(column)
+        ];
     }
 
     /// <summary>
@@ -48,10 +51,7 @@ public class TableColumnCollection : IReadOnlyList<TableColumn>
     /// </summary>
     /// <returns>列定義の列挙子。</returns>
     public IEnumerator<TableColumn> GetEnumerator() =>
-        (
-            from column in table.TableDefinitionPart.Table.TableColumns.Elements<Spreadsheet.TableColumn>()
-            select new TableColumn(column)
-        ).GetEnumerator();
+        ((IEnumerable<TableColumn>)items).GetEnumerator();
 
     /// <summary>
     /// Excel テーブル内の列定義を列挙します。

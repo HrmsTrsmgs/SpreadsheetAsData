@@ -23,6 +23,11 @@ public class Table
     readonly CellRangeReference rangeReference;
 
     /// <summary>
+    /// 同じ列定義を同じ <see cref="TableColumn"/> インスタンスとして返す列コレクションです。
+    /// </summary>
+    readonly TableColumnCollection columns;
+
+    /// <summary>
     /// ヘッダー行を除いたデータ行数です。
     /// </summary>
     int DataRowCount =>
@@ -44,6 +49,7 @@ public class Table
         TableDefinitionPart = tableDefinitionPart;
         this.worksheet = worksheet;
         rangeReference = CellRangeReference.Parse(tableDefinitionPart.Table.Reference.ToString());
+        columns = new(this);
     }
 
     /// <summary>
@@ -68,7 +74,7 @@ public class Table
     /// Excel テーブルの列定義を取得します。
     /// </summary>
     public TableColumnCollection Columns =>
-        new(this);
+        columns;
 
     /// <summary>
     /// Excel テーブルのデータ行をワークシート上の順序で取得します。
