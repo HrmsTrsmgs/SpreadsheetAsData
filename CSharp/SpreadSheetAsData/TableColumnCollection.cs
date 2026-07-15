@@ -39,7 +39,11 @@ public class TableColumnCollection : IReadOnlyList<TableColumn>
     /// <returns>指定した名前の列定義。</returns>
     /// <exception cref="KeyNotFoundException">指定した名前の列が存在しない場合。</exception>
     public TableColumn this[string name] =>
-        throw new NotImplementedException();
+        (
+            from item in items
+            where item.Name == name
+            select item
+        ).Single();
 
     /// <summary>
     /// Excel テーブル内の列数を取得します。
