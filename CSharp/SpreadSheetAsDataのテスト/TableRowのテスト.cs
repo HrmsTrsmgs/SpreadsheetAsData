@@ -89,7 +89,7 @@ public class TableRowのテスト : IDisposable
         action.Should().Throw<ArgumentException>();
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void 範囲外の列位置を指定した場合に失敗します()
     {
         var action = () => _ = firstRow[4];
