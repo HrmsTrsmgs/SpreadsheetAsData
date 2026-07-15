@@ -39,7 +39,7 @@ public class TableColumnCollectionのテスト : IDisposable
         tested.Name.Should().Be("数値2");
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void Columnsは名前と位置から同じ列オブジェクトを取得します()
     {
         var byName = columns["数値2"];
@@ -48,7 +48,7 @@ public class TableColumnCollectionのテスト : IDisposable
         byName.Should().BeSameAs(byOrdinal);
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void Columnsは存在しない名前を指定した場合に失敗します()
     {
         var action = () => _ = columns["not_found"];

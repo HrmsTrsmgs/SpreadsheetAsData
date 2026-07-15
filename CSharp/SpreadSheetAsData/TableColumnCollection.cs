@@ -43,7 +43,8 @@ public class TableColumnCollection : IReadOnlyList<TableColumn>
             from item in items
             where item.Name == name
             select item
-        ).Single();
+        ).SingleOrDefault()
+            ?? throw new KeyNotFoundException();
 
     /// <summary>
     /// Excel テーブル内の列数を取得します。
