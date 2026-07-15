@@ -29,6 +29,12 @@ public class Table
         (int)(rangeReference.BottomRight.RowIndex - rangeReference.TopLeft.RowIndex);
 
     /// <summary>
+    /// データ行が始まるワークシート上の 1 始まりの行番号です。
+    /// </summary>
+    uint FirstDataRowIndex =>
+        rangeReference.TopLeft.RowIndex + 1;
+
+    /// <summary>
     /// 指定した Open XML テーブル定義からテーブルを作成します。
     /// </summary>
     /// <param name="tableDefinitionPart">テーブル定義を保持する Open XML パート。</param>
@@ -68,6 +74,6 @@ public class Table
     /// Excel テーブルのデータ行をワークシート上の順序で取得します。
     /// </summary>
     public IEnumerable<TableRow> Rows =>
-        from _ in Enumerable.Range(0, DataRowCount)
-        select new TableRow();
+        from rowOffset in Enumerable.Range(0, DataRowCount)
+        select new TableRow(FirstDataRowIndex + (uint)rowOffset);
 }

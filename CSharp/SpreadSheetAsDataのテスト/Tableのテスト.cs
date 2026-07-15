@@ -59,7 +59,7 @@ public class Tableのテスト : IDisposable
         table.Rows.Should().HaveCount(3);
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void Rowsはデータ行をワークシート上の順序で列挙します()
     {
         (
