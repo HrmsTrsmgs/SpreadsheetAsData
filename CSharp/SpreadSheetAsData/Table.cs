@@ -98,8 +98,10 @@ public class Table
     /// <param name="column">取得するセルが属するテーブル列。</param>
     /// <returns>行と列の交点にあるセル。</returns>
     internal Cell ResolveCell(TableRow row, TableColumn column) =>
-        worksheet.Cells[
-            new CellName(
-                rangeReference.TopLeft.ColumnIndex + (uint)column.Ordinal,
-                row.WorksheetRowIndex)];
+        column.Table == this
+            ? worksheet.Cells[
+                new CellName(
+                    rangeReference.TopLeft.ColumnIndex + (uint)column.Ordinal,
+                    row.WorksheetRowIndex)]
+            : throw new ArgumentException(null, nameof(column));
 }
