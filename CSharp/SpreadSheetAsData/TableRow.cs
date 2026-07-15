@@ -6,6 +6,11 @@ namespace Marimo.SpreadSheetAsData;
 public class TableRow
 {
     /// <summary>
+    /// Excel テーブルのデータ行内での 0 始まりの行位置です。
+    /// </summary>
+    readonly int ordinal;
+
+    /// <summary>
     /// ワークシート上の 1 始まりの行番号です。
     /// </summary>
     readonly uint worksheetRowIndex;
@@ -13,9 +18,11 @@ public class TableRow
     /// <summary>
     /// 指定したワークシート行番号のデータ行を作成します。
     /// </summary>
+    /// <param name="ordinal">Excel テーブルのデータ行内での 0 始まりの行位置。</param>
     /// <param name="worksheetRowIndex">ワークシート上の 1 始まりの行番号。</param>
-    internal TableRow(uint worksheetRowIndex)
+    internal TableRow(int ordinal, uint worksheetRowIndex)
     {
+        this.ordinal = ordinal;
         this.worksheetRowIndex = worksheetRowIndex;
     }
 
@@ -27,7 +34,8 @@ public class TableRow
     /// <summary>
     /// Excel テーブルのデータ行内での 0 始まりの行位置を取得します。
     /// </summary>
-    public int Ordinal => throw new NotImplementedException();
+    public int Ordinal =>
+        ordinal;
 
     /// <summary>
     /// ワークシート上の 1 始まりの行番号を取得します。

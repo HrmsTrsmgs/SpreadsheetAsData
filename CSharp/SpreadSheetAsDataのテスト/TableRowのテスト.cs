@@ -27,7 +27,7 @@ public class TableRowのテスト : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void Ordinalはテーブル内の0始まりのデータ行位置を返します()
     {
         firstRow.Ordinal.Should().Be(0);

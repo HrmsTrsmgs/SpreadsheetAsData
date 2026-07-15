@@ -57,7 +57,7 @@ public class Table
         columns = new(this);
         rows = [
             .. from rowOffset in Enumerable.Range(0, DataRowCount)
-               select new TableRow(FirstDataRowIndex + (uint)rowOffset)
+               select new TableRow(rowOffset, FirstDataRowIndex + (uint)rowOffset)
         ];
     }
 
