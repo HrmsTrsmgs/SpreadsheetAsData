@@ -33,13 +33,13 @@ public class TableRowのテスト : IDisposable
         firstRow.Ordinal.Should().Be(0);
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void WorksheetRowIndexはワークシート上の1始まりの行番号を返します()
     {
         firstRow.WorksheetRowIndex.Should().Be(7u);
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void Tableは行が属するExcelテーブルを返します()
     {
         firstRow.Table.Should().BeSameAs(table);

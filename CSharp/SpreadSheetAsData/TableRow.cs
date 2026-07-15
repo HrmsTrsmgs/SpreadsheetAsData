@@ -36,7 +36,8 @@ public class TableRow
     /// <summary>
     /// この行が属する Excel テーブルを取得します。
     /// </summary>
-    public Table Table => throw new NotImplementedException();
+    public Table Table =>
+        table;
 
     /// <summary>
     /// Excel テーブルのデータ行内での 0 始まりの行位置を取得します。
