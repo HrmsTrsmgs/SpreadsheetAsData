@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Marimo.SpreadSheetAsData;
 using Xunit;
 
@@ -23,7 +23,7 @@ public class TableColumnCollectionのテスト : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void Columnsは名前から列を取得します()
     {
         var tested = columns["数値2"];

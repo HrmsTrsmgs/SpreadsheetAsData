@@ -28,6 +28,11 @@ public class Table
     readonly TableColumnCollection columns;
 
     /// <summary>
+    /// 同じデータ行を同じ <see cref="TableRow"/> インスタンスとして返すための行一覧です。
+    /// </summary>
+    readonly TableRow[] rows;
+
+    /// <summary>
     /// ヘッダー行を除いたデータ行数です。
     /// </summary>
     int DataRowCount =>
@@ -50,6 +55,10 @@ public class Table
         this.worksheet = worksheet;
         rangeReference = CellRangeReference.Parse(tableDefinitionPart.Table.Reference.ToString());
         columns = new(this);
+        rows = [
+            .. from rowOffset in Enumerable.Range(0, DataRowCount)
+               select new TableRow(FirstDataRowIndex + (uint)rowOffset)
+        ];
     }
 
     /// <summary>
@@ -80,6 +89,5 @@ public class Table
     /// Excel テーブルのデータ行をワークシート上の順序で取得します。
     /// </summary>
     public IEnumerable<TableRow> Rows =>
-        from rowOffset in Enumerable.Range(0, DataRowCount)
-        select new TableRow(FirstDataRowIndex + (uint)rowOffset);
+        rows;
 }
