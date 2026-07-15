@@ -18,6 +18,17 @@ public class Table
     readonly Worksheet worksheet;
 
     /// <summary>
+    /// Excel テーブル全体のセル範囲参照です。
+    /// </summary>
+    readonly CellRangeReference rangeReference;
+
+    /// <summary>
+    /// ヘッダー行を除いたデータ行数です。
+    /// </summary>
+    int DataRowCount =>
+        (int)(rangeReference.BottomRight.RowIndex - rangeReference.TopLeft.RowIndex);
+
+    /// <summary>
     /// 指定した Open XML テーブル定義からテーブルを作成します。
     /// </summary>
     /// <param name="tableDefinitionPart">テーブル定義を保持する Open XML パート。</param>
@@ -26,6 +37,7 @@ public class Table
     {
         TableDefinitionPart = tableDefinitionPart;
         this.worksheet = worksheet;
+        rangeReference = CellRangeReference.Parse(tableDefinitionPart.Table.Reference.ToString());
     }
 
     /// <summary>
@@ -44,7 +56,7 @@ public class Table
     /// ヘッダー行を含む Excel テーブル全体のセル範囲を取得します。
     /// </summary>
     public CellRange Range =>
-        worksheet.Range[TableDefinitionPart.Table.Reference.ToString()];
+        worksheet.Range[rangeReference.TopLeft, rangeReference.BottomRight];
 
     /// <summary>
     /// Excel テーブルの列定義を取得します。
@@ -55,5 +67,7 @@ public class Table
     /// <summary>
     /// Excel テーブルのデータ行をワークシート上の順序で取得します。
     /// </summary>
-    public IEnumerable<TableRow> Rows => throw new NotImplementedException();
+    public IEnumerable<TableRow> Rows =>
+        from _ in Enumerable.Range(0, DataRowCount)
+        select new TableRow();
 }

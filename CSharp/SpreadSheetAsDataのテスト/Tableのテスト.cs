@@ -53,7 +53,7 @@ public class Tableのテスト : IDisposable
             .Equal("数値", "数値2", "文字列", "真偽値");
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void Rowsはすべてのデータ行を列挙します()
     {
         table.Rows.Should().HaveCount(3);
