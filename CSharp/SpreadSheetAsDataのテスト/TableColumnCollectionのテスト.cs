@@ -56,7 +56,7 @@ public class TableColumnCollectionのテスト : IDisposable
         action.Should().Throw<KeyNotFoundException>();
     }
 
-    [Fact(Skip = "Excelテーブル仕様を先行追加しているため、実装対象になったテストから解除する。")]
+    [Fact]
     public void Columnsは範囲外の位置を指定した場合に失敗します()
     {
         var action = () => _ = columns[4];
