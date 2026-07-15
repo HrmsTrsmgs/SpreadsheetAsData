@@ -7,6 +7,8 @@ namespace Marimo.SpreadSheetAsData.Test;
 public class Tableのテスト : IDisposable
 {
     const string TestFilePath = @"TestData\テーブル.xlsx";
+    const string Excelテーブル要素同一性検証保留理由 =
+        "Excelテーブル列・行を同じ参照として返すキャッシュ実装時に解除する。";
 
     readonly Workbook book;
     readonly Table table;
@@ -53,6 +55,15 @@ public class Tableのテスト : IDisposable
             .Equal("数値", "数値2", "文字列", "真偽値");
     }
 
+    [Fact(Skip = Excelテーブル要素同一性検証保留理由)]
+    public void Columnsは同じExcelテーブル列を同一オブジェクトとして扱います()
+    {
+        var firstEnumeration = table.Columns.ToArray();
+        var secondEnumeration = table.Columns.ToArray();
+
+        firstEnumeration[1].Should().BeSameAs(secondEnumeration[1]);
+    }
+
     [Fact]
     public void Rowsはすべてのデータ行を列挙します()
     {
@@ -68,5 +79,14 @@ public class Tableのテスト : IDisposable
         )
             .Should()
             .Equal(7u, 8u, 9u);
+    }
+
+    [Fact(Skip = Excelテーブル要素同一性検証保留理由)]
+    public void Rowsは同じデータ行を同一オブジェクトとして扱います()
+    {
+        var firstEnumeration = table.Rows.ToArray();
+        var secondEnumeration = table.Rows.ToArray();
+
+        firstEnumeration[1].Should().BeSameAs(secondEnumeration[1]);
     }
 }
