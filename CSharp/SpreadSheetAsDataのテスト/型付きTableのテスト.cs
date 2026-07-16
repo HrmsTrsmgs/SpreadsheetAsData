@@ -24,7 +24,7 @@ public sealed class 型付きTableのテスト : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    [Fact(Skip = "属性を使用したint、double、stringの基本マッピングを実装するときに解除する。")]
+    [Fact]
     public void 型付きTableは属性で指定した列をプロパティへ設定して各データ行を順に列挙します()
     {
         tested.Should().BeEquivalentTo(
