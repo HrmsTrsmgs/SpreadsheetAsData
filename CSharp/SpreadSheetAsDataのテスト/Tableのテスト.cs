@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Marimo.SpreadSheetAsData;
 using Xunit;
 
@@ -10,11 +10,13 @@ public class Tableのテスト : IDisposable
 
     readonly Workbook book;
     readonly Table table;
+    readonly Table typedMappingTable;
 
     public Tableのテスト()
     {
         book = Workbook.Open(TestFilePath);
         table = book.Tables["テーブル2"];
+        typedMappingTable = book.Tables["テーブル6"];
     }
 
     public void Dispose()
@@ -86,5 +88,15 @@ public class Tableのテスト : IDisposable
         var secondEnumeration = table.Rows.ToArray();
 
         firstEnumeration[1].Should().BeSameAs(secondEnumeration[1]);
+    }
+
+    [Fact(Skip = "既存の非型付きTableから型付き行を列挙するEnumerate APIを実装するときに解除する。")]
+    public void EnumerateはReadTableで取得した型付きTableと同じ結果を列挙します()
+    {
+        typedMappingTable.Enumerate<TestMappedRow>()
+            .Should()
+            .BeEquivalentTo(
+                book.ReadTable<TestMappedRow>("テーブル6"),
+                options => options.WithStrictOrdering());
     }
 }

@@ -1,4 +1,4 @@
-namespace Marimo.SpreadSheetAsData;
+﻿namespace Marimo.SpreadSheetAsData;
 
 /// <summary>
 /// Excel テーブル内のデータ行を表します。

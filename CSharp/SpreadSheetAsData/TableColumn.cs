@@ -1,7 +1,7 @@
-namespace Marimo.SpreadSheetAsData;
-
+﻿
 using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
 
+namespace Marimo.SpreadSheetAsData;
 /// <summary>
 /// Excel テーブル内の列定義を表します。
 /// </summary>

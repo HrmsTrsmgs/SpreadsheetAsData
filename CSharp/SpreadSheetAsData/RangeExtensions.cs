@@ -1,4 +1,4 @@
-namespace Marimo.SpreadSheetAsData;
+﻿namespace Marimo.SpreadSheetAsData;
 
 /// <summary>
 /// 整数範囲を読みやすく扱うための内部拡張です。

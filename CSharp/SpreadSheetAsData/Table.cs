@@ -1,7 +1,7 @@
-namespace Marimo.SpreadSheetAsData;
-
+﻿
 using Packaging = DocumentFormat.OpenXml.Packaging;
 
+namespace Marimo.SpreadSheetAsData;
 /// <summary>
 /// ブック内の Excel テーブルを表します。
 /// </summary>
@@ -90,6 +90,14 @@ public class Table
     /// </summary>
     public IEnumerable<TableRow> Rows =>
         rows;
+
+    /// <summary>
+    /// Excel テーブルの各データ行を <typeparamref name="T"/> へ対応付けて列挙します。
+    /// </summary>
+    /// <typeparam name="T">各データ行を対応付ける型。</typeparam>
+    /// <returns>型付き行の列挙。</returns>
+    public IEnumerable<T> Enumerate<T>() =>
+        new Table<T>(this);
 
     /// <summary>
     /// テーブル行と列定義の交点にあるワークシートセルを取得します。
