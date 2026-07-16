@@ -58,11 +58,10 @@ public sealed class Table<T> : IEnumerable<T>
 
     static string GetColumnName(PropertyInfo property) =>
         property.GetCustomAttribute<SpreadsheetColumnAttribute>()?.Name
-            ?? throw new NotImplementedException();
+            ?? property.Name;
 
     static IEnumerable<PropertyInfo> MappedProperties =>
         from property in typeof(T).GetProperties()
-        where property.GetCustomAttribute<SpreadsheetColumnAttribute>() != null
         select property;
 
     static object ConvertValue(object sourceValue, Type propertyType) =>

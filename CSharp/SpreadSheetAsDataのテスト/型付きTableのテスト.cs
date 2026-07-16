@@ -107,7 +107,7 @@ public sealed class 型付きTableのテスト : IDisposable
             .BeEmpty();
     }
 
-    [Fact(Skip = "属性がないプロパティを同名の列へ対応付ける規則を実装するときに解除する。")]
+    [Fact]
     public void 型付きTableは属性がないプロパティ名を列名として使用します()
     {
         book.ReadTable<PropertyNameMappedRow>(MappingTableName)
