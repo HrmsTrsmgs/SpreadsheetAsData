@@ -99,7 +99,7 @@ public sealed class 型付きTableのテスト : IDisposable
             options => options.WithStrictOrdering());
     }
 
-    [Fact(Skip = "データ行がないExcelテーブルの型付き列挙を実装するときに解除する。")]
+    [Fact]
     public void 型付きTableはデータ行がない場合に空の列挙になります()
     {
         book.ReadTable<TestMappedRow>("テーブル3")
