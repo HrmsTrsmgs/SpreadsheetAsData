@@ -184,7 +184,7 @@ public sealed class 型付きTableのテスト : IDisposable
                 options => options.WithStrictOrdering());
     }
 
-    [Fact(Skip = "マッピング先に対応プロパティがない余剰列を無視する規則を実装するときに解除する。")]
+    [Fact]
     public void 型付きTableはマッピング先に対応プロパティがない列を無視します()
     {
         book.ReadTable<IntegerOnlyRow>(MappingTableName)
@@ -193,7 +193,7 @@ public sealed class 型付きTableのテスト : IDisposable
             .Equal(4, 2, 3, 10, 1, 9, 6, 8, 5, 5, 7);
     }
 
-    [Fact(Skip = "属性で指定した列が存在しない場合のマッピングエラーを実装するときに解除する。")]
+    [Fact]
     public void 型付きTableは属性で指定した列が存在しない場合に失敗します()
     {
         var action = () =>

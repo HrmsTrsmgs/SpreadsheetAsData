@@ -57,6 +57,13 @@ public class TableColumnCollectionのテスト : IDisposable
     }
 
     [Fact]
+    public void Containsは指定した名前の列が存在するかを返します()
+    {
+        columns.Contains("数値2").Should().BeTrue();
+        columns.Contains("not_found").Should().BeFalse();
+    }
+
+    [Fact]
     public void Columnsは範囲外の位置を指定した場合に失敗します()
     {
         var action = () => _ = columns[4];

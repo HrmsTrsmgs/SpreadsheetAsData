@@ -41,6 +41,8 @@ public sealed class Table<T> : IEnumerable<T>
 
     T Map(TableRow row)
     {
+        ValidateColumns();
+
         var mapped = Activator.CreateInstance<T>();
 
         foreach (var property in MappedProperties)
@@ -52,6 +54,31 @@ public sealed class Table<T> : IEnumerable<T>
 
         return mapped;
     }
+
+    void ValidateColumns()
+    {
+        foreach (var property in MappedProperties)
+        {
+            var columnName = GetColumnName(property);
+
+            if (!source.Columns.Contains(columnName))
+            {
+                throw CreateMappingException(columnName, property);
+            }
+        }
+    }
+
+    TableMappingException CreateMappingException(
+        string columnName,
+        PropertyInfo property) =>
+        new()
+        {
+            TableName = source.Name,
+            MappingType = typeof(T),
+            ColumnName = columnName,
+            PropertyName = property.Name,
+            PropertyType = property.PropertyType
+        };
 
     static object GetSourceValue(TableRow row, PropertyInfo property) =>
         row[GetColumnName(property)].Value;

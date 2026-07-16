@@ -51,6 +51,18 @@ public class TableColumnCollection : IReadOnlyList<TableColumn>
             ?? throw new KeyNotFoundException();
 
     /// <summary>
+    /// 指定した名前の列定義が存在するかどうかを返します。
+    /// </summary>
+    /// <param name="name">確認する列名。</param>
+    /// <returns>指定した名前の列定義が存在する場合は true。</returns>
+    public bool Contains(string name) =>
+        (
+            from item in items
+            where item.Name == name
+            select item
+        ).Any();
+
+    /// <summary>
     /// Excel テーブル内の列数を取得します。
     /// </summary>
     public int Count => throw new NotImplementedException();
