@@ -7,7 +7,8 @@ namespace Marimo.SpreadSheetAsData.Test;
 public sealed class 型付きTableのテスト : IDisposable
 {
     const string TestFilePath = @"TestData\テーブル.xlsx";
-    const string MappingTableName = "テーブル6";
+    const string MappingTableName = "テーブル2";
+    const string PropertyNameMappingTableName = "テーブル1";
 
     readonly Workbook book;
     readonly Table<TestMappedRow> tested;
@@ -31,69 +32,21 @@ public sealed class 型付きTableのテスト : IDisposable
             [
                 new TestMappedRow
                 {
-                    IntegerValue = 4,
+                    IntegerValue = 1,
                     FloatingPointValue = 4.4,
-                    TextValue = "か"
+                    TextValue = "さしすせそ"
                 },
                 new TestMappedRow
                 {
                     IntegerValue = 2,
-                    FloatingPointValue = 2.2,
-                    TextValue = "き"
+                    FloatingPointValue = 5.5,
+                    TextValue = "たちつてと"
                 },
                 new TestMappedRow
                 {
                     IntegerValue = 3,
-                    FloatingPointValue = 3.3,
-                    TextValue = "く"
-                },
-                new TestMappedRow
-                {
-                    IntegerValue = 10,
-                    FloatingPointValue = 11,
-                    TextValue = "け"
-                },
-                new TestMappedRow
-                {
-                    IntegerValue = 1,
-                    FloatingPointValue = 1.1,
-                    TextValue = "こ"
-                },
-                new TestMappedRow
-                {
-                    IntegerValue = 9,
-                    FloatingPointValue = 9.9,
-                    TextValue = "さ"
-                },
-                new TestMappedRow
-                {
-                    IntegerValue = 6,
                     FloatingPointValue = 6.6,
-                    TextValue = "あ"
-                },
-                new TestMappedRow
-                {
-                    IntegerValue = 8,
-                    FloatingPointValue = 8.8,
-                    TextValue = "い"
-                },
-                new TestMappedRow
-                {
-                    IntegerValue = 5,
-                    FloatingPointValue = 5.5,
-                    TextValue = "う"
-                },
-                new TestMappedRow
-                {
-                    IntegerValue = 5,
-                    FloatingPointValue = 6.6,
-                    TextValue = "え"
-                },
-                new TestMappedRow
-                {
-                    IntegerValue = 7,
-                    FloatingPointValue = 7.7,
-                    TextValue = "お"
+                    TextValue = "なにぬねの"
                 }
             ],
             options => options.WithStrictOrdering());
@@ -110,75 +63,19 @@ public sealed class 型付きTableのテスト : IDisposable
     [Fact]
     public void 型付きTableは属性がないプロパティ名を列名として使用します()
     {
-        book.ReadTable<PropertyNameMappedRow>(MappingTableName)
+        book.ReadTable<PropertyNameMappedRow>(PropertyNameMappingTableName)
             .Should()
             .BeEquivalentTo(
                 [
                     new PropertyNameMappedRow
                     {
-                        @int = 4,
-                        @float = 4.4,
-                        @string = "か"
-                    },
-                    new PropertyNameMappedRow
-                    {
-                        @int = 2,
-                        @float = 2.2,
-                        @string = "き"
-                    },
-                    new PropertyNameMappedRow
-                    {
-                        @int = 3,
-                        @float = 3.3,
-                        @string = "く"
-                    },
-                    new PropertyNameMappedRow
-                    {
-                        @int = 10,
-                        @float = 11,
-                        @string = "け"
-                    },
-                    new PropertyNameMappedRow
-                    {
-                        @int = 1,
                         @float = 1.1,
-                        @string = "こ"
+                        @string = "あいうえお"
                     },
                     new PropertyNameMappedRow
                     {
-                        @int = 9,
-                        @float = 9.9,
-                        @string = "さ"
-                    },
-                    new PropertyNameMappedRow
-                    {
-                        @int = 6,
-                        @float = 6.6,
-                        @string = "あ"
-                    },
-                    new PropertyNameMappedRow
-                    {
-                        @int = 8,
-                        @float = 8.8,
-                        @string = "い"
-                    },
-                    new PropertyNameMappedRow
-                    {
-                        @int = 5,
-                        @float = 5.5,
-                        @string = "う"
-                    },
-                    new PropertyNameMappedRow
-                    {
-                        @int = 5,
-                        @float = 6.6,
-                        @string = "え"
-                    },
-                    new PropertyNameMappedRow
-                    {
-                        @int = 7,
-                        @float = 7.7,
-                        @string = "お"
+                        @float = 2.2,
+                        @string = "かきくけこ"
                     }
                 ],
                 options => options.WithStrictOrdering());
@@ -190,7 +87,7 @@ public sealed class 型付きTableのテスト : IDisposable
         book.ReadTable<IntegerOnlyRow>(MappingTableName)
             .Select(row => row.IntegerValue)
             .Should()
-            .Equal(4, 2, 3, 10, 1, 9, 6, 8, 5, 5, 7);
+            .Equal(1, 2, 3);
     }
 
     [Fact]
@@ -232,11 +129,11 @@ public sealed class 型付きTableのテスト : IDisposable
 
         exception.TableName.Should().Be(MappingTableName);
         exception.MappingType.Should().Be(typeof(StringAsIntegerRow));
-        exception.ColumnName.Should().Be("string");
+        exception.ColumnName.Should().Be("文字列");
         exception.PropertyName.Should().Be(nameof(StringAsIntegerRow.Value));
         exception.PropertyType.Should().Be(typeof(int));
-        exception.WorksheetRowIndex.Should().Be(2U);
-        exception.SourceValue.Should().Be("か");
+        exception.WorksheetRowIndex.Should().Be(7U);
+        exception.SourceValue.Should().Be("さしすせそ");
     }
 
     [Fact]
@@ -256,11 +153,11 @@ public sealed class 型付きTableのテスト : IDisposable
         exception.TableName.Should().Be(MappingTableName);
         exception.MappingType.Should().Be(
             typeof(FloatingPointAsIntegerRow));
-        exception.ColumnName.Should().Be("float");
+        exception.ColumnName.Should().Be("数値");
         exception.PropertyName.Should().Be(
             nameof(FloatingPointAsIntegerRow.Value));
         exception.PropertyType.Should().Be(typeof(int));
-        exception.WorksheetRowIndex.Should().Be(2U);
+        exception.WorksheetRowIndex.Should().Be(7U);
         exception.SourceValue.Should().Be(4.4);
     }
 
@@ -280,7 +177,7 @@ public sealed class 型付きTableのテスト : IDisposable
 
         exception.TableName.Should().Be(MappingTableName);
         exception.MappingType.Should().Be(typeof(DuplicateColumnRow));
-        exception.ColumnName.Should().Be("int");
+        exception.ColumnName.Should().Be("数値2");
         exception.WorksheetRowIndex.Should().BeNull();
         exception.SourceValue.Should().BeNull();
     }
@@ -302,7 +199,7 @@ public sealed class 型付きTableのテスト : IDisposable
         exception.TableName.Should().Be(MappingTableName);
         exception.MappingType.Should().Be(
             typeof(AttributedPropertyWithoutPublicSetterRow));
-        exception.ColumnName.Should().Be("int");
+        exception.ColumnName.Should().Be("数値2");
         exception.PropertyName.Should().Be(
             nameof(
                 AttributedPropertyWithoutPublicSetterRow.IntegerValue));
@@ -321,7 +218,7 @@ public sealed class 型付きTableのテスト : IDisposable
         rows
             .Select(row => row.IntegerValue)
             .Should()
-            .Equal(4, 2, 3, 10, 1, 9, 6, 8, 5, 5, 7);
+            .Equal(1, 2, 3);
 
         rows
             .Select(row => row.Description)
@@ -355,8 +252,6 @@ public sealed class 型付きTableのテスト : IDisposable
 
     public sealed class PropertyNameMappedRow
     {
-        public int @int { get; set; }
-
         public double @float { get; set; }
 
         public string @string { get; set; } = "";
@@ -364,7 +259,7 @@ public sealed class 型付きTableのテスト : IDisposable
 
     public sealed class IntegerOnlyRow
     {
-        [SpreadsheetColumn("int")]
+        [SpreadsheetColumn("数値2")]
         public int IntegerValue { get; set; }
     }
 
@@ -376,13 +271,13 @@ public sealed class 型付きTableのテスト : IDisposable
 
     public sealed class StringAsIntegerRow
     {
-        [SpreadsheetColumn("string")]
+        [SpreadsheetColumn("文字列")]
         public int Value { get; set; }
     }
 
     public sealed class FloatingPointAsIntegerRow
     {
-        [SpreadsheetColumn("float")]
+        [SpreadsheetColumn("数値")]
         public int Value { get; set; }
     }
 
@@ -397,22 +292,22 @@ public sealed class 型付きTableのテスト : IDisposable
 
     public sealed class DuplicateColumnRow
     {
-        [SpreadsheetColumn("int")]
+        [SpreadsheetColumn("数値2")]
         public int FirstValue { get; set; }
 
-        [SpreadsheetColumn("int")]
+        [SpreadsheetColumn("数値2")]
         public int SecondValue { get; set; }
     }
 
     public sealed class AttributedPropertyWithoutPublicSetterRow
     {
-        [SpreadsheetColumn("int")]
+        [SpreadsheetColumn("数値2")]
         public int IntegerValue { get; private set; }
     }
 
     public sealed class RowWithReadOnlyProperty
     {
-        [SpreadsheetColumn("int")]
+        [SpreadsheetColumn("数値2")]
         public int IntegerValue { get; set; }
 
         public string Description => "computed";
@@ -425,7 +320,7 @@ public sealed class 型付きTableのテスト : IDisposable
             Value = value;
         }
 
-        [SpreadsheetColumn("int")]
+        [SpreadsheetColumn("数値2")]
         public int Value { get; set; }
     }
 }

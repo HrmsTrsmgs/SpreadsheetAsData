@@ -16,7 +16,7 @@ public class Tableのテスト : IDisposable
     {
         book = Workbook.Open(TestFilePath);
         table = book.Tables["テーブル2"];
-        typedMappingTable = book.Tables["テーブル6"];
+        typedMappingTable = book.Tables["テーブル2"];
     }
 
     public void Dispose()
@@ -96,7 +96,7 @@ public class Tableのテスト : IDisposable
         typedMappingTable.Enumerate<TestMappedRow>()
             .Should()
             .BeEquivalentTo(
-                book.ReadTable<TestMappedRow>("テーブル6"),
+                book.ReadTable<TestMappedRow>("テーブル2"),
                 options => options.WithStrictOrdering());
     }
 }
