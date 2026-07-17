@@ -47,9 +47,11 @@ public sealed class Table<T> : IEnumerable<T>
 
         foreach (var property in MappedProperties)
         {
+            var sourceValue = GetSourceValue(row, property);
+
             property.SetValue(
                 mapped,
-                ConvertValue(GetSourceValue(row, property), property.PropertyType));
+                ConvertValue(sourceValue, row, property));
         }
 
         return mapped;
@@ -80,6 +82,21 @@ public sealed class Table<T> : IEnumerable<T>
             PropertyType = property.PropertyType
         };
 
+    TableMappingException CreateMappingException(
+        object sourceValue,
+        TableRow row,
+        PropertyInfo property) =>
+        new()
+        {
+            TableName = source.Name,
+            MappingType = typeof(T),
+            ColumnName = GetColumnName(property),
+            PropertyName = property.Name,
+            PropertyType = property.PropertyType,
+            WorksheetRowIndex = row.WorksheetRowIndex,
+            SourceValue = sourceValue
+        };
+
     static object GetSourceValue(TableRow row, PropertyInfo property) =>
         row[GetColumnName(property)].Value;
 
@@ -91,27 +108,35 @@ public sealed class Table<T> : IEnumerable<T>
         from property in typeof(T).GetProperties()
         select property;
 
-    static object ConvertValue(object sourceValue, Type propertyType) =>
-        propertyType switch
+    object ConvertValue(
+        object sourceValue,
+        TableRow row,
+        PropertyInfo property)
+    {
+        if (TryConvertValue(sourceValue, property.PropertyType, out var converted))
         {
-            _ when propertyType == typeof(int) => ConvertInteger(sourceValue),
-            _ when propertyType == typeof(double) => ConvertDouble(sourceValue),
-            _ when propertyType == typeof(string) => ConvertString(sourceValue),
-            _ => throw new NotImplementedException()
+            return converted;
+        }
+
+        throw CreateMappingException(sourceValue, row, property);
+    }
+
+    static bool TryConvertValue(
+        object sourceValue,
+        Type propertyType,
+        out object converted)
+    {
+        object? conversion = (propertyType, sourceValue) switch
+        {
+            ({ } type, double number) when type == typeof(int)
+                && double.IsInteger(number) => (int)number,
+            ({ } type, double number) when type == typeof(double) => number,
+            ({ } type, string text) when type == typeof(string) => text,
+            _ => null
         };
 
-    static int ConvertInteger(object sourceValue) =>
-        sourceValue is double number && double.IsInteger(number)
-            ? (int)number
-            : throw new NotImplementedException();
+        converted = conversion ?? new();
 
-    static double ConvertDouble(object sourceValue) =>
-        sourceValue is double number
-            ? number
-            : throw new NotImplementedException();
-
-    static string ConvertString(object sourceValue) =>
-        sourceValue is string text
-            ? text
-            : throw new NotImplementedException();
+        return conversion != null;
+    }
 }

@@ -216,7 +216,7 @@ public sealed class 型付きTableのテスト : IDisposable
         exception.SourceValue.Should().BeNull();
     }
 
-    [Fact(Skip = "セル値を対象プロパティ型へ変換できない場合のマッピングエラーを実装するときに解除する。")]
+    [Fact]
     public void 型付きTableはセル値をプロパティ型へ変換できない場合に失敗します()
     {
         var action = () =>
