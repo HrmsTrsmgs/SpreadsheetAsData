@@ -6,6 +6,47 @@
 public sealed class TableMappingException : Exception
 {
     /// <summary>
+    /// 空のマッピング例外を作成します。
+    /// </summary>
+    public TableMappingException()
+    {
+    }
+
+    internal TableMappingException(
+        Table table,
+        Type mappingType,
+        string columnName)
+    {
+        TableName = table.Name;
+        MappingType = mappingType;
+        ColumnName = columnName;
+    }
+
+    internal TableMappingException(
+        Table table,
+        Type mappingType,
+        string columnName,
+        System.Reflection.PropertyInfo property)
+        : this(table, mappingType, columnName)
+    {
+        PropertyName = property.Name;
+        PropertyType = property.PropertyType;
+    }
+
+    internal TableMappingException(
+        Table table,
+        Type mappingType,
+        string columnName,
+        System.Reflection.PropertyInfo property,
+        TableRow row,
+        object sourceValue)
+        : this(table, mappingType, columnName, property)
+    {
+        WorksheetRowIndex = row.WorksheetRowIndex;
+        SourceValue = sourceValue;
+    }
+
+    /// <summary>
     /// マッピングに失敗した Excel テーブル名を取得または設定します。
     /// </summary>
     public string? TableName { get; init; }

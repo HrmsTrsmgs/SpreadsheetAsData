@@ -20,6 +20,7 @@ public sealed class Table<T> : IEnumerable<T>
     internal Table(Table source)
     {
         this.source = source;
+        ValidateColumns();
     }
 
     /// <summary>
@@ -41,8 +42,6 @@ public sealed class Table<T> : IEnumerable<T>
 
     T Map(TableRow row)
     {
-        ValidateColumns();
-
         var mapped = Activator.CreateInstance<T>();
 
         foreach (var property in MappedProperties)
@@ -59,43 +58,43 @@ public sealed class Table<T> : IEnumerable<T>
 
     void ValidateColumns()
     {
+        ValidateDuplicateColumns();
+
         foreach (var property in MappedProperties)
         {
             var columnName = GetColumnName(property);
 
             if (!source.Columns.Contains(columnName))
             {
-                throw CreateMappingException(columnName, property);
+                throw new TableMappingException(
+                    source,
+                    typeof(T),
+                    columnName,
+                    property);
             }
         }
     }
 
-    TableMappingException CreateMappingException(
-        string columnName,
-        PropertyInfo property) =>
-        new()
-        {
-            TableName = source.Name,
-            MappingType = typeof(T),
-            ColumnName = columnName,
-            PropertyName = property.Name,
-            PropertyType = property.PropertyType
-        };
+    void ValidateDuplicateColumns()
+    {
+        var duplicateColumnName = FindDuplicateColumnName();
 
-    TableMappingException CreateMappingException(
-        object sourceValue,
-        TableRow row,
-        PropertyInfo property) =>
-        new()
+        if (duplicateColumnName is not null)
         {
-            TableName = source.Name,
-            MappingType = typeof(T),
-            ColumnName = GetColumnName(property),
-            PropertyName = property.Name,
-            PropertyType = property.PropertyType,
-            WorksheetRowIndex = row.WorksheetRowIndex,
-            SourceValue = sourceValue
-        };
+            throw new TableMappingException(
+                source,
+                typeof(T),
+                duplicateColumnName);
+        }
+    }
+
+    static string? FindDuplicateColumnName() =>
+        (
+            from property in MappedProperties
+            group property by GetColumnName(property) into propertiesByColumn
+            where propertiesByColumn.Skip(1).Any()
+            select propertiesByColumn.Key
+        ).FirstOrDefault();
 
     static object GetSourceValue(TableRow row, PropertyInfo property) =>
         row[GetColumnName(property)].Value;
@@ -118,7 +117,13 @@ public sealed class Table<T> : IEnumerable<T>
             return converted;
         }
 
-        throw CreateMappingException(sourceValue, row, property);
+        throw new TableMappingException(
+            source,
+            typeof(T),
+            GetColumnName(property),
+            property,
+            row,
+            sourceValue);
     }
 
     static bool TryConvertValue(

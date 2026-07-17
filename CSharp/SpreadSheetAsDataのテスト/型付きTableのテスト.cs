@@ -102,7 +102,7 @@ public sealed class 型付きTableのテスト : IDisposable
     [Fact]
     public void 型付きTableはデータ行がない場合に空の列挙になります()
     {
-        book.ReadTable<TestMappedRow>("テーブル3")
+        book.ReadTable<EmptyTableRow>("テーブル3")
             .Should()
             .BeEmpty();
     }
@@ -239,7 +239,7 @@ public sealed class 型付きTableのテスト : IDisposable
         exception.SourceValue.Should().Be("か");
     }
 
-    [Fact(Skip = "小数をintへ暗黙に丸めず変換失敗とする規則を実装するときに解除する。")]
+    [Fact]
     public void 型付きTableは小数をintへ変換しようとした場合に失敗します()
     {
         var action = () =>
@@ -264,7 +264,7 @@ public sealed class 型付きTableのテスト : IDisposable
         exception.SourceValue.Should().Be(4.4);
     }
 
-    [Fact(Skip = "複数のプロパティが同じ列を指定した場合の検証を実装するときに解除する。")]
+    [Fact]
     public void 型付きTableは複数のプロパティが同じ列を指定した場合に失敗します()
     {
         var action = () =>
@@ -384,6 +384,15 @@ public sealed class 型付きTableのテスト : IDisposable
     {
         [SpreadsheetColumn("float")]
         public int Value { get; set; }
+    }
+
+    public sealed class EmptyTableRow
+    {
+        [SpreadsheetColumn("列1")]
+        public string FirstValue { get; set; } = "";
+
+        [SpreadsheetColumn("列2")]
+        public string SecondValue { get; set; } = "";
     }
 
     public sealed class DuplicateColumnRow
