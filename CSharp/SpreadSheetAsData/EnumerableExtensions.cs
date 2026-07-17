@@ -34,4 +34,27 @@ static class EnumerableExtensions
             index = checked(index + 1);
         }
     }
+
+    /// <summary>
+    /// 列挙の先頭要素を取得できるかどうかを返します。
+    /// </summary>
+    /// <typeparam name="T">列挙する要素の型。</typeparam>
+    /// <param name="self">先頭要素を取得する列挙。</param>
+    /// <param name="value">取得できた先頭要素。取得できなかった場合は使用しない。</param>
+    /// <returns>先頭要素を取得できた場合は true。</returns>
+    internal static bool TryGetFirst<T>(
+        this IEnumerable<T> self,
+        out T value)
+    {
+        using var enumerator = self.GetEnumerator();
+
+        if (enumerator.MoveNext())
+        {
+            value = enumerator.Current;
+            return true;
+        }
+
+        value = default!;
+        return false;
+    }
 }

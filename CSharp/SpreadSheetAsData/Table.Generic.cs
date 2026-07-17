@@ -35,6 +35,11 @@ public sealed class Table<T> : Table, IEnumerable<T>
     System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() =>
         GetEnumerator();
 
+    /// <summary>
+    /// 非型付きのテーブル行を、マッピング先の型へ変換します。
+    /// </summary>
+    /// <param name="row">変換元のテーブル行。</param>
+    /// <returns>変換した型付き行。</returns>
     T Map(TableRow row)
     {
         var mapped = Activator.CreateInstance<T>();
@@ -51,9 +56,13 @@ public sealed class Table<T> : Table, IEnumerable<T>
         return mapped;
     }
 
+    /// <summary>
+    /// マッピング定義が、この Excel テーブルの列構成に対応できることを検証します。
+    /// </summary>
     void ValidateColumns()
     {
         ValidateDuplicateColumns();
+        ValidateAttributedPropertiesHavePublicSetters();
 
         foreach (var property in MappedProperties)
         {
@@ -70,11 +79,17 @@ public sealed class Table<T> : Table, IEnumerable<T>
         }
     }
 
+    /// <summary>
+    /// 同じ Excel テーブル列へ複数のプロパティを対応付けていないことを検証します。
+    /// </summary>
     void ValidateDuplicateColumns()
     {
-        var duplicateColumnName = FindDuplicateColumnName();
-
-        if (duplicateColumnName is not null)
+        if ((
+            from property in MappedProperties
+            group property by GetColumnName(property) into propertiesByColumn
+            where propertiesByColumn.Skip(1).Any()
+            select propertiesByColumn.Key
+        ).TryGetFirst(out var duplicateColumnName))
         {
             throw new TableMappingException(
                 this,
@@ -83,25 +98,58 @@ public sealed class Table<T> : Table, IEnumerable<T>
         }
     }
 
-    static string? FindDuplicateColumnName() =>
-        (
+    /// <summary>
+    /// 属性で対応付けたプロパティへ値を書き込めることを検証します。
+    /// </summary>
+    void ValidateAttributedPropertiesHavePublicSetters()
+    {
+        if ((
             from property in MappedProperties
-            group property by GetColumnName(property) into propertiesByColumn
-            where propertiesByColumn.Skip(1).Any()
-            select propertiesByColumn.Key
-        ).FirstOrDefault();
+            where property.GetCustomAttribute<SpreadsheetColumnAttribute>() is not null
+                && property.SetMethod?.IsPublic != true
+            select property
+        ).TryGetFirst(out var propertyWithoutPublicSetter))
+        {
+            throw new TableMappingException(
+                this,
+                typeof(T),
+                GetColumnName(propertyWithoutPublicSetter),
+                propertyWithoutPublicSetter);
+        }
+    }
 
+    /// <summary>
+    /// テーブル行から、指定したプロパティに対応する元セル値を取得します。
+    /// </summary>
+    /// <param name="row">値を取得するテーブル行。</param>
+    /// <param name="property">マッピング先プロパティ。</param>
+    /// <returns>プロパティに対応するセル値。</returns>
     static object GetSourceValue(TableRow row, PropertyInfo property) =>
         row[GetColumnName(property)].Value;
 
+    /// <summary>
+    /// プロパティに対応する Excel テーブル列名を取得します。
+    /// </summary>
+    /// <param name="property">列名を取得するプロパティ。</param>
+    /// <returns>属性で指定した列名。属性がない場合はプロパティ名。</returns>
     static string GetColumnName(PropertyInfo property) =>
         property.GetCustomAttribute<SpreadsheetColumnAttribute>()?.Name
             ?? property.Name;
 
+    /// <summary>
+    /// マッピング対象になる公開プロパティを取得します。
+    /// </summary>
     static IEnumerable<PropertyInfo> MappedProperties =>
         from property in typeof(T).GetProperties()
         select property;
 
+    /// <summary>
+    /// 元セル値を、指定したプロパティへ設定できる値へ変換します。
+    /// </summary>
+    /// <param name="sourceValue">変換元のセル値。</param>
+    /// <param name="row">変換元のテーブル行。</param>
+    /// <param name="property">変換先プロパティ。</param>
+    /// <returns>プロパティへ設定する値。</returns>
     object ConvertValue(
         object sourceValue,
         TableRow row,
@@ -121,6 +169,13 @@ public sealed class Table<T> : Table, IEnumerable<T>
             sourceValue);
     }
 
+    /// <summary>
+    /// 元セル値を指定した型へ変換します。
+    /// </summary>
+    /// <param name="sourceValue">変換元のセル値。</param>
+    /// <param name="propertyType">変換先のプロパティ型。</param>
+    /// <param name="converted">変換に成功した場合の値。</param>
+    /// <returns>変換できた場合は true。</returns>
     static bool TryConvertValue(
         object sourceValue,
         Type propertyType,

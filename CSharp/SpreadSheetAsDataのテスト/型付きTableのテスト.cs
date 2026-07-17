@@ -182,7 +182,7 @@ public sealed class 型付きTableのテスト : IDisposable
         exception.SourceValue.Should().BeNull();
     }
 
-    [Fact(Skip = "属性を付けたプロパティにpublic setterがない場合の検証を実装するときに解除する。")]
+    [Fact]
     public void 型付きTableは属性を付けたプロパティにpublicなsetterがない場合に失敗します()
     {
         var action = () =>
