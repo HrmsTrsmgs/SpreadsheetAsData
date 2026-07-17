@@ -6,20 +6,15 @@ namespace Marimo.SpreadSheetAsData;
 /// Excel テーブルの各データ行を指定した型へ対応付けて列挙する型付きテーブルを表します。
 /// </summary>
 /// <typeparam name="T">各データ行を対応付ける型。</typeparam>
-public sealed class Table<T> : IEnumerable<T>
+public sealed class Table<T> : Table, IEnumerable<T>
 {
-    /// <summary>
-    /// 型付き列挙の元になる非型付き Excel テーブルです。
-    /// </summary>
-    readonly Table source;
-
     /// <summary>
     /// 指定した非型付き Excel テーブルから型付きテーブルを作成します。
     /// </summary>
     /// <param name="source">型付き列挙の元になる Excel テーブル。</param>
     internal Table(Table source)
+        : base(source.TableDefinitionPart, source.Worksheet)
     {
-        this.source = source;
         ValidateColumns();
     }
 
@@ -29,7 +24,7 @@ public sealed class Table<T> : IEnumerable<T>
     /// <returns>型付き行の列挙子。</returns>
     public IEnumerator<T> GetEnumerator() =>
         (
-            from row in source.Rows
+            from row in base.Rows
             select Map(row)
         ).GetEnumerator();
 
@@ -64,10 +59,10 @@ public sealed class Table<T> : IEnumerable<T>
         {
             var columnName = GetColumnName(property);
 
-            if (!source.Columns.Contains(columnName))
+            if (!Columns.Contains(columnName))
             {
                 throw new TableMappingException(
-                    source,
+                    this,
                     typeof(T),
                     columnName,
                     property);
@@ -82,7 +77,7 @@ public sealed class Table<T> : IEnumerable<T>
         if (duplicateColumnName is not null)
         {
             throw new TableMappingException(
-                source,
+                this,
                 typeof(T),
                 duplicateColumnName);
         }
@@ -118,7 +113,7 @@ public sealed class Table<T> : IEnumerable<T>
         }
 
         throw new TableMappingException(
-            source,
+            this,
             typeof(T),
             GetColumnName(property),
             property,
