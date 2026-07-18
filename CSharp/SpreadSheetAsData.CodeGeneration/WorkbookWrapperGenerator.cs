@@ -13,18 +13,24 @@ public static class WorkbookWrapperGenerator
     /// <returns>生成されたC#ソースコード。</returns>
     public static string[] GenerateSources(
         string filePath,
-        Action<CodeGenerationOptions>? configure = null) =>
+        Action<CodeGenerationOptions>? configure = null)
+    {
+        var options = new CodeGenerationOptions();
+        configure?.Invoke(options);
+
+        return
         [
-            """
+            $$"""
             using Marimo.SpreadSheetAsData;
 
-            namespace Generated;
+            namespace {{options.Namespace}};
 
             public class SalesDataSheet : Worksheet
             {
             }
             """
         ];
+    }
 
     /// <summary>
     /// 指定したExcelブックを解析し、コード生成前に検出できる問題を診断します。

@@ -46,6 +46,42 @@ public sealed class テスト補助のテスト
     }
 
     [Fact]
+    public void GeneratedTypeは指定した型の名前空間を返します()
+    {
+        CodeGenerationSpec
+            .FromSources(
+                """
+                namespace Generated.Custom;
+
+                public class SalesDataSheet
+                {
+                }
+                """)
+            .GeneratedType("SalesDataSheet")
+            .NamespaceName
+            .Should()
+            .Be("Generated.Custom");
+    }
+
+    [Fact]
+    public void GeneratedTypeは名前空間付きの表示名を返します()
+    {
+        CodeGenerationSpec
+            .FromSources(
+                """
+                namespace Generated;
+
+                public class SalesDataSheet
+                {
+                }
+                """)
+            .GeneratedType("SalesDataSheet")
+            .ToString()
+            .Should()
+            .Be("SalesDataSheet: Generated");
+    }
+
+    [Fact]
     public void BaseTypeNameはジェネリック型引数を含む基底型名を返します()
     {
         CodeGenerationSpec

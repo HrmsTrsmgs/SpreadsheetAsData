@@ -109,12 +109,22 @@ sealed class GeneratedCode(Func<string[]> getSources)
         ).ToArray();
 
     /// <summary>
+    /// 生成ソースに含まれる型を取得します。
+    /// </summary>
+    internal GeneratedType[] GeneratedTypes =>
+        (
+            from type in Sources.TypeDeclarations()
+            select new GeneratedType(type)
+        ).ToArray();
+
+    /// <summary>
     /// 指定した生成型を観測します。
     /// </summary>
     /// <param name="name">観測する生成型名。</param>
     /// <returns>指定した生成型を観測するためのテスト用オブジェクト。</returns>
     internal GeneratedType GeneratedType(string name) =>
         new(Sources.TypeDeclaration(name));
+
 }
 
 /// <summary>
@@ -126,6 +136,17 @@ sealed class GeneratedType(TypeDeclarationSyntax declaration)
     /// 生成型の名前を取得します。
     /// </summary>
     internal string Name => declaration.Identifier.ValueText;
+
+    /// <summary>
+    /// 生成型が宣言されている名前空間を取得します。
+    /// </summary>
+    internal string? NamespaceName =>
+        declaration
+            .Ancestors()
+            .OfType<BaseNamespaceDeclarationSyntax>()
+            .FirstOrDefault()
+            ?.Name
+            .ToString();
 
     /// <summary>
     /// 生成型の基底型名を取得します。
@@ -153,4 +174,7 @@ sealed class GeneratedType(TypeDeclarationSyntax declaration)
             where property.Identifier.ValueText == name
             select property
         ).Single();
+
+    public override string ToString() =>
+        $"{Name}: {NamespaceName ?? "(名前空間なし)"}";
 }

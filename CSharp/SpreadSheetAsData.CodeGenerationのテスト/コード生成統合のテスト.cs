@@ -8,19 +8,22 @@ public sealed class コード生成統合のテスト
 {
     const string IntegratedExcelFilePath = @"TestData\コード生成\統合.xlsx";
 
-    [Fact(
-        Skip =
-            "指定した名前空間へすべての生成型を出力する処理を実装するときに解除する。")]
+    [Fact]
     public void 指定した名前空間へすべての型を生成します()
     {
-        CodeGenerationSpec
-            .GenerateSources(
+        var generatedTypes = CodeGenerationSpec
+            .From(
                 IntegratedExcelFilePath,
                 options => options.Namespace = "Generated.Custom")
-            .TypeDeclarations()
+            .GeneratedTypes;
+
+        generatedTypes
             .Should()
-            .OnlyContain(it => it.Parent != null
-                && it.Parent.ToString().Contains("Generated.Custom"));
+            .NotBeEmpty();
+
+        generatedTypes
+            .Should()
+            .OnlyContain(it => it.NamespaceName == "Generated.Custom");
     }
 
     [Fact(
