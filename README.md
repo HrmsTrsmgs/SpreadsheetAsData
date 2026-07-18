@@ -209,6 +209,30 @@ dotnet test .\CSharp\SpreadSheetAsData.sln
 dotnet format .\CSharp\SpreadSheetAsData.sln --verify-no-changes --no-restore --severity warn
 ```
 
+## NuGetパッケージ
+
+C#版は、NuGetパッケージとして公開できるように準備しています。
+パッケージIDは `Marimo.SpreadSheetAsData` です。
+
+ローカルでパッケージを生成する場合は、次のコマンドを実行します。
+
+```powershell
+dotnet pack .\CSharp\SpreadSheetAsData\SpreadSheetAsData.csproj -c Release
+```
+
+生成されたパッケージは、既定では `CSharp\SpreadSheetAsData\bin\Release\` に出力されます。
+ローカルで別プロジェクトから確認する場合は、生成先をNuGetソースとして指定します。
+
+```powershell
+dotnet add package Marimo.SpreadSheetAsData --version 0.1.0 --source .\CSharp\SpreadSheetAsData\bin\Release
+```
+
+NuGet.orgへ公開した後は、通常のNuGetソースから次のように追加できます。
+
+```powershell
+dotnet add package Marimo.SpreadSheetAsData
+```
+
 ## APIドキュメント
 
 C#版のAPIドキュメントは、XMLドキュメントコメントからDocFXで生成します。
@@ -245,7 +269,7 @@ DocFXが生成する `docs/api/csharp/metadata/` と `docs/api/csharp/_site/` �
 ## 制約
 
 NuGetパッケージは公開準備中です。
-現時点では、リポジトリを取得してC#プロジェクトを直接参照する形で確認しています。
+現時点では、ローカルで生成したパッケージと、リポジトリを取得してC#プロジェクトを直接参照する形で確認しています。
 
 現行C#版には、まだセル値を書き込む公開APIはありません。
 過去のRuby版には書き込み機能がありましたが、C#版では再設計しながら追加する予定です。
