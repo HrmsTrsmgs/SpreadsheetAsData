@@ -5,11 +5,26 @@
     <RootNamespace>Marimo.SpreadSheetAsData</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageId>Marimo.SpreadSheetAsData</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>HrmsTrsmgs</Authors>
+    <Description>Reads Excel workbook data through workbook, worksheet, cell range, and typed table APIs.</Description>
+    <PackageTags>excel;spreadsheet;openxml;table;xlsx</PackageTags>
+    <PackageProjectUrl>https://github.com/HrmsTrsmgs/SpreadsheetAsData</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/HrmsTrsmgs/SpreadsheetAsData</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.11.3" />
     <PackageReference Include="System.Interactive" Version="7.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

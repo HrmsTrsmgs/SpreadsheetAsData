@@ -192,22 +192,55 @@ Console.WriteLine(cell.ColumnIndex);
 
 ## ビルドとテスト
 
-C#版は `CSharp/SpreadSheetAsData.sln` に含まれています。
+C#版は `CSharp/SpreadSheetAsData.slnx` に含まれています。
 ライブラリ本体とテストプロジェクトは `net10.0` を対象にしています。
 現在のコードはC# 14の構文を使用します。
 
 .NET 10 SDKが入っている環境では、次のコマンドでビルドとテストを実行できます。
 
 ```powershell
-dotnet build .\CSharp\SpreadSheetAsData.sln
-dotnet test .\CSharp\SpreadSheetAsData.sln
+dotnet build .\CSharp\SpreadSheetAsData.slnx
+dotnet test .\CSharp\SpreadSheetAsData.slnx
 ```
 
 整形と基本的なスタイルチェックは `.editorconfig` に定義しています。
 
 ```powershell
-dotnet format .\CSharp\SpreadSheetAsData.sln --verify-no-changes --no-restore --severity warn
+dotnet format .\CSharp\SpreadSheetAsData.slnx --verify-no-changes --no-restore --severity warn
 ```
+
+## NuGetパッケージ
+
+C#版は、NuGetパッケージとして公開できるように準備しています。
+パッケージIDは `Marimo.SpreadSheetAsData` です。
+
+ローカルでパッケージを生成する場合は、次のコマンドを実行します。
+
+```powershell
+dotnet pack .\CSharp\SpreadSheetAsData\SpreadSheetAsData.csproj -c Release
+```
+
+生成されたパッケージは、既定では `CSharp\SpreadSheetAsData\bin\Release\` に出力されます。
+ローカルで別プロジェクトから確認する場合は、生成先をNuGetソースとして指定します。
+
+```powershell
+dotnet add package Marimo.SpreadSheetAsData --version 0.1.0 --source .\CSharp\SpreadSheetAsData\bin\Release
+```
+
+NuGet.orgへ公開した後は、通常のNuGetソースから次のように追加できます。
+
+```powershell
+dotnet add package Marimo.SpreadSheetAsData
+```
+
+## サンプル
+
+NuGetパッケージとして参照する利用者向けサンプルは、`samples/TableReadingSample/` にあります。
+
+このサンプルは、リポジトリ内のプロダクトコードを `ProjectReference` では参照せず、外部利用者と同じように `PackageReference` で `Marimo.SpreadSheetAsData` を参照します。
+
+NuGet.orgへ公開する前に動かす場合は、先にローカルパッケージを生成し、サンプルの復元時にその生成先をNuGetソースとして指定します。
+詳しい手順は [samples/TableReadingSample/README.md](samples/TableReadingSample/README.md) を参照してください。
 
 ## APIドキュメント
 
@@ -245,7 +278,7 @@ DocFXが生成する `docs/api/csharp/metadata/` と `docs/api/csharp/_site/` �
 ## 制約
 
 NuGetパッケージは公開準備中です。
-現時点では、リポジトリを取得してC#プロジェクトを直接参照する形で確認しています。
+現時点では、ローカルで生成したパッケージと、リポジトリを取得してC#プロジェクトを直接参照する形で確認しています。
 
 現行C#版には、まだセル値を書き込む公開APIはありません。
 過去のRuby版には書き込み機能がありましたが、C#版では再設計しながら追加する予定です。
