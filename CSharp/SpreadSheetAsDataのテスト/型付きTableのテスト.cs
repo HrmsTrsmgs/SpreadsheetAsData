@@ -208,7 +208,7 @@ public sealed class 型付きTableのテスト : IDisposable
         exception.SourceValue.Should().BeNull();
     }
 
-    [Fact(Skip = "属性のない読み取り専用プロパティをマッピング対象外にする規則を実装するときに解除する。")]
+    [Fact]
     public void 型付きTableは属性のない読み取り専用プロパティを無視します()
     {
         var rows = book
