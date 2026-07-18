@@ -233,6 +233,15 @@ NuGet.orgへ公開した後は、通常のNuGetソースから次のように追
 dotnet add package Marimo.SpreadSheetAsData
 ```
 
+## サンプル
+
+NuGetパッケージとして参照する利用者向けサンプルは、`samples/TableReadingSample/` にあります。
+
+このサンプルは、リポジトリ内のプロダクトコードを `ProjectReference` では参照せず、外部利用者と同じように `PackageReference` で `Marimo.SpreadSheetAsData` を参照します。
+
+NuGet.orgへ公開する前に動かす場合は、先にローカルパッケージを生成し、サンプルの復元時にその生成先をNuGetソースとして指定します。
+詳しい手順は [samples/TableReadingSample/README.md](samples/TableReadingSample/README.md) を参照してください。
+
 ## APIドキュメント
 
 C#版のAPIドキュメントは、XMLドキュメントコメントからDocFXで生成します。

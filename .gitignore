@@ -2,6 +2,10 @@
 *.rels
 *.bin
 
+# .NET build output
+bin/
+obj/
+
 # Visual Studio local workspace files
 .vs/
 CSharp/.vs/
