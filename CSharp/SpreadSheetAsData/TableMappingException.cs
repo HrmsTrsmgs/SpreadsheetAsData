@@ -14,11 +14,18 @@ public sealed class TableMappingException : Exception
 
     internal TableMappingException(
         Table table,
-        Type mappingType,
-        string columnName)
+        Type mappingType)
     {
         TableName = table.Name;
         MappingType = mappingType;
+    }
+
+    internal TableMappingException(
+        Table table,
+        Type mappingType,
+        string columnName)
+        : this(table, mappingType)
+    {
         ColumnName = columnName;
     }
 

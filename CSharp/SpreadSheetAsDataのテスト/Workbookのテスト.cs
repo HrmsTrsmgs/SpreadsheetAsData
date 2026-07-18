@@ -94,7 +94,7 @@ public class Workbookのテスト : IDisposable
         book1["Sheet1"].Name.Should().Be("Sheet1");
     }
 
-    [Fact(Skip = "ReadTableで存在しないテーブル名を指定した場合の動作を実装するときに解除する。")]
+    [Fact]
     public void ReadTableは存在しないテーブル名を指定した場合に失敗します()
     {
         using var tested = Workbook.Open(@"TestData\テーブル.xlsx");

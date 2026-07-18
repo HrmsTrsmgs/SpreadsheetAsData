@@ -90,7 +90,7 @@ public class Tableのテスト : IDisposable
         firstEnumeration[1].Should().BeSameAs(secondEnumeration[1]);
     }
 
-    [Fact(Skip = "既存の非型付きTableから型付き行を列挙するEnumerate APIを実装するときに解除する。")]
+    [Fact]
     public void EnumerateはReadTableで取得した型付きTableと同じ結果を列挙します()
     {
         typedMappingTable.Enumerate<TestMappedRow>()

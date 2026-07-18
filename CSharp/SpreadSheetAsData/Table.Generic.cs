@@ -15,6 +15,7 @@ public sealed class Table<T> : Table, IEnumerable<T>
     internal Table(Table source)
         : base(source.TableDefinitionPart, source.Worksheet)
     {
+        ValidateMappingTypeCanBeCreated();
         ValidateColumns();
     }
 
@@ -34,6 +35,17 @@ public sealed class Table<T> : Table, IEnumerable<T>
     /// <returns>型付き行の列挙子。</returns>
     System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() =>
         GetEnumerator();
+
+    /// <summary>
+    /// マッピング先の型を作成できることを検証します。
+    /// </summary>
+    void ValidateMappingTypeCanBeCreated()
+    {
+        if (typeof(T).GetConstructor(Type.EmptyTypes) is null)
+        {
+            throw new TableMappingException(this, typeof(T));
+        }
+    }
 
     /// <summary>
     /// 非型付きのテーブル行を、マッピング先の型へ変換します。

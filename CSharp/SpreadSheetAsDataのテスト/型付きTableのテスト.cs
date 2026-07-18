@@ -226,7 +226,7 @@ public sealed class 型付きTableのテスト : IDisposable
             .OnlyContain(value => value == "computed");
     }
 
-    [Fact(Skip = "publicな引数なしコンストラクターを要求する型生成規則を実装するときに解除する。")]
+    [Fact]
     public void 型付きTableはpublicな引数なしコンストラクターがない型では失敗します()
     {
         var action = () =>
