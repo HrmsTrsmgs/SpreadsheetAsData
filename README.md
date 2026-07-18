@@ -8,6 +8,10 @@ Open XML SDKを内部実装として使いながら、利用側コードから�
 ## 現在のC#版でできること
 
 * `.xlsx` ファイルを開く
+* Excelテーブルを名前で取得する
+* Excelテーブルの列、データ行、セルを取得する
+* Excelテーブルの各データ行を、利用者定義型へ対応付けて列挙する
+* 定義名、A1形式、左上セルと右下セルの指定でセル範囲を取得する
 * ワークシートを名前または位置で取得する
 * セルをA1形式、または列番号と行番号で取得する
 * セル参照、行番号、列番号を取得する
@@ -15,9 +19,134 @@ Open XML SDKを内部実装として使いながら、利用側コードから�
 
 現在のC#版は、読み取り機能を中心に再整備している段階です。
 書き込みは、このライブラリの主要な拡張対象です。
-書式、日付、テーブル、広範なExcel機能への対応は、書き込みの基礎機能を整えた後の補助機能として扱います。
+書式、日付、数式、広範なExcel機能への対応は、基本的なデータ読み書きを整えた後の補助機能として扱います。
 
 ## 使用例
+
+SpreadsheetAsDataは、Excelファイルを低水準のシート、行、セルの集合として扱うのではなく、まず業務上の表データとして読み取れるAPIを優先します。
+
+### 型付きテーブルとして読む
+
+Excelテーブルの列名とC#のプロパティを対応付けると、各データ行を利用者定義型として列挙できます。
+列名とプロパティ名が異なる場合は、`SpreadsheetColumn` 属性でExcelテーブル列名を指定します。
+
+```csharp
+using Marimo.SpreadSheetAsData;
+
+public sealed class OrderRow
+{
+    [SpreadsheetColumn("商品名")]
+    public string ProductName { get; set; } = "";
+
+    [SpreadsheetColumn("数量")]
+    public int Quantity { get; set; }
+
+    [SpreadsheetColumn("単価")]
+    public double UnitPrice { get; set; }
+}
+
+using var book = Workbook.Open("orders.xlsx");
+
+foreach (var order in book.ReadTable<OrderRow>("注文一覧"))
+{
+    Console.WriteLine(
+        $"{order.ProductName}: {order.Quantity * order.UnitPrice}");
+}
+```
+
+列名とプロパティ名が同じ場合は、属性を書かずに読み取れます。
+
+```csharp
+using Marimo.SpreadSheetAsData;
+
+public sealed class CustomerRow
+{
+    public string Name { get; set; } = "";
+
+    public int Age { get; set; }
+}
+
+using var book = Workbook.Open("customers.xlsx");
+
+var customers = book.ReadTable<CustomerRow>("Customers");
+```
+
+型付きテーブルでは、現在 `int`、`double`、`string` への基本的な変換を扱います。
+対応する列がない場合、変換できない値がある場合、同じ列へ複数のプロパティを対応付けた場合は `TableMappingException` で失敗します。
+
+### Excelテーブルを直接読む
+
+型を用意せず、Excelテーブルの構造をそのまま扱うこともできます。
+列、データ行、セルの位置情報が必要な場合はこちらを使います。
+
+```csharp
+using Marimo.SpreadSheetAsData;
+
+using var book = Workbook.Open("orders.xlsx");
+
+var table = book.Tables["注文一覧"];
+
+Console.WriteLine(table.Name);
+Console.WriteLine(table.Worksheet.Name);
+Console.WriteLine(table.Range);
+
+foreach (var column in table.Columns)
+{
+    Console.WriteLine($"{column.Ordinal}: {column.Name}");
+}
+
+foreach (var row in table.Rows)
+{
+    var productName = row["商品名"].Value;
+    var quantity = row["数量"].Value;
+
+    Console.WriteLine(
+        $"{row.WorksheetRowIndex}: {productName} x {quantity}");
+}
+```
+
+`TableRow` では、列名、列位置、`TableColumn` からセルを取得できます。
+
+```csharp
+var firstRow = table.Rows.First();
+
+var byName = firstRow["商品名"];
+var byOrdinal = firstRow[0];
+var byColumn = firstRow[table.Columns["商品名"]];
+```
+
+### 定義名とセル範囲を読む
+
+ブックまたはワークシートの `Range` から、定義名やA1形式の範囲参照を解決できます。
+名前付き範囲として取得した場合、`CellRange.Name` と `ToString()` はその名前を返します。
+
+```csharp
+using Marimo.SpreadSheetAsData;
+
+using var book = Workbook.Open("report.xlsx");
+
+var namedRange = book.Range["集計範囲"];
+
+Console.WriteLine(namedRange.Name);
+Console.WriteLine(namedRange.TopLeftCell.Value);
+Console.WriteLine(namedRange.BottomRightCell.Value);
+
+var sheet = book.Sheets["売上"];
+var range = sheet.Range["A1", "C10"];
+
+Console.WriteLine(range.TopLeftCell.Reference);
+Console.WriteLine(range.BottomRightCell.Reference);
+```
+
+定義名が単一セルを表す場合は、`Cell` から直接取得できます。
+
+```csharp
+var total = book.Cell["総合計"].Value;
+```
+
+### ワークシートとセルを読む
+
+より低水準の操作として、ワークシートやセルを直接取得できます。
 
 ```csharp
 using Marimo.SpreadSheetAsData;
@@ -109,11 +238,14 @@ DocFXが生成する `docs/api/csharp/metadata/` と `docs/api/csharp/_site/` �
 直近の再整備では、次を確認しています。
 
 * ビルド: 成功
-* テスト: 成功、118件成功
+* テスト: 成功、172件成功
 * XMLドキュメント生成: 成功、警告なし
 * `dotnet format --verify-no-changes`: 成功
 
 ## 制約
+
+NuGetパッケージは公開準備中です。
+現時点では、リポジトリを取得してC#プロジェクトを直接参照する形で確認しています。
 
 現行C#版には、まだセル値を書き込む公開APIはありません。
 過去のRuby版には書き込み機能がありましたが、C#版では再設計しながら追加する予定です。
