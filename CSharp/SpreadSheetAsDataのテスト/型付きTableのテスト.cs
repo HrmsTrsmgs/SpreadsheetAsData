@@ -7,8 +7,8 @@ namespace Marimo.SpreadSheetAsData.Test;
 public sealed class 型付きTableのテスト : IDisposable
 {
     const string TestFilePath = @"TestData\テーブル.xlsx";
-    const string MappingTableName = "テーブル2";
-    const string PropertyNameMappingTableName = "テーブル1";
+    const string MappingTableName = "型付き行マッピング";
+    const string PropertyNameMappingTableName = "プロパティ名マッピング";
 
     readonly Workbook book;
     readonly Table<TestMappedRow> tested;
@@ -55,7 +55,7 @@ public sealed class 型付きTableのテスト : IDisposable
     [Fact]
     public void 型付きTableはデータ行がない場合に空の列挙になります()
     {
-        book.ReadTable<EmptyTableRow>("テーブル3")
+        book.ReadTable<EmptyTableRow>("空行マッピング")
             .Should()
             .BeEmpty();
     }

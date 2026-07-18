@@ -30,9 +30,9 @@ public class TableCollectionのテスト : IDisposable
     [Fact]
     public void Tablesは名前からExcelテーブルを取得します()
     {
-        var tested = book.Tables["テーブル2"];
+        var tested = book.Tables["型付き行マッピング"];
 
-        tested.Name.Should().Be("テーブル2");
+        tested.Name.Should().Be("型付き行マッピング");
     }
 
     [Fact]
@@ -40,11 +40,11 @@ public class TableCollectionのテスト : IDisposable
     {
         var enumerated = (
             from table in book.Tables
-            where table.Name == "テーブル2"
+            where table.Name == "型付き行マッピング"
             select table
         ).Single();
 
-        var tested = book.Tables["テーブル2"];
+        var tested = book.Tables["型付き行マッピング"];
 
         tested.Should().BeSameAs(enumerated);
     }
@@ -54,7 +54,7 @@ public class TableCollectionのテスト : IDisposable
     {
         var tested = (
             from table in book.Tables
-            where table.Name == "テーブル6"
+            where table.Name == "別シート行列挙"
             select table
         ).Single();
 

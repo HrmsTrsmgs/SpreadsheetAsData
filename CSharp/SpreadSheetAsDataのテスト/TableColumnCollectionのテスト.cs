@@ -14,7 +14,7 @@ public class TableColumnCollectionのテスト : IDisposable
     public TableColumnCollectionのテスト()
     {
         book = Workbook.Open(TestFilePath);
-        columns = book.Tables["テーブル2"].Columns;
+        columns = book.Tables["型付き行マッピング"].Columns;
     }
 
     public void Dispose()

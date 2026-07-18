@@ -15,7 +15,7 @@ public class TableColumnのテスト : IDisposable
     public TableColumnのテスト()
     {
         book = Workbook.Open(TestFilePath);
-        table = book.Tables["テーブル2"];
+        table = book.Tables["型付き行マッピング"];
         column = table.Columns["数値2"];
     }
 

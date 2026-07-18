@@ -15,8 +15,8 @@ public class Tableのテスト : IDisposable
     public Tableのテスト()
     {
         book = Workbook.Open(TestFilePath);
-        table = book.Tables["テーブル2"];
-        typedMappingTable = book.Tables["テーブル2"];
+        table = book.Tables["型付き行マッピング"];
+        typedMappingTable = book.Tables["型付き行マッピング"];
     }
 
     public void Dispose()
@@ -28,7 +28,7 @@ public class Tableのテスト : IDisposable
     [Fact]
     public void NameはExcelテーブル名を返します()
     {
-        table.Name.Should().Be("テーブル2");
+        table.Name.Should().Be("型付き行マッピング");
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class Tableのテスト : IDisposable
         typedMappingTable.Enumerate<TestMappedRow>()
             .Should()
             .BeEquivalentTo(
-                book.ReadTable<TestMappedRow>("テーブル2"),
+                book.ReadTable<TestMappedRow>("型付き行マッピング"),
                 options => options.WithStrictOrdering());
     }
 }
