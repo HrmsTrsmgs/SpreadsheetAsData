@@ -1,0 +1,95 @@
+﻿using FluentAssertions;
+using Marimo.SpreadSheetAsData;
+using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
+using Xunit;
+
+namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
+
+public sealed class コード生成アクセスのテスト
+{
+    const string TestFilePath = @"TestData\コード生成\基本構造.xlsx";
+
+    [Fact(
+        Skip =
+            "Bookから各ワークシートを型付きプロパティとして取得する生成処理を実装するときに解除する。")]
+    public void Bookは各ワークシートを型付きプロパティとして公開します()
+    {
+        CodeGenerationSpec
+            .GenerateSources(TestFilePath)
+            .PropertyDeclaration("BasicStructureBook", "SalesData")
+            .Should()
+            .NotBeNull();
+    }
+
+    [Fact(
+        Skip =
+            "Bookから各Excelテーブルを型付きプロパティとして取得する生成処理を実装するときに解除する。")]
+    public void Bookは各Excelテーブルを型付きプロパティとして公開します()
+    {
+        CodeGenerationSpec
+            .GenerateSources(TestFilePath)
+            .PropertyDeclaration("BasicStructureBook", "SalesDetail")
+            .Type
+            .ToString()
+            .Should()
+            .Be("SalesDetailTable");
+    }
+
+    [Fact(
+        Skip =
+            "生成BookをWorkbookとして扱える継承構造と既存非型付きAPIの利用を実装するときに解除する。")]
+    public void 生成されたBook型からWorkbookの非型付きAPIも使用できます()
+    {
+        var book = (Workbook)Activator.CreateInstance(
+            CodeGenerationSpec
+                .CompileGeneratedAssembly(TestFilePath)
+                .GetRequiredType("BasicStructureBook"))!;
+
+        book.Sheets.Should().NotBeNull();
+        book.Tables.Should().NotBeNull();
+        book.Cell.Should().NotBeNull();
+        book.Range.Should().NotBeNull();
+        book["sales_data"].Should().NotBeNull();
+    }
+
+    [Fact(
+        Skip =
+            "Sheetからそのシートに属するExcelテーブルだけを型付きプロパティとして取得する生成処理を実装するときに解除する。")]
+    public void Sheetはそのシートに属するExcelテーブルを型付きプロパティとして公開します()
+    {
+        var sources = CodeGenerationSpec.GenerateSources(TestFilePath);
+
+        sources
+            .PropertyDeclaration("SalesDataSheet", "SalesDetail")
+            .Type
+            .ToString()
+            .Should()
+            .Be("SalesDetailTable");
+
+        sources
+            .TypeDeclaration("SalesDataSheet")
+            .Members
+            .OfType<Microsoft.CodeAnalysis.CSharp.Syntax.PropertyDeclarationSyntax>()
+            .Should()
+            .NotContain(it => it.Identifier.ValueText == "ProductList");
+    }
+
+    [Fact(
+        Skip =
+            "生成SheetをWorksheetとして扱える継承構造と既存非型付きAPIの利用を実装するときに解除する。")]
+    public void 生成されたSheet型からWorksheetの非型付きAPIも使用できます()
+    {
+        var sheet = (Worksheet)Activator.CreateInstance(
+            CodeGenerationSpec
+                .CompileGeneratedAssembly(TestFilePath)
+                .GetRequiredType("SalesDataSheet"))!;
+
+        sheet.Name.Should().NotBeNull();
+        sheet.Book.Should().NotBeNull();
+        sheet.Cell.Should().NotBeNull();
+        sheet.Range.Should().NotBeNull();
+        sheet.Cells.Should().NotBeNull();
+    }
+}
+
+
