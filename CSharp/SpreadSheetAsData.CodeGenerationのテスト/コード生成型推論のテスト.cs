@@ -6,7 +6,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class コード生成型推論のテスト
 {
-    const string TestFilePath = @"TestData\コード生成\基本構造.xlsx";
+    const string BasicStructureExcelFilePath = @"TestData\コード生成\基本構造.xlsx";
 
     [Fact(
         Skip =
@@ -14,7 +14,7 @@ public sealed class コード生成型推論のテスト
     public void 整数値だけを持つ列をintプロパティとして生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(TestFilePath)
+            .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("SalesDetail", "CustomerId")
             .Type
             .ToString()
@@ -28,7 +28,7 @@ public sealed class コード生成型推論のテスト
     public void 小数値を持つ列をdoubleプロパティとして生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(TestFilePath)
+            .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("SalesDetail", "Amount")
             .Type
             .ToString()
@@ -42,7 +42,7 @@ public sealed class コード生成型推論のテスト
     public void 文字列値を持つ列をstringプロパティとして生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(TestFilePath)
+            .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("SalesDetail", "Description")
             .Type
             .ToString()
@@ -56,7 +56,7 @@ public sealed class コード生成型推論のテスト
     public void 生成された列プロパティに元のExcel列名を設定します()
     {
         CodeGenerationSpec
-            .GenerateSources(TestFilePath)
+            .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("SalesDetail", "CustomerId")
             .AttributeArguments("SpreadsheetColumn")
             .Should()

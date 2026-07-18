@@ -7,9 +7,9 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class コード生成診断のテスト
 {
-    const string ColumnNameCollisionTestFilePath = @"TestData\コード生成\列名衝突.xlsx";
-    const string BookMemberNameCollisionTestFilePath = @"TestData\コード生成\Bookメンバー名衝突.xlsx";
-    const string InvalidNameTestFilePath = @"TestData\コード生成\無効名.xlsx";
+    const string ColumnNameCollisionExcelFilePath = @"TestData\コード生成\列名衝突.xlsx";
+    const string BookMemberNameCollisionExcelFilePath = @"TestData\コード生成\Bookメンバー名衝突.xlsx";
+    const string InvalidNameExcelFilePath = @"TestData\コード生成\無効名.xlsx";
 
     [Fact(
         Skip =
@@ -17,7 +17,7 @@ public sealed class コード生成診断のテスト
     public void 自動変換後に同じ列プロパティ名となる場合にエラーを診断します()
     {
         CodeGenerationSpec
-            .GenerateDiagnostics(ColumnNameCollisionTestFilePath)
+            .GenerateDiagnostics(ColumnNameCollisionExcelFilePath)
             .Should()
             .ContainEquivalentOf(
                 new CodeGenerationDiagnostic(
@@ -32,7 +32,7 @@ public sealed class コード生成診断のテスト
     public void 名前衝突を自動的な連番追加では解消しません()
     {
         CodeGenerationSpec
-            .GenerateSources(ColumnNameCollisionTestFilePath)
+            .GenerateSources(ColumnNameCollisionExcelFilePath)
             .TypeDeclarations()
             .Should()
             .NotContain(it => it.Identifier.ValueText.Contains("CustomerId2"));
@@ -45,7 +45,7 @@ public sealed class コード生成診断のテスト
     {
         CodeGenerationSpec
             .GenerateDiagnostics(
-                ColumnNameCollisionTestFilePath,
+                ColumnNameCollisionExcelFilePath,
                 options => options.NameMappings["customer-id"] = "CustomerIdDash")
             .Should()
             .BeEmpty();
@@ -57,7 +57,7 @@ public sealed class コード生成診断のテスト
     public void 同じ生成型内の異なる種類のメンバー名が衝突した場合にも診断します()
     {
         CodeGenerationSpec
-            .GenerateDiagnostics(BookMemberNameCollisionTestFilePath)
+            .GenerateDiagnostics(BookMemberNameCollisionExcelFilePath)
             .Should()
             .Contain(it => it.IsError
                 && it.GeneratedName == "SalesData"
@@ -71,7 +71,7 @@ public sealed class コード生成診断のテスト
     public void 有効なCSharp識別子を生成できない名前を診断します()
     {
         CodeGenerationSpec
-            .GenerateDiagnostics(InvalidNameTestFilePath)
+            .GenerateDiagnostics(InvalidNameExcelFilePath)
             .Should()
             .Contain(it => it.IsError
                 && it.InvalidSourceName == "---");

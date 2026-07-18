@@ -6,8 +6,8 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class CSharp識別子生成のテスト
 {
-    const string AsciiNameConversionTestFilePath = @"TestData\コード生成\ASCII名前変換.xlsx";
-    const string JapaneseMixedNameTestFilePath = @"TestData\コード生成\日本語混在名前.xlsx";
+    const string AsciiNameConversionExcelFilePath = @"TestData\コード生成\ASCII名前変換.xlsx";
+    const string JapaneseMixedNameExcelFilePath = @"TestData\コード生成\日本語混在名前.xlsx";
 
     [Theory(
         Skip =
@@ -21,7 +21,7 @@ public sealed class CSharp識別子生成のテスト
         string generatedTypeName)
     {
         CodeGenerationSpec
-            .From(AsciiNameConversionTestFilePath)
+            .From(AsciiNameConversionExcelFilePath)
             .TypeNames
             .Should()
             .Contain(
@@ -40,7 +40,7 @@ public sealed class CSharp識別子生成のテスト
         string generatedTypeName)
     {
         CodeGenerationSpec
-            .From(AsciiNameConversionTestFilePath)
+            .From(AsciiNameConversionExcelFilePath)
             .TypeNames
             .Should()
             .Contain(
@@ -59,7 +59,7 @@ public sealed class CSharp識別子生成のテスト
         string generatedTypeName)
     {
         CodeGenerationSpec
-            .From(AsciiNameConversionTestFilePath)
+            .From(AsciiNameConversionExcelFilePath)
             .TypeNames
             .Should()
             .Contain(
@@ -81,7 +81,7 @@ public sealed class CSharp識別子生成のテスト
         string generatedPropertyName)
     {
         CodeGenerationSpec
-            .From(AsciiNameConversionTestFilePath)
+            .From(AsciiNameConversionExcelFilePath)
             .GeneratedType(dataTypeName)
             .PropertyNames
             .Should()
@@ -102,7 +102,7 @@ public sealed class CSharp識別子生成のテスト
         string generatedTypeName)
     {
         CodeGenerationSpec
-            .From(JapaneseMixedNameTestFilePath)
+            .From(JapaneseMixedNameExcelFilePath)
             .TypeNames
             .Should()
             .Contain(
@@ -122,7 +122,7 @@ public sealed class CSharp識別子生成のテスト
         string generatedPropertyName)
     {
         CodeGenerationSpec
-            .From(JapaneseMixedNameTestFilePath)
+            .From(JapaneseMixedNameExcelFilePath)
             .GeneratedType("商品_明細")
             .PropertyNames
             .Should()
@@ -138,7 +138,7 @@ public sealed class CSharp識別子生成のテスト
     public void 日本語混在列名の使用できない識別子文字はアンダースコアへ置換します()
     {
         CodeGenerationSpec
-            .From(JapaneseMixedNameTestFilePath)
+            .From(JapaneseMixedNameExcelFilePath)
             .GeneratedType("商品_明細")
             .PropertyNames
             .Should()
@@ -157,7 +157,7 @@ public sealed class CSharp識別子生成のテスト
         string generatedTypeName)
     {
         CodeGenerationSpec
-            .From(AsciiNameConversionTestFilePath)
+            .From(AsciiNameConversionExcelFilePath)
             .TypeNames
             .Should()
             .Contain(
@@ -172,7 +172,7 @@ public sealed class CSharp識別子生成のテスト
     public void 自動変換ではキーワードもPascalCaseへ変換します()
     {
         CodeGenerationSpec
-            .From(AsciiNameConversionTestFilePath)
+            .From(AsciiNameConversionExcelFilePath)
             .TypeNames
             .Should()
             .Contain("ClassSheet");

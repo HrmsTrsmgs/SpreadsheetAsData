@@ -7,7 +7,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class コード生成型構造のテスト
 {
-    const string TestFilePath = @"TestData\コード生成\基本構造.xlsx";
+    const string BasicStructureExcelFilePath = @"TestData\コード生成\基本構造.xlsx";
 
     [Fact(
         Skip =
@@ -15,19 +15,17 @@ public sealed class コード生成型構造のテスト
     public void 生成されたBook型はWorkbookを継承します()
     {
         CodeGenerationSpec
-            .CompileGeneratedAssembly(TestFilePath)
+            .CompileGeneratedAssembly(BasicStructureExcelFilePath)
             .GetRequiredType("BasicStructureBook")
             .Should()
             .BeAssignableTo<Workbook>();
     }
 
-    [Fact(
-        Skip =
-            "生成されたSheet型がWorksheetを継承する処理を実装するときに解除する。")]
+    [Fact]
     public void 生成されたSheet型はWorksheetを継承します()
     {
         CodeGenerationSpec
-            .CompileGeneratedAssembly(TestFilePath)
+            .CompileGeneratedAssembly(BasicStructureExcelFilePath)
             .GetRequiredType("SalesDataSheet")
             .Should()
             .BeAssignableTo<Worksheet>();
@@ -38,7 +36,7 @@ public sealed class コード生成型構造のテスト
             "生成専用Table型が生成された行データ型を型引数にしたTableを基底型としてコンパイルできる処理を実装するときに解除する。")]
     public void 生成されたTable型は生成された行データ型を型引数とするTableを継承します()
     {
-        var assembly = CodeGenerationSpec.CompileGeneratedAssembly(TestFilePath);
+        var assembly = CodeGenerationSpec.CompileGeneratedAssembly(BasicStructureExcelFilePath);
 
         assembly
             .GetRequiredType("SalesDetailTable")
@@ -54,7 +52,7 @@ public sealed class コード生成型構造のテスト
     public void 生成された行データ型はTableRowを継承しないPOCOです()
     {
         var dataType = CodeGenerationSpec
-            .CompileGeneratedAssembly(TestFilePath)
+            .CompileGeneratedAssembly(BasicStructureExcelFilePath)
             .GetRequiredType("SalesDetail");
 
         dataType.BaseType.Should().Be(typeof(object));
@@ -67,7 +65,7 @@ public sealed class コード生成型構造のテスト
     public void 生成された行データ型の列プロパティはpublicなgetterとsetterを持ちます()
     {
         var property = CodeGenerationSpec
-            .CompileGeneratedAssembly(TestFilePath)
+            .CompileGeneratedAssembly(BasicStructureExcelFilePath)
             .GetRequiredType("SalesDetail")
             .GetProperty("CustomerId");
 
@@ -81,7 +79,7 @@ public sealed class コード生成型構造のテスト
             "生成型をpartialとして出力し利用者のpartial定義と同時コンパイルできる処理を実装するときに解除する。")]
     public void 生成された型は別ファイルのpartial定義と共にコンパイルできます()
     {
-        var sources = CodeGenerationSpec.GenerateSources(TestFilePath);
+        var sources = CodeGenerationSpec.GenerateSources(BasicStructureExcelFilePath);
 
         GeneratedSourceCompiler
             .Compile(

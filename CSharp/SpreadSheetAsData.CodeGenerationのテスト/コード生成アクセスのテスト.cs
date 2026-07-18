@@ -7,7 +7,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class コード生成アクセスのテスト
 {
-    const string TestFilePath = @"TestData\コード生成\基本構造.xlsx";
+    const string BasicStructureExcelFilePath = @"TestData\コード生成\基本構造.xlsx";
 
     [Fact(
         Skip =
@@ -15,7 +15,7 @@ public sealed class コード生成アクセスのテスト
     public void Bookは各ワークシートを型付きプロパティとして公開します()
     {
         CodeGenerationSpec
-            .GenerateSources(TestFilePath)
+            .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("BasicStructureBook", "SalesData")
             .Should()
             .NotBeNull();
@@ -27,7 +27,7 @@ public sealed class コード生成アクセスのテスト
     public void Bookは各Excelテーブルを型付きプロパティとして公開します()
     {
         CodeGenerationSpec
-            .GenerateSources(TestFilePath)
+            .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("BasicStructureBook", "SalesDetail")
             .Type
             .ToString()
@@ -42,7 +42,7 @@ public sealed class コード生成アクセスのテスト
     {
         var book = (Workbook)Activator.CreateInstance(
             CodeGenerationSpec
-                .CompileGeneratedAssembly(TestFilePath)
+                .CompileGeneratedAssembly(BasicStructureExcelFilePath)
                 .GetRequiredType("BasicStructureBook"))!;
 
         book.Sheets.Should().NotBeNull();
@@ -57,7 +57,7 @@ public sealed class コード生成アクセスのテスト
             "Sheetからそのシートに属するExcelテーブルだけを型付きプロパティとして取得する生成処理を実装するときに解除する。")]
     public void Sheetはそのシートに属するExcelテーブルを型付きプロパティとして公開します()
     {
-        var sources = CodeGenerationSpec.GenerateSources(TestFilePath);
+        var sources = CodeGenerationSpec.GenerateSources(BasicStructureExcelFilePath);
 
         sources
             .PropertyDeclaration("SalesDataSheet", "SalesDetail")
@@ -81,7 +81,7 @@ public sealed class コード生成アクセスのテスト
     {
         var sheet = (Worksheet)Activator.CreateInstance(
             CodeGenerationSpec
-                .CompileGeneratedAssembly(TestFilePath)
+                .CompileGeneratedAssembly(BasicStructureExcelFilePath)
                 .GetRequiredType("SalesDataSheet"))!;
 
         sheet.Name.Should().NotBeNull();

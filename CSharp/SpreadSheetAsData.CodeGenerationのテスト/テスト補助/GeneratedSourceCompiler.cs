@@ -6,8 +6,16 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 
+/// <summary>
+/// 生成ソースをメモリ上でコンパイルし、実行時型として検証するためのテスト補助です。
+/// </summary>
 static class GeneratedSourceCompiler
 {
+    /// <summary>
+    /// 指定したC#ソースコードを、SpreadsheetAsData本体を参照したアセンブリとしてコンパイルします。
+    /// </summary>
+    /// <param name="sources">コンパイルするC#ソースコード。</param>
+    /// <returns>コンパイルしたアセンブリ。</returns>
     internal static Assembly Compile(IEnumerable<string> sources)
     {
         var syntaxTrees =
@@ -37,6 +45,9 @@ static class GeneratedSourceCompiler
         return AssemblyLoadContext.Default.LoadFromStream(stream);
     }
 
+    /// <summary>
+    /// 生成ソースのコンパイルに必要な参照アセンブリです。
+    /// </summary>
     static IEnumerable<MetadataReference> References =>
         (
             from path in TrustedPlatformAssemblyPaths
@@ -46,6 +57,9 @@ static class GeneratedSourceCompiler
             select MetadataReference.CreateFromFile(paths.Key)
         );
 
+    /// <summary>
+    /// 現在の.NET実行環境が既定で参照できるアセンブリパスです。
+    /// </summary>
     static IEnumerable<string> TrustedPlatformAssemblyPaths =>
         ((string?)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES"))
             ?.Split(Path.PathSeparator)

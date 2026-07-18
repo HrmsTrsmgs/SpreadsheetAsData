@@ -8,7 +8,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class コード生成型付きTableのテスト
 {
-    const string TestFilePath = @"TestData\コード生成\基本構造.xlsx";
+    const string BasicStructureExcelFilePath = @"TestData\コード生成\基本構造.xlsx";
 
     [Fact(
         Skip =
@@ -17,7 +17,7 @@ public sealed class コード生成型付きTableのテスト
     {
         var table = Activator.CreateInstance(
             CodeGenerationSpec
-                .CompileGeneratedAssembly(TestFilePath)
+                .CompileGeneratedAssembly(BasicStructureExcelFilePath)
                 .GetRequiredType("SalesDetailTable"));
 
         var rows = ((IEnumerable)table!).Cast<object>().ToArray();
@@ -40,7 +40,7 @@ public sealed class コード生成型付きTableのテスト
     {
         var table = (Table)Activator.CreateInstance(
             CodeGenerationSpec
-                .CompileGeneratedAssembly(TestFilePath)
+                .CompileGeneratedAssembly(BasicStructureExcelFilePath)
                 .GetRequiredType("SalesDetailTable"))!;
 
         table.Rows.Should().NotBeEmpty();
@@ -53,7 +53,7 @@ public sealed class コード生成型付きTableのテスト
     {
         var table = (Table)Activator.CreateInstance(
             CodeGenerationSpec
-                .CompileGeneratedAssembly(TestFilePath)
+                .CompileGeneratedAssembly(BasicStructureExcelFilePath)
                 .GetRequiredType("SalesDetailTable"))!;
 
         table.Name.Should().Be("sales_detail");
@@ -67,10 +67,10 @@ public sealed class コード生成型付きTableのテスト
             "生成された行データ型がReadTableの利用者定義POCOと同じ変換規則で読み込まれる処理を実装するときに解除する。")]
     public void 生成された行データ型は利用者定義POCOと同じ変換規則で読み込まれます()
     {
-        using var book = Workbook.Open(TestFilePath);
+        using var book = Workbook.Open(BasicStructureExcelFilePath);
         var generatedTable = (IEnumerable)Activator.CreateInstance(
             CodeGenerationSpec
-                .CompileGeneratedAssembly(TestFilePath)
+                .CompileGeneratedAssembly(BasicStructureExcelFilePath)
                 .GetRequiredType("SalesDetailTable"))!;
 
         generatedTable

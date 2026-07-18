@@ -6,7 +6,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class コード生成統合のテスト
 {
-    const string TestFilePath = @"TestData\コード生成\統合.xlsx";
+    const string IntegratedExcelFilePath = @"TestData\コード生成\統合.xlsx";
 
     [Fact(
         Skip =
@@ -15,7 +15,7 @@ public sealed class コード生成統合のテスト
     {
         CodeGenerationSpec
             .GenerateSources(
-                TestFilePath,
+                IntegratedExcelFilePath,
                 options => options.Namespace = "Generated.Custom")
             .TypeDeclarations()
             .Should()
@@ -29,7 +29,7 @@ public sealed class コード生成統合のテスト
     public void 有効なExcelファイルから生成したすべてのソースはコンパイルできます()
     {
         CodeGenerationSpec
-            .CompileGeneratedAssembly(TestFilePath)
+            .CompileGeneratedAssembly(IntegratedExcelFilePath)
             .Should()
             .NotBeNull();
     }
@@ -40,9 +40,9 @@ public sealed class コード生成統合のテスト
     public void 同じExcelファイルと設定から同じ生成結果を返します()
     {
         CodeGenerationSpec
-            .GenerateSources(TestFilePath)
+            .GenerateSources(IntegratedExcelFilePath)
             .Should()
-            .Equal(CodeGenerationSpec.GenerateSources(TestFilePath));
+            .Equal(CodeGenerationSpec.GenerateSources(IntegratedExcelFilePath));
     }
 
     [Fact(
@@ -51,7 +51,7 @@ public sealed class コード生成統合のテスト
     public void 正常なExcelファイルではエラー診断を返しません()
     {
         CodeGenerationSpec
-            .GenerateDiagnostics(TestFilePath)
+            .GenerateDiagnostics(IntegratedExcelFilePath)
             .Should()
             .BeEmpty();
     }

@@ -6,8 +6,8 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class コード生成名前設定のテスト
 {
-    const string SimpleNameMappingsTestFilePath = @"TestData\コード生成\簡易名前置換.xlsx";
-    const string ContextNameMappingsTestFilePath = @"TestData\コード生成\文脈付き名前置換.xlsx";
+    const string SimpleNameMappingsExcelFilePath = @"TestData\コード生成\簡易名前置換.xlsx";
+    const string ContextNameMappingsExcelFilePath = @"TestData\コード生成\文脈付き名前置換.xlsx";
 
     [Fact(
         Skip =
@@ -16,7 +16,7 @@ public sealed class コード生成名前設定のテスト
     {
         CodeGenerationSpec
             .GenerateSources(
-                SimpleNameMappingsTestFilePath,
+                SimpleNameMappingsExcelFilePath,
                 options => options.NameMappings["cust_id"] = "CustomerID")
             .PropertyDeclaration("SalesDetail", "CustomerID")
             .Should()
@@ -29,7 +29,7 @@ public sealed class コード生成名前設定のテスト
     public void NameMappingsは対象種類を指定せず同じ元名へ適用されます()
     {
         var sources = CodeGenerationSpec.GenerateSources(
-            SimpleNameMappingsTestFilePath,
+            SimpleNameMappingsExcelFilePath,
             options => options.NameMappings["data"] = "MappedData");
 
         sources.TypeDeclaration("MappedDataSheet").Should().NotBeNull();
@@ -42,7 +42,7 @@ public sealed class コード生成名前設定のテスト
     public void 文脈付き名前設定は同じ元列名をテーブルごとに異なる名前へ変更できます()
     {
         var sources = CodeGenerationSpec.GenerateSources(
-            ContextNameMappingsTestFilePath,
+            ContextNameMappingsExcelFilePath,
             options =>
             {
                 options.ContextNameMappings["customers.id"] = "CustomerId";
@@ -59,7 +59,7 @@ public sealed class コード生成名前設定のテスト
     public void 文脈付き名前設定はブック定義名とシートローカル定義名を区別できます()
     {
         var sources = CodeGenerationSpec.GenerateSources(
-            ContextNameMappingsTestFilePath,
+            ContextNameMappingsExcelFilePath,
             options =>
             {
                 options.ContextNameMappings["book.total"] = "GrandTotal";
@@ -77,7 +77,7 @@ public sealed class コード生成名前設定のテスト
     {
         CodeGenerationSpec
             .GenerateSources(
-                ContextNameMappingsTestFilePath,
+                ContextNameMappingsExcelFilePath,
                 options =>
                 {
                     options.NameMappings["id"] = "MappedId";

@@ -6,7 +6,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class コード生成定義名のテスト
 {
-    const string TestFilePath = @"TestData\コード生成\定義名.xlsx";
+    const string DefinedNamesExcelFilePath = @"TestData\コード生成\定義名.xlsx";
 
     [Fact(
         Skip =
@@ -14,7 +14,7 @@ public sealed class コード生成定義名のテスト
     public void ブックスコープの単一セル定義名をBookのCellプロパティとして生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(TestFilePath)
+            .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("DefinedNamesBook", "MainCell")
             .Type
             .ToString()
@@ -28,7 +28,7 @@ public sealed class コード生成定義名のテスト
     public void ブックスコープの複数セル定義名をBookのCellRangeプロパティとして生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(TestFilePath)
+            .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("DefinedNamesBook", "MainRange")
             .Type
             .ToString()
@@ -42,7 +42,7 @@ public sealed class コード生成定義名のテスト
     public void シートローカルの単一セル定義名をSheetのCellプロパティとして生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(TestFilePath)
+            .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("SalesDataSheet", "LocalCell")
             .Type
             .ToString()
@@ -56,7 +56,7 @@ public sealed class コード生成定義名のテスト
     public void シートローカルの複数セル定義名をSheetのCellRangeプロパティとして生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(TestFilePath)
+            .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("SalesDataSheet", "LocalRange")
             .Type
             .ToString()
@@ -69,7 +69,7 @@ public sealed class コード生成定義名のテスト
             "同じ定義名をブックスコープとシートローカルで別々のプロパティとして生成するときに解除する。")]
     public void ブックスコープとシートローカルで同じ定義名を区別して生成します()
     {
-        var sources = CodeGenerationSpec.GenerateSources(TestFilePath);
+        var sources = CodeGenerationSpec.GenerateSources(DefinedNamesExcelFilePath);
 
         sources.PropertyDeclaration("DefinedNamesBook", "Total").Should().NotBeNull();
         sources.PropertyDeclaration("SalesDataSheet", "Total").Should().NotBeNull();

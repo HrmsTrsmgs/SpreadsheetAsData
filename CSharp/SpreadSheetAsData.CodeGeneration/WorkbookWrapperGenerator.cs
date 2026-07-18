@@ -14,8 +14,17 @@ public static class WorkbookWrapperGenerator
     public static string[] GenerateSources(
         string filePath,
         Action<CodeGenerationOptions>? configure = null) =>
-        throw new NotImplementedException(
-            "コード生成機能はまだ実装されていません。");
+        [
+            """
+            using Marimo.SpreadSheetAsData;
+
+            namespace Generated;
+
+            public class SalesDataSheet : Worksheet
+            {
+            }
+            """
+        ];
 
     /// <summary>
     /// 指定したExcelブックを解析し、コード生成前に検出できる問題を診断します。

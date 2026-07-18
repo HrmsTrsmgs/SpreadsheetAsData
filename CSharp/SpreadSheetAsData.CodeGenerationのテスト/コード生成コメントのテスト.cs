@@ -6,8 +6,8 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class コード生成コメントのテスト
 {
-    const string BasicStructureTestFilePath = @"TestData\コード生成\基本構造.xlsx";
-    const string DefinedNamesTestFilePath = @"TestData\コード生成\定義名.xlsx";
+    const string BasicStructureExcelFilePath = @"TestData\コード生成\基本構造.xlsx";
+    const string DefinedNamesExcelFilePath = @"TestData\コード生成\定義名.xlsx";
 
     [Fact(
         Skip =
@@ -15,7 +15,7 @@ public sealed class コード生成コメントのテスト
     public void Book型のコメントを生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(BasicStructureTestFilePath)
+            .GenerateSources(BasicStructureExcelFilePath)
             .TypeDeclaration("BasicStructureBook")
             .SummaryText()
             .Should()
@@ -28,7 +28,7 @@ public sealed class コード生成コメントのテスト
     public void Sheet型のコメントを生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(BasicStructureTestFilePath)
+            .GenerateSources(BasicStructureExcelFilePath)
             .TypeDeclaration("SalesDataSheet")
             .SummaryText()
             .Should()
@@ -41,7 +41,7 @@ public sealed class コード生成コメントのテスト
     public void Table型のコメントを生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(BasicStructureTestFilePath)
+            .GenerateSources(BasicStructureExcelFilePath)
             .TypeDeclaration("SalesDetailTable")
             .SummaryText()
             .Should()
@@ -54,7 +54,7 @@ public sealed class コード生成コメントのテスト
     public void 行データ型のコメントを生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(BasicStructureTestFilePath)
+            .GenerateSources(BasicStructureExcelFilePath)
             .TypeDeclaration("SalesDetail")
             .SummaryText()
             .Should()
@@ -67,7 +67,7 @@ public sealed class コード生成コメントのテスト
     public void Sheetプロパティのコメントを生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(BasicStructureTestFilePath)
+            .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("BasicStructureBook", "SalesData")
             .SummaryText()
             .Should()
@@ -80,7 +80,7 @@ public sealed class コード生成コメントのテスト
     public void Tableプロパティのコメントを生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(BasicStructureTestFilePath)
+            .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("BasicStructureBook", "SalesDetail")
             .SummaryText()
             .Should()
@@ -93,7 +93,7 @@ public sealed class コード生成コメントのテスト
     public void 列プロパティのコメントを生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(BasicStructureTestFilePath)
+            .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("SalesDetail", "CustomerId")
             .SummaryText()
             .Should()
@@ -106,7 +106,7 @@ public sealed class コード生成コメントのテスト
     public void ブックスコープの単一セル定義名プロパティのコメントを生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(DefinedNamesTestFilePath)
+            .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("DefinedNamesBook", "MainCell")
             .SummaryText()
             .Should()
@@ -119,7 +119,7 @@ public sealed class コード生成コメントのテスト
     public void ブックスコープの複数セル定義名プロパティのコメントを生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(DefinedNamesTestFilePath)
+            .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("DefinedNamesBook", "MainRange")
             .SummaryText()
             .Should()
@@ -132,7 +132,7 @@ public sealed class コード生成コメントのテスト
     public void シートローカルの単一セル定義名プロパティのコメントを生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(DefinedNamesTestFilePath)
+            .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("SalesDataSheet", "LocalCell")
             .SummaryText()
             .Should()
@@ -145,7 +145,7 @@ public sealed class コード生成コメントのテスト
     public void シートローカルの複数セル定義名プロパティのコメントを生成します()
     {
         CodeGenerationSpec
-            .GenerateSources(DefinedNamesTestFilePath)
+            .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("SalesDataSheet", "LocalRange")
             .SummaryText()
             .Should()
