@@ -15,6 +15,13 @@ public sealed class SpreadsheetColumnAttribute : Attribute
     /// <param name="name">対応付ける Excel テーブル列名。</param>
     public SpreadsheetColumnAttribute(string name)
     {
+        ArgumentNullException.ThrowIfNull(name);
+
+        if (name == "")
+        {
+            throw new ArgumentException(null, nameof(name));
+        }
+
         Name = name;
     }
 
