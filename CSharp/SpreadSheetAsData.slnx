@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/.nuget/">
+    <File Path=".nuget/packages.config" />
+  </Folder>
+  <Project Path="SpreadSheetAsData/SpreadSheetAsData.csproj" />
+  <Project Path="SpreadSheetAsDataのテスト/SpreadSheetAsDataのテスト.csproj" />
+</Solution>

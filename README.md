@@ -192,21 +192,21 @@ Console.WriteLine(cell.ColumnIndex);
 
 ## ビルドとテスト
 
-C#版は `CSharp/SpreadSheetAsData.sln` に含まれています。
+C#版は `CSharp/SpreadSheetAsData.slnx` に含まれています。
 ライブラリ本体とテストプロジェクトは `net10.0` を対象にしています。
 現在のコードはC# 14の構文を使用します。
 
 .NET 10 SDKが入っている環境では、次のコマンドでビルドとテストを実行できます。
 
 ```powershell
-dotnet build .\CSharp\SpreadSheetAsData.sln
-dotnet test .\CSharp\SpreadSheetAsData.sln
+dotnet build .\CSharp\SpreadSheetAsData.slnx
+dotnet test .\CSharp\SpreadSheetAsData.slnx
 ```
 
 整形と基本的なスタイルチェックは `.editorconfig` に定義しています。
 
 ```powershell
-dotnet format .\CSharp\SpreadSheetAsData.sln --verify-no-changes --no-restore --severity warn
+dotnet format .\CSharp\SpreadSheetAsData.slnx --verify-no-changes --no-restore --severity warn
 ```
 
 ## NuGetパッケージ
