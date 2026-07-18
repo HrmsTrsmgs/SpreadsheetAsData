@@ -1,7 +1,8 @@
-namespace Marimo.SpreadSheetAsData;
-
+﻿
 using Packaging = DocumentFormat.OpenXml.Packaging;
+using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
 
+namespace Marimo.SpreadSheetAsData;
 /// <summary>
 /// ブック内の Excel テーブルを表します。
 /// </summary>
@@ -33,16 +34,16 @@ public class Table
     readonly TableRow[] rows;
 
     /// <summary>
-    /// ヘッダー行を除いたデータ行数です。
-    /// </summary>
-    int DataRowCount =>
-        (int)(rangeReference.BottomRight.RowIndex - rangeReference.TopLeft.RowIndex);
-
-    /// <summary>
     /// データ行が始まるワークシート上の 1 始まりの行番号です。
     /// </summary>
     uint FirstDataRowIndex =>
         rangeReference.TopLeft.RowIndex + 1;
+
+    Range DataRowIndexRange =>
+        (int)FirstDataRowIndex..((int)rangeReference.BottomRight.RowIndex + 1);
+
+    Range ColumnIndexRange =>
+        (int)rangeReference.TopLeft.ColumnIndex..((int)rangeReference.BottomRight.ColumnIndex + 1);
 
     /// <summary>
     /// 指定した Open XML テーブル定義からテーブルを作成します。
@@ -56,10 +57,23 @@ public class Table
         rangeReference = CellRangeReference.Parse(tableDefinitionPart.Table.Reference.ToString());
         columns = new(this);
         rows = [
-            .. from rowOffset in Enumerable.Range(0, DataRowCount)
-               select new TableRow(this, rowOffset, FirstDataRowIndex + (uint)rowOffset)
+            .. from dataRow in DataRowIndexes.WithIndex()
+               select new TableRow(this, dataRow.Index, dataRow.Value)
         ];
     }
+
+    IEnumerable<uint> DataRowIndexes =>
+        (
+            from cell in worksheet.WorksheetPart.Worksheet.Descendants<Spreadsheet.Cell>()
+            let cellName = CellName.Parse(cell.CellReference?.Value ?? throw new InvalidOperationException())
+            where IsDataCell(cellName)
+            orderby cellName.RowIndex
+            select cellName.RowIndex
+        ).Distinct();
+
+    bool IsDataCell(CellName cellName) =>
+        DataRowIndexRange.Contains(cellName.RowIndex)
+            && ColumnIndexRange.Contains(cellName.ColumnIndex);
 
     /// <summary>
     /// Excel テーブル名を取得します。
@@ -90,6 +104,14 @@ public class Table
     /// </summary>
     public IEnumerable<TableRow> Rows =>
         rows;
+
+    /// <summary>
+    /// Excel テーブルの各データ行を <typeparamref name="T"/> へ対応付けて列挙します。
+    /// </summary>
+    /// <typeparam name="T">各データ行を対応付ける型。</typeparam>
+    /// <returns>型付き行の列挙。</returns>
+    public IEnumerable<T> Enumerate<T>() =>
+        new Table<T>(this);
 
     /// <summary>
     /// テーブル行と列定義の交点にあるワークシートセルを取得します。

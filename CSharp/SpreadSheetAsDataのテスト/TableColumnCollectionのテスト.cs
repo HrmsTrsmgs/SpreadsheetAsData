@@ -14,7 +14,7 @@ public class TableColumnCollectionのテスト : IDisposable
     public TableColumnCollectionのテスト()
     {
         book = Workbook.Open(TestFilePath);
-        columns = book.Tables["テーブル2"].Columns;
+        columns = book.Tables["型付き行マッピング"].Columns;
     }
 
     public void Dispose()
@@ -54,6 +54,13 @@ public class TableColumnCollectionのテスト : IDisposable
         var action = () => _ = columns["not_found"];
 
         action.Should().Throw<KeyNotFoundException>();
+    }
+
+    [Fact]
+    public void Containsは指定した名前の列が存在するかを返します()
+    {
+        columns.Contains("数値2").Should().BeTrue();
+        columns.Contains("not_found").Should().BeFalse();
     }
 
     [Fact]

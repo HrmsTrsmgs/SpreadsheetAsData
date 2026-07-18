@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Marimo.SpreadSheetAsData;
 using Xunit;
 
@@ -10,11 +10,13 @@ public class Tableのテスト : IDisposable
 
     readonly Workbook book;
     readonly Table table;
+    readonly Table typedMappingTable;
 
     public Tableのテスト()
     {
         book = Workbook.Open(TestFilePath);
-        table = book.Tables["テーブル2"];
+        table = book.Tables["型付き行マッピング"];
+        typedMappingTable = book.Tables["型付き行マッピング"];
     }
 
     public void Dispose()
@@ -26,7 +28,7 @@ public class Tableのテスト : IDisposable
     [Fact]
     public void NameはExcelテーブル名を返します()
     {
-        table.Name.Should().Be("テーブル2");
+        table.Name.Should().Be("型付き行マッピング");
     }
 
     [Fact]
@@ -86,5 +88,15 @@ public class Tableのテスト : IDisposable
         var secondEnumeration = table.Rows.ToArray();
 
         firstEnumeration[1].Should().BeSameAs(secondEnumeration[1]);
+    }
+
+    [Fact]
+    public void EnumerateはReadTableで取得した型付きTableと同じ結果を列挙します()
+    {
+        typedMappingTable.Enumerate<TestMappedRow>()
+            .Should()
+            .BeEquivalentTo(
+                book.ReadTable<TestMappedRow>("型付き行マッピング"),
+                options => options.WithStrictOrdering());
     }
 }

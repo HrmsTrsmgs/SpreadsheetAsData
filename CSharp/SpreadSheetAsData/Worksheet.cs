@@ -95,9 +95,9 @@ public class Worksheet
             where xml.CellReference == cellReference
             select xml;
 
-        return cellXml.Any()
-            ? new Cell(this, cellXml.Single())
-            : new Cell(this, cellReference);
+        return cellXml.IsEmpty()
+            ? new Cell(this, cellReference)
+            : new Cell(this, cellXml.Single());
     }
 
     /// <summary>

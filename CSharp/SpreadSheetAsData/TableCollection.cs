@@ -1,7 +1,7 @@
-namespace Marimo.SpreadSheetAsData;
-
+﻿
 using Packaging = DocumentFormat.OpenXml.Packaging;
 
+namespace Marimo.SpreadSheetAsData;
 /// <summary>
 /// ブック内の Excel テーブルを取得するコレクションを表します。
 /// </summary>

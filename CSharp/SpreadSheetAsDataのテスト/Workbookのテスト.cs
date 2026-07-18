@@ -94,4 +94,20 @@ public class Workbookのテスト : IDisposable
         book1["Sheet1"].Name.Should().Be("Sheet1");
     }
 
+    [Fact]
+    public void ReadTableは存在しないテーブル名を指定した場合に失敗します()
+    {
+        using var tested = Workbook.Open(@"TestData\テーブル.xlsx");
+
+        var action = () =>
+        {
+            tested.ReadTable<TestMappedRow>("missing")
+                .ToArray();
+        };
+
+        action
+            .Should()
+            .Throw<KeyNotFoundException>();
+    }
+
 }

@@ -155,6 +155,15 @@ public class Workbook : IDisposable
     public TableCollection Tables { get; }
 
     /// <summary>
+    /// 指定した名前の Excel テーブルを、各データ行を <typeparamref name="T"/> へ対応付ける型付きテーブルとして取得します。
+    /// </summary>
+    /// <typeparam name="T">各データ行を対応付ける型。</typeparam>
+    /// <param name="name">取得する Excel テーブル名。</param>
+    /// <returns>指定した Excel テーブルの型付き列挙。</returns>
+    public Table<T> ReadTable<T>(string name) =>
+        new(Tables[name]);
+
+    /// <summary>
     /// 指定した位置のワークシートを取得します。
     /// </summary>
     /// <param name="index">取得するワークシートの 0 始まりの位置。</param>

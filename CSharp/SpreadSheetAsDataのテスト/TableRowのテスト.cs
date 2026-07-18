@@ -16,7 +16,7 @@ public class TableRowのテスト : IDisposable
     public TableRowのテスト()
     {
         book = Workbook.Open(TestFilePath);
-        table = book.Tables["テーブル2"];
+        table = book.Tables["型付き行マッピング"];
         firstRow = table.Rows.First();
         secondColumn = table.Columns["数値2"];
     }
@@ -81,7 +81,7 @@ public class TableRowのテスト : IDisposable
     public void 別のExcelテーブルに属するTableColumnを指定した場合に失敗します()
     {
         var foreignColumn =
-            book.Tables["テーブル28"]
+            book.Tables["別テーブル列検証"]
                 .Columns["数値2"];
 
         var action = () => _ = firstRow[foreignColumn];
