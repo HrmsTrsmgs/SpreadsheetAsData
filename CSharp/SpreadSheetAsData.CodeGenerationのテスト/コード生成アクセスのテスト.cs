@@ -45,7 +45,7 @@ public sealed class コード生成アクセスのテスト
                 BasicStructureExcelFilePath));
 
         var book = (Workbook)Activator.CreateInstance(
-            assembly.GetRequiredType("BasicStructureBook"))!;
+            assembly.GeneratedType("BasicStructureBook"))!;
 
         book.Sheets.Should().NotBeNull();
         book.Tables.Should().NotBeNull();
@@ -87,7 +87,7 @@ public sealed class コード生成アクセスのテスト
                 BasicStructureExcelFilePath));
 
         var sheet = (Worksheet)Activator.CreateInstance(
-            assembly.GetRequiredType("SalesDataSheet"))!;
+            assembly.GeneratedType("SalesDataSheet"))!;
 
         sheet.Name.Should().NotBeNull();
         sheet.Book.Should().NotBeNull();
@@ -96,5 +96,3 @@ public sealed class コード生成アクセスのテスト
         sheet.Cells.Should().NotBeNull();
     }
 }
-
-

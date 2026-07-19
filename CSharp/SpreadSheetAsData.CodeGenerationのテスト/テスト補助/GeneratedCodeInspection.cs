@@ -61,12 +61,12 @@ static class GeneratedCodeInspection
         GeneratedSourceCompiler.Compile(sources);
 
     /// <summary>
-    /// 生成コードをコンパイルしたアセンブリから、既定名前空間内の型を取得します。
+    /// 生成コードをコンパイルしたアセンブリから、既定名前空間内の生成型を取得します。
     /// </summary>
     /// <param name="assembly">検索対象のアセンブリ。</param>
-    /// <param name="typeName">既定名前空間を除いた型名。</param>
+    /// <param name="typeName">既定名前空間を除いた生成型名。</param>
     /// <returns>指定した生成型。</returns>
-    internal static Type GetRequiredType(this Assembly assembly, string typeName) =>
+    internal static Type GeneratedType(this Assembly assembly, string typeName) =>
         assembly.GetType($"{NamespaceName}.{typeName}")
             ?? throw new InvalidOperationException(typeName);
 }

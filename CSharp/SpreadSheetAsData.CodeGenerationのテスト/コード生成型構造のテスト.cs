@@ -32,7 +32,7 @@ public sealed class コード生成型構造のテスト
             .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
-            .GetRequiredType("BasicStructureBook")
+            .GeneratedType("BasicStructureBook")
             .Should()
             .BeAssignableTo<Workbook>();
     }
@@ -59,7 +59,7 @@ public sealed class コード生成型構造のテスト
             .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
-            .GetRequiredType("SalesDataSheet")
+            .GeneratedType("SalesDataSheet")
             .Should()
             .BeAssignableTo<Worksheet>();
     }
@@ -109,7 +109,7 @@ public sealed class コード生成型構造のテスト
             .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
-            .GetRequiredType("SalesDetail");
+            .GeneratedType("SalesDetail");
 
         dataType.BaseType.Should().Be(typeof(object));
         dataType.Should().NotBeAssignableTo<TableRow>();
@@ -124,7 +124,7 @@ public sealed class コード生成型構造のテスト
             .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
-            .GetRequiredType("SalesDetail")
+            .GeneratedType("SalesDetail")
             .GetProperty("CustomerId");
 
         property.Should().NotBeNull();
@@ -151,7 +151,7 @@ public sealed class コード生成型構造のテスト
                     }
                     """
                 ])
-            .GetRequiredType("BasicStructureBook")
+            .GeneratedType("BasicStructureBook")
             .GetProperty("AddedByUser")
             .Should()
             .NotBeNull();
@@ -176,7 +176,7 @@ public sealed class コード生成型構造のテスト
                     }
                     """
                 ])
-            .GetRequiredType("SalesDataSheet")
+            .GeneratedType("SalesDataSheet")
             .GetProperty("AddedByUser")
             .Should()
             .NotBeNull();
@@ -201,7 +201,7 @@ public sealed class コード生成型構造のテスト
                     }
                     """
                 ])
-            .GetRequiredType("SalesDetailTable")
+            .GeneratedType("SalesDetailTable")
             .GetProperty("AddedByUser")
             .Should()
             .NotBeNull();
@@ -226,7 +226,7 @@ public sealed class コード生成型構造のテスト
                     }
                     """
                 ])
-            .GetRequiredType("SalesDetail")
+            .GeneratedType("SalesDetail")
             .GetProperty("AddedByUser")
             .Should()
             .NotBeNull();

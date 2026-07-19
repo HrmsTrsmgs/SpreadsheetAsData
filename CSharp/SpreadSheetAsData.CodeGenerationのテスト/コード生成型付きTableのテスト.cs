@@ -19,7 +19,7 @@ public sealed class コード生成型付きTableのテスト
             GeneratedCodeInspection.GenerateSources(
                 BasicStructureExcelFilePath));
         var table = Activator.CreateInstance(
-            assembly.GetRequiredType("SalesDetailTable"));
+            assembly.GeneratedType("SalesDetailTable"));
 
         var rows = ((IEnumerable)table!).Cast<object>().ToArray();
 
@@ -43,7 +43,7 @@ public sealed class コード生成型付きTableのテスト
             GeneratedCodeInspection.GenerateSources(
                 BasicStructureExcelFilePath));
         var table = (Table)Activator.CreateInstance(
-            assembly.GetRequiredType("SalesDetailTable"))!;
+            assembly.GeneratedType("SalesDetailTable"))!;
 
         table.Rows.Should().NotBeEmpty();
     }
@@ -57,7 +57,7 @@ public sealed class コード生成型付きTableのテスト
             GeneratedCodeInspection.GenerateSources(
                 BasicStructureExcelFilePath));
         var table = (Table)Activator.CreateInstance(
-            assembly.GetRequiredType("SalesDetailTable"))!;
+            assembly.GeneratedType("SalesDetailTable"))!;
 
         table.Name.Should().Be("sales_detail");
         table.Worksheet.Should().NotBeNull();
@@ -75,7 +75,7 @@ public sealed class コード生成型付きTableのテスト
             GeneratedCodeInspection.GenerateSources(
                 BasicStructureExcelFilePath));
         var generatedTable = (IEnumerable)Activator.CreateInstance(
-            assembly.GetRequiredType("SalesDetailTable"))!;
+            assembly.GeneratedType("SalesDetailTable"))!;
 
         generatedTable
             .Cast<object>()
@@ -112,5 +112,3 @@ public sealed class コード生成型付きTableのテスト
         public string Description { get; set; } = "";
     }
 }
-
-
