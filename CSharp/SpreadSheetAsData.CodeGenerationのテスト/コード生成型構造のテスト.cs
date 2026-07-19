@@ -65,9 +65,10 @@ public sealed class コード生成型構造のテスト
     }
 
     [Theory]
-    [InlineData("SalesDetailTable")]
-    [InlineData("ProductListTable")]
+    [InlineData("SalesDetail", "SalesDetailTable")]
+    [InlineData("ProductList", "ProductListTable")]
     public void 生成されたTable型をExcelテーブル名に対応する型名で生成します(
+        string excelTableName,
         string generatedTypeName)
     {
         GeneratedCodeInspection
@@ -76,7 +77,10 @@ public sealed class コード生成型構造のテスト
                     BasicStructureExcelFilePath))
             .TypeNames
             .Should()
-            .Contain(generatedTypeName);
+            .Contain(
+                generatedTypeName,
+                "Excelテーブル {0} から生成される型名だから",
+                excelTableName);
     }
 
     [Theory]
