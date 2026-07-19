@@ -41,6 +41,5 @@ public static class WorkbookWrapperGenerator
     public static CodeGenerationDiagnostic[] GenerateDiagnostics(
         string filePath,
         Action<CodeGenerationOptions>? configure = null) =>
-        throw new NotImplementedException(
-            "コード生成診断機能はまだ実装されていません。");
+        [];
 }

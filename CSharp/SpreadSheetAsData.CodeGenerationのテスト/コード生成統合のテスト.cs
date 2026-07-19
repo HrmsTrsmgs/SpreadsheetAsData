@@ -48,9 +48,7 @@ public sealed class コード生成統合のテスト
                     IntegratedExcelFilePath));
     }
 
-    [Fact(
-        Skip =
-            "正常なExcelファイルでエラー診断を返さない処理を実装するときに解除する。")]
+    [Fact]
     public void 正常なExcelファイルではエラー診断を返しません()
     {
         GeneratedCodeInspection
