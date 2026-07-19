@@ -10,6 +10,21 @@ public sealed class CSharp識別子生成のテスト
     const string CamelCaseIdentifierExcelFilePath = @"TestData\コード生成\salesReport.xlsx";
     const string JapaneseMixedNameExcelFilePath = @"TestData\コード生成\日本語混在名前.xlsx";
 
+    [Theory]
+    [InlineData("salesReport", "SalesReport")]
+    [InlineData("salesData", "SalesData")]
+    [InlineData("salesDetail", "SalesDetail")]
+    [InlineData("customerId", "CustomerId")]
+    public void camelCaseのExcel由来名はPascalCaseの識別子本文へ変換します(
+        string excelName,
+        string identifierBody)
+    {
+        WorkbookWrapperComponents
+            .Identifier(excelName)
+            .Should()
+            .Be(identifierBody);
+    }
+
     [Fact]
     public void camelCaseブック名はPascalCaseのBook型名へ変換します()
     {
@@ -73,56 +88,25 @@ public sealed class CSharp識別子生成のテスト
 
     [Theory(
         Skip =
-            "ASCIIシート名をPascalCaseのSheet型名へ自動変換する処理を実装するときに解除する。")]
-    [InlineData("sales_detail", "SalesDetailSheet")]
-    [InlineData("sales-detail", "SalesDetailSheet")]
-    [InlineData("sales detail", "SalesDetailSheet")]
-    [InlineData("SALES_DETAIL1", "SalesDetail1Sheet")]
-    public void ASCIIシート名はPascalCaseのSheet型名へ変換します(
-        string excelSheetName,
-        string generatedTypeName)
-    {
-        GeneratedCodeInspection
-            .SyntaxFrom(
-                GeneratedCodeInspection.GenerateSources(
-                    AsciiNameConversionExcelFilePath))
-            .TypeNames
-            .Should()
-            .Contain(
-                generatedTypeName,
-                "Excelシート名 {0} から生成される型名だから",
-                excelSheetName);
-    }
-
-    [Theory(
-        Skip =
-            "ASCIIテーブル名をPascalCaseのTable型名へ自動変換する処理を実装するときに解除する。")]
-    [InlineData("sales_detail", "SalesDetailTable")]
-    [InlineData("sales_detail_dash", "SalesDetailDashTable")]
-    public void ASCIIテーブル名はPascalCaseのTable型名へ変換します(
-        string excelTableName,
-        string generatedTypeName)
-    {
-        GeneratedCodeInspection
-            .SyntaxFrom(
-                GeneratedCodeInspection.GenerateSources(
-                    AsciiNameConversionExcelFilePath))
-            .TypeNames
-            .Should()
-            .Contain(
-                generatedTypeName,
-                "Excelテーブル名 {0} から生成される型名だから",
-                excelTableName);
-    }
-
-    [Theory(
-        Skip =
-            "ASCIIテーブル名をPascalCaseの行データ型名へ自動変換する処理を実装するときに解除する。")]
+            "識別子本文がASCIIの区切り文字を単語境界としてPascalCaseへ変換するときに解除する。")]
     [InlineData("sales_detail", "SalesDetail")]
-    [InlineData("sales_detail_dash", "SalesDetailDash")]
-    public void ASCIIテーブル名はPascalCaseの行データ型名へ変換します(
-        string excelTableName,
-        string generatedTypeName)
+    [InlineData("sales-detail", "SalesDetail")]
+    [InlineData("sales detail", "SalesDetail")]
+    [InlineData("SALES_DETAIL1", "SalesDetail1")]
+    public void ASCII識別子本文は区切り文字を単語境界としてPascalCaseへ変換します(
+        string excelName,
+        string identifierBody)
+    {
+        WorkbookWrapperComponents
+            .Identifier(excelName)
+            .Should()
+            .Be(identifierBody);
+    }
+
+    [Fact(
+        Skip =
+            "識別子本文の変換規則をTable型名と行データ型名の両方へ適用するときに解除する。")]
+    public void Table型名と行データ型名は同じ識別子本文を使用します()
     {
         GeneratedCodeInspection
             .SyntaxFrom(
@@ -130,68 +114,44 @@ public sealed class CSharp識別子生成のテスト
                     AsciiNameConversionExcelFilePath))
             .TypeNames
             .Should()
-            .Contain(
-                generatedTypeName,
-                "Excelテーブル名 {0} から生成される型名だから",
-                excelTableName);
+            .Contain(["SalesDetail", "SalesDetailTable"]);
     }
 
-    [Theory(
+    [Fact(
         Skip =
-            "ASCII列名をPascalCaseの行データプロパティ名へ自動変換する処理を実装するときに解除する。")]
-    [InlineData("SalesDetail", "customer_id", "CustomerId")]
-    [InlineData("SalesDetail", "url_value", "UrlValue")]
-    [InlineData("SalesDetailDash", "xml_id", "XmlId")]
-    [InlineData("SalesDetailDash", "api_url", "ApiUrl")]
-    public void ASCII列名はPascalCaseの行データプロパティ名へ変換します(
-        string dataTypeName,
-        string excelColumnName,
-        string generatedPropertyName)
+            "識別子本文の変換規則を列プロパティ名へ適用するときに解除する。")]
+    public void 列プロパティ名は識別子本文を使用します()
     {
         GeneratedCodeInspection
             .SyntaxFrom(
                 GeneratedCodeInspection.GenerateSources(
                     AsciiNameConversionExcelFilePath))
-            .GeneratedType(dataTypeName)
+            .GeneratedType("SalesDetail")
             .PropertyNames
             .Should()
-            .Contain(
-                generatedPropertyName,
-                "Excel列名 {0} から生成されるプロパティ名だから",
-                excelColumnName);
+            .Contain("CustomerId");
     }
 
     [Theory(
         Skip =
-            "非ASCIIを含むシート名の内部単語境界を推測しない識別子変換を実装するときに解除する。")]
-    [InlineData("商品_明細", "商品_明細Sheet")]
-    [InlineData("商品-明細", "商品_明細Sheet")]
-    [InlineData("sales商品-detail", "Sales商品_detailSheet")]
-    public void 日本語混在シート名は内部の単語境界を推測しません(
-        string excelSheetName,
-        string generatedTypeName)
+            "非ASCIIを含む識別子本文の内部単語境界を推測しない変換規則を実装するときに解除する。")]
+    [InlineData("商品_明細", "商品_明細")]
+    [InlineData("商品-明細", "商品_明細")]
+    [InlineData("sales商品-detail", "Sales商品_detail")]
+    public void 非ASCIIを含む識別子本文は内部の単語境界を推測しません(
+        string excelName,
+        string identifierBody)
     {
-        GeneratedCodeInspection
-            .SyntaxFrom(
-                GeneratedCodeInspection.GenerateSources(
-                    JapaneseMixedNameExcelFilePath))
-            .TypeNames
+        WorkbookWrapperComponents
+            .Identifier(excelName)
             .Should()
-            .Contain(
-                generatedTypeName,
-                "Excelシート名 {0} から生成される型名だから",
-                excelSheetName);
+            .Be(identifierBody);
     }
 
-    [Theory(
+    [Fact(
         Skip =
-            "非ASCIIを含む列名の内部単語境界を推測しない識別子変換を実装するときに解除する。")]
-    [InlineData("商品_id", "商品_id")]
-    [InlineData("sales商品_detail", "Sales商品_detail")]
-    [InlineData("商品sales_detail", "商品sales_detail")]
-    public void 日本語混在列名は内部の単語境界を推測しません(
-        string excelColumnName,
-        string generatedPropertyName)
+            "非ASCIIを含む識別子本文の変換規則を列プロパティ名へ適用するときに解除する。")]
+    public void 非ASCIIを含む列プロパティ名は識別子本文を使用します()
     {
         GeneratedCodeInspection
             .SyntaxFrom(
@@ -200,61 +160,43 @@ public sealed class CSharp識別子生成のテスト
             .GeneratedType("商品_明細")
             .PropertyNames
             .Should()
-            .Contain(
-                generatedPropertyName,
-                "Excel列名 {0} から生成されるプロパティ名だから",
-                excelColumnName);
+            .Contain(["商品_id", "Sales商品_detail", "商品sales_detail"]);
     }
 
     [Fact(
         Skip =
-            "非ASCIIを含む名前の使用できない識別子文字をアンダースコアへ置換するときに解除する。")]
-    public void 日本語混在列名の使用できない識別子文字はアンダースコアへ置換します()
+            "識別子本文に使用できない文字をアンダースコアへ置換するときに解除する。")]
+    public void 識別子本文に使用できない文字はアンダースコアへ置換します()
     {
-        GeneratedCodeInspection
-            .SyntaxFrom(
-                GeneratedCodeInspection.GenerateSources(
-                    JapaneseMixedNameExcelFilePath))
-            .GeneratedType("商品_明細")
-            .PropertyNames
+        WorkbookWrapperComponents
+            .Identifier("商品 明細")
             .Should()
-            .Contain(
-                "商品_明細",
-                "Excel列名 商品 明細 から生成されるプロパティ名だから");
+            .Be("商品_明細");
     }
 
     [Theory(
         Skip =
-            "数字から始まるシート名を有効なCSharp識別子へ補正するときに解除する。")]
-    [InlineData("2026_sales", "_2026SalesSheet")]
-    [InlineData("2026商品", "_2026商品Sheet")]
-    public void 数字から始まるシート名は有効なCSharp識別子へ補正します(
-        string excelSheetName,
-        string generatedTypeName)
+            "数字から始まる識別子本文を有効なCSharp識別子へ補正するときに解除する。")]
+    [InlineData("2026_sales", "_2026Sales")]
+    [InlineData("2026商品", "_2026商品")]
+    public void 数字から始まる識別子本文は有効なCSharp識別子へ補正します(
+        string excelName,
+        string identifierBody)
     {
-        GeneratedCodeInspection
-            .SyntaxFrom(
-                GeneratedCodeInspection.GenerateSources(
-                    AsciiNameConversionExcelFilePath))
-            .TypeNames
+        WorkbookWrapperComponents
+            .Identifier(excelName)
             .Should()
-            .Contain(
-                generatedTypeName,
-                "Excelシート名 {0} から生成される型名だから",
-                excelSheetName);
+            .Be(identifierBody);
     }
 
     [Fact(
         Skip =
-            "自動変換名がCSharpキーワードにならないようPascalCaseへ変換するときに解除する。")]
-    public void 自動変換ではキーワードもPascalCaseへ変換します()
+            "CSharpキーワードと同じExcel名をキーワードでない識別子本文へ変換するときに解除する。")]
+    public void CSharpキーワードと同じExcel名はキーワードでない識別子本文へ変換します()
     {
-        GeneratedCodeInspection
-            .SyntaxFrom(
-                GeneratedCodeInspection.GenerateSources(
-                    AsciiNameConversionExcelFilePath))
-            .TypeNames
+        WorkbookWrapperComponents
+            .Identifier("class")
             .Should()
-            .Contain("ClassSheet");
+            .Be("Class");
     }
 }

@@ -75,7 +75,7 @@ static class WorkbookWrapperComponents
     static string ForEach(IEnumerable<string> generatedBlocks) =>
         string.Join(Environment.NewLine, generatedBlocks);
 
-    static string Identifier(string sourceName) =>
+    internal static string Identifier(string sourceName) =>
         sourceName.Length == 0
             ? sourceName
             : $"{char.ToUpperInvariant(sourceName[0])}{sourceName[1..]}";
