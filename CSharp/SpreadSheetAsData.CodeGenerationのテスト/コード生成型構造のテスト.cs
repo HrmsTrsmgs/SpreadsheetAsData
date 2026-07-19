@@ -132,10 +132,83 @@ public sealed class コード生成型構造のテスト
         property.SetMethod!.IsPublic.Should().BeTrue();
     }
 
-    [Fact(
-        Skip =
-            "生成型をpartialとして出力し利用者のpartial定義と同時コンパイルできる処理を実装するときに解除する。")]
-    public void 生成された型は別ファイルのpartial定義と共にコンパイルできます()
+    [Fact]
+    public void 生成されたBook型は別ファイルのpartial定義と共にコンパイルできます()
+    {
+        var sources = GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath);
+
+        GeneratedSourceCompiler
+            .Compile(
+                [
+                    .. sources,
+                    """
+                    namespace Generated;
+
+                    public partial class BasicStructureBook
+                    {
+                        public bool AddedByUser => true;
+                    }
+                    """
+                ])
+            .GetRequiredType("BasicStructureBook")
+            .GetProperty("AddedByUser")
+            .Should()
+            .NotBeNull();
+    }
+
+    [Fact]
+    public void 生成されたSheet型は別ファイルのpartial定義と共にコンパイルできます()
+    {
+        var sources = GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath);
+
+        GeneratedSourceCompiler
+            .Compile(
+                [
+                    .. sources,
+                    """
+                    namespace Generated;
+
+                    public partial class SalesDataSheet
+                    {
+                        public bool AddedByUser => true;
+                    }
+                    """
+                ])
+            .GetRequiredType("SalesDataSheet")
+            .GetProperty("AddedByUser")
+            .Should()
+            .NotBeNull();
+    }
+
+    [Fact]
+    public void 生成されたTable型は別ファイルのpartial定義と共にコンパイルできます()
+    {
+        var sources = GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath);
+
+        GeneratedSourceCompiler
+            .Compile(
+                [
+                    .. sources,
+                    """
+                    namespace Generated;
+
+                    public partial class SalesDetailTable
+                    {
+                        public bool AddedByUser => true;
+                    }
+                    """
+                ])
+            .GetRequiredType("SalesDetailTable")
+            .GetProperty("AddedByUser")
+            .Should()
+            .NotBeNull();
+    }
+
+    [Fact]
+    public void 生成された行データ型は別ファイルのpartial定義と共にコンパイルできます()
     {
         var sources = GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath);

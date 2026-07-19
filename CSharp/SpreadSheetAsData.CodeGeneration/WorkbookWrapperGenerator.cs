@@ -28,7 +28,7 @@ public static class WorkbookWrapperGenerator
             from sheet in book.Sheets.Values
             select $$"""
 
-            public class {{GenerateTypeName(sheet.Name, "Sheet")}} : Worksheet
+            public partial class {{GenerateTypeName(sheet.Name, "Sheet")}} : Worksheet
             {
                 public {{GenerateTypeName(sheet.Name, "Sheet")}}(Workbook book) : base(book, {{GenerateStringLiteral(sheet.Name)}})
                 {
@@ -41,7 +41,7 @@ public static class WorkbookWrapperGenerator
             let tableTypeName = GenerateTypeName(table.Name, "Table")
             select $$"""
 
-            public class {{tableTypeName}} : Table<{{rowTypeName}}>
+            public partial class {{tableTypeName}} : Table<{{rowTypeName}}>
             {
                 public {{tableTypeName}}(Table source) : base(source)
                 {
@@ -52,7 +52,7 @@ public static class WorkbookWrapperGenerator
             from table in book.Tables
             select $$"""
 
-            public class {{GenerateTypeName(table.Name, "")}}
+            public partial class {{GenerateTypeName(table.Name, "")}}
             {
             }
             """;
@@ -64,7 +64,7 @@ public static class WorkbookWrapperGenerator
 
             namespace {{options.Namespace}};
 
-            public class {{bookTypeName}} : Workbook
+            public partial class {{bookTypeName}} : Workbook
             {
                 public {{bookTypeName}}() : base({{GenerateStringLiteral(filePath)}})
                 {
