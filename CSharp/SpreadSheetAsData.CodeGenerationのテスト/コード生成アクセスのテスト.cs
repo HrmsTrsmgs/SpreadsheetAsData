@@ -7,7 +7,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class コード生成アクセスのテスト
 {
-    const string BasicStructureExcelFilePath = @"TestData\コード生成\基本構造.xlsx";
+    const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
 
     [Fact(
         Skip =
@@ -51,7 +51,7 @@ public sealed class コード生成アクセスのテスト
         book.Tables.Should().NotBeNull();
         book.Cell.Should().NotBeNull();
         book.Range.Should().NotBeNull();
-        book["sales_data"].Should().NotBeNull();
+        book["SalesData"].Should().NotBeNull();
     }
 
     [Fact(

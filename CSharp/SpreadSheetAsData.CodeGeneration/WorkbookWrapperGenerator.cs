@@ -1,4 +1,6 @@
-﻿namespace Marimo.SpreadSheetAsData.CodeGeneration;
+﻿using Marimo.SpreadSheetAsData;
+
+namespace Marimo.SpreadSheetAsData.CodeGeneration;
 
 /// <summary>
 /// Excelブックから、SpreadsheetAsDataの型付きラッパーコードを生成します。
@@ -18,6 +20,19 @@ public static class WorkbookWrapperGenerator
         var options = new CodeGenerationOptions();
         configure?.Invoke(options);
 
+        using var book = Workbook.Open(filePath);
+        var bookTypeName = GenerateTypeName(
+            Path.GetFileNameWithoutExtension(filePath),
+            "Book");
+        var sheetDeclarations =
+            from sheet in book.Sheets.Values
+            select $$"""
+
+            public class {{GenerateTypeName(sheet.Name, "Sheet")}} : Worksheet
+            {
+            }
+            """;
+
         return
         [
             $$"""
@@ -25,13 +40,10 @@ public static class WorkbookWrapperGenerator
 
             namespace {{options.Namespace}};
 
-            public class BasicStructureBook
+            public class {{bookTypeName}}
             {
             }
-
-            public class SalesDataSheet : Worksheet
-            {
-            }
+            {{string.Join(Environment.NewLine, sheetDeclarations)}}
             """
         ];
     }
@@ -46,4 +58,7 @@ public static class WorkbookWrapperGenerator
         string filePath,
         Action<CodeGenerationOptions>? configure = null) =>
         [];
+
+    static string GenerateTypeName(string sourceName, string suffix) =>
+        $"{sourceName}{suffix}";
 }

@@ -8,7 +8,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class コード生成型付きTableのテスト
 {
-    const string BasicStructureExcelFilePath = @"TestData\コード生成\基本構造.xlsx";
+    const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
 
     [Fact(
         Skip =

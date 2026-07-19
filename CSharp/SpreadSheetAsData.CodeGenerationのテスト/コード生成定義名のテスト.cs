@@ -15,7 +15,7 @@ public sealed class コード生成定義名のテスト
     {
         GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
-            .PropertyDeclaration("DefinedNamesBook", "MainCell")
+            .PropertyDeclaration("定義名Book", "MainCell")
             .Type
             .ToString()
             .Should()
@@ -29,7 +29,7 @@ public sealed class コード生成定義名のテスト
     {
         GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
-            .PropertyDeclaration("DefinedNamesBook", "MainRange")
+            .PropertyDeclaration("定義名Book", "MainRange")
             .Type
             .ToString()
             .Should()
@@ -72,7 +72,7 @@ public sealed class コード生成定義名のテスト
         var sources = GeneratedCodeInspection.GenerateSources(
                     DefinedNamesExcelFilePath);
 
-        sources.PropertyDeclaration("DefinedNamesBook", "Total").Should().NotBeNull();
+        sources.PropertyDeclaration("定義名Book", "Total").Should().NotBeNull();
         sources.PropertyDeclaration("SalesDataSheet", "Total").Should().NotBeNull();
     }
 }

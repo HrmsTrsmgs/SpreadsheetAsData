@@ -6,7 +6,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class コード生成コメントのテスト
 {
-    const string BasicStructureExcelFilePath = @"TestData\コード生成\基本構造.xlsx";
+    const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
     const string DefinedNamesExcelFilePath = @"TestData\コード生成\定義名.xlsx";
 
     [Fact(
@@ -19,7 +19,7 @@ public sealed class コード生成コメントのテスト
             .TypeDeclaration("BasicStructureBook")
             .SummaryText()
             .Should()
-            .Be("Excelブック「基本構造」を型付きで表します。");
+            .Be("Excelブック「BasicStructure」を型付きで表します。");
     }
 
     [Fact(
@@ -32,7 +32,7 @@ public sealed class コード生成コメントのテスト
             .TypeDeclaration("SalesDataSheet")
             .SummaryText()
             .Should()
-            .Be("ワークシート「sales_data」を型付きで表します。");
+            .Be("ワークシート「SalesData」を型付きで表します。");
     }
 
     [Fact(
@@ -71,7 +71,7 @@ public sealed class コード生成コメントのテスト
             .PropertyDeclaration("BasicStructureBook", "SalesData")
             .SummaryText()
             .Should()
-            .Be("ワークシート「sales_data」を取得します。");
+            .Be("ワークシート「SalesData」を取得します。");
     }
 
     [Fact(
@@ -107,7 +107,7 @@ public sealed class コード生成コメントのテスト
     {
         GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
-            .PropertyDeclaration("DefinedNamesBook", "MainCell")
+            .PropertyDeclaration("定義名Book", "MainCell")
             .SummaryText()
             .Should()
             .Be("定義名「main_cell」が表すセルを取得します。");
@@ -120,7 +120,7 @@ public sealed class コード生成コメントのテスト
     {
         GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
-            .PropertyDeclaration("DefinedNamesBook", "MainRange")
+            .PropertyDeclaration("定義名Book", "MainRange")
             .SummaryText()
             .Should()
             .Be("定義名「main_range」が表すセル範囲を取得します。");

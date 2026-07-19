@@ -7,7 +7,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class コード生成型構造のテスト
 {
-    const string BasicStructureExcelFilePath = @"TestData\コード生成\基本構造.xlsx";
+    const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
 
     [Fact]
     public void 生成されたBook型を生成します()
@@ -33,6 +33,18 @@ public sealed class コード生成型構造のテスト
             .GetRequiredType("BasicStructureBook")
             .Should()
             .BeAssignableTo<Workbook>();
+    }
+
+    [Fact]
+    public void 生成されたSheet型を生成します()
+    {
+        GeneratedCodeInspection
+            .SyntaxFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath))
+            .TypeNames
+            .Should()
+            .Contain("SalesDataSheet");
     }
 
     [Fact]
