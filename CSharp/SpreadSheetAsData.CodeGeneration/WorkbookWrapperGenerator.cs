@@ -37,9 +37,22 @@ public static class WorkbookWrapperGenerator
             """;
         var tableDeclarations =
             from table in book.Tables
+            let rowTypeName = GenerateTypeName(table.Name, "")
+            let tableTypeName = GenerateTypeName(table.Name, "Table")
             select $$"""
 
-            public class {{GenerateTypeName(table.Name, "Table")}}
+            public class {{tableTypeName}} : Table<{{rowTypeName}}>
+            {
+                public {{tableTypeName}}(Table source) : base(source)
+                {
+                }
+            }
+            """;
+        var rowDeclarations =
+            from table in book.Tables
+            select $$"""
+
+            public class {{GenerateTypeName(table.Name, "")}}
             {
             }
             """;
@@ -59,6 +72,7 @@ public static class WorkbookWrapperGenerator
             }
             {{string.Join(Environment.NewLine, sheetDeclarations)}}
             {{string.Join(Environment.NewLine, tableDeclarations)}}
+            {{string.Join(Environment.NewLine, rowDeclarations)}}
             """
         ];
     }

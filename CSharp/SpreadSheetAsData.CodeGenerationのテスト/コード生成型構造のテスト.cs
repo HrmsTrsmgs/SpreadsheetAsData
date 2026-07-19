@@ -64,8 +64,11 @@ public sealed class コード生成型構造のテスト
             .BeAssignableTo<Worksheet>();
     }
 
-    [Fact]
-    public void 生成されたTable型を生成します()
+    [Theory]
+    [InlineData("SalesDetailTable")]
+    [InlineData("ProductListTable")]
+    public void 生成されたTable型をExcelテーブル名に対応する型名で生成します(
+        string generatedTypeName)
     {
         GeneratedCodeInspection
             .SyntaxFrom(
@@ -73,22 +76,24 @@ public sealed class コード生成型構造のテスト
                     BasicStructureExcelFilePath))
             .TypeNames
             .Should()
-            .Contain("SalesDetailTable");
+            .Contain(generatedTypeName);
     }
 
-    [Fact(
-        Skip =
-            "生成専用Table型が生成された行データ型を型引数にしたTableを基底型としてコンパイルできる処理を実装するときに解除する。")]
-    public void 生成されたTable型は生成された行データ型を型引数とするTableを継承します()
+    [Theory]
+    [InlineData("SalesDetailTable", "Table<SalesDetail>")]
+    [InlineData("ProductListTable", "Table<ProductList>")]
+    public void 生成されたTable型は生成された行データ型を型引数とするTableを継承します(
+        string generatedTypeName,
+        string baseTypeName)
     {
         GeneratedCodeInspection
             .SyntaxFrom(
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
-            .GeneratedType("SalesDetailTable")
+            .GeneratedType(generatedTypeName)
             .BaseTypeName
             .Should()
-            .Be("Table<SalesDetail>");
+            .Be(baseTypeName);
     }
 
     [Fact(
