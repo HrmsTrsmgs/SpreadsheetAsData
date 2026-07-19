@@ -7,7 +7,69 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 public sealed class CSharp識別子生成のテスト
 {
     const string AsciiNameConversionExcelFilePath = @"TestData\コード生成\ASCII名前変換.xlsx";
+    const string CamelCaseIdentifierExcelFilePath = @"TestData\コード生成\salesReport.xlsx";
     const string JapaneseMixedNameExcelFilePath = @"TestData\コード生成\日本語混在名前.xlsx";
+
+    [Fact]
+    public void camelCaseブック名はPascalCaseのBook型名へ変換します()
+    {
+        GeneratedCodeInspection
+            .SyntaxFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    CamelCaseIdentifierExcelFilePath))
+            .TypeNames
+            .Should()
+            .Contain("SalesReportBook");
+    }
+
+    [Fact]
+    public void camelCaseシート名はPascalCaseのSheet型名へ変換します()
+    {
+        GeneratedCodeInspection
+            .SyntaxFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    CamelCaseIdentifierExcelFilePath))
+            .TypeNames
+            .Should()
+            .Contain("SalesDataSheet");
+    }
+
+    [Fact]
+    public void camelCaseテーブル名はPascalCaseのTable型名へ変換します()
+    {
+        GeneratedCodeInspection
+            .SyntaxFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    CamelCaseIdentifierExcelFilePath))
+            .TypeNames
+            .Should()
+            .Contain("SalesDetailTable");
+    }
+
+    [Fact]
+    public void camelCaseテーブル名はPascalCaseの行データ型名へ変換します()
+    {
+        GeneratedCodeInspection
+            .SyntaxFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    CamelCaseIdentifierExcelFilePath))
+            .TypeNames
+            .Should()
+            .Contain("SalesDetail");
+    }
+
+    [Fact]
+    public void camelCase列名はPascalCaseの行データプロパティ名へ変換します()
+    {
+        GeneratedCodeInspection
+            .SyntaxFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    CamelCaseIdentifierExcelFilePath))
+            .GeneratedType("SalesDetail")
+            .PropertyNames
+            .Should()
+            .Contain("CustomerId");
+    }
 
     [Theory(
         Skip =

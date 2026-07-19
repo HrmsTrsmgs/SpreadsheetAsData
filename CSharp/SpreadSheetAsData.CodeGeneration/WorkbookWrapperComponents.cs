@@ -19,9 +19,9 @@ static class WorkbookWrapperComponents
 
         namespace {{namespaceName}};
 
-        public partial class {{Path.GetFileNameWithoutExtension(filePath)}}Book : Workbook
+        public partial class {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book : Workbook
         {
-            public {{Path.GetFileNameWithoutExtension(filePath)}}Book() : base({{StringLiteral(filePath)}})
+            public {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book() : base({{StringLiteral(filePath)}})
             {
             }
         }
@@ -39,9 +39,9 @@ static class WorkbookWrapperComponents
     static string SheetDeclaration(Worksheet sheet)
         => $$"""
 
-        public partial class {{sheet.Name}}Sheet : Worksheet
+        public partial class {{Identifier(sheet.Name)}}Sheet : Worksheet
         {
-            public {{sheet.Name}}Sheet(Workbook book) : base(book, {{StringLiteral(sheet.Name)}})
+            public {{Identifier(sheet.Name)}}Sheet(Workbook book) : base(book, {{StringLiteral(sheet.Name)}})
             {
             }
         }
@@ -50,9 +50,9 @@ static class WorkbookWrapperComponents
     static string TableDeclaration(Table table)
         => $$"""
 
-        public partial class {{table.Name}}Table : Table<{{table.Name}}>
+        public partial class {{Identifier(table.Name)}}Table : Table<{{Identifier(table.Name)}}>
         {
-            public {{table.Name}}Table(Table source) : base(source)
+            public {{Identifier(table.Name)}}Table(Table source) : base(source)
             {
             }
         }
@@ -61,7 +61,7 @@ static class WorkbookWrapperComponents
     static string RowDeclaration(Table table)
         => $$"""
 
-        public partial class {{table.Name}}
+        public partial class {{Identifier(table.Name)}}
         {
         {{ForEach(
             from column in table.Columns
@@ -70,10 +70,15 @@ static class WorkbookWrapperComponents
         """;
 
     static string RowPropertyDeclaration(TableColumn column) =>
-        $"    public object? {column.Name} {{ get; set; }}";
+        $"    public object? {Identifier(column.Name)} {{ get; set; }}";
 
     static string ForEach(IEnumerable<string> generatedBlocks) =>
         string.Join(Environment.NewLine, generatedBlocks);
+
+    static string Identifier(string sourceName) =>
+        sourceName.Length == 0
+            ? sourceName
+            : $"{char.ToUpperInvariant(sourceName[0])}{sourceName[1..]}";
 
     static string StringLiteral(string value) =>
         "\"" + value.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
