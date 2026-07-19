@@ -28,7 +28,29 @@ public sealed class テスト補助のテスト
     }
 
     [Fact]
-    public void GeneratedTypeは指定した型の名前を返します()
+    public void GeneratedTypeは指定した名前の生成型を返します()
+    {
+        CodeGenerationSpec
+            .FromSources(
+                """
+                namespace Generated;
+
+                public class BasicStructureBook
+                {
+                }
+
+                public class SalesDetailTable
+                {
+                }
+                """)
+            .GeneratedType("SalesDetailTable")
+            .Name
+            .Should()
+            .Be("SalesDetailTable");
+    }
+
+    [Fact]
+    public void Nameは生成型の名前を返します()
     {
         CodeGenerationSpec
             .FromSources(
@@ -46,7 +68,7 @@ public sealed class テスト補助のテスト
     }
 
     [Fact]
-    public void GeneratedTypeは指定した型の名前空間を返します()
+    public void NamespaceNameは指定した生成型の名前空間を返します()
     {
         CodeGenerationSpec
             .FromSources(
@@ -64,7 +86,7 @@ public sealed class テスト補助のテスト
     }
 
     [Fact]
-    public void GeneratedTypeは名前空間付きの表示名を返します()
+    public void ToStringは生成型の名前空間付き表示名を返します()
     {
         CodeGenerationSpec
             .FromSources(
