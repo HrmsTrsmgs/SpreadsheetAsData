@@ -9,6 +9,18 @@ public sealed class コード生成型構造のテスト
 {
     const string BasicStructureExcelFilePath = @"TestData\コード生成\基本構造.xlsx";
 
+    [Fact]
+    public void 生成されたBook型を生成します()
+    {
+        GeneratedCodeInspection
+            .SyntaxFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath))
+            .TypeNames
+            .Should()
+            .Contain("BasicStructureBook");
+    }
+
     [Fact(
         Skip =
             "生成されたBook型がWorkbookを継承する処理を実装するときに解除する。")]

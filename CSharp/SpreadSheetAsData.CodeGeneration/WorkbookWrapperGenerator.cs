@@ -25,6 +25,10 @@ public static class WorkbookWrapperGenerator
 
             namespace {{options.Namespace}};
 
+            public class BasicStructureBook
+            {
+            }
+
             public class SalesDataSheet : Worksheet
             {
             }
