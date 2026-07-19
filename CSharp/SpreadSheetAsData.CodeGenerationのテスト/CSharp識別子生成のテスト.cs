@@ -20,8 +20,8 @@ public sealed class CSharp識別子生成のテスト
         string excelSheetName,
         string generatedTypeName)
     {
-        CodeGenerationSpec
-            .From(AsciiNameConversionExcelFilePath)
+        GeneratedCodeInspection
+            .SyntaxFrom(AsciiNameConversionExcelFilePath)
             .TypeNames
             .Should()
             .Contain(
@@ -39,8 +39,8 @@ public sealed class CSharp識別子生成のテスト
         string excelTableName,
         string generatedTypeName)
     {
-        CodeGenerationSpec
-            .From(AsciiNameConversionExcelFilePath)
+        GeneratedCodeInspection
+            .SyntaxFrom(AsciiNameConversionExcelFilePath)
             .TypeNames
             .Should()
             .Contain(
@@ -58,8 +58,8 @@ public sealed class CSharp識別子生成のテスト
         string excelTableName,
         string generatedTypeName)
     {
-        CodeGenerationSpec
-            .From(AsciiNameConversionExcelFilePath)
+        GeneratedCodeInspection
+            .SyntaxFrom(AsciiNameConversionExcelFilePath)
             .TypeNames
             .Should()
             .Contain(
@@ -80,8 +80,8 @@ public sealed class CSharp識別子生成のテスト
         string excelColumnName,
         string generatedPropertyName)
     {
-        CodeGenerationSpec
-            .From(AsciiNameConversionExcelFilePath)
+        GeneratedCodeInspection
+            .SyntaxFrom(AsciiNameConversionExcelFilePath)
             .GeneratedType(dataTypeName)
             .PropertyNames
             .Should()
@@ -101,8 +101,8 @@ public sealed class CSharp識別子生成のテスト
         string excelSheetName,
         string generatedTypeName)
     {
-        CodeGenerationSpec
-            .From(JapaneseMixedNameExcelFilePath)
+        GeneratedCodeInspection
+            .SyntaxFrom(JapaneseMixedNameExcelFilePath)
             .TypeNames
             .Should()
             .Contain(
@@ -121,8 +121,8 @@ public sealed class CSharp識別子生成のテスト
         string excelColumnName,
         string generatedPropertyName)
     {
-        CodeGenerationSpec
-            .From(JapaneseMixedNameExcelFilePath)
+        GeneratedCodeInspection
+            .SyntaxFrom(JapaneseMixedNameExcelFilePath)
             .GeneratedType("商品_明細")
             .PropertyNames
             .Should()
@@ -137,8 +137,8 @@ public sealed class CSharp識別子生成のテスト
             "非ASCIIを含む名前の使用できない識別子文字をアンダースコアへ置換するときに解除する。")]
     public void 日本語混在列名の使用できない識別子文字はアンダースコアへ置換します()
     {
-        CodeGenerationSpec
-            .From(JapaneseMixedNameExcelFilePath)
+        GeneratedCodeInspection
+            .SyntaxFrom(JapaneseMixedNameExcelFilePath)
             .GeneratedType("商品_明細")
             .PropertyNames
             .Should()
@@ -156,8 +156,8 @@ public sealed class CSharp識別子生成のテスト
         string excelSheetName,
         string generatedTypeName)
     {
-        CodeGenerationSpec
-            .From(AsciiNameConversionExcelFilePath)
+        GeneratedCodeInspection
+            .SyntaxFrom(AsciiNameConversionExcelFilePath)
             .TypeNames
             .Should()
             .Contain(
@@ -171,8 +171,8 @@ public sealed class CSharp識別子生成のテスト
             "自動変換名がCSharpキーワードにならないようPascalCaseへ変換するときに解除する。")]
     public void 自動変換ではキーワードもPascalCaseへ変換します()
     {
-        CodeGenerationSpec
-            .From(AsciiNameConversionExcelFilePath)
+        GeneratedCodeInspection
+            .SyntaxFrom(AsciiNameConversionExcelFilePath)
             .TypeNames
             .Should()
             .Contain("ClassSheet");

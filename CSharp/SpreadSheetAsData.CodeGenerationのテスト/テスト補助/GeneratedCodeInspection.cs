@@ -5,9 +5,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 
 /// <summary>
-/// コード生成仕様テストで、生成結果を観測するための入口を提供します。
+/// コード生成テストで、生成結果を観測するための入口を提供します。
 /// </summary>
-static class CodeGenerationSpec
+static class GeneratedCodeInspection
 {
     /// <summary>
     /// テスト内で生成コードをコンパイルするときの既定の名前空間です。
@@ -15,22 +15,22 @@ static class CodeGenerationSpec
     internal const string NamespaceName = "Generated";
 
     /// <summary>
-    /// 指定したExcelファイルから生成されるコードを観測します。
+    /// 指定したExcelファイルから生成されるコードを構文として観測します。
     /// </summary>
     /// <param name="filePath">コード生成元のExcelファイル。</param>
     /// <param name="configure">コード生成設定を変更する処理。</param>
     /// <returns>生成コードを観測するためのテスト用オブジェクト。</returns>
-    internal static GeneratedCode From(
+    internal static GeneratedCode SyntaxFrom(
         string filePath,
         Action<CodeGenerationOptions>? configure = null) =>
         new(() => GenerateSources(filePath, configure));
 
     /// <summary>
-    /// テスト内で直接用意した生成済みソースコードを観測します。
+    /// テスト内で直接用意した生成済みソースコードを構文として観測します。
     /// </summary>
     /// <param name="sources">観測するC#ソースコード。</param>
     /// <returns>生成コードを観測するためのテスト用オブジェクト。</returns>
-    internal static GeneratedCode FromSources(params string[] sources) =>
+    internal static GeneratedCode SyntaxFromSources(params string[] sources) =>
         new(() => sources);
 
     /// <summary>
@@ -61,7 +61,7 @@ static class CodeGenerationSpec
     /// <param name="filePath">コード生成元のExcelファイル。</param>
     /// <param name="configure">コード生成設定を変更する処理。</param>
     /// <returns>生成コードをコンパイルしたアセンブリ。</returns>
-    internal static Assembly CompileGeneratedAssembly(
+    internal static Assembly AssemblyFrom(
         string filePath,
         Action<CodeGenerationOptions>? configure = null) =>
         GeneratedSourceCompiler.Compile(GenerateSources(filePath, configure));
@@ -78,7 +78,7 @@ static class CodeGenerationSpec
 }
 
 /// <summary>
-/// 生成されたC#ソースコード全体を、仕様テスト向けの語彙で観測します。
+/// 生成されたC#ソースコード全体を、コード生成テスト向けの語彙で観測します。
 /// </summary>
 sealed class GeneratedCode(Func<string[]> getSources)
 {
@@ -128,7 +128,7 @@ sealed class GeneratedCode(Func<string[]> getSources)
 }
 
 /// <summary>
-/// 生成された1つの型を、仕様テスト向けの語彙で観測します。
+/// 生成された1つの型を、コード生成テスト向けの語彙で観測します。
 /// </summary>
 sealed class GeneratedType(TypeDeclarationSyntax declaration)
 {

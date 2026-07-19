@@ -11,8 +11,8 @@ public sealed class コード生成統合のテスト
     [Fact]
     public void 指定した名前空間へすべての型を生成します()
     {
-        var generatedTypes = CodeGenerationSpec
-            .From(
+        var generatedTypes = GeneratedCodeInspection
+            .SyntaxFrom(
                 IntegratedExcelFilePath,
                 options => options.Namespace = "Generated.Custom")
             .GeneratedTypes;
@@ -28,11 +28,11 @@ public sealed class コード生成統合のテスト
 
     [Fact(
         Skip =
-            "有効なExcelファイルから生成したすべてのソースがRoslynでコンパイルできる処理を実装するときに解除する。")]
-    public void 有効なExcelファイルから生成したすべてのソースはコンパイルできます()
+            "基本的なExcelファイルから生成したソースがRoslynでコンパイルできる処理を実装するときに解除する。")]
+    public void 基本的なExcelファイルからコンパイルできるソースを生成します()
     {
-        CodeGenerationSpec
-            .CompileGeneratedAssembly(IntegratedExcelFilePath)
+        GeneratedCodeInspection
+            .AssemblyFrom(IntegratedExcelFilePath)
             .Should()
             .NotBeNull();
     }
@@ -42,10 +42,10 @@ public sealed class コード生成統合のテスト
             "同じExcelファイルと同じ設定から決定的な生成結果を返す処理を実装するときに解除する。")]
     public void 同じExcelファイルと設定から同じ生成結果を返します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(IntegratedExcelFilePath)
             .Should()
-            .Equal(CodeGenerationSpec.GenerateSources(IntegratedExcelFilePath));
+            .Equal(GeneratedCodeInspection.GenerateSources(IntegratedExcelFilePath));
     }
 
     [Fact(
@@ -53,7 +53,7 @@ public sealed class コード生成統合のテスト
             "正常なExcelファイルでエラー診断を返さない処理を実装するときに解除する。")]
     public void 正常なExcelファイルではエラー診断を返しません()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateDiagnostics(IntegratedExcelFilePath)
             .Should()
             .BeEmpty();

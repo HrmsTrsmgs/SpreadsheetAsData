@@ -13,7 +13,7 @@ public sealed class コード生成定義名のテスト
             "ブックスコープの単一セル定義名をBookのCell取得プロパティとして生成するときに解除する。")]
     public void ブックスコープの単一セル定義名をBookのCellプロパティとして生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("DefinedNamesBook", "MainCell")
             .Type
@@ -27,7 +27,7 @@ public sealed class コード生成定義名のテスト
             "ブックスコープの複数セル定義名をBookのCellRange取得プロパティとして生成するときに解除する。")]
     public void ブックスコープの複数セル定義名をBookのCellRangeプロパティとして生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("DefinedNamesBook", "MainRange")
             .Type
@@ -41,7 +41,7 @@ public sealed class コード生成定義名のテスト
             "シートローカルの単一セル定義名をSheetのCell取得プロパティとして生成するときに解除する。")]
     public void シートローカルの単一セル定義名をSheetのCellプロパティとして生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("SalesDataSheet", "LocalCell")
             .Type
@@ -55,7 +55,7 @@ public sealed class コード生成定義名のテスト
             "シートローカルの複数セル定義名をSheetのCellRange取得プロパティとして生成するときに解除する。")]
     public void シートローカルの複数セル定義名をSheetのCellRangeプロパティとして生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("SalesDataSheet", "LocalRange")
             .Type
@@ -69,7 +69,7 @@ public sealed class コード生成定義名のテスト
             "同じ定義名をブックスコープとシートローカルで別々のプロパティとして生成するときに解除する。")]
     public void ブックスコープとシートローカルで同じ定義名を区別して生成します()
     {
-        var sources = CodeGenerationSpec.GenerateSources(DefinedNamesExcelFilePath);
+        var sources = GeneratedCodeInspection.GenerateSources(DefinedNamesExcelFilePath);
 
         sources.PropertyDeclaration("DefinedNamesBook", "Total").Should().NotBeNull();
         sources.PropertyDeclaration("SalesDataSheet", "Total").Should().NotBeNull();

@@ -14,7 +14,7 @@ public sealed class コード生成アクセスのテスト
             "Bookから各ワークシートを型付きプロパティとして取得する生成処理を実装するときに解除する。")]
     public void Bookは各ワークシートを型付きプロパティとして公開します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("BasicStructureBook", "SalesData")
             .Should()
@@ -26,7 +26,7 @@ public sealed class コード生成アクセスのテスト
             "Bookから各Excelテーブルを型付きプロパティとして取得する生成処理を実装するときに解除する。")]
     public void Bookは各Excelテーブルを型付きプロパティとして公開します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("BasicStructureBook", "SalesDetail")
             .Type
@@ -41,8 +41,8 @@ public sealed class コード生成アクセスのテスト
     public void 生成されたBook型からWorkbookの非型付きAPIも使用できます()
     {
         var book = (Workbook)Activator.CreateInstance(
-            CodeGenerationSpec
-                .CompileGeneratedAssembly(BasicStructureExcelFilePath)
+            GeneratedCodeInspection
+                .AssemblyFrom(BasicStructureExcelFilePath)
                 .GetRequiredType("BasicStructureBook"))!;
 
         book.Sheets.Should().NotBeNull();
@@ -57,7 +57,7 @@ public sealed class コード生成アクセスのテスト
             "Sheetからそのシートに属するExcelテーブルだけを型付きプロパティとして取得する生成処理を実装するときに解除する。")]
     public void Sheetはそのシートに属するExcelテーブルを型付きプロパティとして公開します()
     {
-        var sources = CodeGenerationSpec.GenerateSources(BasicStructureExcelFilePath);
+        var sources = GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath);
 
         sources
             .PropertyDeclaration("SalesDataSheet", "SalesDetail")
@@ -80,8 +80,8 @@ public sealed class コード生成アクセスのテスト
     public void 生成されたSheet型からWorksheetの非型付きAPIも使用できます()
     {
         var sheet = (Worksheet)Activator.CreateInstance(
-            CodeGenerationSpec
-                .CompileGeneratedAssembly(BasicStructureExcelFilePath)
+            GeneratedCodeInspection
+                .AssemblyFrom(BasicStructureExcelFilePath)
                 .GetRequiredType("SalesDataSheet"))!;
 
         sheet.Name.Should().NotBeNull();

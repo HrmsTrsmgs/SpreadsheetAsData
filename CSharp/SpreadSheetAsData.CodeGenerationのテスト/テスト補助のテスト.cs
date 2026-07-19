@@ -9,8 +9,8 @@ public sealed class テスト補助のテスト
     [Fact]
     public void TypeNamesは生成ソースに含まれる型名を返します()
     {
-        CodeGenerationSpec
-            .FromSources(
+        GeneratedCodeInspection
+            .SyntaxFromSources(
                 """
                 namespace Generated;
 
@@ -30,8 +30,8 @@ public sealed class テスト補助のテスト
     [Fact]
     public void GeneratedTypeは指定した名前の生成型を返します()
     {
-        CodeGenerationSpec
-            .FromSources(
+        GeneratedCodeInspection
+            .SyntaxFromSources(
                 """
                 namespace Generated;
 
@@ -52,8 +52,8 @@ public sealed class テスト補助のテスト
     [Fact]
     public void Nameは生成型の名前を返します()
     {
-        CodeGenerationSpec
-            .FromSources(
+        GeneratedCodeInspection
+            .SyntaxFromSources(
                 """
                 namespace Generated;
 
@@ -70,8 +70,8 @@ public sealed class テスト補助のテスト
     [Fact]
     public void NamespaceNameは指定した生成型の名前空間を返します()
     {
-        CodeGenerationSpec
-            .FromSources(
+        GeneratedCodeInspection
+            .SyntaxFromSources(
                 """
                 namespace Generated.Custom;
 
@@ -88,8 +88,8 @@ public sealed class テスト補助のテスト
     [Fact]
     public void ToStringは生成型の名前空間付き表示名を返します()
     {
-        CodeGenerationSpec
-            .FromSources(
+        GeneratedCodeInspection
+            .SyntaxFromSources(
                 """
                 namespace Generated;
 
@@ -106,8 +106,8 @@ public sealed class テスト補助のテスト
     [Fact]
     public void BaseTypeNameはジェネリック型引数を含む基底型名を返します()
     {
-        CodeGenerationSpec
-            .FromSources(
+        GeneratedCodeInspection
+            .SyntaxFromSources(
                 """
                 namespace Generated;
 
@@ -128,8 +128,8 @@ public sealed class テスト補助のテスト
     [Fact]
     public void PropertyNamesは指定した型に含まれるプロパティ名を返します()
     {
-        CodeGenerationSpec
-            .FromSources(
+        GeneratedCodeInspection
+            .SyntaxFromSources(
                 """
                 namespace Generated;
 

@@ -14,7 +14,7 @@ public sealed class コード生成名前設定のテスト
             "NameMappingsを自動名前変換より優先して生成名へ適用するときに解除する。")]
     public void NameMappingsは自動名前変換より優先されます()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(
                 SimpleNameMappingsExcelFilePath,
                 options => options.NameMappings["cust_id"] = "CustomerID")
@@ -28,7 +28,7 @@ public sealed class コード生成名前設定のテスト
             "NameMappingsを要素種類や所属先を問わない元名の対応表として適用するときに解除する。")]
     public void NameMappingsは対象種類を指定せず同じ元名へ適用されます()
     {
-        var sources = CodeGenerationSpec.GenerateSources(
+        var sources = GeneratedCodeInspection.GenerateSources(
             SimpleNameMappingsExcelFilePath,
             options => options.NameMappings["data"] = "MappedData");
 
@@ -41,7 +41,7 @@ public sealed class コード生成名前設定のテスト
             "文脈付き名前設定で同じ元列名をテーブルごとに異なる名前へ変更するときに解除する。")]
     public void 文脈付き名前設定は同じ元列名をテーブルごとに異なる名前へ変更できます()
     {
-        var sources = CodeGenerationSpec.GenerateSources(
+        var sources = GeneratedCodeInspection.GenerateSources(
             ContextNameMappingsExcelFilePath,
             options =>
             {
@@ -58,7 +58,7 @@ public sealed class コード生成名前設定のテスト
             "文脈付き名前設定でブック定義名とシートローカル定義名を区別するときに解除する。")]
     public void 文脈付き名前設定はブック定義名とシートローカル定義名を区別できます()
     {
-        var sources = CodeGenerationSpec.GenerateSources(
+        var sources = GeneratedCodeInspection.GenerateSources(
             ContextNameMappingsExcelFilePath,
             options =>
             {
@@ -75,7 +75,7 @@ public sealed class コード生成名前設定のテスト
             "文脈付き名前設定をNameMappingsより優先して適用するときに解除する。")]
     public void 文脈付き名前設定はNameMappingsより優先されます()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(
                 ContextNameMappingsExcelFilePath,
                 options =>

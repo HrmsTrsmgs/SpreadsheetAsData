@@ -14,7 +14,7 @@ public sealed class コード生成コメントのテスト
             "Book型のXML summaryへ元ブック名を含む固定文言を生成するときに解除する。")]
     public void Book型のコメントを生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .TypeDeclaration("BasicStructureBook")
             .SummaryText()
@@ -27,7 +27,7 @@ public sealed class コード生成コメントのテスト
             "Sheet型のXML summaryへ元ワークシート名を含む固定文言を生成するときに解除する。")]
     public void Sheet型のコメントを生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .TypeDeclaration("SalesDataSheet")
             .SummaryText()
@@ -40,7 +40,7 @@ public sealed class コード生成コメントのテスト
             "Table型のXML summaryへ元Excelテーブル名を含む固定文言を生成するときに解除する。")]
     public void Table型のコメントを生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .TypeDeclaration("SalesDetailTable")
             .SummaryText()
@@ -53,7 +53,7 @@ public sealed class コード生成コメントのテスト
             "行データ型のXML summaryへ元Excelテーブル名を含む固定文言を生成するときに解除する。")]
     public void 行データ型のコメントを生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .TypeDeclaration("SalesDetail")
             .SummaryText()
@@ -66,7 +66,7 @@ public sealed class コード生成コメントのテスト
             "SheetプロパティのXML summaryへ元ワークシート名を含む固定文言を生成するときに解除する。")]
     public void Sheetプロパティのコメントを生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("BasicStructureBook", "SalesData")
             .SummaryText()
@@ -79,7 +79,7 @@ public sealed class コード生成コメントのテスト
             "TableプロパティのXML summaryへ元Excelテーブル名を含む固定文言を生成するときに解除する。")]
     public void Tableプロパティのコメントを生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("BasicStructureBook", "SalesDetail")
             .SummaryText()
@@ -92,7 +92,7 @@ public sealed class コード生成コメントのテスト
             "列プロパティのXML summaryへ元Excel列名を含む固定文言を生成するときに解除する。")]
     public void 列プロパティのコメントを生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("SalesDetail", "CustomerId")
             .SummaryText()
@@ -105,7 +105,7 @@ public sealed class コード生成コメントのテスト
             "ブックスコープ単一セル定義名プロパティのXML summaryへ固定文言を生成するときに解除する。")]
     public void ブックスコープの単一セル定義名プロパティのコメントを生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("DefinedNamesBook", "MainCell")
             .SummaryText()
@@ -118,7 +118,7 @@ public sealed class コード生成コメントのテスト
             "ブックスコープ複数セル定義名プロパティのXML summaryへ固定文言を生成するときに解除する。")]
     public void ブックスコープの複数セル定義名プロパティのコメントを生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("DefinedNamesBook", "MainRange")
             .SummaryText()
@@ -131,7 +131,7 @@ public sealed class コード生成コメントのテスト
             "シートローカル単一セル定義名プロパティのXML summaryへ固定文言を生成するときに解除する。")]
     public void シートローカルの単一セル定義名プロパティのコメントを生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("SalesDataSheet", "LocalCell")
             .SummaryText()
@@ -144,7 +144,7 @@ public sealed class コード生成コメントのテスト
             "シートローカル複数セル定義名プロパティのXML summaryへ固定文言を生成するときに解除する。")]
     public void シートローカルの複数セル定義名プロパティのコメントを生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("SalesDataSheet", "LocalRange")
             .SummaryText()

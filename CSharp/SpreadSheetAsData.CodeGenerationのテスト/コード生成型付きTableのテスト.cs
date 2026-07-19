@@ -16,8 +16,8 @@ public sealed class コード生成型付きTableのテスト
     public void 生成されたTableはPOCOをExcel上の順序で列挙します()
     {
         var table = Activator.CreateInstance(
-            CodeGenerationSpec
-                .CompileGeneratedAssembly(BasicStructureExcelFilePath)
+            GeneratedCodeInspection
+                .AssemblyFrom(BasicStructureExcelFilePath)
                 .GetRequiredType("SalesDetailTable"));
 
         var rows = ((IEnumerable)table!).Cast<object>().ToArray();
@@ -39,8 +39,8 @@ public sealed class コード生成型付きTableのテスト
     public void 生成されたTableをTableとして扱うと非型付き行を利用できます()
     {
         var table = (Table)Activator.CreateInstance(
-            CodeGenerationSpec
-                .CompileGeneratedAssembly(BasicStructureExcelFilePath)
+            GeneratedCodeInspection
+                .AssemblyFrom(BasicStructureExcelFilePath)
                 .GetRequiredType("SalesDetailTable"))!;
 
         table.Rows.Should().NotBeEmpty();
@@ -52,8 +52,8 @@ public sealed class コード生成型付きTableのテスト
     public void 生成されたTable型からTableの構造情報を使用できます()
     {
         var table = (Table)Activator.CreateInstance(
-            CodeGenerationSpec
-                .CompileGeneratedAssembly(BasicStructureExcelFilePath)
+            GeneratedCodeInspection
+                .AssemblyFrom(BasicStructureExcelFilePath)
                 .GetRequiredType("SalesDetailTable"))!;
 
         table.Name.Should().Be("sales_detail");
@@ -69,8 +69,8 @@ public sealed class コード生成型付きTableのテスト
     {
         using var book = Workbook.Open(BasicStructureExcelFilePath);
         var generatedTable = (IEnumerable)Activator.CreateInstance(
-            CodeGenerationSpec
-                .CompileGeneratedAssembly(BasicStructureExcelFilePath)
+            GeneratedCodeInspection
+                .AssemblyFrom(BasicStructureExcelFilePath)
                 .GetRequiredType("SalesDetailTable"))!;
 
         generatedTable

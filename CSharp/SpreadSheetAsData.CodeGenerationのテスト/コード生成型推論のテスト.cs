@@ -13,7 +13,7 @@ public sealed class コード生成型推論のテスト
             "整数値だけを持つExcel列をintプロパティとして生成するときに解除する。")]
     public void 整数値だけを持つ列をintプロパティとして生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("SalesDetail", "CustomerId")
             .Type
@@ -27,7 +27,7 @@ public sealed class コード生成型推論のテスト
             "小数値を持つExcel列をdoubleプロパティとして生成するときに解除する。")]
     public void 小数値を持つ列をdoubleプロパティとして生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("SalesDetail", "Amount")
             .Type
@@ -41,7 +41,7 @@ public sealed class コード生成型推論のテスト
             "文字列値を持つExcel列をstringプロパティとして生成するときに解除する。")]
     public void 文字列値を持つ列をstringプロパティとして生成します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("SalesDetail", "Description")
             .Type
@@ -55,7 +55,7 @@ public sealed class コード生成型推論のテスト
             "生成列プロパティへ元のExcel列名をSpreadsheetColumn属性として出力するときに解除する。")]
     public void 生成された列プロパティに元のExcel列名を設定します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("SalesDetail", "CustomerId")
             .AttributeArguments("SpreadsheetColumn")

@@ -16,7 +16,7 @@ public sealed class コード生成診断のテスト
             "自動変換後に同じ列プロパティ名となる場合のエラー診断を実装するときに解除する。")]
     public void 自動変換後に同じ列プロパティ名となる場合にエラーを診断します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateDiagnostics(ColumnNameCollisionExcelFilePath)
             .Should()
             .ContainEquivalentOf(
@@ -31,7 +31,7 @@ public sealed class コード生成診断のテスト
             "名前衝突時に連番追加で自動解消しない診断処理を実装するときに解除する。")]
     public void 名前衝突を自動的な連番追加では解消しません()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateSources(ColumnNameCollisionExcelFilePath)
             .TypeDeclarations()
             .Should()
@@ -43,7 +43,7 @@ public sealed class コード生成診断のテスト
             "NameMappingsで生成名を変更して名前衝突を解消する処理を実装するときに解除する。")]
     public void NameMappingsで生成名を変更すると名前衝突を解消できます()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateDiagnostics(
                 ColumnNameCollisionExcelFilePath,
                 options => options.NameMappings["customer-id"] = "CustomerIdDash")
@@ -56,7 +56,7 @@ public sealed class コード生成診断のテスト
             "同じ生成型内で異なる種類のメンバー名が衝突した場合の診断を実装するときに解除する。")]
     public void 同じ生成型内の異なる種類のメンバー名が衝突した場合にも診断します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateDiagnostics(BookMemberNameCollisionExcelFilePath)
             .Should()
             .Contain(it => it.IsError
@@ -70,7 +70,7 @@ public sealed class コード生成診断のテスト
             "有効なCSharp識別子を生成できない名前のエラー診断を実装するときに解除する。")]
     public void 有効なCSharp識別子を生成できない名前を診断します()
     {
-        CodeGenerationSpec
+        GeneratedCodeInspection
             .GenerateDiagnostics(InvalidNameExcelFilePath)
             .Should()
             .Contain(it => it.IsError
