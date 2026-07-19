@@ -15,10 +15,11 @@ public sealed class コード生成型付きTableのテスト
             "生成TableがPOCOをExcel上の順序で列挙する処理を実装するときに解除する。")]
     public void 生成されたTableはPOCOをExcel上の順序で列挙します()
     {
+        var assembly = GeneratedCodeInspection.AssemblyFrom(
+            GeneratedCodeInspection.GenerateSources(
+                BasicStructureExcelFilePath));
         var table = Activator.CreateInstance(
-            GeneratedCodeInspection
-                .AssemblyFrom(BasicStructureExcelFilePath)
-                .GetRequiredType("SalesDetailTable"));
+            assembly.GetRequiredType("SalesDetailTable"));
 
         var rows = ((IEnumerable)table!).Cast<object>().ToArray();
 
@@ -38,10 +39,11 @@ public sealed class コード生成型付きTableのテスト
             "生成TableをTableとして扱った場合に非型付きRowsを利用できる継承構造を実装するときに解除する。")]
     public void 生成されたTableをTableとして扱うと非型付き行を利用できます()
     {
+        var assembly = GeneratedCodeInspection.AssemblyFrom(
+            GeneratedCodeInspection.GenerateSources(
+                BasicStructureExcelFilePath));
         var table = (Table)Activator.CreateInstance(
-            GeneratedCodeInspection
-                .AssemblyFrom(BasicStructureExcelFilePath)
-                .GetRequiredType("SalesDetailTable"))!;
+            assembly.GetRequiredType("SalesDetailTable"))!;
 
         table.Rows.Should().NotBeEmpty();
     }
@@ -51,10 +53,11 @@ public sealed class コード生成型付きTableのテスト
             "生成TableからTableの構造情報を利用できる継承構造を実装するときに解除する。")]
     public void 生成されたTable型からTableの構造情報を使用できます()
     {
+        var assembly = GeneratedCodeInspection.AssemblyFrom(
+            GeneratedCodeInspection.GenerateSources(
+                BasicStructureExcelFilePath));
         var table = (Table)Activator.CreateInstance(
-            GeneratedCodeInspection
-                .AssemblyFrom(BasicStructureExcelFilePath)
-                .GetRequiredType("SalesDetailTable"))!;
+            assembly.GetRequiredType("SalesDetailTable"))!;
 
         table.Name.Should().Be("sales_detail");
         table.Worksheet.Should().NotBeNull();
@@ -68,10 +71,11 @@ public sealed class コード生成型付きTableのテスト
     public void 生成された行データ型は利用者定義POCOと同じ変換規則で読み込まれます()
     {
         using var book = Workbook.Open(BasicStructureExcelFilePath);
+        var assembly = GeneratedCodeInspection.AssemblyFrom(
+            GeneratedCodeInspection.GenerateSources(
+                BasicStructureExcelFilePath));
         var generatedTable = (IEnumerable)Activator.CreateInstance(
-            GeneratedCodeInspection
-                .AssemblyFrom(BasicStructureExcelFilePath)
-                .GetRequiredType("SalesDetailTable"))!;
+            assembly.GetRequiredType("SalesDetailTable"))!;
 
         generatedTable
             .Cast<object>()

@@ -15,26 +15,23 @@ static class GeneratedCodeInspection
     internal const string NamespaceName = "Generated";
 
     /// <summary>
-    /// 指定したExcelファイルから生成されるコードを構文として観測します。
+    /// 生成済みソースコードを構文として観測します。
     /// </summary>
-    /// <param name="filePath">コード生成元のExcelファイル。</param>
-    /// <param name="configure">コード生成設定を変更する処理。</param>
+    /// <param name="sources">観測するC#ソースコード。</param>
     /// <returns>生成コードを観測するためのテスト用オブジェクト。</returns>
-    internal static GeneratedCode SyntaxFrom(
-        string filePath,
-        Action<CodeGenerationOptions>? configure = null) =>
-        new(() => GenerateSources(filePath, configure));
+    internal static GeneratedCode SyntaxFrom(IEnumerable<string> sources) =>
+        new(() => sources.ToArray());
 
     /// <summary>
     /// テスト内で直接用意した生成済みソースコードを構文として観測します。
     /// </summary>
     /// <param name="sources">観測するC#ソースコード。</param>
     /// <returns>生成コードを観測するためのテスト用オブジェクト。</returns>
-    internal static GeneratedCode SyntaxFromSources(params string[] sources) =>
-        new(() => sources);
+    internal static GeneratedCode SyntaxFrom(params string[] sources) =>
+        SyntaxFrom((IEnumerable<string>)sources);
 
     /// <summary>
-    /// 製品コードのコード生成APIを呼び出します。
+    /// 指定したExcelファイルから生成されるC#ソースコードを取得します。
     /// </summary>
     /// <param name="filePath">コード生成元のExcelファイル。</param>
     /// <param name="configure">コード生成設定を変更する処理。</param>
@@ -56,15 +53,12 @@ static class GeneratedCodeInspection
         WorkbookWrapperGenerator.GenerateDiagnostics(filePath, configure);
 
     /// <summary>
-    /// 指定したExcelファイルから生成したコードをコンパイルします。
+    /// 生成済みソースコードをコンパイルします。
     /// </summary>
-    /// <param name="filePath">コード生成元のExcelファイル。</param>
-    /// <param name="configure">コード生成設定を変更する処理。</param>
+    /// <param name="sources">コンパイルするC#ソースコード。</param>
     /// <returns>生成コードをコンパイルしたアセンブリ。</returns>
-    internal static Assembly AssemblyFrom(
-        string filePath,
-        Action<CodeGenerationOptions>? configure = null) =>
-        GeneratedSourceCompiler.Compile(GenerateSources(filePath, configure));
+    internal static Assembly AssemblyFrom(IEnumerable<string> sources) =>
+        GeneratedSourceCompiler.Compile(sources);
 
     /// <summary>
     /// 生成コードをコンパイルしたアセンブリから、既定名前空間内の型を取得します。

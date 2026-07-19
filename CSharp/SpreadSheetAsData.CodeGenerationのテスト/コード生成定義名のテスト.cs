@@ -69,7 +69,8 @@ public sealed class コード生成定義名のテスト
             "同じ定義名をブックスコープとシートローカルで別々のプロパティとして生成するときに解除する。")]
     public void ブックスコープとシートローカルで同じ定義名を区別して生成します()
     {
-        var sources = GeneratedCodeInspection.GenerateSources(DefinedNamesExcelFilePath);
+        var sources = GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesExcelFilePath);
 
         sources.PropertyDeclaration("DefinedNamesBook", "Total").Should().NotBeNull();
         sources.PropertyDeclaration("SalesDataSheet", "Total").Should().NotBeNull();

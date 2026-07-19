@@ -40,10 +40,12 @@ public sealed class コード生成アクセスのテスト
             "生成BookをWorkbookとして扱える継承構造と既存非型付きAPIの利用を実装するときに解除する。")]
     public void 生成されたBook型からWorkbookの非型付きAPIも使用できます()
     {
+        var assembly = GeneratedCodeInspection.AssemblyFrom(
+            GeneratedCodeInspection.GenerateSources(
+                BasicStructureExcelFilePath));
+
         var book = (Workbook)Activator.CreateInstance(
-            GeneratedCodeInspection
-                .AssemblyFrom(BasicStructureExcelFilePath)
-                .GetRequiredType("BasicStructureBook"))!;
+            assembly.GetRequiredType("BasicStructureBook"))!;
 
         book.Sheets.Should().NotBeNull();
         book.Tables.Should().NotBeNull();
@@ -57,7 +59,8 @@ public sealed class コード生成アクセスのテスト
             "Sheetからそのシートに属するExcelテーブルだけを型付きプロパティとして取得する生成処理を実装するときに解除する。")]
     public void Sheetはそのシートに属するExcelテーブルを型付きプロパティとして公開します()
     {
-        var sources = GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath);
+        var sources = GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath);
 
         sources
             .PropertyDeclaration("SalesDataSheet", "SalesDetail")
@@ -79,10 +82,12 @@ public sealed class コード生成アクセスのテスト
             "生成SheetをWorksheetとして扱える継承構造と既存非型付きAPIの利用を実装するときに解除する。")]
     public void 生成されたSheet型からWorksheetの非型付きAPIも使用できます()
     {
+        var assembly = GeneratedCodeInspection.AssemblyFrom(
+            GeneratedCodeInspection.GenerateSources(
+                BasicStructureExcelFilePath));
+
         var sheet = (Worksheet)Activator.CreateInstance(
-            GeneratedCodeInspection
-                .AssemblyFrom(BasicStructureExcelFilePath)
-                .GetRequiredType("SalesDataSheet"))!;
+            assembly.GetRequiredType("SalesDataSheet"))!;
 
         sheet.Name.Should().NotBeNull();
         sheet.Book.Should().NotBeNull();

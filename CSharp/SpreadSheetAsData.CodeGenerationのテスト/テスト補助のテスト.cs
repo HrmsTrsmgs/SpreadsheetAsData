@@ -10,7 +10,7 @@ public sealed class テスト補助のテスト
     public void TypeNamesは生成ソースに含まれる型名を返します()
     {
         GeneratedCodeInspection
-            .SyntaxFromSources(
+            .SyntaxFrom(
                 """
                 namespace Generated;
 
@@ -31,7 +31,7 @@ public sealed class テスト補助のテスト
     public void GeneratedTypeは指定した名前の生成型を返します()
     {
         GeneratedCodeInspection
-            .SyntaxFromSources(
+            .SyntaxFrom(
                 """
                 namespace Generated;
 
@@ -53,7 +53,7 @@ public sealed class テスト補助のテスト
     public void Nameは生成型の名前を返します()
     {
         GeneratedCodeInspection
-            .SyntaxFromSources(
+            .SyntaxFrom(
                 """
                 namespace Generated;
 
@@ -71,7 +71,7 @@ public sealed class テスト補助のテスト
     public void NamespaceNameは指定した生成型の名前空間を返します()
     {
         GeneratedCodeInspection
-            .SyntaxFromSources(
+            .SyntaxFrom(
                 """
                 namespace Generated.Custom;
 
@@ -89,7 +89,7 @@ public sealed class テスト補助のテスト
     public void ToStringは生成型の名前空間付き表示名を返します()
     {
         GeneratedCodeInspection
-            .SyntaxFromSources(
+            .SyntaxFrom(
                 """
                 namespace Generated;
 
@@ -107,7 +107,7 @@ public sealed class テスト補助のテスト
     public void BaseTypeNameはジェネリック型引数を含む基底型名を返します()
     {
         GeneratedCodeInspection
-            .SyntaxFromSources(
+            .SyntaxFrom(
                 """
                 namespace Generated;
 
@@ -129,7 +129,7 @@ public sealed class テスト補助のテスト
     public void PropertyNamesは指定した型に含まれるプロパティ名を返します()
     {
         GeneratedCodeInspection
-            .SyntaxFromSources(
+            .SyntaxFrom(
                 """
                 namespace Generated;
 

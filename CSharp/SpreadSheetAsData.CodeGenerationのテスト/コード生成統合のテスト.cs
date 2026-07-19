@@ -13,8 +13,9 @@ public sealed class コード生成統合のテスト
     {
         var generatedTypes = GeneratedCodeInspection
             .SyntaxFrom(
-                IntegratedExcelFilePath,
-                options => options.Namespace = "Generated.Custom")
+                GeneratedCodeInspection.GenerateSources(
+                    IntegratedExcelFilePath,
+                    options => options.Namespace = "Generated.Custom"))
             .GeneratedTypes;
 
         generatedTypes
@@ -26,26 +27,25 @@ public sealed class コード生成統合のテスト
             .OnlyContain(it => it.NamespaceName == "Generated.Custom");
     }
 
-    [Fact(
-        Skip =
-            "基本的なExcelファイルから生成したソースがRoslynでコンパイルできる処理を実装するときに解除する。")]
+    [Fact]
     public void 基本的なExcelファイルからコンパイルできるソースを生成します()
     {
         GeneratedCodeInspection
-            .AssemblyFrom(IntegratedExcelFilePath)
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    IntegratedExcelFilePath))
             .Should()
             .NotBeNull();
     }
 
-    [Fact(
-        Skip =
-            "同じExcelファイルと同じ設定から決定的な生成結果を返す処理を実装するときに解除する。")]
+    [Fact]
     public void 同じExcelファイルと設定から同じ生成結果を返します()
     {
         GeneratedCodeInspection
             .GenerateSources(IntegratedExcelFilePath)
             .Should()
-            .Equal(GeneratedCodeInspection.GenerateSources(IntegratedExcelFilePath));
+            .Equal(GeneratedCodeInspection.GenerateSources(
+                    IntegratedExcelFilePath));
     }
 
     [Fact(
