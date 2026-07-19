@@ -40,18 +40,17 @@ public sealed class コード生成アクセスのテスト
             "生成BookをWorkbookとして扱える継承構造と既存非型付きAPIの利用を実装するときに解除する。")]
     public void 生成されたBook型からWorkbookの非型付きAPIも使用できます()
     {
-        var assembly = GeneratedCodeInspection.AssemblyFrom(
-            GeneratedCodeInspection.GenerateSources(
-                BasicStructureExcelFilePath));
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath))
+            .GeneratedInstance<Workbook>("BasicStructureBook");
 
-        var book = (Workbook)Activator.CreateInstance(
-            assembly.GeneratedType("BasicStructureBook"))!;
-
-        book.Sheets.Should().NotBeNull();
-        book.Tables.Should().NotBeNull();
-        book.Cell.Should().NotBeNull();
-        book.Range.Should().NotBeNull();
-        book["SalesData"].Should().NotBeNull();
+        tested.Sheets.Should().NotBeNull();
+        tested.Tables.Should().NotBeNull();
+        tested.Cell.Should().NotBeNull();
+        tested.Range.Should().NotBeNull();
+        tested["SalesData"].Should().NotBeNull();
     }
 
     [Fact(
@@ -82,17 +81,16 @@ public sealed class コード生成アクセスのテスト
             "生成SheetをWorksheetとして扱える継承構造と既存非型付きAPIの利用を実装するときに解除する。")]
     public void 生成されたSheet型からWorksheetの非型付きAPIも使用できます()
     {
-        var assembly = GeneratedCodeInspection.AssemblyFrom(
-            GeneratedCodeInspection.GenerateSources(
-                BasicStructureExcelFilePath));
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath))
+            .GeneratedInstance<Worksheet>("SalesDataSheet");
 
-        var sheet = (Worksheet)Activator.CreateInstance(
-            assembly.GeneratedType("SalesDataSheet"))!;
-
-        sheet.Name.Should().NotBeNull();
-        sheet.Book.Should().NotBeNull();
-        sheet.Cell.Should().NotBeNull();
-        sheet.Range.Should().NotBeNull();
-        sheet.Cells.Should().NotBeNull();
+        tested.Name.Should().NotBeNull();
+        tested.Book.Should().NotBeNull();
+        tested.Cell.Should().NotBeNull();
+        tested.Range.Should().NotBeNull();
+        tested.Cells.Should().NotBeNull();
     }
 }

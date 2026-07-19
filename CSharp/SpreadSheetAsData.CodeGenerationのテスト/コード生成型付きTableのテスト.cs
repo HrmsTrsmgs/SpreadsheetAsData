@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Marimo.SpreadSheetAsData;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 using Xunit;
@@ -15,21 +14,20 @@ public sealed class コード生成型付きTableのテスト
             "生成TableがPOCOをExcel上の順序で列挙する処理を実装するときに解除する。")]
     public void 生成されたTableはPOCOをExcel上の順序で列挙します()
     {
-        var assembly = GeneratedCodeInspection.AssemblyFrom(
-            GeneratedCodeInspection.GenerateSources(
-                BasicStructureExcelFilePath));
-        var table = Activator.CreateInstance(
-            assembly.GeneratedType("SalesDetailTable"));
+        var rows = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath))
+            .GeneratedInstance<IEnumerable<object>>("SalesDetailTable")
+            .ToArray();
 
-        var rows = ((IEnumerable)table!).Cast<object>().ToArray();
-
-        rows.Select(it => it.GetType().GetProperty("CustomerId")!.GetValue(it))
+        rows.Select(it => PropertyValue(it, "CustomerId"))
             .Should()
             .Equal(1, 2);
-        rows.Select(it => it.GetType().GetProperty("Amount")!.GetValue(it))
+        rows.Select(it => PropertyValue(it, "Amount"))
             .Should()
             .Equal(10.5, 20.5);
-        rows.Select(it => it.GetType().GetProperty("Description")!.GetValue(it))
+        rows.Select(it => PropertyValue(it, "Description"))
             .Should()
             .Equal("a", "b");
     }
@@ -39,13 +37,14 @@ public sealed class コード生成型付きTableのテスト
             "生成TableをTableとして扱った場合に非型付きRowsを利用できる継承構造を実装するときに解除する。")]
     public void 生成されたTableをTableとして扱うと非型付き行を利用できます()
     {
-        var assembly = GeneratedCodeInspection.AssemblyFrom(
-            GeneratedCodeInspection.GenerateSources(
-                BasicStructureExcelFilePath));
-        var table = (Table)Activator.CreateInstance(
-            assembly.GeneratedType("SalesDetailTable"))!;
-
-        table.Rows.Should().NotBeEmpty();
+        GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath))
+            .GeneratedInstance<Table>("SalesDetailTable")
+            .Rows
+            .Should()
+            .NotBeEmpty();
     }
 
     [Fact(
@@ -53,16 +52,16 @@ public sealed class コード生成型付きTableのテスト
             "生成TableからTableの構造情報を利用できる継承構造を実装するときに解除する。")]
     public void 生成されたTable型からTableの構造情報を使用できます()
     {
-        var assembly = GeneratedCodeInspection.AssemblyFrom(
-            GeneratedCodeInspection.GenerateSources(
-                BasicStructureExcelFilePath));
-        var table = (Table)Activator.CreateInstance(
-            assembly.GeneratedType("SalesDetailTable"))!;
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath))
+            .GeneratedInstance<Table>("SalesDetailTable");
 
-        table.Name.Should().Be("sales_detail");
-        table.Worksheet.Should().NotBeNull();
-        table.Range.Should().NotBeNull();
-        table.Columns.Should().NotBeEmpty();
+        tested.Name.Should().Be("sales_detail");
+        tested.Worksheet.Should().NotBeNull();
+        tested.Range.Should().NotBeNull();
+        tested.Columns.Should().NotBeEmpty();
     }
 
     [Fact(
@@ -71,14 +70,11 @@ public sealed class コード生成型付きTableのテスト
     public void 生成された行データ型は利用者定義POCOと同じ変換規則で読み込まれます()
     {
         using var book = Workbook.Open(BasicStructureExcelFilePath);
-        var assembly = GeneratedCodeInspection.AssemblyFrom(
-            GeneratedCodeInspection.GenerateSources(
-                BasicStructureExcelFilePath));
-        var generatedTable = (IEnumerable)Activator.CreateInstance(
-            assembly.GeneratedType("SalesDetailTable"))!;
-
-        generatedTable
-            .Cast<object>()
+        GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath))
+            .GeneratedInstance<IEnumerable<object>>("SalesDetailTable")
             .Select(ReadGeneratedRow)
             .Should()
             .Equal(
@@ -86,14 +82,19 @@ public sealed class コード生成型付きTableのテスト
                     .Select(ReadHandWrittenRow));
     }
 
-    static object[] ReadGeneratedRow(object row) =>
+    static object?[] ReadGeneratedRow(object row) =>
         [
-            row.GetType().GetProperty("CustomerId")!.GetValue(row)!,
-            row.GetType().GetProperty("Amount")!.GetValue(row)!,
-            row.GetType().GetProperty("Description")!.GetValue(row)!
+            PropertyValue(row, "CustomerId"),
+            PropertyValue(row, "Amount"),
+            PropertyValue(row, "Description")
         ];
 
-    static object[] ReadHandWrittenRow(ReadTableComparison row) =>
+    static object? PropertyValue(object source, string propertyName) =>
+        source.GetType()
+            .GetProperty(propertyName)
+            ?.GetValue(source);
+
+    static object?[] ReadHandWrittenRow(ReadTableComparison row) =>
         [
             row.CustomerId,
             row.Amount,

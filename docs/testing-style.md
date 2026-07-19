@@ -135,6 +135,15 @@ var missingColumns = mapper.FindMissingColumns();
 
 単に処理結果であることしか示さない名前より、対象の役割を示す名前を優先する。
 
+テスト対象となるオブジェクトを変数で受ける必要があり、型名や種類名をそのまま変数名にするだけなら `tested` とする。
+
+```csharp
+var tested = assembly.GeneratedInstance<Table>("SalesDetailTable");
+
+tested.Name.Should().Be("sales_detail");
+tested.Rows.Should().NotBeEmpty();
+```
+
 ただし、名前を考えるために不自然な抽象化を追加しない。
 
 英語の変数名を増やすこと自体を可読性向上とはみなさない。日本語話者にとって、式そのものより英語名の方が必ず読みやすいとは限らないためである。

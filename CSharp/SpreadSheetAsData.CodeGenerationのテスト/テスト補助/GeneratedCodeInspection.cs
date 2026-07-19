@@ -69,6 +69,18 @@ static class GeneratedCodeInspection
     internal static Type GeneratedType(this Assembly assembly, string typeName) =>
         assembly.GetType($"{NamespaceName}.{typeName}")
             ?? throw new InvalidOperationException(typeName);
+
+    /// <summary>
+    /// 生成コードをコンパイルしたアセンブリから、指定した型として生成型のインスタンスを作成します。
+    /// </summary>
+    /// <typeparam name="T">作成したインスタンスを扱う型。</typeparam>
+    /// <param name="assembly">検索対象のアセンブリ。</param>
+    /// <param name="typeName">既定名前空間を除いた生成型名。</param>
+    /// <returns>指定した型として扱う生成型のインスタンス。</returns>
+    internal static T GeneratedInstance<T>(this Assembly assembly, string typeName) =>
+        Activator.CreateInstance(assembly.GeneratedType(typeName)) is T instance
+            ? instance
+            : throw new InvalidOperationException(typeName);
 }
 
 /// <summary>

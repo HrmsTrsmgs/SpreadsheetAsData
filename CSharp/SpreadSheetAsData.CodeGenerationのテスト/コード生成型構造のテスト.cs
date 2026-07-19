@@ -128,20 +128,22 @@ public sealed class コード生成型構造のテスト
             .GetProperty("CustomerId");
 
         property.Should().NotBeNull();
-        property!.GetMethod!.IsPublic.Should().BeTrue();
-        property.SetMethod!.IsPublic.Should().BeTrue();
+
+        property.GetMethod.Should().NotBeNull();
+        property.GetMethod.IsPublic.Should().BeTrue();
+
+        property.SetMethod.Should().NotBeNull();
+        property.SetMethod.IsPublic.Should().BeTrue();
     }
 
     [Fact]
     public void 生成されたBook型は別ファイルのpartial定義と共にコンパイルできます()
     {
-        var sources = GeneratedCodeInspection.GenerateSources(
-                    BasicStructureExcelFilePath);
-
         GeneratedSourceCompiler
             .Compile(
                 [
-                    .. sources,
+                    .. GeneratedCodeInspection.GenerateSources(
+                        BasicStructureExcelFilePath),
                     """
                     namespace Generated;
 
@@ -160,13 +162,11 @@ public sealed class コード生成型構造のテスト
     [Fact]
     public void 生成されたSheet型は別ファイルのpartial定義と共にコンパイルできます()
     {
-        var sources = GeneratedCodeInspection.GenerateSources(
-                    BasicStructureExcelFilePath);
-
         GeneratedSourceCompiler
             .Compile(
                 [
-                    .. sources,
+                    .. GeneratedCodeInspection.GenerateSources(
+                        BasicStructureExcelFilePath),
                     """
                     namespace Generated;
 
@@ -185,13 +185,11 @@ public sealed class コード生成型構造のテスト
     [Fact]
     public void 生成されたTable型は別ファイルのpartial定義と共にコンパイルできます()
     {
-        var sources = GeneratedCodeInspection.GenerateSources(
-                    BasicStructureExcelFilePath);
-
         GeneratedSourceCompiler
             .Compile(
                 [
-                    .. sources,
+                    .. GeneratedCodeInspection.GenerateSources(
+                        BasicStructureExcelFilePath),
                     """
                     namespace Generated;
 
@@ -210,13 +208,11 @@ public sealed class コード生成型構造のテスト
     [Fact]
     public void 生成された行データ型は別ファイルのpartial定義と共にコンパイルできます()
     {
-        var sources = GeneratedCodeInspection.GenerateSources(
-                    BasicStructureExcelFilePath);
-
         GeneratedSourceCompiler
             .Compile(
                 [
-                    .. sources,
+                    .. GeneratedCodeInspection.GenerateSources(
+                        BasicStructureExcelFilePath),
                     """
                     namespace Generated;
 
