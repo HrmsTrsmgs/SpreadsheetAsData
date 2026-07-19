@@ -86,13 +86,17 @@ public sealed class CSharp識別子生成のテスト
             .Contain("CustomerId");
     }
 
-    [Theory(
+    [Theory]
+    [InlineData("sales_detail", "SalesDetail")]
+    [InlineData("sales-detail", "SalesDetail",
         Skip =
             "識別子本文がASCIIの区切り文字を単語境界としてPascalCaseへ変換するときに解除する。")]
-    [InlineData("sales_detail", "SalesDetail")]
-    [InlineData("sales-detail", "SalesDetail")]
-    [InlineData("sales detail", "SalesDetail")]
-    [InlineData("SALES_DETAIL1", "SalesDetail1")]
+    [InlineData("sales detail", "SalesDetail",
+        Skip =
+            "識別子本文がASCIIの区切り文字を単語境界としてPascalCaseへ変換するときに解除する。")]
+    [InlineData("SALES_DETAIL1", "SalesDetail1",
+        Skip =
+            "識別子本文がASCIIの区切り文字を単語境界としてPascalCaseへ変換するときに解除する。")]
     public void ASCII識別子本文は区切り文字を単語境界としてPascalCaseへ変換します(
         string excelName,
         string identifierBody)

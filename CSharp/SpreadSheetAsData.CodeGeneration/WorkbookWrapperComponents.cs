@@ -76,6 +76,12 @@ static class WorkbookWrapperComponents
         string.Join(Environment.NewLine, generatedBlocks);
 
     internal static string Identifier(string sourceName) =>
+        string.Join(
+            "",
+            from word in sourceName.Split('_')
+            select Capitalize(word));
+
+    static string Capitalize(string sourceName) =>
         sourceName.Length == 0
             ? sourceName
             : $"{char.ToUpperInvariant(sourceName[0])}{sourceName[1..]}";
