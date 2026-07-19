@@ -115,9 +115,7 @@ public sealed class コード生成型構造のテスト
         dataType.Should().NotBeAssignableTo<TableRow>();
     }
 
-    [Fact(
-        Skip =
-            "生成された行データ型の列プロパティへpublic getterとpublic setterを生成する処理を実装するときに解除する。")]
+    [Fact]
     public void 生成された行データ型の列プロパティはpublicなgetterとsetterを持ちます()
     {
         var property = GeneratedCodeInspection

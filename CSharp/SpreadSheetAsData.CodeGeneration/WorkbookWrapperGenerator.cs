@@ -21,42 +21,6 @@ public static class WorkbookWrapperGenerator
         configure?.Invoke(options);
 
         using var book = Workbook.Open(filePath);
-        var bookTypeName = GenerateTypeName(
-            Path.GetFileNameWithoutExtension(filePath),
-            "Book");
-        var sheetDeclarations =
-            from sheet in book.Sheets.Values
-            select $$"""
-
-            public partial class {{GenerateTypeName(sheet.Name, "Sheet")}} : Worksheet
-            {
-                public {{GenerateTypeName(sheet.Name, "Sheet")}}(Workbook book) : base(book, {{GenerateStringLiteral(sheet.Name)}})
-                {
-                }
-            }
-            """;
-        var tableDeclarations =
-            from table in book.Tables
-            let rowTypeName = GenerateTypeName(table.Name, "")
-            let tableTypeName = GenerateTypeName(table.Name, "Table")
-            select $$"""
-
-            public partial class {{tableTypeName}} : Table<{{rowTypeName}}>
-            {
-                public {{tableTypeName}}(Table source) : base(source)
-                {
-                }
-            }
-            """;
-        var rowDeclarations =
-            from table in book.Tables
-            select $$"""
-
-            public partial class {{GenerateTypeName(table.Name, "")}}
-            {
-            }
-            """;
-
         return
         [
             $$"""
@@ -64,15 +28,21 @@ public static class WorkbookWrapperGenerator
 
             namespace {{options.Namespace}};
 
-            public partial class {{bookTypeName}} : Workbook
+            public partial class {{Path.GetFileNameWithoutExtension(filePath)}}Book : Workbook
             {
-                public {{bookTypeName}}() : base({{GenerateStringLiteral(filePath)}})
+                public {{Path.GetFileNameWithoutExtension(filePath)}}Book() : base({{GenerateStringLiteral(filePath)}})
                 {
                 }
             }
-            {{string.Join(Environment.NewLine, sheetDeclarations)}}
-            {{string.Join(Environment.NewLine, tableDeclarations)}}
-            {{string.Join(Environment.NewLine, rowDeclarations)}}
+            {{ForEach(
+                from sheet in book.Sheets.Values
+                select SheetDeclaration(sheet))}}
+            {{ForEach(
+                from table in book.Tables
+                select TableDeclaration(table))}}
+            {{ForEach(
+                from table in book.Tables
+                select RowDeclaration(table))}}
             """
         ];
     }
@@ -88,8 +58,44 @@ public static class WorkbookWrapperGenerator
         Action<CodeGenerationOptions>? configure = null) =>
         [];
 
-    static string GenerateTypeName(string sourceName, string suffix) =>
-        $"{sourceName}{suffix}";
+    static string SheetDeclaration(Worksheet sheet)
+        => $$"""
+
+        public partial class {{sheet.Name}}Sheet : Worksheet
+        {
+            public {{sheet.Name}}Sheet(Workbook book) : base(book, {{GenerateStringLiteral(sheet.Name)}})
+            {
+            }
+        }
+        """;
+
+    static string TableDeclaration(Table table)
+        => $$"""
+
+        public partial class {{table.Name}}Table : Table<{{table.Name}}>
+        {
+            public {{table.Name}}Table(Table source) : base(source)
+            {
+            }
+        }
+        """;
+
+    static string RowDeclaration(Table table)
+        => $$"""
+
+        public partial class {{table.Name}}
+        {
+        {{ForEach(
+            from column in table.Columns
+            select RowPropertyDeclaration(column))}}
+        }
+        """;
+
+    static string RowPropertyDeclaration(TableColumn column) =>
+        $"    public object? {column.Name} {{ get; set; }}";
+
+    static string ForEach(IEnumerable<string> generatedBlocks) =>
+        string.Join(Environment.NewLine, generatedBlocks);
 
     static string GenerateStringLiteral(string value) =>
         "\"" + value.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
