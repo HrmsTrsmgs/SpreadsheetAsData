@@ -1,4 +1,5 @@
 ﻿using Marimo.SpreadSheetAsData;
+using static Marimo.SpreadSheetAsData.CodeGeneration.WorkbookWrapperComponents;
 
 namespace Marimo.SpreadSheetAsData.CodeGeneration;
 
@@ -23,27 +24,7 @@ public static class WorkbookWrapperGenerator
         using var book = Workbook.Open(filePath);
         return
         [
-            $$"""
-            using Marimo.SpreadSheetAsData;
-
-            namespace {{options.Namespace}};
-
-            public partial class {{Path.GetFileNameWithoutExtension(filePath)}}Book : Workbook
-            {
-                public {{Path.GetFileNameWithoutExtension(filePath)}}Book() : base({{GenerateStringLiteral(filePath)}})
-                {
-                }
-            }
-            {{ForEach(
-                from sheet in book.Sheets.Values
-                select SheetDeclaration(sheet))}}
-            {{ForEach(
-                from table in book.Tables
-                select TableDeclaration(table))}}
-            {{ForEach(
-                from table in book.Tables
-                select RowDeclaration(table))}}
-            """
+            SourceFile(filePath, options.Namespace, book)
         ];
     }
 
@@ -57,46 +38,4 @@ public static class WorkbookWrapperGenerator
         string filePath,
         Action<CodeGenerationOptions>? configure = null) =>
         [];
-
-    static string SheetDeclaration(Worksheet sheet)
-        => $$"""
-
-        public partial class {{sheet.Name}}Sheet : Worksheet
-        {
-            public {{sheet.Name}}Sheet(Workbook book) : base(book, {{GenerateStringLiteral(sheet.Name)}})
-            {
-            }
-        }
-        """;
-
-    static string TableDeclaration(Table table)
-        => $$"""
-
-        public partial class {{table.Name}}Table : Table<{{table.Name}}>
-        {
-            public {{table.Name}}Table(Table source) : base(source)
-            {
-            }
-        }
-        """;
-
-    static string RowDeclaration(Table table)
-        => $$"""
-
-        public partial class {{table.Name}}
-        {
-        {{ForEach(
-            from column in table.Columns
-            select RowPropertyDeclaration(column))}}
-        }
-        """;
-
-    static string RowPropertyDeclaration(TableColumn column) =>
-        $"    public object? {column.Name} {{ get; set; }}";
-
-    static string ForEach(IEnumerable<string> generatedBlocks) =>
-        string.Join(Environment.NewLine, generatedBlocks);
-
-    static string GenerateStringLiteral(string value) =>
-        "\"" + value.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
 }
