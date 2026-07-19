@@ -76,15 +76,34 @@ static class WorkbookWrapperComponents
         string.Join(Environment.NewLine, generatedBlocks);
 
     internal static string Identifier(string sourceName) =>
-        string.Join(
-            "",
-            from word in sourceName.Split('_')
-            select Capitalize(word));
+        string.Concat(
+            from word in sourceName.Split(['_', '-', ' '])
+            select PascalCaseWord(word));
 
-    static string Capitalize(string sourceName) =>
-        sourceName.Length == 0
-            ? sourceName
-            : $"{char.ToUpperInvariant(sourceName[0])}{sourceName[1..]}";
+    static string PascalCaseWord(string word) =>
+        CapitalizeFirstLetter(
+            ShouldNormalizeUpperCaseWord(word)
+                ? word.ToLowerInvariant()
+                : word);
+
+    static bool ShouldNormalizeUpperCaseWord(string word) =>
+        IsUpperCaseWord(word)
+            && !IsPreservedTwoLetterAcronym(word);
+
+    static bool IsUpperCaseWord(string word) =>
+        word.Any(char.IsLetter)
+            && word
+                .Where(char.IsLetter)
+                .All(char.IsUpper);
+
+    static bool IsPreservedTwoLetterAcronym(string word) =>
+        word != "ID"
+            && word.Count(char.IsLetter) == 2;
+
+    static string CapitalizeFirstLetter(string word) =>
+        word.Length == 0
+            ? word
+            : $"{char.ToUpperInvariant(word[0])}{word[1..]}";
 
     static string StringLiteral(string value) =>
         "\"" + value.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";

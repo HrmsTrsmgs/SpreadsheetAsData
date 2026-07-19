@@ -88,15 +88,8 @@ public sealed class CSharp識別子生成のテスト
 
     [Theory]
     [InlineData("sales_detail", "SalesDetail")]
-    [InlineData("sales-detail", "SalesDetail",
-        Skip =
-            "識別子本文がASCIIの区切り文字を単語境界としてPascalCaseへ変換するときに解除する。")]
-    [InlineData("sales detail", "SalesDetail",
-        Skip =
-            "識別子本文がASCIIの区切り文字を単語境界としてPascalCaseへ変換するときに解除する。")]
-    [InlineData("SALES_DETAIL1", "SalesDetail1",
-        Skip =
-            "識別子本文がASCIIの区切り文字を単語境界としてPascalCaseへ変換するときに解除する。")]
+    [InlineData("sales-detail", "SalesDetail")]
+    [InlineData("sales detail", "SalesDetail")]
     public void ASCII識別子本文は区切り文字を単語境界としてPascalCaseへ変換します(
         string excelName,
         string identifierBody)
@@ -105,6 +98,33 @@ public sealed class CSharp識別子生成のテスト
             .Identifier(excelName)
             .Should()
             .Be(identifierBody);
+    }
+
+    [Fact]
+    public void ASCII識別子本文は全大文字の単語をPascalCaseへ正規化します()
+    {
+        WorkbookWrapperComponents
+            .Identifier("SALES_DETAIL1")
+            .Should()
+            .Be("SalesDetail1");
+    }
+
+    [Fact]
+    public void ASCII識別子本文は二文字頭字語を両方大文字で変換します()
+    {
+        WorkbookWrapperComponents
+            .Identifier("IO_stream")
+            .Should()
+            .Be("IOStream");
+    }
+
+    [Fact]
+    public void ASCII識別子本文はIdを二文字頭字語の例外として変換します()
+    {
+        WorkbookWrapperComponents
+            .Identifier("customer_ID")
+            .Should()
+            .Be("CustomerId");
     }
 
     [Fact(
