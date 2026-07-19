@@ -100,9 +100,7 @@ public sealed class コード生成型構造のテスト
             .Be(baseTypeName);
     }
 
-    [Fact(
-        Skip =
-            "生成された行データ型をTableRowではなく通常のPOCOとして生成する処理を実装するときに解除する。")]
+    [Fact]
     public void 生成された行データ型はTableRowを継承しないPOCOです()
     {
         var dataType = GeneratedCodeInspection
