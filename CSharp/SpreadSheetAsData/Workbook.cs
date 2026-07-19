@@ -21,6 +21,14 @@ public class Workbook : IDisposable
         new(Packaging.SpreadsheetDocument.Open(filePath, true));
 
     /// <summary>
+    /// 派生した型付きブックから、指定したファイルをブックとして開きます。
+    /// </summary>
+    /// <param name="filePath">開く Spreadsheet ファイルのパス。</param>
+    protected Workbook(string filePath) : this(Packaging.SpreadsheetDocument.Open(filePath, true))
+    {
+    }
+
+    /// <summary>
     /// 既に開かれた Open XML ドキュメントを所有するブックを作成します。
     /// </summary>
     /// <param name="document">ブックとして扱う Open XML ドキュメント。</param>

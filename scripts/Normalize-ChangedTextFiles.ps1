@@ -11,7 +11,7 @@ $safeDirectory = $repositoryRoot.Replace("\", "/")
 function Invoke-Git {
     param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Arguments)
 
-    & git -C $repositoryRoot -c "safe.directory=$safeDirectory" @Arguments
+    & git -C $repositoryRoot -c "safe.directory=$safeDirectory" -c "core.quotePath=false" @Arguments
 }
 
 function Get-ChangedPath {

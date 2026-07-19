@@ -30,6 +30,9 @@ public static class WorkbookWrapperGenerator
 
             public class {{GenerateTypeName(sheet.Name, "Sheet")}} : Worksheet
             {
+                public {{GenerateTypeName(sheet.Name, "Sheet")}}(Workbook book) : base(book, {{GenerateStringLiteral(sheet.Name)}})
+                {
+                }
             }
             """;
         var tableDeclarations =
@@ -48,8 +51,11 @@ public static class WorkbookWrapperGenerator
 
             namespace {{options.Namespace}};
 
-            public class {{bookTypeName}}
+            public class {{bookTypeName}} : Workbook
             {
+                public {{bookTypeName}}() : base({{GenerateStringLiteral(filePath)}})
+                {
+                }
             }
             {{string.Join(Environment.NewLine, sheetDeclarations)}}
             {{string.Join(Environment.NewLine, tableDeclarations)}}
@@ -70,4 +76,7 @@ public static class WorkbookWrapperGenerator
 
     static string GenerateTypeName(string sourceName, string suffix) =>
         $"{sourceName}{suffix}";
+
+    static string GenerateStringLiteral(string value) =>
+        "\"" + value.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
 }

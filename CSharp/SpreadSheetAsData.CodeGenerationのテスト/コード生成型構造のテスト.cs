@@ -25,9 +25,7 @@ public sealed class コード生成型構造のテスト
             .Contain(generatedTypeName);
     }
 
-    [Fact(
-        Skip =
-            "生成されたBook型がWorkbookを継承する処理を実装するときに解除する。")]
+    [Fact]
     public void 生成されたBook型はWorkbookを継承します()
     {
         GeneratedCodeInspection
@@ -152,5 +150,3 @@ public sealed class コード生成型構造のテスト
             .NotBeNull();
     }
 }
-
-

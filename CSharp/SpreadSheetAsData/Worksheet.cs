@@ -18,9 +18,9 @@ public class Worksheet
     readonly string? name;
 
     /// <summary>
-    /// 空のワークシートを作成します。
+    /// ワークシートが持つコレクションを初期化します。
     /// </summary>
-    public Worksheet()
+    Worksheet()
     {
         Cells = new CellCollection(this);
         Cell = new(this, resolvesWorksheetNames: true);
@@ -32,7 +32,7 @@ public class Worksheet
     /// </summary>
     /// <param name="book">ワークシートが属するブック。</param>
     /// <param name="name">ワークシート名。</param>
-    internal Worksheet(Workbook book, string name) : this()
+    protected internal Worksheet(Workbook book, string name) : this()
     {
         this.book = book;
         this.name = name;
