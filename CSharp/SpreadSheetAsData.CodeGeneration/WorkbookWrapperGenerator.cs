@@ -32,6 +32,14 @@ public static class WorkbookWrapperGenerator
             {
             }
             """;
+        var tableDeclarations =
+            from table in book.Tables
+            select $$"""
+
+            public class {{GenerateTypeName(table.Name, "Table")}}
+            {
+            }
+            """;
 
         return
         [
@@ -44,6 +52,7 @@ public static class WorkbookWrapperGenerator
             {
             }
             {{string.Join(Environment.NewLine, sheetDeclarations)}}
+            {{string.Join(Environment.NewLine, tableDeclarations)}}
             """
         ];
     }

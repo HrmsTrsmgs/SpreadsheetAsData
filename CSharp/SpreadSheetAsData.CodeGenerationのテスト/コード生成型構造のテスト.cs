@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Marimo.SpreadSheetAsData;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 using Xunit;
 
@@ -67,21 +66,31 @@ public sealed class コード生成型構造のテスト
             .BeAssignableTo<Worksheet>();
     }
 
+    [Fact]
+    public void 生成されたTable型を生成します()
+    {
+        GeneratedCodeInspection
+            .SyntaxFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath))
+            .TypeNames
+            .Should()
+            .Contain("SalesDetailTable");
+    }
+
     [Fact(
         Skip =
             "生成専用Table型が生成された行データ型を型引数にしたTableを基底型としてコンパイルできる処理を実装するときに解除する。")]
     public void 生成されたTable型は生成された行データ型を型引数とするTableを継承します()
     {
-        var assembly = GeneratedCodeInspection.AssemblyFrom(
-            GeneratedCodeInspection.GenerateSources(
-                BasicStructureExcelFilePath));
-
-        assembly
-            .GetRequiredType("SalesDetailTable")
-            .BaseType
+        GeneratedCodeInspection
+            .SyntaxFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath))
+            .GeneratedType("SalesDetailTable")
+            .BaseTypeName
             .Should()
-            .Be(typeof(Table<>).MakeGenericType(
-                assembly.GetRequiredType("SalesDetail")));
+            .Be("Table<SalesDetail>");
     }
 
     [Fact(
