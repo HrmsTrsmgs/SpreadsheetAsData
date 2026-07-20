@@ -12,12 +12,14 @@ public sealed class コード生成定義名のテスト
     [Fact]
     public void ブックスコープの単一セル定義名をBookのCellプロパティとして生成します()
     {
-        GeneratedCodeInspection
-            .GenerateSources(DefinedNamesExcelFilePath)
-            .TypeDeclaration("定義名Book")
-            .PropertyDeclaration("MainCell")
-            .Type.ToString()
-            .Should().Be("Cell");
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(DefinedNamesExcelFilePath))
+            .GeneratedType("定義名Book")
+            .GetProperty("MainCell");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(typeof(Cell));
     }
 
     [Fact]
@@ -38,12 +40,14 @@ public sealed class コード生成定義名のテスト
             "シートローカルの単一セル定義名をSheetのCell取得プロパティとして生成するときに解除する。")]
     public void シートローカルの単一セル定義名をSheetのCellプロパティとして生成します()
     {
-        GeneratedCodeInspection
-            .GenerateSources(DefinedNamesExcelFilePath)
-            .TypeDeclaration("SalesDataSheet")
-            .PropertyDeclaration("LocalCell")
-            .Type.ToString()
-            .Should().Be("Cell");
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(DefinedNamesExcelFilePath))
+            .GeneratedType("SalesDataSheet")
+            .GetProperty("LocalCell");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(typeof(Cell));
     }
 
     [Fact(
@@ -51,12 +55,14 @@ public sealed class コード生成定義名のテスト
             "シートローカルの複数セル定義名をSheetのCellRange取得プロパティとして生成するときに解除する。")]
     public void シートローカルの複数セル定義名をSheetのCellRangeプロパティとして生成します()
     {
-        GeneratedCodeInspection
-            .GenerateSources(DefinedNamesExcelFilePath)
-            .TypeDeclaration("SalesDataSheet")
-            .PropertyDeclaration("LocalRange")
-            .Type.ToString()
-            .Should().Be("CellRange");
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(DefinedNamesExcelFilePath))
+            .GeneratedType("SalesDataSheet")
+            .GetProperty("LocalRange");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(typeof(CellRange));
     }
 
     [Fact(
@@ -64,12 +70,12 @@ public sealed class コード生成定義名のテスト
             "同じ定義名をブックスコープとシートローカルで別々のプロパティとして生成するときに解除する。")]
     public void ブックスコープとシートローカルで同じ定義名を区別して生成します()
     {
-        var sources = GeneratedCodeInspection.GenerateSources(
-                    DefinedNamesExcelFilePath);
+        var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
+            GeneratedCodeInspection.GenerateSources(DefinedNamesExcelFilePath));
 
-        sources.TypeDeclaration("定義名Book")
-            .PropertyDeclaration("Total").Should().NotBeNull();
-        sources.TypeDeclaration("SalesDataSheet")
-            .PropertyDeclaration("Total").Should().NotBeNull();
+        generatedAssembly.GeneratedType("定義名Book")
+            .GetProperty("Total").Should().NotBeNull();
+        generatedAssembly.GeneratedType("SalesDataSheet")
+            .GetProperty("Total").Should().NotBeNull();
     }
 }

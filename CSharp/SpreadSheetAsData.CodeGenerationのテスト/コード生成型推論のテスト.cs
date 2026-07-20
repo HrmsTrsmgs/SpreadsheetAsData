@@ -1,3 +1,4 @@
+using System.Reflection;
 using FluentAssertions;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 using Xunit;
@@ -13,12 +14,14 @@ public sealed class コード生成型推論のテスト
             "整数値だけを持つExcel列をintプロパティとして生成するときに解除する。")]
     public void 整数値だけを持つ列をintプロパティとして生成します()
     {
-        GeneratedCodeInspection
-            .GenerateSources(BasicStructureExcelFilePath)
-            .TypeDeclaration("SalesDetail")
-            .PropertyDeclaration("CustomerId")
-            .Type.ToString()
-            .Should().Be("int");
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
+            .GeneratedType("SalesDetail")
+            .GetProperty("CustomerId");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(typeof(int));
     }
 
     [Fact(
@@ -26,12 +29,14 @@ public sealed class コード生成型推論のテスト
             "小数値を持つExcel列をdoubleプロパティとして生成するときに解除する。")]
     public void 小数値を持つ列をdoubleプロパティとして生成します()
     {
-        GeneratedCodeInspection
-            .GenerateSources(BasicStructureExcelFilePath)
-            .TypeDeclaration("SalesDetail")
-            .PropertyDeclaration("Amount")
-            .Type.ToString()
-            .Should().Be("double");
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
+            .GeneratedType("SalesDetail")
+            .GetProperty("Amount");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(typeof(double));
     }
 
     [Fact(
@@ -39,12 +44,14 @@ public sealed class コード生成型推論のテスト
             "文字列値を持つExcel列をstringプロパティとして生成するときに解除する。")]
     public void 文字列値を持つ列をstringプロパティとして生成します()
     {
-        GeneratedCodeInspection
-            .GenerateSources(BasicStructureExcelFilePath)
-            .TypeDeclaration("SalesDetail")
-            .PropertyDeclaration("Description")
-            .Type.ToString()
-            .Should().Be("string");
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
+            .GeneratedType("SalesDetail")
+            .GetProperty("Description");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(typeof(string));
     }
 
     [Fact(
@@ -52,13 +59,18 @@ public sealed class コード生成型推論のテスト
             "生成列プロパティへ元のExcel列名をSpreadsheetColumn属性として出力するときに解除する。")]
     public void 生成された列プロパティに元のExcel列名を設定します()
     {
-        GeneratedCodeInspection
-            .GenerateSources(BasicStructureExcelFilePath)
-            .TypeDeclaration("SalesDetail")
-            .PropertyDeclaration("CustomerId")
-            .AttributeArguments("SpreadsheetColumn")
-            .Should().Contain("\"customer_id\"");
+        var generatedProperty = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
+            .GeneratedType("SalesDetail")
+            .GetProperty("CustomerId");
+
+        generatedProperty.Should().NotBeNull();
+
+        var tested =
+            generatedProperty.GetCustomAttribute<SpreadsheetColumnAttribute>();
+
+        tested.Should().NotBeNull();
+        tested.Name.Should().Be("customer_id");
     }
 }
-
-

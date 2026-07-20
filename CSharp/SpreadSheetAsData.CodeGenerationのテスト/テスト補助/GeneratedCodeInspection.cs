@@ -115,15 +115,6 @@ sealed class GeneratedCode(Func<string[]> getSources)
         ).ToArray();
 
     /// <summary>
-    /// 生成ソースに含まれる型を取得します。
-    /// </summary>
-    internal GeneratedType[] GeneratedTypes =>
-        (
-            from type in Sources.TypeDeclarations()
-            select new GeneratedType(type)
-        ).ToArray();
-
-    /// <summary>
     /// 指定した生成型を観測します。
     /// </summary>
     /// <param name="name">観測する生成型名。</param>
@@ -153,12 +144,6 @@ sealed class GeneratedType(TypeDeclarationSyntax declaration)
             .FirstOrDefault()
             ?.Name
             .ToString();
-
-    /// <summary>
-    /// 生成型の基底型名を取得します。
-    /// </summary>
-    internal string? BaseTypeName =>
-        declaration.BaseList?.Types.SingleOrDefault()?.Type.ToString();
 
     /// <summary>
     /// 生成型に宣言されたプロパティ名を取得します。

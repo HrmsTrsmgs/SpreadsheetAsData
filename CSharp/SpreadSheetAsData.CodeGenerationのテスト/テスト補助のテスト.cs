@@ -98,27 +98,6 @@ public sealed class テスト補助のテスト
     }
 
     [Fact]
-    public void BaseTypeNameはジェネリック型引数を含む基底型名を返します()
-    {
-        GeneratedCodeInspection
-            .SyntaxFrom(
-                """
-                namespace Generated;
-
-                public class SalesDetailTable : Table<SalesDetail>
-                {
-                }
-
-                public class SalesDetail
-                {
-                }
-                """)
-            .GeneratedType("SalesDetailTable")
-            .BaseTypeName
-            .Should().Be("Table<SalesDetail>");
-    }
-
-    [Fact]
     public void PropertyNamesは指定した型に含まれるプロパティ名を返します()
     {
         GeneratedCodeInspection

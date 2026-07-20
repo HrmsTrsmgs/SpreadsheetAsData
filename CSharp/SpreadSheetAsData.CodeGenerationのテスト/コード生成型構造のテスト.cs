@@ -17,10 +17,10 @@ public sealed class コード生成型構造のテスト
         string generatedTypeName)
     {
         GeneratedCodeInspection
-            .SyntaxFrom(
-                GeneratedCodeInspection.GenerateSources(
-                    excelFilePath))
-            .TypeNames
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(excelFilePath))
+            .DefinedTypes
+            .Select(it => it.Name)
             .Should().Contain(generatedTypeName);
     }
 
@@ -42,10 +42,11 @@ public sealed class コード生成型構造のテスト
         string generatedTypeName)
     {
         GeneratedCodeInspection
-            .SyntaxFrom(
+            .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
-            .TypeNames
+            .DefinedTypes
+            .Select(it => it.Name)
             .Should().Contain(generatedTypeName);
     }
 
@@ -68,10 +69,11 @@ public sealed class コード生成型構造のテスト
         string generatedTypeName)
     {
         GeneratedCodeInspection
-            .SyntaxFrom(
+            .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
-            .TypeNames
+            .DefinedTypes
+            .Select(it => it.Name)
             .Should().Contain(
                 generatedTypeName,
                 "Excelテーブル {0} から生成される型名だから",
@@ -79,19 +81,21 @@ public sealed class コード生成型構造のテスト
     }
 
     [Theory]
-    [InlineData("SalesDetailTable", "Table<SalesDetail>")]
-    [InlineData("ProductListTable", "Table<ProductList>")]
+    [InlineData("SalesDetailTable", "SalesDetail")]
+    [InlineData("ProductListTable", "ProductList")]
     public void 生成されたTable型は生成された行データ型を型引数とするTableを継承します(
         string generatedTypeName,
-        string baseTypeName)
+        string rowTypeName)
     {
-        GeneratedCodeInspection
-            .SyntaxFrom(
-                GeneratedCodeInspection.GenerateSources(
-                    BasicStructureExcelFilePath))
-            .GeneratedType(generatedTypeName)
-            .BaseTypeName
-            .Should().Be(baseTypeName);
+        var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
+            GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath));
+
+        var tested = generatedAssembly.GeneratedType(generatedTypeName).BaseType;
+
+        tested.Should().NotBeNull();
+        tested.GetGenericTypeDefinition().Should().Be(typeof(Table<>));
+        tested.GenericTypeArguments.Should().Equal(
+            generatedAssembly.GeneratedType(rowTypeName));
     }
 
     [Fact]

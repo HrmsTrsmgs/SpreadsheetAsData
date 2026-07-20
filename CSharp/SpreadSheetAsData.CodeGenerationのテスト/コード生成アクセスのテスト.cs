@@ -14,11 +14,16 @@ public sealed class コード生成アクセスのテスト
             "Bookから各ワークシートを型付きプロパティとして取得する生成処理を実装するときに解除する。")]
     public void Bookは各ワークシートを型付きプロパティとして公開します()
     {
-        GeneratedCodeInspection
-            .GenerateSources(BasicStructureExcelFilePath)
-            .TypeDeclaration("BasicStructureBook")
-            .PropertyDeclaration("SalesData")
-            .Should().NotBeNull();
+        var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
+            GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath));
+
+        var tested = generatedAssembly
+            .GeneratedType("BasicStructureBook")
+            .GetProperty("SalesData");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(
+            generatedAssembly.GeneratedType("SalesDataSheet"));
     }
 
     [Fact(
@@ -26,12 +31,16 @@ public sealed class コード生成アクセスのテスト
             "Bookから各Excelテーブルを型付きプロパティとして取得する生成処理を実装するときに解除する。")]
     public void Bookは各Excelテーブルを型付きプロパティとして公開します()
     {
-        GeneratedCodeInspection
-            .GenerateSources(BasicStructureExcelFilePath)
-            .TypeDeclaration("BasicStructureBook")
-            .PropertyDeclaration("SalesDetail")
-            .Type.ToString()
-            .Should().Be("SalesDetailTable");
+        var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
+            GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath));
+
+        var tested = generatedAssembly
+            .GeneratedType("BasicStructureBook")
+            .GetProperty("SalesDetail");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(
+            generatedAssembly.GeneratedType("SalesDetailTable"));
     }
 
     [Fact(
@@ -57,20 +66,16 @@ public sealed class コード生成アクセスのテスト
             "Sheetからそのシートに属するExcelテーブルだけを型付きプロパティとして取得する生成処理を実装するときに解除する。")]
     public void Sheetはそのシートに属するExcelテーブルを型付きプロパティとして公開します()
     {
-        var sources = GeneratedCodeInspection.GenerateSources(
-                    BasicStructureExcelFilePath);
+        var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
+            GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath));
 
-        sources
-            .TypeDeclaration("SalesDataSheet")
-            .PropertyDeclaration("SalesDetail")
-            .Type.ToString()
-            .Should().Be("SalesDetailTable");
+        var sheetType = generatedAssembly.GeneratedType("SalesDataSheet");
+        var tested = sheetType.GetProperty("SalesDetail");
 
-        sources
-            .TypeDeclaration("SalesDataSheet")
-            .Members
-            .OfType<Microsoft.CodeAnalysis.CSharp.Syntax.PropertyDeclarationSyntax>()
-            .Should().NotContain(it => it.Identifier.ValueText == "ProductList");
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(
+            generatedAssembly.GeneratedType("SalesDetailTable"));
+        sheetType.GetProperty("ProductList").Should().BeNull();
     }
 
     [Fact(

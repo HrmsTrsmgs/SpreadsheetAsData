@@ -12,17 +12,18 @@ public sealed class コード生成統合のテスト
     public void 指定した名前空間へすべての型を生成します()
     {
         var generatedTypes = GeneratedCodeInspection
-            .SyntaxFrom(
+            .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(
                     IntegratedExcelFilePath,
                     options => options.Namespace = "Generated.Custom"))
-            .GeneratedTypes;
+            .DefinedTypes
+            .ToArray();
 
         generatedTypes
             .Should().NotBeEmpty();
 
         generatedTypes
-            .Should().OnlyContain(it => it.NamespaceName == "Generated.Custom");
+            .Should().OnlyContain(it => it.Namespace == "Generated.Custom");
     }
 
     [Fact]
@@ -52,5 +53,3 @@ public sealed class コード生成統合のテスト
             .Should().BeEmpty();
     }
 }
-
-
