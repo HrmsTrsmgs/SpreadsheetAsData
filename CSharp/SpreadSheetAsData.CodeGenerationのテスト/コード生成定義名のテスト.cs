@@ -61,9 +61,7 @@ public sealed class コード生成定義名のテスト
         tested.PropertyType.Should().Be(typeof(CellRange));
     }
 
-    [Fact(
-        Skip =
-            "同じ定義名をブックスコープとシートローカルで別々のプロパティとして生成するときに解除する。")]
+    [Fact]
     public void ブックスコープとシートローカルで同じ定義名を区別して生成します()
     {
         var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
