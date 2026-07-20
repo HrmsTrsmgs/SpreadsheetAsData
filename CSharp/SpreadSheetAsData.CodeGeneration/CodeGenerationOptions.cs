@@ -11,12 +11,7 @@ public sealed class CodeGenerationOptions
     public string Namespace { get; set; } = "Generated";
 
     /// <summary>
-    /// Excel上の名前から生成後のC#名への対応表を取得します。
+    /// Excel上の名前または文脈付き名前から生成後のC#名への対応表を取得または設定します。
     /// </summary>
-    public Dictionary<string, string> NameMappings { get; } = [];
-
-    /// <summary>
-    /// 所属先を含むExcel上の名前から生成後のC#名への対応表を取得します。
-    /// </summary>
-    public Dictionary<string, string> ContextNameMappings { get; } = [];
+    public Dictionary<string, string> NameMappings { get; set; } = [];
 }

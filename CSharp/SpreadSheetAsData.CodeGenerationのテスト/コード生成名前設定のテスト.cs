@@ -7,7 +7,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 public sealed class コード生成名前設定のテスト
 {
     const string SimpleNameMappingsExcelFilePath = @"TestData\コード生成\簡易名前置換.xlsx";
-    const string ContextNameMappingsExcelFilePath = @"TestData\コード生成\文脈付き名前置換.xlsx";
+    const string ContextualNameMappingsExcelFilePath = @"TestData\コード生成\文脈付き名前置換.xlsx";
 
     [Fact]
     public void NameMappingsは自動名前変換より優先されます()
@@ -16,6 +16,22 @@ public sealed class コード生成名前設定のテスト
             .GenerateSources(
                 SimpleNameMappingsExcelFilePath,
                 options => options.NameMappings["cust_id"] = "CustomerID")
+            .PropertyDeclaration("SalesDetail", "CustomerID")
+            .Should()
+            .NotBeNull();
+    }
+
+    [Fact]
+    public void NameMappingsは辞書を代入して設定できます()
+    {
+        GeneratedCodeInspection
+            .GenerateSources(
+                SimpleNameMappingsExcelFilePath,
+                options =>
+                    options.NameMappings = new()
+                    {
+                        ["cust_id"] = "CustomerID"
+                    })
             .PropertyDeclaration("SalesDetail", "CustomerID")
             .Should()
             .NotBeNull();
@@ -33,14 +49,14 @@ public sealed class コード生成名前設定のテスト
     }
 
     [Fact]
-    public void 文脈付き名前設定は同じ元列名をテーブルごとに異なる名前へ変更できます()
+    public void NameMappingsは文脈付きキーで同じ元列名をテーブルごとに異なる名前へ変更できます()
     {
         var sources = GeneratedCodeInspection.GenerateSources(
-            ContextNameMappingsExcelFilePath,
+            ContextualNameMappingsExcelFilePath,
             options =>
             {
-                options.ContextNameMappings["customers.id"] = "CustomerId";
-                options.ContextNameMappings["products.id"] = "ProductId";
+                options.NameMappings["customers.id"] = "CustomerId";
+                options.NameMappings["products.id"] = "ProductId";
             });
 
         sources.PropertyDeclaration("Customers", "CustomerId").Should().NotBeNull();
@@ -49,35 +65,35 @@ public sealed class コード生成名前設定のテスト
 
     [Fact(
         Skip =
-            "文脈付き名前設定でブック定義名とシートローカル定義名を区別するときに解除する。")]
-    public void 文脈付き名前設定はブック定義名とシートローカル定義名を区別できます()
+            "NameMappingsの文脈付きキーでブック定義名とシートローカル定義名を区別するときに解除する。")]
+    public void NameMappingsは文脈付きキーでブック定義名とシートローカル定義名を区別できます()
     {
         var sources = GeneratedCodeInspection.GenerateSources(
-            ContextNameMappingsExcelFilePath,
+            ContextualNameMappingsExcelFilePath,
             options =>
             {
-                options.ContextNameMappings["book.total"] = "GrandTotal";
-                options.ContextNameMappings["sales_data.total"] = "SheetTotal";
+                options.NameMappings["book.total"] = "GrandTotal";
+                options.NameMappings["sales_data.total"] = "SheetTotal";
             });
 
-        sources.PropertyDeclaration("ContextNameMappingsBook", "GrandTotal").Should().NotBeNull();
+        sources.PropertyDeclaration("文脈付き名前置換Book", "GrandTotal").Should().NotBeNull();
         sources.PropertyDeclaration("SalesDataSheet", "SheetTotal").Should().NotBeNull();
     }
 
     [Fact(
         Skip =
-            "文脈付き名前設定をNameMappingsより優先して適用するときに解除する。")]
-    public void 文脈付き名前設定はNameMappingsより優先されます()
+            "NameMappingsの文脈付きキーを単純キーより優先して適用するときに解除する。")]
+    public void NameMappingsは文脈付きキーを単純キーより優先します()
     {
         GeneratedCodeInspection
             .GenerateSources(
-                ContextNameMappingsExcelFilePath,
+                ContextualNameMappingsExcelFilePath,
                 options =>
                 {
                     options.NameMappings["id"] = "MappedId";
-                    options.ContextNameMappings["customers.id"] = "CustomerId";
+                    options.NameMappings["customers.id"] = "CustomerId";
                 })
-            .PropertyDeclaration("CustomersRow", "CustomerId")
+            .PropertyDeclaration("Customers", "CustomerId")
             .Should()
             .NotBeNull();
     }

@@ -92,7 +92,7 @@ static class WorkbookWrapperComponents
         string contextName,
         string sourceName,
         CodeGenerationOptions options) =>
-        options.ContextNameMappings.GetValueOrDefault($"{contextName}.{sourceName}")
+        options.NameMappings.GetValueOrDefault($"{contextName}.{sourceName}")
             ?? GeneratedName(sourceName, options);
 
     static string GeneratedName(
