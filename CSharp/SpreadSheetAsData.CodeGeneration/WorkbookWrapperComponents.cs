@@ -1,4 +1,5 @@
-﻿using Marimo.SpreadSheetAsData;
+﻿using System.Globalization;
+using Marimo.SpreadSheetAsData;
 
 namespace Marimo.SpreadSheetAsData.CodeGeneration;
 
@@ -76,9 +77,40 @@ static class WorkbookWrapperComponents
         string.Join(Environment.NewLine, generatedBlocks);
 
     internal static string Identifier(string sourceName) =>
+        ContainsNonAscii(sourceName)
+            ? CapitalizeFirstLetter(
+                ReplaceInvalidIdentifierPartCharacters(
+                    sourceName.Replace('-', '_').Replace(' ', '_')))
+            : AsciiIdentifier(sourceName);
+
+    static string AsciiIdentifier(string sourceName) =>
         string.Concat(
             from word in sourceName.Split(['_', '-', ' '])
-            select PascalCaseWord(word));
+            select PascalCaseWord(ReplaceInvalidIdentifierPartCharacters(word)));
+
+    static string ReplaceInvalidIdentifierPartCharacters(string sourceName) =>
+        string.Concat(
+            from character in sourceName
+            select IsIdentifierPartCharacter(character)
+                ? character
+                : '_');
+
+    static bool IsIdentifierPartCharacter(char character) =>
+        char.GetUnicodeCategory(character) is
+            UnicodeCategory.UppercaseLetter
+            or UnicodeCategory.LowercaseLetter
+            or UnicodeCategory.TitlecaseLetter
+            or UnicodeCategory.ModifierLetter
+            or UnicodeCategory.OtherLetter
+            or UnicodeCategory.LetterNumber
+            or UnicodeCategory.DecimalDigitNumber
+            or UnicodeCategory.ConnectorPunctuation
+            or UnicodeCategory.NonSpacingMark
+            or UnicodeCategory.SpacingCombiningMark
+            or UnicodeCategory.Format;
+
+    static bool ContainsNonAscii(string sourceName) =>
+        sourceName.Any(it => !char.IsAscii(it));
 
     static string PascalCaseWord(string word) =>
         CapitalizeFirstLetter(
