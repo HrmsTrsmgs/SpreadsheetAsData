@@ -25,6 +25,18 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void Bookはワークシートプロパティから型付きSheetを取得します()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
+            .GeneratedInstance<Workbook>("BasicStructureBook");
+
+        (((dynamic)book).SalesData as object)
+            .Should().NotBeNull();
+    }
+
+    [Fact]
     public void Bookは各Excelテーブルを型付きプロパティとして公開します()
     {
         var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
@@ -39,12 +51,22 @@ public sealed class コード生成アクセスのテスト
             generatedAssembly.GeneratedType("SalesDetailTable"));
     }
 
-    [Fact(
-        Skip =
-            "生成BookをWorkbookとして扱える継承構造と既存非型付きAPIの利用を実装するときに解除する。")]
+    [Fact]
+    public void BookはExcelテーブルプロパティから型付きTableを取得します()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
+            .GeneratedInstance<Workbook>("BasicStructureBook");
+
+        (((dynamic)book).SalesDetail as object)
+            .Should().NotBeNull();
+    }
+
+    [Fact]
     public void 生成されたBook型からWorkbookの非型付きAPIも使用できます()
     {
-        var tested = GeneratedCodeInspection
+        using var tested = GeneratedCodeInspection
             .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))

@@ -65,7 +65,7 @@ static class WorkbookWrapperComponents
     static string BookTablePropertyDeclaration(
         Table table,
         CodeGenerationOptions options) =>
-        $"    public {GeneratedName(table.Name, options)}Table {GeneratedName(table.Name, options)} => throw new System.NotImplementedException();";
+        $"    public {GeneratedName(table.Name, options)}Table {GeneratedName(table.Name, options)} => new(Tables[{StringLiteral(table.Name)}]);";
 
     /// <summary>
     /// ワークシートを表す派生Sheet型の宣言を生成します。
