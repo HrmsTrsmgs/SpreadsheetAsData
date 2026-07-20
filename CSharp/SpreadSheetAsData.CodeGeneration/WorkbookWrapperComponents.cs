@@ -13,36 +13,46 @@ static class WorkbookWrapperComponents
     /// </summary>
     internal static string SourceFile(
         string filePath,
-        string namespaceName,
+        CodeGenerationOptions options,
         Workbook book) =>
         $$"""
         using Marimo.SpreadSheetAsData;
 
-        namespace {{namespaceName}};
+        namespace {{options.Namespace}};
 
         public partial class {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book : Workbook
         {
             public {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book() : base({{StringLiteral(filePath)}})
             {
             }
+        {{ForEach(
+            from sheet in book.Sheets.Values
+            select SheetPropertyDeclaration(sheet, options))}}
         }
         {{ForEach(
             from sheet in book.Sheets.Values
-            select SheetDeclaration(sheet))}}
+            select SheetDeclaration(sheet, options))}}
         {{ForEach(
             from table in book.Tables
             select TableDeclaration(table))}}
         {{ForEach(
             from table in book.Tables
-            select RowDeclaration(table))}}
+            select RowDeclaration(table, options))}}
         """;
 
-    static string SheetDeclaration(Worksheet sheet)
+    static string SheetPropertyDeclaration(
+        Worksheet sheet,
+        CodeGenerationOptions options) =>
+        $"    public {GeneratedName(sheet.Name, options)}Sheet {GeneratedName(sheet.Name, options)} => new(this);";
+
+    static string SheetDeclaration(
+        Worksheet sheet,
+        CodeGenerationOptions options)
         => $$"""
 
-        public partial class {{Identifier(sheet.Name)}}Sheet : Worksheet
+        public partial class {{GeneratedName(sheet.Name, options)}}Sheet : Worksheet
         {
-            public {{Identifier(sheet.Name)}}Sheet(Workbook book) : base(book, {{StringLiteral(sheet.Name)}})
+            public {{GeneratedName(sheet.Name, options)}}Sheet(Workbook book) : base(book, {{StringLiteral(sheet.Name)}})
             {
             }
         }
@@ -59,19 +69,29 @@ static class WorkbookWrapperComponents
         }
         """;
 
-    static string RowDeclaration(Table table)
+    static string RowDeclaration(
+        Table table,
+        CodeGenerationOptions options)
         => $$"""
 
         public partial class {{Identifier(table.Name)}}
         {
         {{ForEach(
             from column in table.Columns
-            select RowPropertyDeclaration(column))}}
+            select RowPropertyDeclaration(column, options))}}
         }
         """;
 
-    static string RowPropertyDeclaration(TableColumn column) =>
-        $"    public object? {Identifier(column.Name)} {{ get; set; }}";
+    static string RowPropertyDeclaration(
+        TableColumn column,
+        CodeGenerationOptions options) =>
+        $"    public object? {GeneratedName(column.Name, options)} {{ get; set; }}";
+
+    static string GeneratedName(
+        string sourceName,
+        CodeGenerationOptions options) =>
+        options.NameMappings.GetValueOrDefault(sourceName)
+            ?? Identifier(sourceName);
 
     static string ForEach(IEnumerable<string> generatedBlocks) =>
         string.Join(Environment.NewLine, generatedBlocks);

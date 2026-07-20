@@ -24,7 +24,7 @@ public static class WorkbookWrapperGenerator
         using var book = Workbook.Open(filePath);
         return
         [
-            SourceFile(filePath, options.Namespace, book)
+            SourceFile(filePath, options, book)
         ];
     }
 

@@ -9,9 +9,7 @@ public sealed class コード生成名前設定のテスト
     const string SimpleNameMappingsExcelFilePath = @"TestData\コード生成\簡易名前置換.xlsx";
     const string ContextNameMappingsExcelFilePath = @"TestData\コード生成\文脈付き名前置換.xlsx";
 
-    [Fact(
-        Skip =
-            "NameMappingsを自動名前変換より優先して生成名へ適用するときに解除する。")]
+    [Fact]
     public void NameMappingsは自動名前変換より優先されます()
     {
         GeneratedCodeInspection
@@ -23,9 +21,7 @@ public sealed class コード生成名前設定のテスト
             .NotBeNull();
     }
 
-    [Fact(
-        Skip =
-            "NameMappingsを要素種類や所属先を問わない元名の対応表として適用するときに解除する。")]
+    [Fact]
     public void NameMappingsは対象種類を指定せず同じ元名へ適用されます()
     {
         var sources = GeneratedCodeInspection.GenerateSources(
@@ -33,7 +29,7 @@ public sealed class コード生成名前設定のテスト
             options => options.NameMappings["data"] = "MappedData");
 
         sources.TypeDeclaration("MappedDataSheet").Should().NotBeNull();
-        sources.PropertyDeclaration("SimpleNameMappingsBook", "MappedData").Should().NotBeNull();
+        sources.PropertyDeclaration("簡易名前置換Book", "MappedData").Should().NotBeNull();
     }
 
     [Fact(
