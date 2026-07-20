@@ -61,10 +61,19 @@ public class Cellのテスト : IDisposable
     }
 
     [Fact]
-    public void Valueプロパティは文字列の値を取得できます()
+    public void Valueプロパティは共有文字列セルの値を取得できます()
     {
         (a3.Value as object).Should().BeOfType<string>().Which.Should().Be("あいうえお");
         (b3.Value as object).Should().BeOfType<string>().Which.Should().Be("かきくけこ");
+    }
+
+    [Fact]
+    public void Valueプロパティは文字列セルの値を取得できます()
+    {
+        using var book = Workbook.Open(@"TestData\文字列セル.xlsx");
+
+        (book.Sheets["Sheet1"].Cells["A1"].Value as object)
+            .Should().Be("直接文字列");
     }
 
     [Fact]

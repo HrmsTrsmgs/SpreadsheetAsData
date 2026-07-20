@@ -106,16 +106,16 @@ public sealed class コード生成アクセスのテスト
             .Should().NotBeNull();
     }
 
-    [Fact(
-        Skip =
-            "生成SheetをWorksheetとして扱える継承構造と既存非型付きAPIの利用を実装するときに解除する。")]
+    [Fact]
     public void 生成されたSheet型からWorksheetの非型付きAPIも使用できます()
     {
-        var tested = GeneratedCodeInspection
+        using var book = GeneratedCodeInspection
             .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
-            .GeneratedInstance<Worksheet>("SalesDataSheet");
+            .GeneratedInstance<Workbook>("BasicStructureBook");
+
+        Worksheet tested = ((dynamic)book).SalesData;
 
         tested.Name.Should().NotBeNull();
         tested.Book.Should().NotBeNull();

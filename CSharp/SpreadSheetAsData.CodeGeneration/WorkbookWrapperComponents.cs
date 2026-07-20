@@ -131,8 +131,49 @@ static class WorkbookWrapperComponents
     static string RowPropertyDeclaration(
         Table table,
         TableColumn column,
-        CodeGenerationOptions options) =>
-        $"    public object? {GeneratedName(table.Name, column.Name, options)} {{ get; set; }}";
+        CodeGenerationOptions options)
+    {
+        var propertyTypeName = ColumnPropertyTypeName(table, column);
+
+        return
+            $"    public {propertyTypeName} {GeneratedName(table.Name, column.Name, options)} {{ get; set; }}{PropertyInitializer(propertyTypeName)}";
+    }
+
+    /// <summary>
+    /// 既存の型付きTableマッピングで読み込めるプロパティ型名を、列の値から決定します。
+    /// </summary>
+    static string ColumnPropertyTypeName(Table table, TableColumn column)
+    {
+        var values = (
+            from row in table.Rows
+            select row[column].Value
+        ).ToArray();
+
+        if (values.All(it => it is string))
+        {
+            return "string";
+        }
+
+        if (values.All(it => it is double number && double.IsInteger(number)))
+        {
+            return "int";
+        }
+
+        if (values.All(it => it is double))
+        {
+            return "double";
+        }
+
+        return "object?";
+    }
+
+    /// <summary>
+    /// 生成プロパティがコンパイル時の初期化警告を出さないための初期値を返します。
+    /// </summary>
+    static string PropertyInitializer(string propertyTypeName) =>
+        propertyTypeName == "string"
+            ? " = \"\";"
+            : "";
 
     /// <summary>
     /// ブック全体から参照できる定義名だけを選びます。

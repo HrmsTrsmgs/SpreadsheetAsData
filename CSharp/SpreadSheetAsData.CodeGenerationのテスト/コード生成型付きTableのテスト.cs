@@ -9,16 +9,16 @@ public sealed class コード生成型付きTableのテスト
 {
     const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
 
-    [Fact(
-        Skip =
-            "生成TableがPOCOをExcel上の順序で列挙する処理を実装するときに解除する。")]
+    [Fact]
     public void 生成されたTableはPOCOをExcel上の順序で列挙します()
     {
-        var rows = GeneratedCodeInspection
+        using var book = GeneratedCodeInspection
             .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
-            .GeneratedInstance<IEnumerable<object>>("SalesDetailTable")
+            .GeneratedInstance<Workbook>("BasicStructureBook");
+
+        var rows = ((IEnumerable<object>)((dynamic)book).SalesDetail)
             .ToArray();
 
         rows.Select(it => PropertyValue(it, "CustomerId"))
@@ -34,13 +34,15 @@ public sealed class コード生成型付きTableのテスト
             "生成TableをTableとして扱った場合に非型付きRowsを利用できる継承構造を実装するときに解除する。")]
     public void 生成されたTableをTableとして扱うと非型付き行を利用できます()
     {
-        GeneratedCodeInspection
+        using var book = GeneratedCodeInspection
             .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
-            .GeneratedInstance<Table>("SalesDetailTable")
-            .Rows
-            .Should().NotBeEmpty();
+            .GeneratedInstance<Workbook>("BasicStructureBook");
+
+        Table tested = ((dynamic)book).SalesDetail;
+
+        tested.Rows.Should().NotBeEmpty();
     }
 
     [Fact(
@@ -48,11 +50,13 @@ public sealed class コード生成型付きTableのテスト
             "生成TableからTableの構造情報を利用できる継承構造を実装するときに解除する。")]
     public void 生成されたTable型からTableの構造情報を使用できます()
     {
-        var tested = GeneratedCodeInspection
+        using var book = GeneratedCodeInspection
             .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
-            .GeneratedInstance<Table>("SalesDetailTable");
+            .GeneratedInstance<Workbook>("BasicStructureBook");
+
+        Table tested = ((dynamic)book).SalesDetail;
 
         tested.Name.Should().Be("sales_detail");
         tested.Worksheet.Should().NotBeNull();
@@ -66,11 +70,13 @@ public sealed class コード生成型付きTableのテスト
     public void 生成された行データ型は利用者定義POCOと同じ変換規則で読み込まれます()
     {
         using var book = Workbook.Open(BasicStructureExcelFilePath);
-        GeneratedCodeInspection
+        using var generatedBook = GeneratedCodeInspection
             .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
-            .GeneratedInstance<IEnumerable<object>>("SalesDetailTable")
+            .GeneratedInstance<Workbook>("BasicStructureBook");
+
+        ((IEnumerable<object>)((dynamic)generatedBook).SalesDetail)
             .Select(ReadGeneratedRow)
             .Should().Equal(
                 book.ReadTable<ReadTableComparison>("sales_detail")
