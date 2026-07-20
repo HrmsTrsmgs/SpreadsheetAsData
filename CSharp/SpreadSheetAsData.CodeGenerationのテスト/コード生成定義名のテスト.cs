@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 using Marimo.SpreadSheetAsData;
 using Xunit;
@@ -14,7 +14,8 @@ public sealed class コード生成定義名のテスト
     {
         GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
-            .PropertyDeclaration("定義名Book", "MainCell")
+            .TypeDeclaration("定義名Book")
+            .PropertyDeclaration("MainCell")
             .Type.ToString()
             .Should().Be("Cell");
     }
@@ -39,7 +40,8 @@ public sealed class コード生成定義名のテスト
     {
         GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
-            .PropertyDeclaration("SalesDataSheet", "LocalCell")
+            .TypeDeclaration("SalesDataSheet")
+            .PropertyDeclaration("LocalCell")
             .Type.ToString()
             .Should().Be("Cell");
     }
@@ -51,7 +53,8 @@ public sealed class コード生成定義名のテスト
     {
         GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
-            .PropertyDeclaration("SalesDataSheet", "LocalRange")
+            .TypeDeclaration("SalesDataSheet")
+            .PropertyDeclaration("LocalRange")
             .Type.ToString()
             .Should().Be("CellRange");
     }
@@ -64,8 +67,10 @@ public sealed class コード生成定義名のテスト
         var sources = GeneratedCodeInspection.GenerateSources(
                     DefinedNamesExcelFilePath);
 
-        sources.PropertyDeclaration("定義名Book", "Total").Should().NotBeNull();
-        sources.PropertyDeclaration("SalesDataSheet", "Total").Should().NotBeNull();
+        sources.TypeDeclaration("定義名Book")
+            .PropertyDeclaration("Total").Should().NotBeNull();
+        sources.TypeDeclaration("SalesDataSheet")
+            .PropertyDeclaration("Total").Should().NotBeNull();
     }
 }
 

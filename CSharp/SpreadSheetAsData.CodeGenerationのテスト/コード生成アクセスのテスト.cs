@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Marimo.SpreadSheetAsData;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 using Xunit;
@@ -16,7 +16,8 @@ public sealed class コード生成アクセスのテスト
     {
         GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
-            .PropertyDeclaration("BasicStructureBook", "SalesData")
+            .TypeDeclaration("BasicStructureBook")
+            .PropertyDeclaration("SalesData")
             .Should().NotBeNull();
     }
 
@@ -27,7 +28,8 @@ public sealed class コード生成アクセスのテスト
     {
         GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
-            .PropertyDeclaration("BasicStructureBook", "SalesDetail")
+            .TypeDeclaration("BasicStructureBook")
+            .PropertyDeclaration("SalesDetail")
             .Type.ToString()
             .Should().Be("SalesDetailTable");
     }
@@ -59,7 +61,8 @@ public sealed class コード生成アクセスのテスト
                     BasicStructureExcelFilePath);
 
         sources
-            .PropertyDeclaration("SalesDataSheet", "SalesDetail")
+            .TypeDeclaration("SalesDataSheet")
+            .PropertyDeclaration("SalesDetail")
             .Type.ToString()
             .Should().Be("SalesDetailTable");
 

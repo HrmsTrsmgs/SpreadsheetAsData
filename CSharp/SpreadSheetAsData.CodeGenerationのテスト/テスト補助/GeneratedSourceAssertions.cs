@@ -40,21 +40,17 @@ static class GeneratedSourceAssertions
         ).Single();
 
     /// <summary>
-    /// 生成ソースから指定した型のプロパティ宣言を取得します。
+    /// 指定した型宣言から指定した名前のプロパティ宣言を取得します。
     /// </summary>
-    /// <param name="sources">解析するC#ソースコード。</param>
-    /// <param name="typeName">プロパティを持つ型名。</param>
+    /// <param name="type">プロパティを取得する型宣言。</param>
     /// <param name="propertyName">取得するプロパティ名。</param>
     /// <returns>指定したプロパティ宣言。</returns>
     internal static PropertyDeclarationSyntax PropertyDeclaration(
-        this IEnumerable<string> sources,
-        string typeName,
+        this TypeDeclarationSyntax type,
         string propertyName) =>
         (
             from property in
-                sources
-                    .TypeDeclaration(typeName)
-                    .Members
+                type.Members
                     .OfType<PropertyDeclarationSyntax>()
             where property.Identifier.ValueText == propertyName
             select property

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 using Xunit;
 
@@ -15,7 +15,8 @@ public sealed class コード生成型推論のテスト
     {
         GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
-            .PropertyDeclaration("SalesDetail", "CustomerId")
+            .TypeDeclaration("SalesDetail")
+            .PropertyDeclaration("CustomerId")
             .Type.ToString()
             .Should().Be("int");
     }
@@ -27,7 +28,8 @@ public sealed class コード生成型推論のテスト
     {
         GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
-            .PropertyDeclaration("SalesDetail", "Amount")
+            .TypeDeclaration("SalesDetail")
+            .PropertyDeclaration("Amount")
             .Type.ToString()
             .Should().Be("double");
     }
@@ -39,7 +41,8 @@ public sealed class コード生成型推論のテスト
     {
         GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
-            .PropertyDeclaration("SalesDetail", "Description")
+            .TypeDeclaration("SalesDetail")
+            .PropertyDeclaration("Description")
             .Type.ToString()
             .Should().Be("string");
     }
@@ -51,7 +54,8 @@ public sealed class コード生成型推論のテスト
     {
         GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
-            .PropertyDeclaration("SalesDetail", "CustomerId")
+            .TypeDeclaration("SalesDetail")
+            .PropertyDeclaration("CustomerId")
             .AttributeArguments("SpreadsheetColumn")
             .Should().Contain("\"customer_id\"");
     }

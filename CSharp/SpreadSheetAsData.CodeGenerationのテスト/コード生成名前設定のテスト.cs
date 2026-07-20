@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 using Xunit;
 
@@ -16,7 +16,8 @@ public sealed class コード生成名前設定のテスト
             .GenerateSources(
                 SimpleNameMappingsExcelFilePath,
                 options => options.NameMappings["cust_id"] = "CustomerID")
-            .PropertyDeclaration("SalesDetail", "CustomerID")
+            .TypeDeclaration("SalesDetail")
+            .PropertyDeclaration("CustomerID")
             .Should().NotBeNull();
     }
 
@@ -31,7 +32,8 @@ public sealed class コード生成名前設定のテスト
                     {
                         ["cust_id"] = "CustomerID"
                     })
-            .PropertyDeclaration("SalesDetail", "CustomerID")
+            .TypeDeclaration("SalesDetail")
+            .PropertyDeclaration("CustomerID")
             .Should().NotBeNull();
     }
 
@@ -43,7 +45,8 @@ public sealed class コード生成名前設定のテスト
             options => options.NameMappings["data"] = "MappedData");
 
         sources.TypeDeclaration("MappedDataSheet").Should().NotBeNull();
-        sources.PropertyDeclaration("簡易名前置換Book", "MappedData").Should().NotBeNull();
+        sources.TypeDeclaration("簡易名前置換Book")
+            .PropertyDeclaration("MappedData").Should().NotBeNull();
     }
 
     [Fact]
@@ -58,8 +61,10 @@ public sealed class コード生成名前設定のテスト
                     ["products.id"] = "ProductId"
                 });
 
-        sources.PropertyDeclaration("Customers", "CustomerId").Should().NotBeNull();
-        sources.PropertyDeclaration("Products", "ProductId").Should().NotBeNull();
+        sources.TypeDeclaration("Customers")
+            .PropertyDeclaration("CustomerId").Should().NotBeNull();
+        sources.TypeDeclaration("Products")
+            .PropertyDeclaration("ProductId").Should().NotBeNull();
     }
 
     [Fact(
@@ -76,8 +81,10 @@ public sealed class コード生成名前設定のテスト
                     ["sales_data.total"] = "SheetTotal"
                 });
 
-        sources.PropertyDeclaration("文脈付き名前置換Book", "GrandTotal").Should().NotBeNull();
-        sources.PropertyDeclaration("SalesDataSheet", "SheetTotal").Should().NotBeNull();
+        sources.TypeDeclaration("文脈付き名前置換Book")
+            .PropertyDeclaration("GrandTotal").Should().NotBeNull();
+        sources.TypeDeclaration("SalesDataSheet")
+            .PropertyDeclaration("SheetTotal").Should().NotBeNull();
     }
 
     [Fact(
@@ -94,7 +101,8 @@ public sealed class コード生成名前設定のテスト
                         ["id"] = "MappedId",
                         ["customers.id"] = "CustomerId"
                     })
-            .PropertyDeclaration("Customers", "CustomerId")
+            .TypeDeclaration("Customers")
+            .PropertyDeclaration("CustomerId")
             .Should().NotBeNull();
     }
 }

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 using Xunit;
 
@@ -64,7 +64,8 @@ public sealed class コード生成コメントのテスト
     {
         GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
-            .PropertyDeclaration("BasicStructureBook", "SalesData")
+            .TypeDeclaration("BasicStructureBook")
+            .PropertyDeclaration("SalesData")
             .SummaryText()
             .Should().Be("ワークシート「SalesData」を取得します。");
     }
@@ -76,7 +77,8 @@ public sealed class コード生成コメントのテスト
     {
         GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
-            .PropertyDeclaration("BasicStructureBook", "SalesDetail")
+            .TypeDeclaration("BasicStructureBook")
+            .PropertyDeclaration("SalesDetail")
             .SummaryText()
             .Should().Be("Excelテーブル「sales_detail」を取得します。");
     }
@@ -88,7 +90,8 @@ public sealed class コード生成コメントのテスト
     {
         GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
-            .PropertyDeclaration("SalesDetail", "CustomerId")
+            .TypeDeclaration("SalesDetail")
+            .PropertyDeclaration("CustomerId")
             .SummaryText()
             .Should().Be("Excel列「customer_id」の値を取得または設定します。");
     }
@@ -100,7 +103,8 @@ public sealed class コード生成コメントのテスト
     {
         GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
-            .PropertyDeclaration("定義名Book", "MainCell")
+            .TypeDeclaration("定義名Book")
+            .PropertyDeclaration("MainCell")
             .SummaryText()
             .Should().Be("定義名「main_cell」が表すセルを取得します。");
     }
@@ -112,7 +116,8 @@ public sealed class コード生成コメントのテスト
     {
         GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
-            .PropertyDeclaration("定義名Book", "MainRange")
+            .TypeDeclaration("定義名Book")
+            .PropertyDeclaration("MainRange")
             .SummaryText()
             .Should().Be("定義名「main_range」が表すセル範囲を取得します。");
     }
@@ -124,7 +129,8 @@ public sealed class コード生成コメントのテスト
     {
         GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
-            .PropertyDeclaration("SalesDataSheet", "LocalCell")
+            .TypeDeclaration("SalesDataSheet")
+            .PropertyDeclaration("LocalCell")
             .SummaryText()
             .Should().Be("ワークシート「sales_data」の定義名「local_cell」が表すセルを取得します。");
     }
@@ -136,7 +142,8 @@ public sealed class コード生成コメントのテスト
     {
         GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
-            .PropertyDeclaration("SalesDataSheet", "LocalRange")
+            .TypeDeclaration("SalesDataSheet")
+            .PropertyDeclaration("LocalRange")
             .SummaryText()
             .Should().Be("ワークシート「sales_data」の定義名「local_range」が表すセル範囲を取得します。");
     }
