@@ -23,14 +23,14 @@ public sealed class コード生成定義名のテスト
     [Fact]
     public void ブックスコープの複数セル定義名をBookのCellRangeプロパティとして生成します()
     {
-        var property = GeneratedCodeInspection
+        var tested = GeneratedCodeInspection
             .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(DefinedNamesExcelFilePath))
             .GeneratedType("定義名Book")
             .GetProperty("MainRange");
 
-        property.Should().NotBeNull();
-        property.PropertyType.Should().Be(typeof(CellRange));
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(typeof(CellRange));
     }
 
     [Fact(
@@ -73,5 +73,3 @@ public sealed class コード生成定義名のテスト
             .PropertyDeclaration("Total").Should().NotBeNull();
     }
 }
-
-

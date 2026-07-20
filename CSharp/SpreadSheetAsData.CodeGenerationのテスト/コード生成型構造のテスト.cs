@@ -110,20 +110,20 @@ public sealed class コード生成型構造のテスト
     [Fact]
     public void 生成された行データ型の列プロパティはpublicなgetterとsetterを持ちます()
     {
-        var property = GeneratedCodeInspection
+        var tested = GeneratedCodeInspection
             .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
             .GeneratedType("SalesDetail")
             .GetProperty("CustomerId");
 
-        property.Should().NotBeNull();
+        tested.Should().NotBeNull();
 
-        property.GetMethod.Should().NotBeNull();
-        property.GetMethod.IsPublic.Should().BeTrue();
+        tested.GetMethod.Should().NotBeNull();
+        tested.GetMethod.IsPublic.Should().BeTrue();
 
-        property.SetMethod.Should().NotBeNull();
-        property.SetMethod.IsPublic.Should().BeTrue();
+        tested.SetMethod.Should().NotBeNull();
+        tested.SetMethod.IsPublic.Should().BeTrue();
     }
 
     [Fact]
