@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 using Marimo.SpreadSheetAsData;
 using Xunit;
@@ -35,9 +35,7 @@ public sealed class コード生成定義名のテスト
         tested.PropertyType.Should().Be(typeof(CellRange));
     }
 
-    [Fact(
-        Skip =
-            "シートローカルの単一セル定義名をSheetのCell取得プロパティとして生成するときに解除する。")]
+    [Fact]
     public void シートローカルの単一セル定義名をSheetのCellプロパティとして生成します()
     {
         var tested = GeneratedCodeInspection

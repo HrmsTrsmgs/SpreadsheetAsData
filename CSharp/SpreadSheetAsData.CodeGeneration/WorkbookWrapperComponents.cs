@@ -63,6 +63,10 @@ static class WorkbookWrapperComponents
             public {{GeneratedName(sheet.Name, options)}}Sheet(Workbook book) : base(book, {{StringLiteral(sheet.Name)}})
             {
             }
+        {{ForEach(
+            from definedName in SheetScopedDefinedNames(sheet)
+            where IsSingleCellDefinedName(definedName)
+            select SheetCellDefinedNamePropertyDeclaration(definedName, options))}}
         }
         """;
 
@@ -101,6 +105,11 @@ static class WorkbookWrapperComponents
         where definedName.Worksheet == null
         select definedName;
 
+    static IEnumerable<DefinedName> SheetScopedDefinedNames(Worksheet sheet) =>
+        from definedName in sheet.Book.DefinedNames
+        where definedName.Worksheet?.Name == sheet.Name
+        select definedName;
+
     static bool IsSingleCellDefinedName(DefinedName definedName) =>
         definedName.Range.TopLeftCell == definedName.Range.BottomRightCell;
 
@@ -113,6 +122,11 @@ static class WorkbookWrapperComponents
         DefinedName definedName,
         CodeGenerationOptions options) =>
         $"    public CellRange {GeneratedName(definedName.Name, options)} => Range[{StringLiteral(definedName.Name)}];";
+
+    static string SheetCellDefinedNamePropertyDeclaration(
+        DefinedName definedName,
+        CodeGenerationOptions options) =>
+        $"    public Cell {GeneratedName(definedName.Name, options)} => Cell[{StringLiteral(definedName.Name)}];";
 
     static string GeneratedName(
         string contextName,
