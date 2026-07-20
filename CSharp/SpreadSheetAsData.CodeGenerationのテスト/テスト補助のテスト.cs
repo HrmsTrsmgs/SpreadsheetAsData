@@ -23,8 +23,7 @@ public sealed class テスト補助のテスト
                 }
                 """)
             .TypeNames
-            .Should()
-            .BeEquivalentTo("BasicStructureBook", "SalesDataSheet");
+            .Should().BeEquivalentTo("BasicStructureBook", "SalesDataSheet");
     }
 
     [Fact]
@@ -45,8 +44,7 @@ public sealed class テスト補助のテスト
                 """)
             .GeneratedType("SalesDetailTable")
             .Name
-            .Should()
-            .Be("SalesDetailTable");
+            .Should().Be("SalesDetailTable");
     }
 
     [Fact]
@@ -63,8 +61,7 @@ public sealed class テスト補助のテスト
                 """)
             .GeneratedType("SalesDetailTable")
             .Name
-            .Should()
-            .Be("SalesDetailTable");
+            .Should().Be("SalesDetailTable");
     }
 
     [Fact]
@@ -81,8 +78,7 @@ public sealed class テスト補助のテスト
                 """)
             .GeneratedType("SalesDataSheet")
             .NamespaceName
-            .Should()
-            .Be("Generated.Custom");
+            .Should().Be("Generated.Custom");
     }
 
     [Fact]
@@ -98,9 +94,7 @@ public sealed class テスト補助のテスト
                 }
                 """)
             .GeneratedType("SalesDataSheet")
-            .ToString()
-            .Should()
-            .Be("SalesDataSheet: Generated");
+            .ToString().Should().Be("SalesDataSheet: Generated");
     }
 
     [Fact]
@@ -121,8 +115,7 @@ public sealed class テスト補助のテスト
                 """)
             .GeneratedType("SalesDetailTable")
             .BaseTypeName
-            .Should()
-            .Be("Table<SalesDetail>");
+            .Should().Be("Table<SalesDetail>");
     }
 
     [Fact]
@@ -141,7 +134,6 @@ public sealed class テスト補助のテスト
                 """)
             .GeneratedType("SalesDetail")
             .PropertyNames
-            .Should()
-            .BeEquivalentTo("CustomerId", "Amount");
+            .Should().BeEquivalentTo("CustomerId", "Amount");
     }
 }

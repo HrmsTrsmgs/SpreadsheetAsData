@@ -17,8 +17,7 @@ public sealed class コード生成名前設定のテスト
                 SimpleNameMappingsExcelFilePath,
                 options => options.NameMappings["cust_id"] = "CustomerID")
             .PropertyDeclaration("SalesDetail", "CustomerID")
-            .Should()
-            .NotBeNull();
+            .Should().NotBeNull();
     }
 
     [Fact]
@@ -33,8 +32,7 @@ public sealed class コード生成名前設定のテスト
                         ["cust_id"] = "CustomerID"
                     })
             .PropertyDeclaration("SalesDetail", "CustomerID")
-            .Should()
-            .NotBeNull();
+            .Should().NotBeNull();
     }
 
     [Fact]
@@ -97,8 +95,7 @@ public sealed class コード生成名前設定のテスト
                         ["customers.id"] = "CustomerId"
                     })
             .PropertyDeclaration("Customers", "CustomerId")
-            .Should()
-            .NotBeNull();
+            .Should().NotBeNull();
     }
 }
 

@@ -22,14 +22,11 @@ public sealed class コード生成型付きTableのテスト
             .ToArray();
 
         rows.Select(it => PropertyValue(it, "CustomerId"))
-            .Should()
-            .Equal(1, 2);
+            .Should().Equal(1, 2);
         rows.Select(it => PropertyValue(it, "Amount"))
-            .Should()
-            .Equal(10.5, 20.5);
+            .Should().Equal(10.5, 20.5);
         rows.Select(it => PropertyValue(it, "Description"))
-            .Should()
-            .Equal("a", "b");
+            .Should().Equal("a", "b");
     }
 
     [Fact(
@@ -43,8 +40,7 @@ public sealed class コード生成型付きTableのテスト
                     BasicStructureExcelFilePath))
             .GeneratedInstance<Table>("SalesDetailTable")
             .Rows
-            .Should()
-            .NotBeEmpty();
+            .Should().NotBeEmpty();
     }
 
     [Fact(
@@ -76,8 +72,7 @@ public sealed class コード生成型付きTableのテスト
                     BasicStructureExcelFilePath))
             .GeneratedInstance<IEnumerable<object>>("SalesDetailTable")
             .Select(ReadGeneratedRow)
-            .Should()
-            .Equal(
+            .Should().Equal(
                 book.ReadTable<ReadTableComparison>("sales_detail")
                     .Select(ReadHandWrittenRow));
     }

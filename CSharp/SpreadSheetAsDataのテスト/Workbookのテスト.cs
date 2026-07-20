@@ -106,8 +106,7 @@ public class Workbookのテスト : IDisposable
         };
 
         action
-            .Should()
-            .Throw<KeyNotFoundException>();
+            .Should().Throw<KeyNotFoundException>();
     }
 
     [Fact]
@@ -117,8 +116,7 @@ public class Workbookのテスト : IDisposable
 
         tested.DefinedNames
             .Select(it => it.Name)
-            .Should()
-            .Equal("A1", "book_cell", "book_range", "cell_name", "range_name");
+            .Should().Equal("A1", "book_cell", "book_range", "cell_name", "range_name");
     }
 
     [Fact]

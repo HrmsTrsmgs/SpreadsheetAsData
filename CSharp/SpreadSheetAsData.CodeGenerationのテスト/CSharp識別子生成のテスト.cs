@@ -20,8 +20,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier(excelName)
-            .Should()
-            .Be(identifierBody);
+            .Should().Be(identifierBody);
     }
 
     [Fact]
@@ -32,8 +31,7 @@ public sealed class CSharp識別子生成のテスト
                 GeneratedCodeInspection.GenerateSources(
                     キャメルケースIdentifierExcelFilePath))
             .TypeNames
-            .Should()
-            .Contain("SalesReportBook");
+            .Should().Contain("SalesReportBook");
     }
 
     [Fact]
@@ -44,8 +42,7 @@ public sealed class CSharp識別子生成のテスト
                 GeneratedCodeInspection.GenerateSources(
                     キャメルケースIdentifierExcelFilePath))
             .TypeNames
-            .Should()
-            .Contain("SalesDataSheet");
+            .Should().Contain("SalesDataSheet");
     }
 
     [Fact]
@@ -56,8 +53,7 @@ public sealed class CSharp識別子生成のテスト
                 GeneratedCodeInspection.GenerateSources(
                     キャメルケースIdentifierExcelFilePath))
             .TypeNames
-            .Should()
-            .Contain("SalesDetailTable");
+            .Should().Contain("SalesDetailTable");
     }
 
     [Fact]
@@ -68,8 +64,7 @@ public sealed class CSharp識別子生成のテスト
                 GeneratedCodeInspection.GenerateSources(
                     キャメルケースIdentifierExcelFilePath))
             .TypeNames
-            .Should()
-            .Contain("SalesDetail");
+            .Should().Contain("SalesDetail");
     }
 
     [Fact]
@@ -81,8 +76,7 @@ public sealed class CSharp識別子生成のテスト
                     キャメルケースIdentifierExcelFilePath))
             .GeneratedType("SalesDetail")
             .PropertyNames
-            .Should()
-            .Contain("CustomerId");
+            .Should().Contain("CustomerId");
     }
 
     [Theory]
@@ -95,8 +89,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier(excelName)
-            .Should()
-            .Be(identifierBody);
+            .Should().Be(identifierBody);
     }
 
     [Fact]
@@ -104,8 +97,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier("SALES_DETAIL1")
-            .Should()
-            .Be("SalesDetail1");
+            .Should().Be("SalesDetail1");
     }
 
     [Fact]
@@ -113,8 +105,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier("IO_stream")
-            .Should()
-            .Be("IOStream");
+            .Should().Be("IOStream");
     }
 
     [Fact]
@@ -122,8 +113,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier("customer_ID")
-            .Should()
-            .Be("CustomerId");
+            .Should().Be("CustomerId");
     }
 
     [Theory]
@@ -136,8 +126,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier(excelName)
-            .Should()
-            .Be(identifierBody);
+            .Should().Be(identifierBody);
     }
 
     [Fact]
@@ -149,8 +138,7 @@ public sealed class CSharp識別子生成のテスト
                     JapaneseMixedNameExcelFilePath))
             .GeneratedType("商品_明細")
             .PropertyNames
-            .Should()
-            .Contain(["商品_id", "Sales商品_detail", "商品sales_detail"]);
+            .Should().Contain(["商品_id", "Sales商品_detail", "商品sales_detail"]);
     }
 
     [Theory]
@@ -174,8 +162,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier($"price{character}rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Theory]
@@ -187,8 +174,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier($"price{character}rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Theory]
@@ -200,8 +186,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier($"price{character}rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Theory]
@@ -216,8 +201,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier($"price{character}rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Theory]
@@ -228,8 +212,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier($"price{character}rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Fact]
@@ -237,8 +220,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier("price$rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Theory]
@@ -262,8 +244,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier($"price{character}rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Theory]
@@ -275,8 +256,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier($"price{character}rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Theory]
@@ -288,8 +268,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier($"price{character}rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Fact]
@@ -297,8 +276,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier("price－rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Theory]
@@ -313,8 +291,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier($"price{character}rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Theory]
@@ -325,8 +302,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier($"price{character}rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Fact]
@@ -334,8 +310,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier("price＄rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Fact]
@@ -343,8 +318,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier("商品⿰明細")
-            .Should()
-            .Be("商品_明細");
+            .Should().Be("商品_明細");
     }
 
     [Fact]
@@ -352,8 +326,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier("price\u3000rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Fact]
@@ -361,8 +334,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier("price\u0001rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Fact]
@@ -370,8 +342,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier("price\u00B2rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Fact]
@@ -379,8 +350,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier("price\u20DDrate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Fact]
@@ -388,8 +358,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier("price\uE000rate")
-            .Should()
-            .Be("Price_rate");
+            .Should().Be("Price_rate");
     }
 
     [Theory]
@@ -401,8 +370,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier(excelName)
-            .Should()
-            .Be(identifierBody);
+            .Should().Be(identifierBody);
     }
 
     [Theory]
@@ -416,8 +384,7 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier(excelName)
-            .Should()
-            .Be(identifierBody);
+            .Should().Be(identifierBody);
     }
 
     [Fact]
@@ -425,7 +392,6 @@ public sealed class CSharp識別子生成のテスト
     {
         WorkbookWrapperComponents
             .Identifier("class")
-            .Should()
-            .Be("Class");
+            .Should().Be("Class");
     }
 }

@@ -14,13 +14,11 @@ public class EnumerableExtensionsのテスト
 
         tested
             .Select(item => item.Value)
-            .Should()
-            .Equal("a", "b", "c");
+            .Should().Equal("a", "b", "c");
 
         tested
             .Select(item => item.Index)
-            .Should()
-            .Equal(0, 1, 2);
+            .Should().Equal(0, 1, 2);
     }
 
     [Fact]
@@ -32,12 +30,10 @@ public class EnumerableExtensionsのテスト
 
         tested
             .Select(item => item.Value)
-            .Should()
-            .Equal("a", "b", "c");
+            .Should().Equal("a", "b", "c");
 
         tested
             .Select(item => item.Index)
-            .Should()
-            .Equal(1, 2, 3);
+            .Should().Equal(1, 2, 3);
     }
 }

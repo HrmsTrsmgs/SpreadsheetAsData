@@ -146,6 +146,9 @@ SpreadsheetAsDataを、第三者がビルド、テスト、利用、レビュー
 * FluentAssertions の `Should().NotBeNull()` は nullable 解析に対応しているため、確認後の同じ変数は非 null として扱える。
 * nullable な値を `Should().NotBeNull()` で検証した後、その値を続けて検証するためだけに `!`、`?? throw`、`Which` を追加しない。
 * `Which` はFluentAssertionsのチェーンで後続の `Should()` へつなぐ場合に使い、nullable回避の一時変数化には使わない。
+* FluentAssertions の `Should()` と最終アサーションは原則として同じ行に置き、`Should()` だけを単独行にしない。
+* FluentAssertions の `Which`、検証対象の短いプロパティ、`ToString()` なども、一続きの句として読める場合は無理に縦へ分割しない。
+* FluentAssertions のチェーンは、声に出して読んだときの区切りや意味の切れ目で改行してよいが、`Should()` の前で改行すること自体をルールにはしない。
 * 静的型で保証できる戻り値の型を、実行時アサーションで確認しない。
 * APIの形として戻り値の型を示したい場合は、`var` ではなく明示的な型の変数で受ける。
 * 実装詳細ではなく、外部から観測できる振る舞いを優先してテストする。

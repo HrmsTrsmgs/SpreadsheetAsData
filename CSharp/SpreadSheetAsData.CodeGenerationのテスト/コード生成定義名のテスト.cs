@@ -15,10 +15,8 @@ public sealed class コード生成定義名のテスト
         GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("定義名Book", "MainCell")
-            .Type
-            .ToString()
-            .Should()
-            .Be("Cell");
+            .Type.ToString()
+            .Should().Be("Cell");
     }
 
     [Fact]
@@ -42,10 +40,8 @@ public sealed class コード生成定義名のテスト
         GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("SalesDataSheet", "LocalCell")
-            .Type
-            .ToString()
-            .Should()
-            .Be("Cell");
+            .Type.ToString()
+            .Should().Be("Cell");
     }
 
     [Fact(
@@ -56,10 +52,8 @@ public sealed class コード生成定義名のテスト
         GeneratedCodeInspection
             .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("SalesDataSheet", "LocalRange")
-            .Type
-            .ToString()
-            .Should()
-            .Be("CellRange");
+            .Type.ToString()
+            .Should().Be("CellRange");
     }
 
     [Fact(

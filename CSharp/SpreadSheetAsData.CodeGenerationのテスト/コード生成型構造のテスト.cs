@@ -21,8 +21,7 @@ public sealed class コード生成型構造のテスト
                 GeneratedCodeInspection.GenerateSources(
                     excelFilePath))
             .TypeNames
-            .Should()
-            .Contain(generatedTypeName);
+            .Should().Contain(generatedTypeName);
     }
 
     [Fact]
@@ -33,8 +32,7 @@ public sealed class コード生成型構造のテスト
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
             .GeneratedType("BasicStructureBook")
-            .Should()
-            .BeAssignableTo<Workbook>();
+            .Should().BeAssignableTo<Workbook>();
     }
 
     [Theory]
@@ -48,8 +46,7 @@ public sealed class コード生成型構造のテスト
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
             .TypeNames
-            .Should()
-            .Contain(generatedTypeName);
+            .Should().Contain(generatedTypeName);
     }
 
     [Fact]
@@ -60,8 +57,7 @@ public sealed class コード生成型構造のテスト
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
             .GeneratedType("SalesDataSheet")
-            .Should()
-            .BeAssignableTo<Worksheet>();
+            .Should().BeAssignableTo<Worksheet>();
     }
 
     [Theory]
@@ -76,8 +72,7 @@ public sealed class コード生成型構造のテスト
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath))
             .TypeNames
-            .Should()
-            .Contain(
+            .Should().Contain(
                 generatedTypeName,
                 "Excelテーブル {0} から生成される型名だから",
                 excelTableName);
@@ -96,8 +91,7 @@ public sealed class コード生成型構造のテスト
                     BasicStructureExcelFilePath))
             .GeneratedType(generatedTypeName)
             .BaseTypeName
-            .Should()
-            .Be(baseTypeName);
+            .Should().Be(baseTypeName);
     }
 
     [Fact]
@@ -151,8 +145,7 @@ public sealed class コード生成型構造のテスト
                 ])
             .GeneratedType("BasicStructureBook")
             .GetProperty("AddedByUser")
-            .Should()
-            .NotBeNull();
+            .Should().NotBeNull();
     }
 
     [Fact]
@@ -174,8 +167,7 @@ public sealed class コード生成型構造のテスト
                 ])
             .GeneratedType("SalesDataSheet")
             .GetProperty("AddedByUser")
-            .Should()
-            .NotBeNull();
+            .Should().NotBeNull();
     }
 
     [Fact]
@@ -197,8 +189,7 @@ public sealed class コード生成型構造のテスト
                 ])
             .GeneratedType("SalesDetailTable")
             .GetProperty("AddedByUser")
-            .Should()
-            .NotBeNull();
+            .Should().NotBeNull();
     }
 
     [Fact]
@@ -220,7 +211,6 @@ public sealed class コード生成型構造のテスト
                 ])
             .GeneratedType("SalesDetail")
             .GetProperty("AddedByUser")
-            .Should()
-            .NotBeNull();
+            .Should().NotBeNull();
     }
 }

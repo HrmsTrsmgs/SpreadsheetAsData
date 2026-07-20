@@ -19,12 +19,10 @@ public sealed class コード生成統合のテスト
             .GeneratedTypes;
 
         generatedTypes
-            .Should()
-            .NotBeEmpty();
+            .Should().NotBeEmpty();
 
         generatedTypes
-            .Should()
-            .OnlyContain(it => it.NamespaceName == "Generated.Custom");
+            .Should().OnlyContain(it => it.NamespaceName == "Generated.Custom");
     }
 
     [Fact]
@@ -34,8 +32,7 @@ public sealed class コード生成統合のテスト
             .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(
                     IntegratedExcelFilePath))
-            .Should()
-            .NotBeNull();
+            .Should().NotBeNull();
     }
 
     [Fact]
@@ -43,8 +40,7 @@ public sealed class コード生成統合のテスト
     {
         GeneratedCodeInspection
             .GenerateSources(IntegratedExcelFilePath)
-            .Should()
-            .Equal(GeneratedCodeInspection.GenerateSources(
+            .Should().Equal(GeneratedCodeInspection.GenerateSources(
                     IntegratedExcelFilePath));
     }
 
@@ -53,8 +49,7 @@ public sealed class コード生成統合のテスト
     {
         GeneratedCodeInspection
             .GenerateDiagnostics(IntegratedExcelFilePath)
-            .Should()
-            .BeEmpty();
+            .Should().BeEmpty();
     }
 }
 

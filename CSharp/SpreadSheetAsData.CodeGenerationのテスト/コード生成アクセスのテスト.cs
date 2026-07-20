@@ -17,8 +17,7 @@ public sealed class コード生成アクセスのテスト
         GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("BasicStructureBook", "SalesData")
-            .Should()
-            .NotBeNull();
+            .Should().NotBeNull();
     }
 
     [Fact(
@@ -29,10 +28,8 @@ public sealed class コード生成アクセスのテスト
         GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("BasicStructureBook", "SalesDetail")
-            .Type
-            .ToString()
-            .Should()
-            .Be("SalesDetailTable");
+            .Type.ToString()
+            .Should().Be("SalesDetailTable");
     }
 
     [Fact(
@@ -63,17 +60,14 @@ public sealed class コード生成アクセスのテスト
 
         sources
             .PropertyDeclaration("SalesDataSheet", "SalesDetail")
-            .Type
-            .ToString()
-            .Should()
-            .Be("SalesDetailTable");
+            .Type.ToString()
+            .Should().Be("SalesDetailTable");
 
         sources
             .TypeDeclaration("SalesDataSheet")
             .Members
             .OfType<Microsoft.CodeAnalysis.CSharp.Syntax.PropertyDeclarationSyntax>()
-            .Should()
-            .NotContain(it => it.Identifier.ValueText == "ProductList");
+            .Should().NotContain(it => it.Identifier.ValueText == "ProductList");
     }
 
     [Fact(

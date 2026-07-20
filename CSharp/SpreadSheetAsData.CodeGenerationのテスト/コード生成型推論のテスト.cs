@@ -16,10 +16,8 @@ public sealed class コード生成型推論のテスト
         GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("SalesDetail", "CustomerId")
-            .Type
-            .ToString()
-            .Should()
-            .Be("int");
+            .Type.ToString()
+            .Should().Be("int");
     }
 
     [Fact(
@@ -30,10 +28,8 @@ public sealed class コード生成型推論のテスト
         GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("SalesDetail", "Amount")
-            .Type
-            .ToString()
-            .Should()
-            .Be("double");
+            .Type.ToString()
+            .Should().Be("double");
     }
 
     [Fact(
@@ -44,10 +40,8 @@ public sealed class コード生成型推論のテスト
         GeneratedCodeInspection
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("SalesDetail", "Description")
-            .Type
-            .ToString()
-            .Should()
-            .Be("string");
+            .Type.ToString()
+            .Should().Be("string");
     }
 
     [Fact(
@@ -59,8 +53,7 @@ public sealed class コード生成型推論のテスト
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("SalesDetail", "CustomerId")
             .AttributeArguments("SpreadsheetColumn")
-            .Should()
-            .Contain("\"customer_id\"");
+            .Should().Contain("\"customer_id\"");
     }
 }
 

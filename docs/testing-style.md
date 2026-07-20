@@ -52,13 +52,11 @@ var rows = tested.ToArray();
 
 rows
     .Select(row => row.Id)
-    .Should()
-    .Equal(1, 2, 3);
+    .Should().Equal(1, 2, 3);
 
 rows
     .Select(row => row.Name)
-    .Should()
-    .Equal("a", "b", "c");
+    .Should().Equal("a", "b", "c");
 ```
 
 この例では、同じ列挙結果を複数回検証し、列挙を一度だけに固定するため、一時変数に意味がある。
@@ -68,8 +66,7 @@ rows
 
 ```csharp
 var thrown = action
-    .Should()
-    .Throw<TableMappingException>();
+    .Should().Throw<TableMappingException>();
 
 thrown.Which.TableName.Should().Be("Table1");
 thrown.Which.ColumnName.Should().Be("string");
@@ -94,12 +91,39 @@ property.PropertyType.Should().Be(typeof(CellRange));
 
 ```csharp
 action
-    .Should()
-    .Throw<TableMappingException>()
-    .Which
-    .TableName
-    .Should()
-    .Be("Table1");
+    .Should().Throw<TableMappingException>()
+    .Which.TableName
+    .Should().Be("Table1");
+```
+
+## Fluentな検証句の改行
+
+`Should()` と最終アサーションは、原則として同じ行に置く。
+FluentAssertions は英文に近い検証句として読むため、`Should()` だけを単独行にして述語を分断しない。
+`Which`、検証対象の短いプロパティ、`ToString()` なども、一続きの句として読める場合は無理に縦へ分割しない。
+
+```csharp
+actual.Should().Be(expected);
+
+book.ReadTable<TestRow>("Table1")
+    .Select(it => it.Value)
+    .Should().Equal(1, 2, 3);
+
+action
+    .Should().Throw<TableMappingException>()
+    .Which.TableName.Should().Be("Table1");
+```
+
+検証対象を作るチェーンは、声に出して読んだときの区切りや、意味の切れ目で改行してよい。
+ただし、`Should()` の前で改行すること自体をルールにはしない。
+検証対象の構築が長い場合など、読みやすくなるときの選択肢として扱う。
+期待値が長い場合は、`Should()` とアサーション名ではなく、引数側を改行する。
+
+```csharp
+actual.Should().Equal(
+    1,
+    2,
+    3);
 ```
 
 ## 一時変数を作らない基準
@@ -109,8 +133,7 @@ action
 ```csharp
 book.ReadTable<IntegerOnlyRow>("Table1")
     .Select(row => row.IntegerValue)
-    .Should()
-    .Equal(1, 2, 3);
+    .Should().Equal(1, 2, 3);
 ```
 
 次のような、一度しか使わない中間変数は原則として作らない。
@@ -131,8 +154,7 @@ tested.Value.Should().Be(expected);
 
 ```csharp
 book.ReadTable<TestRow>("Table1")
-    .Should()
-    .BeEmpty();
+    .Should().BeEmpty();
 ```
 
 特に、変数名が次のような一般名でしかなく、右辺以上の情報を加えていない場合はインライン化する。

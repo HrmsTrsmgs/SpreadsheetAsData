@@ -18,8 +18,7 @@ public sealed class コード生成診断のテスト
     {
         GeneratedCodeInspection
             .GenerateDiagnostics(ColumnNameCollisionExcelFilePath)
-            .Should()
-            .ContainEquivalentOf(
+            .Should().ContainEquivalentOf(
                 new CodeGenerationDiagnostic(
                     true,
                     "CustomerId",
@@ -34,8 +33,7 @@ public sealed class コード生成診断のテスト
         GeneratedCodeInspection
             .GenerateSources(ColumnNameCollisionExcelFilePath)
             .TypeDeclarations()
-            .Should()
-            .NotContain(it => it.Identifier.ValueText.Contains("CustomerId2"));
+            .Should().NotContain(it => it.Identifier.ValueText.Contains("CustomerId2"));
     }
 
     [Fact(
@@ -47,8 +45,7 @@ public sealed class コード生成診断のテスト
             .GenerateDiagnostics(
                 ColumnNameCollisionExcelFilePath,
                 options => options.NameMappings["customer-id"] = "CustomerIdDash")
-            .Should()
-            .BeEmpty();
+            .Should().BeEmpty();
     }
 
     [Fact(
@@ -58,8 +55,7 @@ public sealed class コード生成診断のテスト
     {
         GeneratedCodeInspection
             .GenerateDiagnostics(BookMemberNameCollisionExcelFilePath)
-            .Should()
-            .Contain(it => it.IsError
+            .Should().Contain(it => it.IsError
                 && it.GeneratedName == "SalesData"
                 && it.SourceNames.Contains("sales_data")
                 && it.SourceNames.Contains("sales-data"));
@@ -72,8 +68,7 @@ public sealed class コード生成診断のテスト
     {
         GeneratedCodeInspection
             .GenerateDiagnostics(InvalidNameExcelFilePath)
-            .Should()
-            .Contain(it => it.IsError
+            .Should().Contain(it => it.IsError
                 && it.InvalidSourceName == "---");
     }
 }

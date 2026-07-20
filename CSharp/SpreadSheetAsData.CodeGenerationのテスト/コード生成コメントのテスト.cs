@@ -18,8 +18,7 @@ public sealed class コード生成コメントのテスト
             .GenerateSources(BasicStructureExcelFilePath)
             .TypeDeclaration("BasicStructureBook")
             .SummaryText()
-            .Should()
-            .Be("Excelブック「BasicStructure」を型付きで表します。");
+            .Should().Be("Excelブック「BasicStructure」を型付きで表します。");
     }
 
     [Fact(
@@ -31,8 +30,7 @@ public sealed class コード生成コメントのテスト
             .GenerateSources(BasicStructureExcelFilePath)
             .TypeDeclaration("SalesDataSheet")
             .SummaryText()
-            .Should()
-            .Be("ワークシート「SalesData」を型付きで表します。");
+            .Should().Be("ワークシート「SalesData」を型付きで表します。");
     }
 
     [Fact(
@@ -44,8 +42,7 @@ public sealed class コード生成コメントのテスト
             .GenerateSources(BasicStructureExcelFilePath)
             .TypeDeclaration("SalesDetailTable")
             .SummaryText()
-            .Should()
-            .Be("Excelテーブル「sales_detail」を型付きで表します。");
+            .Should().Be("Excelテーブル「sales_detail」を型付きで表します。");
     }
 
     [Fact(
@@ -57,8 +54,7 @@ public sealed class コード生成コメントのテスト
             .GenerateSources(BasicStructureExcelFilePath)
             .TypeDeclaration("SalesDetail")
             .SummaryText()
-            .Should()
-            .Be("Excelテーブル「sales_detail」の1行を表します。");
+            .Should().Be("Excelテーブル「sales_detail」の1行を表します。");
     }
 
     [Fact(
@@ -70,8 +66,7 @@ public sealed class コード生成コメントのテスト
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("BasicStructureBook", "SalesData")
             .SummaryText()
-            .Should()
-            .Be("ワークシート「SalesData」を取得します。");
+            .Should().Be("ワークシート「SalesData」を取得します。");
     }
 
     [Fact(
@@ -83,8 +78,7 @@ public sealed class コード生成コメントのテスト
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("BasicStructureBook", "SalesDetail")
             .SummaryText()
-            .Should()
-            .Be("Excelテーブル「sales_detail」を取得します。");
+            .Should().Be("Excelテーブル「sales_detail」を取得します。");
     }
 
     [Fact(
@@ -96,8 +90,7 @@ public sealed class コード生成コメントのテスト
             .GenerateSources(BasicStructureExcelFilePath)
             .PropertyDeclaration("SalesDetail", "CustomerId")
             .SummaryText()
-            .Should()
-            .Be("Excel列「customer_id」の値を取得または設定します。");
+            .Should().Be("Excel列「customer_id」の値を取得または設定します。");
     }
 
     [Fact(
@@ -109,8 +102,7 @@ public sealed class コード生成コメントのテスト
             .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("定義名Book", "MainCell")
             .SummaryText()
-            .Should()
-            .Be("定義名「main_cell」が表すセルを取得します。");
+            .Should().Be("定義名「main_cell」が表すセルを取得します。");
     }
 
     [Fact(
@@ -122,8 +114,7 @@ public sealed class コード生成コメントのテスト
             .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("定義名Book", "MainRange")
             .SummaryText()
-            .Should()
-            .Be("定義名「main_range」が表すセル範囲を取得します。");
+            .Should().Be("定義名「main_range」が表すセル範囲を取得します。");
     }
 
     [Fact(
@@ -135,8 +126,7 @@ public sealed class コード生成コメントのテスト
             .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("SalesDataSheet", "LocalCell")
             .SummaryText()
-            .Should()
-            .Be("ワークシート「sales_data」の定義名「local_cell」が表すセルを取得します。");
+            .Should().Be("ワークシート「sales_data」の定義名「local_cell」が表すセルを取得します。");
     }
 
     [Fact(
@@ -148,8 +138,7 @@ public sealed class コード生成コメントのテスト
             .GenerateSources(DefinedNamesExcelFilePath)
             .PropertyDeclaration("SalesDataSheet", "LocalRange")
             .SummaryText()
-            .Should()
-            .Be("ワークシート「sales_data」の定義名「local_range」が表すセル範囲を取得します。");
+            .Should().Be("ワークシート「sales_data」の定義名「local_range」が表すセル範囲を取得します。");
     }
 }
 

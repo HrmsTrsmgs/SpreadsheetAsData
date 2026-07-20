@@ -49,24 +49,21 @@ public class TableRowのテスト : IDisposable
     public void 列名を指定すると対応するセルを返します()
     {
         firstRow["数値2"]
-            .Reference.Should()
-            .Be("C7");
+            .Reference.Should().Be("C7");
     }
 
     [Fact]
     public void TableColumnを指定すると対応するセルを返します()
     {
         firstRow[secondColumn]
-            .Reference.Should()
-            .Be("C7");
+            .Reference.Should().Be("C7");
     }
 
     [Fact]
     public void 列位置を指定すると対応するセルを返します()
     {
         firstRow[1]
-            .Reference.Should()
-            .Be("C7");
+            .Reference.Should().Be("C7");
     }
 
     [Fact]

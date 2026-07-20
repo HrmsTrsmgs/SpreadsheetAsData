@@ -56,16 +56,14 @@ public sealed class 型付きTableのテスト : IDisposable
     public void 型付きTableはデータ行がない場合に空の列挙になります()
     {
         book.ReadTable<EmptyTableRow>("空行マッピング")
-            .Should()
-            .BeEmpty();
+            .Should().BeEmpty();
     }
 
     [Fact]
     public void 型付きTableは属性がないプロパティ名を列名として使用します()
     {
         book.ReadTable<PropertyNameMappedRow>(PropertyNameMappingTableName)
-            .Should()
-            .BeEquivalentTo(
+            .Should().BeEquivalentTo(
                 [
                     new PropertyNameMappedRow
                     {
@@ -86,8 +84,7 @@ public sealed class 型付きTableのテスト : IDisposable
     {
         book.ReadTable<IntegerOnlyRow>(MappingTableName)
             .Select(row => row.IntegerValue)
-            .Should()
-            .Equal(1, 2, 3);
+            .Should().Equal(1, 2, 3);
     }
 
     [Fact]
@@ -100,8 +97,7 @@ public sealed class 型付きTableのテスト : IDisposable
         };
 
         var thrown = action
-            .Should()
-            .Throw<TableMappingException>();
+            .Should().Throw<TableMappingException>();
 
         thrown.Which.TableName.Should().Be(MappingTableName);
         thrown.Which.MappingType.Should().Be(typeof(MissingColumnRow));
@@ -122,8 +118,7 @@ public sealed class 型付きTableのテスト : IDisposable
         };
 
         var thrown = action
-            .Should()
-            .Throw<TableMappingException>();
+            .Should().Throw<TableMappingException>();
 
         thrown.Which.TableName.Should().Be(MappingTableName);
         thrown.Which.MappingType.Should().Be(typeof(StringAsIntegerRow));
@@ -144,8 +139,7 @@ public sealed class 型付きTableのテスト : IDisposable
         };
 
         var thrown = action
-            .Should()
-            .Throw<TableMappingException>();
+            .Should().Throw<TableMappingException>();
 
         thrown.Which.TableName.Should().Be(MappingTableName);
         thrown.Which.MappingType.Should().Be(
@@ -168,8 +162,7 @@ public sealed class 型付きTableのテスト : IDisposable
         };
 
         var thrown = action
-            .Should()
-            .Throw<TableMappingException>();
+            .Should().Throw<TableMappingException>();
 
         thrown.Which.TableName.Should().Be(MappingTableName);
         thrown.Which.MappingType.Should().Be(typeof(DuplicateColumnRow));
@@ -188,8 +181,7 @@ public sealed class 型付きTableのテスト : IDisposable
         };
 
         var thrown = action
-            .Should()
-            .Throw<TableMappingException>();
+            .Should().Throw<TableMappingException>();
 
         thrown.Which.TableName.Should().Be(MappingTableName);
         thrown.Which.MappingType.Should().Be(
@@ -212,13 +204,11 @@ public sealed class 型付きTableのテスト : IDisposable
 
         rows
             .Select(row => row.IntegerValue)
-            .Should()
-            .Equal(1, 2, 3);
+            .Should().Equal(1, 2, 3);
 
         rows
             .Select(row => row.Description)
-            .Should()
-            .OnlyContain(value => value == "computed");
+            .Should().OnlyContain(value => value == "computed");
     }
 
     [Fact]
@@ -231,8 +221,7 @@ public sealed class 型付きTableのテスト : IDisposable
         };
 
         var thrown = action
-            .Should()
-            .Throw<TableMappingException>();
+            .Should().Throw<TableMappingException>();
 
         thrown.Which.TableName.Should().Be(MappingTableName);
         thrown.Which.MappingType.Should().Be(
