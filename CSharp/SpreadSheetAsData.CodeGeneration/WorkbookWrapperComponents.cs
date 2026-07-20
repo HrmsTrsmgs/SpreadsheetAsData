@@ -36,6 +36,9 @@ static class WorkbookWrapperComponents
         {{ForEach(
             from sheet in book.Sheets.Values
             select SheetPropertyDeclaration(sheet, options))}}
+        {{ForEach(
+            from table in book.Tables
+            select BookTablePropertyDeclaration(table, options))}}
         }
         {{ForEach(
             from sheet in book.Sheets.Values
@@ -55,6 +58,14 @@ static class WorkbookWrapperComponents
         Worksheet sheet,
         CodeGenerationOptions options) =>
         $"    public {GeneratedName(sheet.Name, options)}Sheet {GeneratedName(sheet.Name, options)} => new(this);";
+
+    /// <summary>
+    /// Book型から指定Excelテーブル型を取得するプロパティ宣言を生成します。
+    /// </summary>
+    static string BookTablePropertyDeclaration(
+        Table table,
+        CodeGenerationOptions options) =>
+        $"    public {GeneratedName(table.Name, options)}Table {GeneratedName(table.Name, options)} => throw new System.NotImplementedException();";
 
     /// <summary>
     /// ワークシートを表す派生Sheet型の宣言を生成します。

@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Marimo.SpreadSheetAsData;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 using Xunit;
@@ -9,9 +9,7 @@ public sealed class コード生成アクセスのテスト
 {
     const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
 
-    [Fact(
-        Skip =
-            "Bookから各ワークシートを型付きプロパティとして取得する生成処理を実装するときに解除する。")]
+    [Fact]
     public void Bookは各ワークシートを型付きプロパティとして公開します()
     {
         var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
@@ -26,9 +24,7 @@ public sealed class コード生成アクセスのテスト
             generatedAssembly.GeneratedType("SalesDataSheet"));
     }
 
-    [Fact(
-        Skip =
-            "Bookから各Excelテーブルを型付きプロパティとして取得する生成処理を実装するときに解除する。")]
+    [Fact]
     public void Bookは各Excelテーブルを型付きプロパティとして公開します()
     {
         var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
