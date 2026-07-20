@@ -8,7 +8,6 @@
 
 ```csharp
 var rows = tested.ToArray();
-var exception = action.Should().Throw<SomeException>().Which;
 var cell = sheet.Cells["A1"];
 ```
 
@@ -44,7 +43,7 @@ readonly Table tested;
 * 同じ値を複数回使用する
 * 複数のAssertで同じ対象を検証する
 * 列挙や評価を一度だけに固定する
-* 例外の複数プロパティを検証する
+* 例外アサーションを一度だけ実行して複数プロパティを検証する
 * 式の一部が独立した概念を表す
 * デバッグ時に途中結果を観察する価値が高い
 
@@ -64,17 +63,17 @@ rows
 
 この例では、同じ列挙結果を複数回検証し、列挙を一度だけに固定するため、一時変数に意味がある。
 
-例外についても、複数の情報を確認する場合は変数へ受ける。
+例外について複数の情報を確認する場合は、例外オブジェクトではなく例外アサーションを変数へ受ける。
+`Which` は後続の `Should()` へつなぐために使い、変数へ受けない。
 
 ```csharp
-var exception = action
+var thrown = action
     .Should()
-    .Throw<TableMappingException>()
-    .Which;
+    .Throw<TableMappingException>();
 
-exception.TableName.Should().Be("Table1");
-exception.ColumnName.Should().Be("string");
-exception.PropertyName.Should().Be(nameof(TestRow.Value));
+thrown.Which.TableName.Should().Be("Table1");
+thrown.Which.ColumnName.Should().Be("string");
+thrown.Which.PropertyName.Should().Be(nameof(TestRow.Value));
 ```
 
 ## FluentAssertions と null 検証
@@ -155,7 +154,6 @@ object
 
 ```csharp
 var rows = tested.ToArray();
-var exception = action.Should().Throw<TableMappingException>().Which;
 var missingColumns = mapper.FindMissingColumns();
 ```
 
@@ -233,7 +231,7 @@ tested.Should().BeEquivalentTo(
 * 明示型のローカル変数を、必要がなければ `var` へ変更する
 * 一度しか使わない `actual`、`result` などをインライン化する
 * 同じ列挙を複数回行っている場合は、一度 `ToArray()` などで受ける
-* 同じ例外オブジェクトの複数プロパティを検証している場合は、変数へ受ける
+* 同じ例外の複数プロパティを検証している場合は、例外オブジェクトではなく例外アサーションを変数へ受ける
 * テストクラス全体の前提になる対象は `readonly` フィールドへ置く
 * 一つのテストでしか使わない値はローカルへ戻す
 * 変数削減によって式が過度に長くなる場合は無理にインライン化しない

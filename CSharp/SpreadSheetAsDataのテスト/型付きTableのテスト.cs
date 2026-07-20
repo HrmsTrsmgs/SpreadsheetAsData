@@ -99,18 +99,17 @@ public sealed class 型付きTableのテスト : IDisposable
                 .ToArray();
         };
 
-        var exception = action
+        var thrown = action
             .Should()
-            .Throw<TableMappingException>()
-            .Which;
+            .Throw<TableMappingException>();
 
-        exception.TableName.Should().Be(MappingTableName);
-        exception.MappingType.Should().Be(typeof(MissingColumnRow));
-        exception.ColumnName.Should().Be("missing");
-        exception.PropertyName.Should().Be(nameof(MissingColumnRow.Value));
-        exception.PropertyType.Should().Be(typeof(int));
-        exception.WorksheetRowIndex.Should().BeNull();
-        exception.SourceValue.Should().BeNull();
+        thrown.Which.TableName.Should().Be(MappingTableName);
+        thrown.Which.MappingType.Should().Be(typeof(MissingColumnRow));
+        thrown.Which.ColumnName.Should().Be("missing");
+        thrown.Which.PropertyName.Should().Be(nameof(MissingColumnRow.Value));
+        thrown.Which.PropertyType.Should().Be(typeof(int));
+        thrown.Which.WorksheetRowIndex.Should().BeNull();
+        thrown.Which.SourceValue.Should().BeNull();
     }
 
     [Fact]
@@ -122,18 +121,17 @@ public sealed class 型付きTableのテスト : IDisposable
                 .ToArray();
         };
 
-        var exception = action
+        var thrown = action
             .Should()
-            .Throw<TableMappingException>()
-            .Which;
+            .Throw<TableMappingException>();
 
-        exception.TableName.Should().Be(MappingTableName);
-        exception.MappingType.Should().Be(typeof(StringAsIntegerRow));
-        exception.ColumnName.Should().Be("文字列");
-        exception.PropertyName.Should().Be(nameof(StringAsIntegerRow.Value));
-        exception.PropertyType.Should().Be(typeof(int));
-        exception.WorksheetRowIndex.Should().Be(7U);
-        exception.SourceValue.Should().Be("さしすせそ");
+        thrown.Which.TableName.Should().Be(MappingTableName);
+        thrown.Which.MappingType.Should().Be(typeof(StringAsIntegerRow));
+        thrown.Which.ColumnName.Should().Be("文字列");
+        thrown.Which.PropertyName.Should().Be(nameof(StringAsIntegerRow.Value));
+        thrown.Which.PropertyType.Should().Be(typeof(int));
+        thrown.Which.WorksheetRowIndex.Should().Be(7U);
+        thrown.Which.SourceValue.Should().Be("さしすせそ");
     }
 
     [Fact]
@@ -145,20 +143,19 @@ public sealed class 型付きTableのテスト : IDisposable
                 .ToArray();
         };
 
-        var exception = action
+        var thrown = action
             .Should()
-            .Throw<TableMappingException>()
-            .Which;
+            .Throw<TableMappingException>();
 
-        exception.TableName.Should().Be(MappingTableName);
-        exception.MappingType.Should().Be(
+        thrown.Which.TableName.Should().Be(MappingTableName);
+        thrown.Which.MappingType.Should().Be(
             typeof(FloatingPointAsIntegerRow));
-        exception.ColumnName.Should().Be("数値");
-        exception.PropertyName.Should().Be(
+        thrown.Which.ColumnName.Should().Be("数値");
+        thrown.Which.PropertyName.Should().Be(
             nameof(FloatingPointAsIntegerRow.Value));
-        exception.PropertyType.Should().Be(typeof(int));
-        exception.WorksheetRowIndex.Should().Be(7U);
-        exception.SourceValue.Should().Be(4.4);
+        thrown.Which.PropertyType.Should().Be(typeof(int));
+        thrown.Which.WorksheetRowIndex.Should().Be(7U);
+        thrown.Which.SourceValue.Should().Be(4.4);
     }
 
     [Fact]
@@ -170,16 +167,15 @@ public sealed class 型付きTableのテスト : IDisposable
                 .ToArray();
         };
 
-        var exception = action
+        var thrown = action
             .Should()
-            .Throw<TableMappingException>()
-            .Which;
+            .Throw<TableMappingException>();
 
-        exception.TableName.Should().Be(MappingTableName);
-        exception.MappingType.Should().Be(typeof(DuplicateColumnRow));
-        exception.ColumnName.Should().Be("数値2");
-        exception.WorksheetRowIndex.Should().BeNull();
-        exception.SourceValue.Should().BeNull();
+        thrown.Which.TableName.Should().Be(MappingTableName);
+        thrown.Which.MappingType.Should().Be(typeof(DuplicateColumnRow));
+        thrown.Which.ColumnName.Should().Be("数値2");
+        thrown.Which.WorksheetRowIndex.Should().BeNull();
+        thrown.Which.SourceValue.Should().BeNull();
     }
 
     [Fact]
@@ -191,21 +187,20 @@ public sealed class 型付きTableのテスト : IDisposable
                 .ToArray();
         };
 
-        var exception = action
+        var thrown = action
             .Should()
-            .Throw<TableMappingException>()
-            .Which;
+            .Throw<TableMappingException>();
 
-        exception.TableName.Should().Be(MappingTableName);
-        exception.MappingType.Should().Be(
+        thrown.Which.TableName.Should().Be(MappingTableName);
+        thrown.Which.MappingType.Should().Be(
             typeof(AttributedPropertyWithoutPublicSetterRow));
-        exception.ColumnName.Should().Be("数値2");
-        exception.PropertyName.Should().Be(
+        thrown.Which.ColumnName.Should().Be("数値2");
+        thrown.Which.PropertyName.Should().Be(
             nameof(
                 AttributedPropertyWithoutPublicSetterRow.IntegerValue));
-        exception.PropertyType.Should().Be(typeof(int));
-        exception.WorksheetRowIndex.Should().BeNull();
-        exception.SourceValue.Should().BeNull();
+        thrown.Which.PropertyType.Should().Be(typeof(int));
+        thrown.Which.WorksheetRowIndex.Should().BeNull();
+        thrown.Which.SourceValue.Should().BeNull();
     }
 
     [Fact]
@@ -235,19 +230,18 @@ public sealed class 型付きTableのテスト : IDisposable
                 .ToArray();
         };
 
-        var exception = action
+        var thrown = action
             .Should()
-            .Throw<TableMappingException>()
-            .Which;
+            .Throw<TableMappingException>();
 
-        exception.TableName.Should().Be(MappingTableName);
-        exception.MappingType.Should().Be(
+        thrown.Which.TableName.Should().Be(MappingTableName);
+        thrown.Which.MappingType.Should().Be(
             typeof(RowWithoutPublicParameterlessConstructor));
-        exception.ColumnName.Should().BeNull();
-        exception.PropertyName.Should().BeNull();
-        exception.PropertyType.Should().BeNull();
-        exception.WorksheetRowIndex.Should().BeNull();
-        exception.SourceValue.Should().BeNull();
+        thrown.Which.ColumnName.Should().BeNull();
+        thrown.Which.PropertyName.Should().BeNull();
+        thrown.Which.PropertyType.Should().BeNull();
+        thrown.Which.WorksheetRowIndex.Should().BeNull();
+        thrown.Which.SourceValue.Should().BeNull();
     }
 
     public sealed class PropertyNameMappedRow
