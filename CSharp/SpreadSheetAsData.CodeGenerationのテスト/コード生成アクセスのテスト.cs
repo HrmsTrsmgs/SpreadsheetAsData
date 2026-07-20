@@ -94,6 +94,18 @@ public sealed class コード生成アクセスのテスト
         sheetType.GetProperty("ProductList").Should().BeNull();
     }
 
+    [Fact]
+    public void SheetはExcelテーブルプロパティから型付きTableを取得します()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
+            .GeneratedInstance<Workbook>("BasicStructureBook");
+
+        ((((dynamic)book).SalesData.SalesDetail) as object)
+            .Should().NotBeNull();
+    }
+
     [Fact(
         Skip =
             "生成SheetをWorksheetとして扱える継承構造と既存非型付きAPIの利用を実装するときに解除する。")]

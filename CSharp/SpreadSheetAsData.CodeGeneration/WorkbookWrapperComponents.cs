@@ -194,7 +194,7 @@ static class WorkbookWrapperComponents
     static string SheetTablePropertyDeclaration(
         Table table,
         CodeGenerationOptions options) =>
-        $"    public {GeneratedName(table.Name, options)}Table {GeneratedName(table.Name, options)} => throw new System.NotImplementedException();";
+        $"    public {GeneratedName(table.Name, options)}Table {GeneratedName(table.Name, options)} => new(Book.Tables[{StringLiteral(table.Name)}]);";
 
     /// <summary>
     /// 文脈付き名前設定を優先して、生成コード上の名前を決定します。
