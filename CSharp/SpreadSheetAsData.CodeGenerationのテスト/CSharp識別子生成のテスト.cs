@@ -140,9 +140,7 @@ public sealed class CSharp識別子生成のテスト
             .Be(identifierBody);
     }
 
-    [Fact(
-        Skip =
-            "非ASCIIを含む識別子の変換規則を列プロパティ名へ適用するときに解除する。")]
+    [Fact]
     public void 非ASCIIを含む列プロパティ名は識別子を使用します()
     {
         GeneratedCodeInspection
@@ -422,9 +420,7 @@ public sealed class CSharp識別子生成のテスト
             .Be(identifierBody);
     }
 
-    [Fact(
-        Skip =
-            "CSharpキーワードと同じExcel名をキーワードでない識別子へ変換するときに解除する。")]
+    [Fact]
     public void CSharpキーワードと同じExcel名はキーワードでない識別子へ変換します()
     {
         WorkbookWrapperComponents
