@@ -78,14 +78,22 @@ static class WorkbookWrapperComponents
         {
         {{ForEach(
             from column in table.Columns
-            select RowPropertyDeclaration(column, options))}}
+            select RowPropertyDeclaration(table, column, options))}}
         }
         """;
 
     static string RowPropertyDeclaration(
+        Table table,
         TableColumn column,
         CodeGenerationOptions options) =>
-        $"    public object? {GeneratedName(column.Name, options)} {{ get; set; }}";
+        $"    public object? {GeneratedName(table.Name, column.Name, options)} {{ get; set; }}";
+
+    static string GeneratedName(
+        string contextName,
+        string sourceName,
+        CodeGenerationOptions options) =>
+        options.ContextNameMappings.GetValueOrDefault($"{contextName}.{sourceName}")
+            ?? GeneratedName(sourceName, options);
 
     static string GeneratedName(
         string sourceName,

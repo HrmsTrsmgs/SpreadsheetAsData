@@ -32,9 +32,7 @@ public sealed class コード生成名前設定のテスト
         sources.PropertyDeclaration("簡易名前置換Book", "MappedData").Should().NotBeNull();
     }
 
-    [Fact(
-        Skip =
-            "文脈付き名前設定で同じ元列名をテーブルごとに異なる名前へ変更するときに解除する。")]
+    [Fact]
     public void 文脈付き名前設定は同じ元列名をテーブルごとに異なる名前へ変更できます()
     {
         var sources = GeneratedCodeInspection.GenerateSources(
@@ -45,8 +43,8 @@ public sealed class コード生成名前設定のテスト
                 options.ContextNameMappings["products.id"] = "ProductId";
             });
 
-        sources.PropertyDeclaration("CustomersRow", "CustomerId").Should().NotBeNull();
-        sources.PropertyDeclaration("ProductsRow", "ProductId").Should().NotBeNull();
+        sources.PropertyDeclaration("Customers", "CustomerId").Should().NotBeNull();
+        sources.PropertyDeclaration("Products", "ProductId").Should().NotBeNull();
     }
 
     [Fact(
