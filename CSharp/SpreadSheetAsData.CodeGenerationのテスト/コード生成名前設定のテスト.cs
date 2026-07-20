@@ -54,10 +54,11 @@ public sealed class コード生成名前設定のテスト
         var sources = GeneratedCodeInspection.GenerateSources(
             ContextualNameMappingsExcelFilePath,
             options =>
-            {
-                options.NameMappings["customers.id"] = "CustomerId";
-                options.NameMappings["products.id"] = "ProductId";
-            });
+                options.NameMappings = new()
+                {
+                    ["customers.id"] = "CustomerId",
+                    ["products.id"] = "ProductId"
+                });
 
         sources.PropertyDeclaration("Customers", "CustomerId").Should().NotBeNull();
         sources.PropertyDeclaration("Products", "ProductId").Should().NotBeNull();
@@ -71,10 +72,11 @@ public sealed class コード生成名前設定のテスト
         var sources = GeneratedCodeInspection.GenerateSources(
             ContextualNameMappingsExcelFilePath,
             options =>
-            {
-                options.NameMappings["book.total"] = "GrandTotal";
-                options.NameMappings["sales_data.total"] = "SheetTotal";
-            });
+                options.NameMappings = new()
+                {
+                    ["book.total"] = "GrandTotal",
+                    ["sales_data.total"] = "SheetTotal"
+                });
 
         sources.PropertyDeclaration("文脈付き名前置換Book", "GrandTotal").Should().NotBeNull();
         sources.PropertyDeclaration("SalesDataSheet", "SheetTotal").Should().NotBeNull();
@@ -89,10 +91,11 @@ public sealed class コード生成名前設定のテスト
             .GenerateSources(
                 ContextualNameMappingsExcelFilePath,
                 options =>
-                {
-                    options.NameMappings["id"] = "MappedId";
-                    options.NameMappings["customers.id"] = "CustomerId";
-                })
+                    options.NameMappings = new()
+                    {
+                        ["id"] = "MappedId",
+                        ["customers.id"] = "CustomerId"
+                    })
             .PropertyDeclaration("Customers", "CustomerId")
             .Should()
             .NotBeNull();

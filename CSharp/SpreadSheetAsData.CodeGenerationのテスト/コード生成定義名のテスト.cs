@@ -8,9 +8,7 @@ public sealed class コード生成定義名のテスト
 {
     const string DefinedNamesExcelFilePath = @"TestData\コード生成\定義名.xlsx";
 
-    [Fact(
-        Skip =
-            "ブックスコープの単一セル定義名をBookのCell取得プロパティとして生成するときに解除する。")]
+    [Fact]
     public void ブックスコープの単一セル定義名をBookのCellプロパティとして生成します()
     {
         GeneratedCodeInspection

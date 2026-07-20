@@ -110,4 +110,48 @@ public class Workbookのテスト : IDisposable
             .Throw<KeyNotFoundException>();
     }
 
+    [Fact]
+    public void DefinedNamesはブック内の定義名を列挙します()
+    {
+        using var tested = Workbook.Open(@"TestData\定義名.xlsx");
+
+        tested.DefinedNames
+            .Select(it => it.Name)
+            .Should()
+            .Equal("A1", "book_cell", "book_range", "cell_name", "range_name");
+    }
+
+    [Fact]
+    public void DefinedNameはブックスコープではWorksheetを返しません()
+    {
+        using var book = Workbook.Open(@"TestData\定義名.xlsx");
+
+        var tested =
+            (
+                from definedName in book.DefinedNames
+                where definedName.Name == "book_cell"
+                select definedName
+            ).Single();
+
+        tested.Worksheet.Should().BeNull();
+        tested.Range.Should().BeSameAs(book.Range["book_cell"]);
+    }
+
+    [Fact]
+    public void DefinedNameはワークシートスコープではWorksheetを返します()
+    {
+        using var book = Workbook.Open(@"TestData\定義名.xlsx");
+        var sheet2 = book.Sheets["Sheet2"];
+
+        var tested =
+            (
+                from definedName in book.DefinedNames
+                where definedName.Name == "cell_name"
+                select definedName
+            ).Single();
+
+        tested.Worksheet.Should().BeSameAs(sheet2);
+        tested.Range.Should().BeSameAs(sheet2.Range["cell_name"]);
+    }
+
 }

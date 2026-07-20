@@ -65,6 +65,24 @@ public class Workbook : IDisposable
                     select new Worksheet(this, sheet.Name?.Value ?? throw new InvalidOperationException()));
 
     /// <summary>
+    /// ブック内の定義名を列挙します。
+    /// 名前付きセルや名前付き範囲を対象とし、Excelテーブル名は含みません。
+    /// </summary>
+    public IEnumerable<DefinedName> DefinedNames =>
+        from definedName in WorkbookPart.Workbook.DefinedNames?.Elements<Spreadsheet.DefinedName>() ?? []
+        let name = definedName.Name?.Value ?? throw new InvalidOperationException()
+        let worksheet = DefinedNameWorksheet(definedName.LocalSheetId?.Value)
+        select new DefinedName(
+            name,
+            worksheet,
+            worksheet?.Range[name] ?? Range[name]);
+
+    Worksheet? DefinedNameWorksheet(uint? localSheetId) =>
+        localSheetId.HasValue
+            ? Sheets[(int)localSheetId.Value]
+            : null;
+
+    /// <summary>
     /// ブックスコープの定義名をセル範囲として解決します。
     /// </summary>
     /// <param name="name">解決する定義名。</param>

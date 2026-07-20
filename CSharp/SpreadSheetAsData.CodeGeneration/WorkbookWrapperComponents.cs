@@ -26,6 +26,10 @@ static class WorkbookWrapperComponents
             {
             }
         {{ForEach(
+            from definedName in BookScopedDefinedNames(book)
+            where IsSingleCellDefinedName(definedName)
+            select BookCellDefinedNamePropertyDeclaration(definedName, options))}}
+        {{ForEach(
             from sheet in book.Sheets.Values
             select SheetPropertyDeclaration(sheet, options))}}
         }
@@ -87,6 +91,19 @@ static class WorkbookWrapperComponents
         TableColumn column,
         CodeGenerationOptions options) =>
         $"    public object? {GeneratedName(table.Name, column.Name, options)} {{ get; set; }}";
+
+    static IEnumerable<DefinedName> BookScopedDefinedNames(Workbook book) =>
+        from definedName in book.DefinedNames
+        where definedName.Worksheet == null
+        select definedName;
+
+    static bool IsSingleCellDefinedName(DefinedName definedName) =>
+        definedName.Range.TopLeftCell == definedName.Range.BottomRightCell;
+
+    static string BookCellDefinedNamePropertyDeclaration(
+        DefinedName definedName,
+        CodeGenerationOptions options) =>
+        $"    public Cell {GeneratedName(definedName.Name, options)} => Cell[{StringLiteral(definedName.Name)}];";
 
     static string GeneratedName(
         string contextName,
