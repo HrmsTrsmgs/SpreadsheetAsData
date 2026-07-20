@@ -88,6 +88,10 @@ static class WorkbookWrapperComponents
             from definedName in SheetScopedDefinedNames(sheet)
             where !IsSingleCellDefinedName(definedName)
             select SheetCellRangeDefinedNamePropertyDeclaration(definedName, options))}}
+        {{ForEach(
+            from table in sheet.Book.Tables
+            where table.Worksheet.Name == sheet.Name
+            select SheetTablePropertyDeclaration(table, options))}}
         }
         """;
 
@@ -183,6 +187,14 @@ static class WorkbookWrapperComponents
         DefinedName definedName,
         CodeGenerationOptions options) =>
         $"    public CellRange {GeneratedName(definedName.Name, options)} => Range[{StringLiteral(definedName.Name)}];";
+
+    /// <summary>
+    /// Sheet型から指定Excelテーブル型を取得するプロパティ宣言を生成します。
+    /// </summary>
+    static string SheetTablePropertyDeclaration(
+        Table table,
+        CodeGenerationOptions options) =>
+        $"    public {GeneratedName(table.Name, options)}Table {GeneratedName(table.Name, options)} => throw new System.NotImplementedException();";
 
     /// <summary>
     /// 文脈付き名前設定を優先して、生成コード上の名前を決定します。

@@ -79,9 +79,7 @@ public sealed class コード生成アクセスのテスト
         tested["SalesData"].Should().NotBeNull();
     }
 
-    [Fact(
-        Skip =
-            "Sheetからそのシートに属するExcelテーブルだけを型付きプロパティとして取得する生成処理を実装するときに解除する。")]
+    [Fact]
     public void Sheetはそのシートに属するExcelテーブルを型付きプロパティとして公開します()
     {
         var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
