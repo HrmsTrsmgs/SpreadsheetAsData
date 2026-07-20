@@ -77,16 +77,32 @@ static class WorkbookWrapperComponents
         string.Join(Environment.NewLine, generatedBlocks);
 
     internal static string Identifier(string sourceName) =>
-        ContainsNonAscii(sourceName)
-            ? CapitalizeFirstLetter(
-                ReplaceInvalidIdentifierPartCharacters(
-                    sourceName.Replace('-', '_').Replace(' ', '_')))
-            : AsciiIdentifier(sourceName);
+        EnsureValidIdentifierStart(
+            ContainsNonAscii(sourceName)
+                ? CapitalizeFirstLetter(
+                    ReplaceInvalidIdentifierPartCharacters(
+                        sourceName.Replace('-', '_').Replace(' ', '_')))
+                : AsciiIdentifier(sourceName));
 
     static string AsciiIdentifier(string sourceName) =>
         string.Concat(
             from word in sourceName.Split(['_', '-', ' '])
             select PascalCaseWord(ReplaceInvalidIdentifierPartCharacters(word)));
+
+    static string EnsureValidIdentifierStart(string identifier) =>
+        identifier.Length == 0 || IsIdentifierStartCharacter(identifier[0])
+            ? identifier
+            : $"_{identifier}";
+
+    static bool IsIdentifierStartCharacter(char character) =>
+        character == '_'
+            || char.GetUnicodeCategory(character) is
+                UnicodeCategory.UppercaseLetter
+                or UnicodeCategory.LowercaseLetter
+                or UnicodeCategory.TitlecaseLetter
+                or UnicodeCategory.ModifierLetter
+                or UnicodeCategory.OtherLetter
+                or UnicodeCategory.LetterNumber;
 
     static string ReplaceInvalidIdentifierPartCharacters(string sourceName) =>
         string.Concat(
