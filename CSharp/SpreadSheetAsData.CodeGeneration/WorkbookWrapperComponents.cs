@@ -1,5 +1,5 @@
-﻿using System.Globalization;
-using Marimo.SpreadSheetAsData;
+﻿using Marimo.SpreadSheetAsData;
+using static Marimo.SpreadSheetAsData.CodeGeneration.CSharpIdentifier;
 
 namespace Marimo.SpreadSheetAsData.CodeGeneration;
 
@@ -48,11 +48,17 @@ static class WorkbookWrapperComponents
             select RowDeclaration(table, options))}}
         """;
 
+    /// <summary>
+    /// Book型から指定ワークシート型を取得するプロパティ宣言を生成します。
+    /// </summary>
     static string SheetPropertyDeclaration(
         Worksheet sheet,
         CodeGenerationOptions options) =>
         $"    public {GeneratedName(sheet.Name, options)}Sheet {GeneratedName(sheet.Name, options)} => new(this);";
 
+    /// <summary>
+    /// ワークシートを表す派生Sheet型の宣言を生成します。
+    /// </summary>
     static string SheetDeclaration(
         Worksheet sheet,
         CodeGenerationOptions options)
@@ -67,9 +73,16 @@ static class WorkbookWrapperComponents
             from definedName in SheetScopedDefinedNames(sheet)
             where IsSingleCellDefinedName(definedName)
             select SheetCellDefinedNamePropertyDeclaration(definedName, options))}}
+        {{ForEach(
+            from definedName in SheetScopedDefinedNames(sheet)
+            where !IsSingleCellDefinedName(definedName)
+            select SheetCellRangeDefinedNamePropertyDeclaration(definedName, options))}}
         }
         """;
 
+    /// <summary>
+    /// Excelテーブルを表す派生Table型の宣言を生成します。
+    /// </summary>
     static string TableDeclaration(Table table)
         => $$"""
 
@@ -81,6 +94,9 @@ static class WorkbookWrapperComponents
         }
         """;
 
+    /// <summary>
+    /// Excelテーブルの1行を表す行データ型の宣言を生成します。
+    /// </summary>
     static string RowDeclaration(
         Table table,
         CodeGenerationOptions options)
@@ -94,40 +110,72 @@ static class WorkbookWrapperComponents
         }
         """;
 
+    /// <summary>
+    /// Excelテーブル列に対応する行データプロパティ宣言を生成します。
+    /// </summary>
     static string RowPropertyDeclaration(
         Table table,
         TableColumn column,
         CodeGenerationOptions options) =>
         $"    public object? {GeneratedName(table.Name, column.Name, options)} {{ get; set; }}";
 
+    /// <summary>
+    /// ブック全体から参照できる定義名だけを選びます。
+    /// </summary>
     static IEnumerable<DefinedName> BookScopedDefinedNames(Workbook book) =>
         from definedName in book.DefinedNames
         where definedName.Worksheet == null
         select definedName;
 
+    /// <summary>
+    /// 指定ワークシートだけで参照できる定義名を選びます。
+    /// </summary>
     static IEnumerable<DefinedName> SheetScopedDefinedNames(Worksheet sheet) =>
         from definedName in sheet.Book.DefinedNames
         where definedName.Worksheet?.Name == sheet.Name
         select definedName;
 
+    /// <summary>
+    /// 定義名が単一セルを指すかどうかを判定します。
+    /// </summary>
     static bool IsSingleCellDefinedName(DefinedName definedName) =>
         definedName.Range.TopLeftCell == definedName.Range.BottomRightCell;
 
+    /// <summary>
+    /// ブックスコープの単一セル定義名を取得するプロパティ宣言を生成します。
+    /// </summary>
     static string BookCellDefinedNamePropertyDeclaration(
         DefinedName definedName,
         CodeGenerationOptions options) =>
         $"    public Cell {GeneratedName(definedName.Name, options)} => Cell[{StringLiteral(definedName.Name)}];";
 
+    /// <summary>
+    /// ブックスコープのセル範囲定義名を取得するプロパティ宣言を生成します。
+    /// </summary>
     static string BookCellRangeDefinedNamePropertyDeclaration(
         DefinedName definedName,
         CodeGenerationOptions options) =>
         $"    public CellRange {GeneratedName(definedName.Name, options)} => Range[{StringLiteral(definedName.Name)}];";
 
+    /// <summary>
+    /// ワークシートスコープの単一セル定義名を取得するプロパティ宣言を生成します。
+    /// </summary>
     static string SheetCellDefinedNamePropertyDeclaration(
         DefinedName definedName,
         CodeGenerationOptions options) =>
         $"    public Cell {GeneratedName(definedName.Name, options)} => Cell[{StringLiteral(definedName.Name)}];";
 
+    /// <summary>
+    /// ワークシートスコープのセル範囲定義名を取得するプロパティ宣言を生成します。
+    /// </summary>
+    static string SheetCellRangeDefinedNamePropertyDeclaration(
+        DefinedName definedName,
+        CodeGenerationOptions options) =>
+        $"    public CellRange {GeneratedName(definedName.Name, options)} => Range[{StringLiteral(definedName.Name)}];";
+
+    /// <summary>
+    /// 文脈付き名前設定を優先して、生成コード上の名前を決定します。
+    /// </summary>
     static string GeneratedName(
         string contextName,
         string sourceName,
@@ -135,92 +183,24 @@ static class WorkbookWrapperComponents
         options.NameMappings.GetValueOrDefault($"{contextName}.{sourceName}")
             ?? GeneratedName(sourceName, options);
 
+    /// <summary>
+    /// 単純な名前設定を優先して、生成コード上の名前を決定します。
+    /// </summary>
     static string GeneratedName(
         string sourceName,
         CodeGenerationOptions options) =>
         options.NameMappings.GetValueOrDefault(sourceName)
             ?? Identifier(sourceName);
 
+    /// <summary>
+    /// 複数のテンプレート部品を、生成ソース上の行単位で連結します。
+    /// </summary>
     static string ForEach(IEnumerable<string> generatedBlocks) =>
         string.Join(Environment.NewLine, generatedBlocks);
 
-    internal static string Identifier(string sourceName) =>
-        EnsureValidIdentifierStart(
-            ContainsNonAscii(sourceName)
-                ? CapitalizeFirstLetter(
-                    ReplaceInvalidIdentifierPartCharacters(
-                        sourceName.Replace('-', '_').Replace(' ', '_')))
-                : AsciiIdentifier(sourceName));
-
-    static string AsciiIdentifier(string sourceName) =>
-        string.Concat(
-            from word in sourceName.Split(['_', '-', ' '])
-            select PascalCaseWord(ReplaceInvalidIdentifierPartCharacters(word)));
-
-    static string EnsureValidIdentifierStart(string identifier) =>
-        identifier.Length == 0 || IsIdentifierStartCharacter(identifier[0])
-            ? identifier
-            : $"_{identifier}";
-
-    static bool IsIdentifierStartCharacter(char character) =>
-        character == '_'
-            || char.GetUnicodeCategory(character) is
-                UnicodeCategory.UppercaseLetter
-                or UnicodeCategory.LowercaseLetter
-                or UnicodeCategory.TitlecaseLetter
-                or UnicodeCategory.ModifierLetter
-                or UnicodeCategory.OtherLetter
-                or UnicodeCategory.LetterNumber;
-
-    static string ReplaceInvalidIdentifierPartCharacters(string sourceName) =>
-        string.Concat(
-            from character in sourceName
-            select IsIdentifierPartCharacter(character)
-                ? character
-                : '_');
-
-    static bool IsIdentifierPartCharacter(char character) =>
-        char.GetUnicodeCategory(character) is
-            UnicodeCategory.UppercaseLetter
-            or UnicodeCategory.LowercaseLetter
-            or UnicodeCategory.TitlecaseLetter
-            or UnicodeCategory.ModifierLetter
-            or UnicodeCategory.OtherLetter
-            or UnicodeCategory.LetterNumber
-            or UnicodeCategory.DecimalDigitNumber
-            or UnicodeCategory.ConnectorPunctuation
-            or UnicodeCategory.NonSpacingMark
-            or UnicodeCategory.SpacingCombiningMark
-            or UnicodeCategory.Format;
-
-    static bool ContainsNonAscii(string sourceName) =>
-        sourceName.Any(it => !char.IsAscii(it));
-
-    static string PascalCaseWord(string word) =>
-        CapitalizeFirstLetter(
-            ShouldNormalizeUpperCaseWord(word)
-                ? word.ToLowerInvariant()
-                : word);
-
-    static bool ShouldNormalizeUpperCaseWord(string word) =>
-        IsUpperCaseWord(word)
-            && !IsPreservedTwoLetterAcronym(word);
-
-    static bool IsUpperCaseWord(string word) =>
-        word.Any(char.IsLetter)
-            && word
-                .Where(char.IsLetter)
-                .All(char.IsUpper);
-
-    static bool IsPreservedTwoLetterAcronym(string word) =>
-        word != "ID"
-            && word.Count(char.IsLetter) == 2;
-
-    static string CapitalizeFirstLetter(string word) =>
-        word.Length == 0
-            ? word
-            : $"{char.ToUpperInvariant(word[0])}{word[1..]}";
-
+    /// <summary>
+    /// 生成コード内へ埋め込む文字列リテラルを作ります。
+    /// </summary>
     static string StringLiteral(string value) =>
         "\"" + value.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
 }

@@ -48,9 +48,7 @@ public sealed class コード生成定義名のテスト
         tested.PropertyType.Should().Be(typeof(Cell));
     }
 
-    [Fact(
-        Skip =
-            "シートローカルの複数セル定義名をSheetのCellRange取得プロパティとして生成するときに解除する。")]
+    [Fact]
     public void シートローカルの複数セル定義名をSheetのCellRangeプロパティとして生成します()
     {
         var tested = GeneratedCodeInspection
