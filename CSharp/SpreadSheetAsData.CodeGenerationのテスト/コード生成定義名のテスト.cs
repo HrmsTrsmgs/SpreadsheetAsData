@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
+using Marimo.SpreadSheetAsData;
 using Xunit;
 
 namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
@@ -20,18 +21,17 @@ public sealed class コード生成定義名のテスト
             .Be("Cell");
     }
 
-    [Fact(
-        Skip =
-            "ブックスコープの複数セル定義名をBookのCellRange取得プロパティとして生成するときに解除する。")]
+    [Fact]
     public void ブックスコープの複数セル定義名をBookのCellRangeプロパティとして生成します()
     {
-        GeneratedCodeInspection
-            .GenerateSources(DefinedNamesExcelFilePath)
-            .PropertyDeclaration("定義名Book", "MainRange")
-            .Type
-            .ToString()
-            .Should()
-            .Be("CellRange");
+        var property = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(DefinedNamesExcelFilePath))
+            .GeneratedType("定義名Book")
+            .GetProperty("MainRange");
+
+        property.Should().NotBeNull();
+        property.PropertyType.Should().Be(typeof(CellRange));
     }
 
     [Fact(

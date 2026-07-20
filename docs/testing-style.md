@@ -77,6 +77,32 @@ exception.ColumnName.Should().Be("string");
 exception.PropertyName.Should().Be(nameof(TestRow.Value));
 ```
 
+## FluentAssertions と null 検証
+
+nullable な値を検証した後に同じ値を続けて使う場合は、まず `Should().NotBeNull()` で仕様として非 null を確認する。
+FluentAssertions の `NotBeNull()` は nullable 解析に対応しているため、確認後の同じ変数は非 null として扱える。
+
+```csharp
+var property = type.GetProperty("MainRange");
+
+property.Should().NotBeNull();
+property.PropertyType.Should().Be(typeof(CellRange));
+```
+
+`NotBeNull()` で確認した値を使うためだけに、`!`、`?? throw`、`Which` を追加しない。
+
+`Which` は、例外検証や型検証などで、FluentAssertions のチェーンとしてさらに検証を続ける場合に使う。nullable 解析を外すための一時変数化には使わない。
+
+```csharp
+action
+    .Should()
+    .Throw<TableMappingException>()
+    .Which
+    .TableName
+    .Should()
+    .Be("Table1");
+```
+
 ## 一時変数を作らない基準
 
 一度しか使用せず、右辺の式がそのまま意味を表している場合は、直接Assertへつなげる。
