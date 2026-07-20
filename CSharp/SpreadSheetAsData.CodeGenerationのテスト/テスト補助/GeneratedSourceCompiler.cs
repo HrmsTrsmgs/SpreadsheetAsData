@@ -50,8 +50,9 @@ static class GeneratedSourceCompiler
     /// </summary>
     static IEnumerable<MetadataReference> References =>
         (
-            from path in TrustedPlatformAssemblyPaths
-                .Append(typeof(Workbook).Assembly.Location)
+            from path in
+                TrustedPlatformAssemblyPaths
+                    .Append(typeof(Workbook).Assembly.Location)
             where !string.IsNullOrEmpty(path)
             group path by path into paths
             select MetadataReference.CreateFromFile(paths.Key)

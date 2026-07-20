@@ -16,11 +16,12 @@ static class GeneratedSourceAssertions
     internal static IEnumerable<TypeDeclarationSyntax> TypeDeclarations(
         this IEnumerable<string> sources) =>
         from source in sources
-        from type in CSharpSyntaxTree
-            .ParseText(source)
-            .GetCompilationUnitRoot()
-            .DescendantNodes()
-            .OfType<TypeDeclarationSyntax>()
+        from type in
+            CSharpSyntaxTree
+                .ParseText(source)
+                .GetCompilationUnitRoot()
+                .DescendantNodes()
+                .OfType<TypeDeclarationSyntax>()
         select type;
 
     /// <summary>
@@ -50,10 +51,11 @@ static class GeneratedSourceAssertions
         string typeName,
         string propertyName) =>
         (
-            from property in sources
-                .TypeDeclaration(typeName)
-                .Members
-                .OfType<PropertyDeclarationSyntax>()
+            from property in
+                sources
+                    .TypeDeclaration(typeName)
+                    .Members
+                    .OfType<PropertyDeclarationSyntax>()
             where property.Identifier.ValueText == propertyName
             select property
         ).Single();
@@ -79,9 +81,10 @@ static class GeneratedSourceAssertions
             ? null
             : string.Join(
                 " ",
-                from token in summary.Content
-                    .OfType<XmlTextSyntax>()
-                    .SelectMany(it => it.TextTokens)
+                from token in
+                    summary.Content
+                        .OfType<XmlTextSyntax>()
+                        .SelectMany(it => it.TextTokens)
                 let text = token.ValueText.Trim()
                 where text != ""
                 select text);
@@ -99,8 +102,9 @@ static class GeneratedSourceAssertions
         from attribute in property.AttributeLists.SelectMany(it => it.Attributes)
         where attribute.Name.ToString() == attributeName
             || attribute.Name.ToString() == attributeName.Replace("Attribute", "")
-        from argument in attribute.ArgumentList?.Arguments
-            ?? []
+        from argument in
+            attribute.ArgumentList?.Arguments
+                ?? []
         select argument.ToString().Trim('"');
 }
 
