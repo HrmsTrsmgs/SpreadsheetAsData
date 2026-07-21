@@ -49,31 +49,40 @@ public class Cellのテスト : IDisposable
     [Fact]
     public void Valueプロパティは数字の値を取得できます()
     {
-        (a1.Value as object).Should().BeOfType<double>().Which.Should().Be(1.1);
-        (b1.Value as object).Should().BeOfType<double>().Which.Should().Be(2.2);
+        var a1Value = a1.Value as object;
+        var b1Value = b1.Value as object;
+
+        a1Value.Should().BeOfType<double>().Which.Should().Be(1.1);
+        b1Value.Should().BeOfType<double>().Which.Should().Be(2.2);
     }
 
     [Fact]
     public void Valueプロパティはboolの値を取得できます()
     {
-        (a2.Value as object).Should().BeOfType<bool>().Which.Should().BeTrue();
-        (b2.Value as object).Should().BeOfType<bool>().Which.Should().BeFalse();
+        var a2Value = a2.Value as object;
+        var b2Value = b2.Value as object;
+
+        a2Value.Should().BeOfType<bool>().Which.Should().BeTrue();
+        b2Value.Should().BeOfType<bool>().Which.Should().BeFalse();
     }
 
     [Fact]
     public void Valueプロパティは共有文字列セルの値を取得できます()
     {
-        (a3.Value as object).Should().BeOfType<string>().Which.Should().Be("あいうえお");
-        (b3.Value as object).Should().BeOfType<string>().Which.Should().Be("かきくけこ");
+        var a3Value = a3.Value as object;
+        var b3Value = b3.Value as object;
+
+        a3Value.Should().BeOfType<string>().Which.Should().Be("あいうえお");
+        b3Value.Should().BeOfType<string>().Which.Should().Be("かきくけこ");
     }
 
     [Fact]
     public void Valueプロパティは文字列セルの値を取得できます()
     {
         using var book = Workbook.Open(@"TestData\文字列セル.xlsx");
+        var tested = book.Sheets["Sheet1"].Cells["A1"].Value as object;
 
-        (book.Sheets["Sheet1"].Cells["A1"].Value as object)
-            .Should().Be("直接文字列");
+        tested.Should().Be("直接文字列");
     }
 
     [Fact]

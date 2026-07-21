@@ -18,14 +18,15 @@ public sealed class コード生成型付きTableのテスト
                     BasicStructureExcelFilePath))
             .GeneratedInstance<Workbook>("BasicStructureBook");
 
-        var rows = ((IEnumerable<object>)((dynamic)book).SalesDetail)
-            .ToArray();
+        dynamic bookAccessor = book;
+        IEnumerable<object> salesDetail = bookAccessor.SalesDetail;
+        var tested = salesDetail.ToArray();
 
-        rows.Select(it => PropertyValue(it, "CustomerId"))
+        tested.Select(it => PropertyValue(it, "CustomerId"))
             .Should().Equal(1, 2);
-        rows.Select(it => PropertyValue(it, "Amount"))
+        tested.Select(it => PropertyValue(it, "Amount"))
             .Should().Equal(10.5, 20.5);
-        rows.Select(it => PropertyValue(it, "Description"))
+        tested.Select(it => PropertyValue(it, "Description"))
             .Should().Equal("a", "b");
     }
 
@@ -38,7 +39,8 @@ public sealed class コード生成型付きTableのテスト
                     BasicStructureExcelFilePath))
             .GeneratedInstance<Workbook>("BasicStructureBook");
 
-        Table tested = ((dynamic)book).SalesDetail;
+        dynamic bookAccessor = book;
+        Table tested = bookAccessor.SalesDetail;
 
         tested.Rows.Should().NotBeEmpty();
     }
@@ -52,7 +54,8 @@ public sealed class コード生成型付きTableのテスト
                     BasicStructureExcelFilePath))
             .GeneratedInstance<Workbook>("BasicStructureBook");
 
-        Table tested = ((dynamic)book).SalesDetail;
+        dynamic bookAccessor = book;
+        Table tested = bookAccessor.SalesDetail;
 
         tested.Name.Should().Be("SalesDetail");
         tested.Worksheet.Should().NotBeNull();
@@ -65,15 +68,15 @@ public sealed class コード生成型付きTableのテスト
     {
         (object? CustomerId, object? Amount, object? Description)[] generatedRows;
 
-        using (var generatedBook = GeneratedCodeInspection
+        using (var generatedWorkbook = GeneratedCodeInspection
                    .AssemblyFrom(
                        GeneratedCodeInspection.GenerateSources(
                            BasicStructureExcelFilePath))
                    .GeneratedInstance<Workbook>("BasicStructureBook"))
         {
-            generatedRows = ((IEnumerable<object>)((dynamic)generatedBook).SalesDetail)
-                .Select(ReadGeneratedRow)
-                .ToArray();
+            dynamic bookAccessor = generatedWorkbook;
+            IEnumerable<object> salesDetail = bookAccessor.SalesDetail;
+            generatedRows = salesDetail.Select(ReadGeneratedRow).ToArray();
         }
 
         using var book = Workbook.Open(BasicStructureExcelFilePath);

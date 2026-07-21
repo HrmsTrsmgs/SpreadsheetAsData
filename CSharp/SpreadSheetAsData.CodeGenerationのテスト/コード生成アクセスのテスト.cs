@@ -32,8 +32,10 @@ public sealed class コード生成アクセスのテスト
                 GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
             .GeneratedInstance<Workbook>("BasicStructureBook");
 
-        (((dynamic)book).SalesData as object)
-            .Should().NotBeNull();
+        dynamic bookAccessor = book;
+        var tested = bookAccessor.SalesData as object;
+
+        tested.Should().NotBeNull();
     }
 
     [Fact]
@@ -59,8 +61,10 @@ public sealed class コード生成アクセスのテスト
                 GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
             .GeneratedInstance<Workbook>("BasicStructureBook");
 
-        (((dynamic)book).SalesDetail as object)
-            .Should().NotBeNull();
+        dynamic bookAccessor = book;
+        var tested = bookAccessor.SalesDetail as object;
+
+        tested.Should().NotBeNull();
     }
 
     [Fact]
@@ -102,8 +106,10 @@ public sealed class コード生成アクセスのテスト
                 GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
             .GeneratedInstance<Workbook>("BasicStructureBook");
 
-        ((((dynamic)book).SalesData.SalesDetail) as object)
-            .Should().NotBeNull();
+        dynamic bookAccessor = book;
+        var tested = bookAccessor.SalesData.SalesDetail as object;
+
+        tested.Should().NotBeNull();
     }
 
     [Fact]
@@ -115,7 +121,8 @@ public sealed class コード生成アクセスのテスト
                     BasicStructureExcelFilePath))
             .GeneratedInstance<Workbook>("BasicStructureBook");
 
-        Worksheet tested = ((dynamic)book).SalesData;
+        dynamic bookAccessor = book;
+        Worksheet tested = bookAccessor.SalesData;
 
         tested.Name.Should().NotBeNull();
         tested.Book.Should().NotBeNull();
