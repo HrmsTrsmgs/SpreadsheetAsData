@@ -63,19 +63,19 @@ foreach (var row in table.Rows)
 ```csharp
 public sealed class Order
 {
-    public string ProductName { get; init; } = "";
-    public int Quantity { get; init; }
-    public decimal UnitPrice { get; init; }
+    public string ProductName { get; set; } = "";
+    public int Quantity { get; set; }
+    public double UnitPrice { get; set; }
 }
 ```
 
 ```csharp
-IEnumerable<Order> orders = book.Tables["Orders"].As<Order>();
+IEnumerable<Order> orders = book.ReadTable<Order>("Orders");
 ```
 
 初回公開版では、プロパティ名と列名の一致を基本規則とします。
 
-必要に応じて、属性などによる列名指定を追加します。
+列名とプロパティ名が異なる場合は、`SpreadsheetColumnAttribute` で列名を指定します。
 
 ### 型付き読み取りコードの生成
 
@@ -84,7 +84,7 @@ IEnumerable<Order> orders = book.Tables["Orders"].As<Order>();
 生成されたコードからは、テーブル名や列名を文字列で指定せずにデータを読み取れることを目標とします。
 
 ```csharp
-using var book = OrdersWorkbook.Open("orders.xlsx");
+using var book = new OrdersBook();
 
 foreach (var order in book.Orders)
 {
@@ -93,7 +93,8 @@ foreach (var order in book.Orders)
 }
 ```
 
-生成されるAPIの具体的な形は、実装と使用例を通じて決定します。
+現行実装では、生成されたBook型の引数なしコンストラクターに生成元Excelファイルのパスを埋め込みます。
+生成コードをNuGetパッケージへ含めるか、コード生成用パッケージを分けるかは初回公開準備で決定します。
 
 ## 初回公開版の完成条件
 
@@ -106,6 +107,7 @@ foreach (var order in book.Orders)
 * APIドキュメントが生成できる
 * 対応範囲と未対応範囲が明記されている
 * Open XML SDKの型が通常の利用側コードへ露出していない
+* NuGetパッケージとコード生成機能の提供単位が決まっている
 * ビルド、テスト、コード整形確認が成功する
 
 ## 初回公開版の対象外
