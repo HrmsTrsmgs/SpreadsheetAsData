@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 using Xunit;
 
@@ -67,9 +67,7 @@ public sealed class コード生成名前設定のテスト
             .PropertyDeclaration("ProductId").Should().NotBeNull();
     }
 
-    [Fact(
-        Skip =
-            "NameMappingsの文脈付きキーでブック定義名とシートローカル定義名を区別するときに解除する。")]
+    [Fact]
     public void NameMappingsは文脈付きキーでブック定義名とシートローカル定義名を区別できます()
     {
         var sources = GeneratedCodeInspection.GenerateSources(
