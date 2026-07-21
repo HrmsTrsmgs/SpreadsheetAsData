@@ -72,6 +72,17 @@ public sealed class コード生成コメントのテスト
     }
 
     [Fact]
+    public void SheetのTableプロパティのコメントを生成します()
+    {
+        GeneratedCodeInspection
+            .GenerateSources(BasicStructureExcelFilePath)
+            .TypeDeclaration("SalesDataSheet")
+            .PropertyDeclaration("SalesDetail")
+            .SummaryText()
+            .Should().Be("Excelテーブル「sales_detail」を取得します。");
+    }
+
+    [Fact]
     public void 列プロパティのコメントを生成します()
     {
         GeneratedCodeInspection

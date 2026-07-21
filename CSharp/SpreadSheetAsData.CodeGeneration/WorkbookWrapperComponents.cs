@@ -28,20 +28,18 @@ static class WorkbookWrapperComponents
             public {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book() : base({{StringLiteral(filePath)}})
             {
             }
-        {{ForEach(
-            from definedName in BookScopedDefinedNames(book)
-            where IsSingleCellDefinedName(definedName)
-            select BookCellDefinedNamePropertyDeclaration(definedName, options))}}
-        {{ForEach(
-            from definedName in BookScopedDefinedNames(book)
-            where !IsSingleCellDefinedName(definedName)
-            select BookCellRangeDefinedNamePropertyDeclaration(definedName, options))}}
-        {{ForEach(
-            from sheet in book.Sheets.Values
-            select SheetPropertyDeclaration(sheet, options))}}
-        {{ForEach(
-            from table in book.Tables
-            select BookTablePropertyDeclaration(table, options))}}
+        {{ForEach([
+            .. from definedName in BookScopedDefinedNames(book)
+               where IsSingleCellDefinedName(definedName)
+               select BookCellDefinedNamePropertyDeclaration(definedName, options),
+            .. from definedName in BookScopedDefinedNames(book)
+               where !IsSingleCellDefinedName(definedName)
+               select BookCellRangeDefinedNamePropertyDeclaration(definedName, options),
+            .. from sheet in book.Sheets.Values
+               select SheetPropertyDeclaration(sheet, options),
+            .. from table in book.Tables
+               select BookTablePropertyDeclaration(table, options)
+        ])}}
         }
         {{ForEach(
             from sheet in book.Sheets.Values
@@ -57,10 +55,11 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// Book型から指定ワークシート型を取得するプロパティ宣言を生成します。
     /// </summary>
-    static string SheetPropertyDeclaration(
+    internal static string SheetPropertyDeclaration(
         Worksheet sheet,
         CodeGenerationOptions options) =>
         $$"""
+
             /// <summary>
             /// ワークシート「{{sheet.Name}}」を取得します。
             /// </summary>
@@ -70,10 +69,11 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// Book型から指定Excelテーブル型を取得するプロパティ宣言を生成します。
     /// </summary>
-    static string BookTablePropertyDeclaration(
+    internal static string BookTablePropertyDeclaration(
         Table table,
         CodeGenerationOptions options) =>
         $$"""
+
             /// <summary>
             /// Excelテーブル「{{table.Name}}」を取得します。
             /// </summary>
@@ -83,7 +83,7 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// ワークシートを表す派生Sheet型の宣言を生成します。
     /// </summary>
-    static string SheetDeclaration(
+    internal static string SheetDeclaration(
         Worksheet sheet,
         CodeGenerationOptions options)
         => $$"""
@@ -96,25 +96,24 @@ static class WorkbookWrapperComponents
             public {{options.GeneratedName(sheet.Name)}}Sheet(Workbook book) : base(book, {{StringLiteral(sheet.Name)}})
             {
             }
-        {{ForEach(
-            from definedName in SheetScopedDefinedNames(sheet)
-            where IsSingleCellDefinedName(definedName)
-            select SheetCellDefinedNamePropertyDeclaration(sheet, definedName, options))}}
-        {{ForEach(
-            from definedName in SheetScopedDefinedNames(sheet)
-            where !IsSingleCellDefinedName(definedName)
-            select SheetCellRangeDefinedNamePropertyDeclaration(sheet, definedName, options))}}
-        {{ForEach(
-            from table in sheet.Book.Tables
-            where table.Worksheet.Name == sheet.Name
-            select SheetTablePropertyDeclaration(table, options))}}
+        {{ForEach([
+            .. from definedName in SheetScopedDefinedNames(sheet)
+               where IsSingleCellDefinedName(definedName)
+               select SheetCellDefinedNamePropertyDeclaration(sheet, definedName, options),
+            .. from definedName in SheetScopedDefinedNames(sheet)
+               where !IsSingleCellDefinedName(definedName)
+               select SheetCellRangeDefinedNamePropertyDeclaration(sheet, definedName, options),
+            .. from table in sheet.Book.Tables
+               where table.Worksheet.Name == sheet.Name
+               select SheetTablePropertyDeclaration(table, options)
+        ])}}
         }
         """;
 
     /// <summary>
     /// Excelテーブルを表す派生Table型の宣言を生成します。
     /// </summary>
-    static string TableDeclaration(Table table)
+    internal static string TableDeclaration(Table table)
         => $$"""
 
         /// <summary>
@@ -131,7 +130,7 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// Excelテーブルの1行を表す行データ型の宣言を生成します。
     /// </summary>
-    static string RowDeclaration(
+    internal static string RowDeclaration(
         Table table,
         CodeGenerationOptions options)
         => $$"""
@@ -150,7 +149,7 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// Excelテーブル列に対応する行データプロパティ宣言を生成します。
     /// </summary>
-    static string RowPropertyDeclaration(
+    internal static string RowPropertyDeclaration(
         Table table,
         TableColumn column,
         CodeGenerationOptions options)
@@ -160,6 +159,7 @@ static class WorkbookWrapperComponents
 
         return
             $$"""
+
                 /// <summary>
                 /// Excel列「{{column.Name}}」の値を取得または設定します。
                 /// </summary>
@@ -170,7 +170,7 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// 生成プロパティ名とExcel列名が一致しない場合に、既存の型付きTableマッピングへ列名を伝える属性を生成します。
     /// </summary>
-    static string ColumnAttributeDeclaration(TableColumn column, string propertyName) =>
+    internal static string ColumnAttributeDeclaration(TableColumn column, string propertyName) =>
         column.Name == propertyName
             ? ""
             : $"    [SpreadsheetColumn({StringLiteral(column.Name)})]{Environment.NewLine}";
@@ -178,7 +178,7 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// 既存の型付きTableマッピングで読み込めるプロパティ型名を、列の値から決定します。
     /// </summary>
-    static string ColumnPropertyTypeName(Table table, TableColumn column)
+    internal static string ColumnPropertyTypeName(Table table, TableColumn column)
     {
         var values = (
             from row in table.Rows
@@ -206,7 +206,7 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// 生成プロパティがコンパイル時の初期化警告を出さないための初期値を返します。
     /// </summary>
-    static string PropertyInitializer(string propertyTypeName) =>
+    internal static string PropertyInitializer(string propertyTypeName) =>
         propertyTypeName == "string"
             ? " = \"\";"
             : "";
@@ -236,10 +236,11 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// ブックスコープの単一セル定義名を取得するプロパティ宣言を生成します。
     /// </summary>
-    static string BookCellDefinedNamePropertyDeclaration(
+    internal static string BookCellDefinedNamePropertyDeclaration(
         DefinedName definedName,
         CodeGenerationOptions options) =>
         $$"""
+
             /// <summary>
             /// 定義名「{{definedName.Name}}」が表すセルを取得します。
             /// </summary>
@@ -249,10 +250,11 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// ブックスコープのセル範囲定義名を取得するプロパティ宣言を生成します。
     /// </summary>
-    static string BookCellRangeDefinedNamePropertyDeclaration(
+    internal static string BookCellRangeDefinedNamePropertyDeclaration(
         DefinedName definedName,
         CodeGenerationOptions options) =>
         $$"""
+
             /// <summary>
             /// 定義名「{{definedName.Name}}」が表すセル範囲を取得します。
             /// </summary>
@@ -262,11 +264,12 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// ワークシートスコープの単一セル定義名を取得するプロパティ宣言を生成します。
     /// </summary>
-    static string SheetCellDefinedNamePropertyDeclaration(
+    internal static string SheetCellDefinedNamePropertyDeclaration(
         Worksheet sheet,
         DefinedName definedName,
         CodeGenerationOptions options) =>
         $$"""
+
             /// <summary>
             /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセルを取得します。
             /// </summary>
@@ -276,11 +279,12 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// ワークシートスコープのセル範囲定義名を取得するプロパティ宣言を生成します。
     /// </summary>
-    static string SheetCellRangeDefinedNamePropertyDeclaration(
+    internal static string SheetCellRangeDefinedNamePropertyDeclaration(
         Worksheet sheet,
         DefinedName definedName,
         CodeGenerationOptions options) =>
         $$"""
+
             /// <summary>
             /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセル範囲を取得します。
             /// </summary>
@@ -290,20 +294,26 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// Sheet型から指定Excelテーブル型を取得するプロパティ宣言を生成します。
     /// </summary>
-    static string SheetTablePropertyDeclaration(
+    internal static string SheetTablePropertyDeclaration(
         Table table,
         CodeGenerationOptions options) =>
-        $"    public {options.GeneratedName(table.Name)}Table {options.GeneratedName(table.Name)} => new(Book.Tables[{StringLiteral(table.Name)}]);";
+        $$"""
+
+            /// <summary>
+            /// Excelテーブル「{{table.Name}}」を取得します。
+            /// </summary>
+            public {{options.GeneratedName(table.Name)}}Table {{options.GeneratedName(table.Name)}} => new(Book.Tables[{{StringLiteral(table.Name)}}]);
+        """;
 
     /// <summary>
     /// 複数のテンプレート部品を、生成ソース上の行単位で連結します。
     /// </summary>
-    static string ForEach(IEnumerable<string> generatedBlocks) =>
+    internal static string ForEach(IEnumerable<string> generatedBlocks) =>
         string.Join(Environment.NewLine, generatedBlocks);
 
     /// <summary>
     /// 生成コード内へ埋め込む文字列リテラルを作ります。
     /// </summary>
-    static string StringLiteral(string value) =>
+    internal static string StringLiteral(string value) =>
         "\"" + value.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
 }

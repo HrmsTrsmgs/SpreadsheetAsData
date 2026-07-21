@@ -177,15 +177,27 @@ public sealed class CSharp識別子生成のテスト
             .Should().Be("Price_rate");
     }
 
-    [Theory]
-    [InlineData(')')]
-    [InlineData(']')]
-    [InlineData('}')]
-    public void ClosePunctuationに分類されるASCII記号はアンダースコアへ置換します(
-        char character)
+    [Fact]
+    public void ClosePunctuationに分類される右丸かっこはアンダースコアへ置換します()
     {
         CSharpIdentifier
-            .Identifier($"price{character}rate")
+            .Identifier("price)rate")
+            .Should().Be("Price_rate");
+    }
+
+    [Fact]
+    public void ClosePunctuationに分類される右角かっこはアンダースコアへ置換します()
+    {
+        CSharpIdentifier
+            .Identifier("price]rate")
+            .Should().Be("Price_rate");
+    }
+
+    [Fact]
+    public void ClosePunctuationに分類される右波かっこはアンダースコアへ置換します()
+    {
+        CSharpIdentifier
+            .Identifier("price}rate")
             .Should().Be("Price_rate");
     }
 
