@@ -23,9 +23,7 @@ public sealed class コード生成診断のテスト
                     ["customer_id", "customer-id"]));
     }
 
-    [Fact(
-        Skip =
-            "名前衝突時に連番追加で自動解消しない診断処理を実装するときに解除する。")]
+    [Fact]
     public void 名前衝突を自動的な連番追加では解消しません()
     {
         GeneratedCodeInspection
@@ -34,9 +32,7 @@ public sealed class コード生成診断のテスト
             .Should().NotContain(it => it.Identifier.ValueText.Contains("CustomerId2"));
     }
 
-    [Fact(
-        Skip =
-            "NameMappingsで生成名を変更して名前衝突を解消する処理を実装するときに解除する。")]
+    [Fact]
     public void NameMappingsで生成名を変更すると名前衝突を解消できます()
     {
         GeneratedCodeInspection
@@ -46,9 +42,7 @@ public sealed class コード生成診断のテスト
             .Should().BeEmpty();
     }
 
-    [Fact(
-        Skip =
-            "同じ生成型内で異なる種類のメンバー名が衝突した場合の診断を実装するときに解除する。")]
+    [Fact]
     public void 同じ生成型内の異なる種類のメンバー名が衝突した場合にも診断します()
     {
         GeneratedCodeInspection
