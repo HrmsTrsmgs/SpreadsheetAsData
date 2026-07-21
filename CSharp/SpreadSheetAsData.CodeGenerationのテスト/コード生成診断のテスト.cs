@@ -11,9 +11,7 @@ public sealed class コード生成診断のテスト
     const string BookMemberNameCollisionExcelFilePath = @"TestData\コード生成\Bookメンバー名衝突.xlsx";
     const string InvalidNameExcelFilePath = @"TestData\コード生成\無効名.xlsx";
 
-    [Fact(
-        Skip =
-            "自動変換後に同じ列プロパティ名となる場合のエラー診断を実装するときに解除する。")]
+    [Fact]
     public void 自動変換後に同じ列プロパティ名となる場合にエラーを診断します()
     {
         GeneratedCodeInspection

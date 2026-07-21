@@ -36,6 +36,32 @@ public static class WorkbookWrapperGenerator
     /// <returns>検出された診断情報。</returns>
     public static CodeGenerationDiagnostic[] GenerateDiagnostics(
         string filePath,
-        Action<CodeGenerationOptions>? configure = null) =>
-        [];
+        Action<CodeGenerationOptions>? configure = null)
+    {
+        var options = new CodeGenerationOptions();
+        configure?.Invoke(options);
+
+        using var book = Workbook.Open(filePath);
+        return
+        [
+            .. from table in book.Tables
+               from diagnostic in ColumnPropertyNameDiagnostics(table, options)
+               select diagnostic
+        ];
+    }
+
+    /// <summary>
+    /// 同じTable行データ型の中で、複数のExcel列が同じ生成プロパティ名になる衝突を検出します。
+    /// </summary>
+    static IEnumerable<CodeGenerationDiagnostic> ColumnPropertyNameDiagnostics(
+        Table table,
+        CodeGenerationOptions options) =>
+        from columnsByPropertyName in
+            from column in table.Columns
+            group column.Name by options.TableColumn(table, column)
+        where columnsByPropertyName.Skip(1).Any()
+        select new CodeGenerationDiagnostic(
+            true,
+            columnsByPropertyName.Key,
+            [.. columnsByPropertyName]);
 }

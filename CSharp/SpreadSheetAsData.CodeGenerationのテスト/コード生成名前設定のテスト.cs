@@ -85,9 +85,7 @@ public sealed class コード生成名前設定のテスト
             .PropertyDeclaration("SheetTotal").Should().NotBeNull();
     }
 
-    [Fact(
-        Skip =
-            "NameMappingsの文脈付きキーを単純キーより優先して適用するときに解除する。")]
+    [Fact]
     public void NameMappingsは文脈付きキーを単純キーより優先します()
     {
         GeneratedCodeInspection
