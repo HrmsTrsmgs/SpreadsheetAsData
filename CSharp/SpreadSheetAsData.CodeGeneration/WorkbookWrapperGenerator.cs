@@ -44,12 +44,28 @@ public static class WorkbookWrapperGenerator
         using var book = Workbook.Open(filePath);
         return
         [
+            .. InvalidBookSheetPropertyNameDiagnostics(book, options),
             .. BookSheetPropertyNameDiagnostics(book, options),
             .. from table in book.Tables
                from diagnostic in ColumnPropertyNameDiagnostics(table, options)
                select diagnostic
         ];
     }
+
+    /// <summary>
+    /// Book型のプロパティ名を生成できないワークシート名を検出します。
+    /// </summary>
+    static IEnumerable<CodeGenerationDiagnostic> InvalidBookSheetPropertyNameDiagnostics(
+        Workbook book,
+        CodeGenerationOptions options) =>
+        from sheet in book.Sheets.Values
+        let propertyName = options.GeneratedName(sheet.Name)
+        where propertyName.IsEmpty()
+        select new CodeGenerationDiagnostic(
+            true,
+            propertyName,
+            [sheet.Name],
+            sheet.Name);
 
     /// <summary>
     /// Book型の中で、複数のワークシートが同じ生成プロパティ名になる衝突を検出します。

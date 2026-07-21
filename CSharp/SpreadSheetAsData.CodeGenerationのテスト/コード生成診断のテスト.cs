@@ -53,14 +53,16 @@ public sealed class コード生成診断のテスト
                 && it.SourceNames.Contains("sales-data"));
     }
 
-    [Fact(
-        Skip =
-            "有効なCSharp識別子を生成できない名前のエラー診断を実装するときに解除する。")]
-    public void 有効なCSharp識別子を生成できない名前を診断します()
+    [Fact]
+    public void 区切り文字だけのシート名はCSharp識別子を生成できないため診断します()
     {
         GeneratedCodeInspection
             .GenerateDiagnostics(InvalidNameExcelFilePath)
-            .Should().Contain(it => it.IsError
-                && it.InvalidSourceName == "---");
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "",
+                    ["---"],
+                    "---"));
     }
 }
