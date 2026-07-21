@@ -19,9 +19,10 @@ public class TableColumnCollection : IReadOnlyList<TableColumn>
     internal TableColumnCollection(Table table)
     {
         items = [
-            .. from column in table.TableDefinitionPart.Table.TableColumns
-                .Elements<Spreadsheet.TableColumn>()
-                .WithIndex()
+            .. from column in
+                table.TableDefinitionPart.Table.TableColumns
+                    .Elements<Spreadsheet.TableColumn>()
+                    .WithIndex()
                select new TableColumn(table, column.Value, column.Index)
         ];
     }

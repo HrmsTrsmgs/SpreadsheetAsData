@@ -164,16 +164,13 @@ public class Worksheetのテスト : IDisposable
     public void RangeはCellNameを指定して範囲を取得します()
     {
         sheet1.Range[CellName.Parse("A1"), CellName.Parse("C3")]
-            .ToString()
-            .Should()
-            .Be("A1:C3");
+            .ToString().Should().Be("A1:C3");
     }
 
     [Fact]
     public void RangeはCellNameと文字列で同じ範囲の場合に同じオブジェクトを取得します()
     {
         sheet1.Range[CellName.Parse("A1"), CellName.Parse("C3")]
-            .Should()
-            .BeSameAs(sheet1.Range["A1", "C3"]);
+            .Should().BeSameAs(sheet1.Range["A1", "C3"]);
     }
 }

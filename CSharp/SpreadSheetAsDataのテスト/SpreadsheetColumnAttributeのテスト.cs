@@ -11,8 +11,7 @@ public class SpreadsheetColumnAttributeのテスト
     {
         new SpreadsheetColumnAttribute("int")
             .Name
-            .Should()
-            .Be("int");
+            .Should().Be("int");
     }
 
     [Fact]
@@ -24,8 +23,7 @@ public class SpreadsheetColumnAttributeのテスト
         };
 
         action
-            .Should()
-            .Throw<ArgumentNullException>()
+            .Should().Throw<ArgumentNullException>()
             .WithParameterName("name");
     }
 
@@ -38,8 +36,7 @@ public class SpreadsheetColumnAttributeのテスト
         };
 
         action
-            .Should()
-            .Throw<ArgumentException>()
+            .Should().Throw<ArgumentException>()
             .WithParameterName("name");
     }
 }

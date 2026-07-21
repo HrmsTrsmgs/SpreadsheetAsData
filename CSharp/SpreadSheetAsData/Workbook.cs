@@ -21,6 +21,14 @@ public class Workbook : IDisposable
         new(Packaging.SpreadsheetDocument.Open(filePath, true));
 
     /// <summary>
+    /// 派生した型付きブックから、指定したファイルをブックとして開きます。
+    /// </summary>
+    /// <param name="filePath">開く Spreadsheet ファイルのパス。</param>
+    protected Workbook(string filePath) : this(Packaging.SpreadsheetDocument.Open(filePath, true))
+    {
+    }
+
+    /// <summary>
     /// 既に開かれた Open XML ドキュメントを所有するブックを作成します。
     /// </summary>
     /// <param name="document">ブックとして扱う Open XML ドキュメント。</param>
@@ -55,6 +63,24 @@ public class Workbook : IDisposable
         sheets ??= new WorksheetCollection(
                     from sheet in (WorkbookPart.Workbook.Sheets ?? throw new InvalidOperationException()).Elements<Spreadsheet.Sheet>()
                     select new Worksheet(this, sheet.Name?.Value ?? throw new InvalidOperationException()));
+
+    /// <summary>
+    /// ブック内の定義名を列挙します。
+    /// 名前付きセルや名前付き範囲を対象とし、Excelテーブル名は含みません。
+    /// </summary>
+    public IEnumerable<DefinedName> DefinedNames =>
+        from definedName in WorkbookPart.Workbook.DefinedNames?.Elements<Spreadsheet.DefinedName>() ?? []
+        let name = definedName.Name?.Value ?? throw new InvalidOperationException()
+        let worksheet = DefinedNameWorksheet(definedName.LocalSheetId?.Value)
+        select new DefinedName(
+            name,
+            worksheet,
+            worksheet?.Range[name] ?? Range[name]);
+
+    Worksheet? DefinedNameWorksheet(uint? localSheetId) =>
+        localSheetId.HasValue
+            ? Sheets[(int)localSheetId.Value]
+            : null;
 
     /// <summary>
     /// ブックスコープの定義名をセル範囲として解決します。

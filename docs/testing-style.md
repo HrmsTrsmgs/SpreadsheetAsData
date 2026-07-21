@@ -8,7 +8,6 @@
 
 ```csharp
 var rows = tested.ToArray();
-var exception = action.Should().Throw<SomeException>().Which;
 var cell = sheet.Cells["A1"];
 ```
 
@@ -44,7 +43,7 @@ readonly Table tested;
 * 同じ値を複数回使用する
 * 複数のAssertで同じ対象を検証する
 * 列挙や評価を一度だけに固定する
-* 例外の複数プロパティを検証する
+* 例外アサーションを一度だけ実行して複数プロパティを検証する
 * 式の一部が独立した概念を表す
 * デバッグ時に途中結果を観察する価値が高い
 
@@ -53,28 +52,78 @@ var rows = tested.ToArray();
 
 rows
     .Select(row => row.Id)
-    .Should()
-    .Equal(1, 2, 3);
+    .Should().Equal(1, 2, 3);
 
 rows
     .Select(row => row.Name)
-    .Should()
-    .Equal("a", "b", "c");
+    .Should().Equal("a", "b", "c");
 ```
 
 この例では、同じ列挙結果を複数回検証し、列挙を一度だけに固定するため、一時変数に意味がある。
 
-例外についても、複数の情報を確認する場合は変数へ受ける。
+例外について複数の情報を確認する場合は、例外オブジェクトではなく例外アサーションを変数へ受ける。
+`Which` は後続の `Should()` へつなぐために使い、変数へ受けない。
 
 ```csharp
-var exception = action
-    .Should()
-    .Throw<TableMappingException>()
-    .Which;
+var thrown = action
+    .Should().Throw<TableMappingException>();
 
-exception.TableName.Should().Be("Table1");
-exception.ColumnName.Should().Be("string");
-exception.PropertyName.Should().Be(nameof(TestRow.Value));
+thrown.Which.TableName.Should().Be("Table1");
+thrown.Which.ColumnName.Should().Be("string");
+thrown.Which.PropertyName.Should().Be(nameof(TestRow.Value));
+```
+
+## FluentAssertions と null 検証
+
+nullable な値を検証した後に同じ値を続けて使う場合は、まず `Should().NotBeNull()` で仕様として非 null を確認する。
+FluentAssertions の `NotBeNull()` は nullable 解析に対応しているため、確認後の同じ変数は非 null として扱える。
+
+```csharp
+var property = type.GetProperty("MainRange");
+
+property.Should().NotBeNull();
+property.PropertyType.Should().Be(typeof(CellRange));
+```
+
+`NotBeNull()` で確認した値を使うためだけに、`!`、`?? throw`、`Which` を追加しない。
+
+`Which` は、例外検証や型検証などで、FluentAssertions のチェーンとしてさらに検証を続ける場合に使う。nullable 解析を外すための一時変数化には使わない。
+
+```csharp
+action
+    .Should().Throw<TableMappingException>()
+    .Which.TableName
+    .Should().Be("Table1");
+```
+
+## Fluentな検証句の改行
+
+`Should()` と最終アサーションは、原則として同じ行に置く。
+FluentAssertions は英文に近い検証句として読むため、`Should()` だけを単独行にして述語を分断しない。
+`Which`、検証対象の短いプロパティ、`ToString()` なども、一続きの句として読める場合は無理に縦へ分割しない。
+
+```csharp
+actual.Should().Be(expected);
+
+book.ReadTable<TestRow>("Table1")
+    .Select(it => it.Value)
+    .Should().Equal(1, 2, 3);
+
+action
+    .Should().Throw<TableMappingException>()
+    .Which.TableName.Should().Be("Table1");
+```
+
+検証対象を作るチェーンは、声に出して読んだときの区切りや、意味の切れ目で改行してよい。
+ただし、`Should()` の前で改行すること自体をルールにはしない。
+検証対象の構築が長い場合など、読みやすくなるときの選択肢として扱う。
+期待値が長い場合は、`Should()` とアサーション名ではなく、引数側を改行する。
+
+```csharp
+actual.Should().Equal(
+    1,
+    2,
+    3);
 ```
 
 ## 一時変数を作らない基準
@@ -84,8 +133,7 @@ exception.PropertyName.Should().Be(nameof(TestRow.Value));
 ```csharp
 book.ReadTable<IntegerOnlyRow>("Table1")
     .Select(row => row.IntegerValue)
-    .Should()
-    .Equal(1, 2, 3);
+    .Should().Equal(1, 2, 3);
 ```
 
 次のような、一度しか使わない中間変数は原則として作らない。
@@ -106,8 +154,7 @@ tested.Value.Should().Be(expected);
 
 ```csharp
 book.ReadTable<TestRow>("Table1")
-    .Should()
-    .BeEmpty();
+    .Should().BeEmpty();
 ```
 
 特に、変数名が次のような一般名でしかなく、右辺以上の情報を加えていない場合はインライン化する。
@@ -129,11 +176,19 @@ object
 
 ```csharp
 var rows = tested.ToArray();
-var exception = action.Should().Throw<TableMappingException>().Which;
 var missingColumns = mapper.FindMissingColumns();
 ```
 
 単に処理結果であることしか示さない名前より、対象の役割を示す名前を優先する。
+
+テスト対象となるオブジェクトを変数で受ける必要があり、型名や種類名をそのまま変数名にするだけなら `tested` とする。
+
+```csharp
+var tested = assembly.GeneratedInstance<Table>("SalesDetailTable");
+
+tested.Name.Should().Be("sales_detail");
+tested.Rows.Should().NotBeEmpty();
+```
 
 ただし、名前を考えるために不自然な抽象化を追加しない。
 
@@ -198,7 +253,7 @@ tested.Should().BeEquivalentTo(
 * 明示型のローカル変数を、必要がなければ `var` へ変更する
 * 一度しか使わない `actual`、`result` などをインライン化する
 * 同じ列挙を複数回行っている場合は、一度 `ToArray()` などで受ける
-* 同じ例外オブジェクトの複数プロパティを検証している場合は、変数へ受ける
+* 同じ例外の複数プロパティを検証している場合は、例外オブジェクトではなく例外アサーションを変数へ受ける
 * テストクラス全体の前提になる対象は `readonly` フィールドへ置く
 * 一つのテストでしか使わない値はローカルへ戻す
 * 変数削減によって式が過度に長くなる場合は無理にインライン化しない

@@ -54,8 +54,8 @@ public class Cell
     /// セルの値を取得します。
     /// </summary>
     /// <remarks>
-    /// 空白セルは <see cref="BlankValue"/>、真偽値セルは <see cref="bool"/>、共有文字列セルは <see cref="string"/>、
-    /// その他の数値セルは <see cref="double"/> として返します。
+    /// 空白セルは <see cref="BlankValue"/>、真偽値セルは <see cref="bool"/>、共有文字列セルと文字列セルは
+    /// <see cref="string"/>、その他の数値セルは <see cref="double"/> として返します。
     /// </remarks>
     public dynamic Value =>
         (Xml.DataType?.Value, Xml.CellValue?.Text) switch
@@ -64,6 +64,7 @@ public class Cell
             (CellValues.Boolean, "0") => false,
             (CellValues.Boolean, _) => true,
             (CellValues.SharedString, _) => SharedStringValue,
+            (CellValues.String, string text) => text,
             (_, string text) => double.Parse(text),
             _ => throw new InvalidOperationException()
         };

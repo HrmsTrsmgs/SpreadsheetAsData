@@ -6,13 +6,13 @@ namespace Marimo.SpreadSheetAsData;
 /// Excel テーブルの各データ行を指定した型へ対応付けて列挙する型付きテーブルを表します。
 /// </summary>
 /// <typeparam name="T">各データ行を対応付ける型。</typeparam>
-public sealed class Table<T> : Table, IEnumerable<T>
+public class Table<T> : Table, IEnumerable<T>
 {
     /// <summary>
     /// 指定した非型付き Excel テーブルから型付きテーブルを作成します。
     /// </summary>
     /// <param name="source">型付き列挙の元になる Excel テーブル。</param>
-    internal Table(Table source)
+    protected internal Table(Table source)
         : base(source.TableDefinitionPart, source.Worksheet)
     {
         ValidateMappingTypeCanBeCreated();

@@ -25,8 +25,16 @@ public class BlankValueのテスト : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    BlankValue TestedBlankValue =>
-        (tested as object).Should().BeOfType<BlankValue>().Which;
+    BlankValue TestedBlankValue
+    {
+        get
+        {
+            object testedValue = tested;
+
+            testedValue.Should().BeOfType<BlankValue>();
+            return (BlankValue)testedValue;
+        }
+    }
 
     [Fact]
     public void 比較すると空白と同じとされます()

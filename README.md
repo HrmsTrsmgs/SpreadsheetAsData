@@ -11,6 +11,7 @@ Open XML SDKを内部実装として使いながら、利用側コードから�
 * Excelテーブルを名前で取得する
 * Excelテーブルの列、データ行、セルを取得する
 * Excelテーブルの各データ行を、利用者定義型へ対応付けて列挙する
+* `.xlsx` から型付き読み取り用のC#ラッパーコードを生成する
 * 定義名、A1形式、左上セルと右下セルの指定でセル範囲を取得する
 * ワークシートを名前または位置で取得する
 * セルをA1形式、または列番号と行番号で取得する
@@ -73,6 +74,44 @@ var customers = book.ReadTable<CustomerRow>("Customers");
 
 型付きテーブルでは、現在 `int`、`double`、`string` への基本的な変換を扱います。
 対応する列がない場合、変換できない値がある場合、同じ列へ複数のプロパティを対応付けた場合は `TableMappingException` で失敗します。
+
+### 型付き読み取りコードを生成する
+
+`Marimo.SpreadSheetAsData.CodeGeneration` では、`.xlsx` に含まれるシート、定義名、Excelテーブルから型付きラッパーのC#ソースコードを生成できます。
+
+```csharp
+using Marimo.SpreadSheetAsData.CodeGeneration;
+
+var sources = WorkbookWrapperGenerator.GenerateSources(
+    "orders.xlsx",
+    options =>
+    {
+        options.Namespace = "MyApp.SpreadSheets";
+        options.NameMappings = new()
+        {
+            ["注文一覧"] = "Orders",
+            ["注文一覧.商品名"] = "ProductName"
+        };
+    });
+```
+
+`GenerateSources` はC#ソース文字列の配列を返します。
+生成されたコードには、ブック、ワークシート、Excelテーブル、行データを表す型と、文字列指定なしでアクセスするためのプロパティが含まれます。
+
+```csharp
+using MyApp.SpreadSheets;
+
+using var book = new OrdersBook();
+
+foreach (var order in book.Orders)
+{
+    Console.WriteLine(order.ProductName);
+}
+```
+
+現在の生成コードは、生成元ExcelファイルのパスをBook型の引数なしコンストラクターに埋め込みます。
+生成前に検出できる名前衝突や無効名は `WorkbookWrapperGenerator.GenerateDiagnostics` で確認できます。
+詳しい規則は [型付き読み取り](docs/typed-reading.md) を参照してください。
 
 ### Excelテーブルを直接読む
 
@@ -213,6 +252,8 @@ dotnet format .\CSharp\SpreadSheetAsData.slnx --verify-no-changes --no-restore -
 
 C#版は、NuGetパッケージとして公開できるように準備しています。
 パッケージIDは `Marimo.SpreadSheetAsData` です。
+現時点のNuGetパッケージ対象はライブラリ本体です。
+`Marimo.SpreadSheetAsData.CodeGeneration` はリポジトリ内プロジェクトとして実装しており、同一パッケージへ含めるか、別パッケージとして公開するかは整理中です。
 
 ローカルでパッケージを生成する場合は、次のコマンドを実行します。
 
@@ -271,7 +312,7 @@ DocFXが生成する `docs/api/csharp/metadata/` と `docs/api/csharp/_site/` �
 直近の再整備では、次を確認しています。
 
 * ビルド: 成功
-* テスト: 成功、172件成功
+* テスト: 成功、本体176件、コード生成185件
 * XMLドキュメント生成: 成功、警告なし
 * `dotnet format --verify-no-changes`: 成功
 

@@ -51,8 +51,7 @@ public class Tableのテスト : IDisposable
             from column in table.Columns
             select column.Name
         )
-            .Should()
-            .Equal("数値", "数値2", "文字列", "真偽値");
+            .Should().Equal("数値", "数値2", "文字列", "真偽値");
     }
 
     [Fact]
@@ -77,8 +76,7 @@ public class Tableのテスト : IDisposable
             from row in table.Rows
             select row.WorksheetRowIndex
         )
-            .Should()
-            .Equal(7u, 8u, 9u);
+            .Should().Equal(7u, 8u, 9u);
     }
 
     [Fact]
@@ -94,8 +92,7 @@ public class Tableのテスト : IDisposable
     public void EnumerateはReadTableで取得した型付きTableと同じ結果を列挙します()
     {
         typedMappingTable.Enumerate<TestMappedRow>()
-            .Should()
-            .BeEquivalentTo(
+            .Should().BeEquivalentTo(
                 book.ReadTable<TestMappedRow>("型付き行マッピング"),
                 options => options.WithStrictOrdering());
     }

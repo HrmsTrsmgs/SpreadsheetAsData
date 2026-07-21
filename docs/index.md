@@ -13,5 +13,8 @@ Ruby版のAPIリファレンスは、Ruby版の再整備後に追加する予定
 
 設計方針や今後の作業計画は、次の文書を参照してください。
 
+* [プロジェクト概要](project-overview.md)
 * [設計方針](design.md)
+* [初回公開版の範囲](public-release-scope.md)
 * [ロードマップ](roadmap.md)
+* [型付き読み取り](typed-reading.md)

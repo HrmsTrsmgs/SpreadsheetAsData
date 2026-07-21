@@ -2,186 +2,198 @@
 
 ## 目的
 
-SpreadsheetAsDataでは、Excelテーブルを単なるセル範囲ではなく、列定義を持ったデータ集合として読み取ります。
+SpreadsheetAsDataでは、Excelテーブルを単なるセル範囲ではなく、列名と行を持つデータ集合として読み取ります。
 
-型付き読み取りは、次の三段階で提供する方針です。
+型付き読み取りは、次の三段階で扱います。
 
-1. 列名を使用した行読み取り
-2. 利用者定義型へのマッピング
-3. `.xlsx`からの型付き読み取りコード生成
+1. Excelテーブルを列名で読む
+2. Excelテーブルを利用者定義型へ対応付けて読む
+3. `.xlsx` から型付き読み取りコードを生成する
 
-書き込み機能は、この文書の対象外です。
+この文書は、現行C#版で実装済みの読み取りAPIと、現在の制約を記録します。
+書き込み機能は対象外です。
 
-## 1. 列名による行読み取り
+## 1. Excelテーブルを列名で読む
 
-最も基本的な読み取り方法です。
-
-テーブル行を列挙し、各値を列名で取得します。
+`Workbook.Tables` からExcelテーブルを取得し、`Table.Rows` でデータ行を列挙します。
 
 ```csharp
+using Marimo.SpreadSheetAsData;
+
 using var book = Workbook.Open("orders.xlsx");
 
 var table = book.Tables["Orders"];
 
 foreach (var row in table.Rows)
 {
-    var productName = row["ProductName"];
-    var quantity = row["Quantity"];
-    var unitPrice = row["UnitPrice"];
+    var productName = row["ProductName"].Value;
+    var quantity = row["Quantity"].Value;
+
+    Console.WriteLine($"{productName}: {quantity}");
 }
 ```
 
-この層では、利用者がC#型を事前に定義する必要はありません。
-
-列名の誤りや値の型変換は、実行時に検出されます。
-
-## 2. 利用者定義型へのマッピング
-
-利用者が定義した型へ、テーブルの各行を変換します。
+`TableRow` では、列名、0始まりの列位置、`TableColumn` からセルを取得できます。
 
 ```csharp
+var firstRow = table.Rows.First();
+
+var byName = firstRow["ProductName"];
+var byOrdinal = firstRow[0];
+var byColumn = firstRow[table.Columns["ProductName"]];
+```
+
+列や行の構造を確認したい場合は、`Table.Columns`、`Table.Range`、`Table.Worksheet` を使用します。
+
+## 2. 利用者定義型へ対応付けて読む
+
+`Workbook.ReadTable<T>(string name)` または `Table.Enumerate<T>()` で、Excelテーブルの各データ行を利用者定義型へ対応付けて列挙できます。
+
+```csharp
+using Marimo.SpreadSheetAsData;
+
 public sealed class Order
 {
-    public string ProductName { get; init; } = "";
-    public int Quantity { get; init; }
-    public decimal UnitPrice { get; init; }
-}
-```
+    public string ProductName { get; set; } = "";
 
-```csharp
+    public int Quantity { get; set; }
+
+    public double UnitPrice { get; set; }
+}
+
 using var book = Workbook.Open("orders.xlsx");
 
-IEnumerable<Order> orders = book.Tables["Orders"].As<Order>();
-
-foreach (var order in orders)
+foreach (var order in book.ReadTable<Order>("Orders"))
 {
     Console.WriteLine(order.ProductName);
 }
 ```
 
-API名は設計中の例です。
-
-### 基本規則
-
-初期実装では、次の規則を基本とします。
-
-* プロパティ名と列名が一致する場合に対応付ける
-* 対象は公開された書き込み可能なプロパティとする
-* 空白値は参照型またはnullable値型へ変換できる
-* 空白値を非nullable値型へ変換する場合はエラーとする
-* 変換できない値を暗黙に既定値へ置き換えない
-* 不足している必須列は読み取り開始時に検出する
-* 使用されない余剰列は許可する
-
-属性による列名指定は、必要性を確認してから追加します。
+プロパティ名とExcel列名が異なる場合は、`SpreadsheetColumnAttribute` で列名を指定します。
 
 ```csharp
 public sealed class Order
 {
     [SpreadsheetColumn("商品名")]
-    public string ProductName { get; init; } = "";
+    public string ProductName { get; set; } = "";
 }
 ```
 
-属性名とAPIは設計中の例です。
+現在の基本規則は次のとおりです。
 
-## 3. `.xlsx`からの型付き読み取りコード生成
+* publicな引数なしコンストラクターが必要
+* public setterを持つプロパティを列へ対応付ける
+* `SpreadsheetColumnAttribute` がある場合は、属性の列名を使用する
+* 属性がない場合は、プロパティ名を列名として使用する
+* 属性がない読み取り専用プロパティは無視する
+* 属性がある読み取り専用プロパティはエラーにする
+* 対応するプロパティがないExcel列は無視する
+* 同じ列へ複数のプロパティを対応付けた場合はエラーにする
+* 指定した列が存在しない場合はエラーにする
 
-型付きDataSetに近い利用方法として、`.xlsx`自体をスキーマの入力としてC#コードを生成します。
+現在対応している変換は、`int`、`double`、`string` です。
 
-生成対象は、初回公開版ではExcelテーブルに限定します。
+* 整数値の `double` は `int` へ変換できる
+* 小数値を `int` へ変換しようとした場合はエラーにする
+* `double` は `double` へ変換できる
+* `string` は `string` へ変換できる
 
-例えば、`Orders`というテーブルから次のような行型を生成します。
+マッピングに失敗した場合は `TableMappingException` を投げます。
+例外には、可能な範囲でテーブル名、列名、プロパティ名、ワークシート上の行番号、元セル値が設定されます。
+
+## 3. `.xlsx` から型付き読み取りコードを生成する
+
+`Marimo.SpreadSheetAsData.CodeGeneration` では、Excelブックから型付きラッパーのC#ソースコードを生成します。
 
 ```csharp
-public sealed class OrderRow
-{
-    public string ProductName { get; init; } = "";
-    public int Quantity { get; init; }
-    public decimal UnitPrice { get; init; }
-}
+using Marimo.SpreadSheetAsData.CodeGeneration;
+
+var sources = WorkbookWrapperGenerator.GenerateSources(
+    "orders.xlsx",
+    options =>
+    {
+        options.Namespace = "MyApp.SpreadSheets";
+        options.NameMappings = new()
+        {
+            ["注文一覧"] = "Orders",
+            ["注文一覧.商品名"] = "ProductName"
+        };
+    });
 ```
 
-ワークブック全体を表す型も生成し、次のように利用できることを目標とします。
+`GenerateSources` はC#ソース文字列の配列を返します。
+現在は1つのソースファイルを生成します。
+
+生成コードには、主に次の型とメンバーが含まれます。
+
+* ブック全体を表す `Book` 派生型
+* ワークシートごとの `Worksheet` 派生型
+* Excelテーブルごとの `Table<T>` 派生型
+* Excelテーブル行を表すPOCO
+* ブック、シート、テーブル、定義名へアクセスする型付きプロパティ
+
+生成されたTable型は既存の `Table<T>` を継承します。
+そのため、生成行型の値変換は手書きPOCOと同じ `Table<T>` のマッピング規則を使用します。
+
+現行実装では、生成されたBook型の引数なしコンストラクターに、生成元Excelファイルのパスを埋め込みます。
 
 ```csharp
-using var book = OrdersWorkbook.Open("orders.xlsx");
+using Generated;
+
+using var book = new OrdersBook();
 
 foreach (var order in book.Orders)
 {
     Console.WriteLine(order.ProductName);
-    Console.WriteLine(order.Quantity);
 }
 ```
 
-生成される型名、メソッド名、プロパティ名は設計中の例です。
+## 名前変換
 
-## 型の判定
+Excel上のブック名、シート名、テーブル名、列名、定義名は、C#識別子として使える名前へ変換します。
 
-Excelテーブルには、データベースの列型に相当する固定的な型定義がないため、生成時に値を調査してC#型を決定します。
+現在の変換では、ASCIIのcamelCaseや区切り記号をPascalCaseへ寄せ、日本語などの非ASCII文字は内部の単語境界を推測せずに扱います。
+生成できない名前や、生成後に同じ名前へ衝突する名前は診断対象です。
 
-初期対応候補は次のとおりです。
+自動変換だけでは意図した名前にならない場合は、`CodeGenerationOptions.NameMappings` で明示的に対応を指定します。
 
-| Excel上の値 | C#型候補 |
-|---|---|
-| 文字列 | `string` |
-| 整数として扱える数値 | `int`または`long` |
-| 小数を含む数値 | `decimal`または`double` |
-| 真偽値 | `bool` |
-| 日付 | `DateTime` |
-| 空白を含む値型列 | 対応するnullable型 |
+```csharp
+options.NameMappings = new()
+{
+    ["sales_detail"] = "SalesDetail",
+    ["sales_detail.customer_id"] = "CustomerId",
+    ["book.main_cell"] = "MainCell",
+    ["sales_data.local_cell"] = "LocalCell"
+};
+```
 
-実際の型決定規則は、実装時にテスト可能な形で固定します。
+文脈付きキーは、単純キーより優先されます。
+同じExcel名を、テーブル、ブック定義名、シートローカル定義名などの文脈ごとに異なるC#名へ変換できます。
 
-曖昧な列を無理に狭い型へ変換せず、安全に読み取れる型を選ぶことを優先します。
+## 診断
 
-## 列名からプロパティ名への変換
+`WorkbookWrapperGenerator.GenerateDiagnostics` は、コード生成前に検出できる問題を返します。
 
-Excelの列名は、そのままではC#の識別子として使用できない場合があります。
+現在は、主に次の問題を診断します。
 
-コード生成では、少なくとも次のケースを扱います。
+* 有効なC#識別子を生成できないシート名
+* Book型内で生成プロパティ名が衝突するシート名
+* 同じ行データ型内で生成プロパティ名が衝突する列名
 
-* 空白を含む列名
-* 記号を含む列名
-* 数字から始まる列名
-* C#の予約語と一致する列名
-* 大文字小文字だけが異なる列名
-* 変換後に同じ名前になる複数の列
-* 空の列名
-* 日本語を含む列名
+診断で扱っていない不一致は、生成コードの利用時に既存の `Workbook`、`Table`、`Table<T>` のAPIで検出されます。
 
-元の列名と生成後のプロパティ名の対応は、生成コードまたは生成時の診断情報から確認できるようにします。
+## 現在の制約
 
-## スキーマの不一致
+現行のコード生成は、読み取り用ラッパーの初期実装です。
 
-コード生成後に`.xlsx`の構造が変更される可能性があります。
+次はまだ対象外です。
 
-読み取り時には、少なくとも次の不一致を検出できるようにします。
-
-* 必要なテーブルが存在しない
-* 必要な列が存在しない
-* 同名の列が複数存在する
-* 値を生成型へ変換できない
-* テーブル名または列名が変更されている
-
-不一致を暗黙に無視して誤ったデータを生成するより、原因が分かる例外または診断結果を返すことを優先します。
-
-## 生成コードの依存関係
-
-生成された公開型には、Open XML SDKの型を露出させません。
-
-生成コードは、SpreadsheetAsDataの公開APIだけを利用してデータを読み取る構造とします。
-
-これにより、Open XML SDKのバージョンやOOXMLの内部構造が、利用側コードへ直接影響することを避けます。
-
-## 初回公開版では扱わないこと
-
-* 生成型を使用した書き込み
-* 双方向データバインディング
-* Excel数式からC#プロパティを生成すること
-* 複数テーブル間の関連を自動推測すること
-* 主キーや外部キーの自動推測
+* 生成コードを使った書き込み
+* 生成後にExcelファイルパスを差し替えるAPI
+* 複数ソースファイルへの分割生成
+* bool、日付、nullable型、decimalなどの型推論
+* 数式、書式、構造化参照からの型生成
+* 複数テーブル間の関連推測
 * 任意のセル範囲からの型生成
-* Excelブック全体を完全なデータベーススキーマとして解釈すること
 
-初回公開版では、各Excelテーブルを独立した型付きデータ集合として読み取ることに集中します。
+初回公開版では、Excelテーブルを独立した型付きデータ集合として読み取ることに集中します。
