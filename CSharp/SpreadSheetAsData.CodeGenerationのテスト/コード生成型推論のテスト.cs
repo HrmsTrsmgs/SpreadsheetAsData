@@ -56,7 +56,7 @@ public sealed class コード生成型推論のテスト
             .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
             .GeneratedType("SalesDetail")
-            .GetProperty("CustomerId");
+            .GetProperty("Amount");
 
         tested.Should().NotBeNull();
         tested.GetCustomAttribute<SpreadsheetColumnAttribute>()

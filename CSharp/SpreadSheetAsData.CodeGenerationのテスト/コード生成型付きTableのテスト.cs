@@ -57,7 +57,7 @@ public sealed class コード生成型付きTableのテスト
         dynamic bookAccessor = book;
         Table tested = bookAccessor.SalesDetail;
 
-        tested.Name.Should().Be("SalesDetail");
+        tested.Name.Should().Be("sales_detail");
         tested.Worksheet.Should().NotBeNull();
         tested.Range.Should().NotBeNull();
         tested.Columns.Should().NotBeEmpty();
@@ -82,7 +82,7 @@ public sealed class コード生成型付きTableのテスト
         using var book = Workbook.Open(BasicStructureExcelFilePath);
 
         generatedRows.Should().Equal(
-                book.ReadTable<ReadTableComparison>("SalesDetail")
+                book.ReadTable<ReadTableComparison>("sales_detail")
                     .Select(ReadHandWrittenRow));
     }
 
@@ -107,6 +107,7 @@ public sealed class コード生成型付きTableのテスト
 
     sealed class ReadTableComparison
     {
+        [SpreadsheetColumn("customer_id")]
         public int CustomerId { get; set; }
 
         public double Amount { get; set; }
