@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using FluentAssertions;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 using Xunit;
@@ -49,9 +49,7 @@ public sealed class コード生成型推論のテスト
         tested.PropertyType.Should().Be(typeof(string));
     }
 
-    [Fact(
-        Skip =
-            "生成プロパティ名とExcel列名が一致する場合に列属性を省略する仕様を実装するときに解除する。")]
+    [Fact]
     public void 列名と生成プロパティ名が一致する場合は列属性を生成しません()
     {
         var tested = GeneratedCodeInspection
@@ -65,9 +63,7 @@ public sealed class コード生成型推論のテスト
             .Should().BeNull();
     }
 
-    [Fact(
-        Skip =
-            "生成プロパティ名とExcel列名が異なる場合に既存の型付きTableマッピングへ接続する仕様を実装するときに解除する。")]
+    [Fact]
     public void 列名と生成プロパティ名が異なる場合は列属性に元のExcel列名を設定します()
     {
         var generatedProperty = GeneratedCodeInspection

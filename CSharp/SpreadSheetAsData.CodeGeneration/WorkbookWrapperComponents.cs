@@ -134,10 +134,21 @@ static class WorkbookWrapperComponents
         CodeGenerationOptions options)
     {
         var propertyTypeName = ColumnPropertyTypeName(table, column);
+        var propertyName = GeneratedName(table.Name, column.Name, options);
 
         return
-            $"    public {propertyTypeName} {GeneratedName(table.Name, column.Name, options)} {{ get; set; }}{PropertyInitializer(propertyTypeName)}";
+            $$"""
+            {{ColumnAttributeDeclaration(column, propertyName)}}    public {{propertyTypeName}} {{propertyName}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
+            """;
     }
+
+    /// <summary>
+    /// 生成プロパティ名とExcel列名が一致しない場合に、既存の型付きTableマッピングへ列名を伝える属性を生成します。
+    /// </summary>
+    static string ColumnAttributeDeclaration(TableColumn column, string propertyName) =>
+        column.Name == propertyName
+            ? ""
+            : $"    [SpreadsheetColumn({StringLiteral(column.Name)})]{Environment.NewLine}";
 
     /// <summary>
     /// 既存の型付きTableマッピングで読み込めるプロパティ型名を、列の値から決定します。
