@@ -1,0 +1,51 @@
+<Project>
+  <PropertyGroup>
+    <_SpreadsheetAsDataTaskAssembly>$(MSBuildThisFileDirectory)..\tools\net10.0\SpreadSheetAsData.Build.dll</_SpreadsheetAsDataTaskAssembly>
+    <_SpreadsheetAsDataSupportsNetTaskHost Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(MSBuildVersion)', '18.0'))">true</_SpreadsheetAsDataSupportsNetTaskHost>
+  </PropertyGroup>
+
+  <UsingTask
+    TaskName="Marimo.SpreadSheetAsData.Build.GenerateSpreadsheetAsData"
+    AssemblyFile="$(_SpreadsheetAsDataTaskAssembly)"
+    Runtime="NET"
+    Condition="'$(_SpreadsheetAsDataSupportsNetTaskHost)' == 'true'" />
+
+  <Target
+    Name="_SpreadsheetAsDataUnsupportedMSBuild"
+    BeforeTargets="CoreCompile"
+    Condition="'@(SpreadsheetAsData)' != '' and '$(DesignTimeBuild)' != 'true' and '$(_SpreadsheetAsDataSupportsNetTaskHost)' != 'true'">
+    <Error
+      Code="SASD000"
+      Text="SpreadsheetAsData のコード生成には MSBuild 18.0 以降 (.NET SDK 10 / Visual Studio 2026) が必要です。" />
+  </Target>
+
+  <Target
+    Name="GenerateSpreadsheetAsDataSources"
+    BeforeTargets="CoreCompile"
+    Condition="'@(SpreadsheetAsData)' != '' and '$(DesignTimeBuild)' != 'true' and '$(_SpreadsheetAsDataSupportsNetTaskHost)' == 'true'">
+    <Marimo.SpreadSheetAsData.Build.GenerateSpreadsheetAsData
+      ExcelFiles="@(SpreadsheetAsData)"
+      ProjectDirectory="$(MSBuildProjectDirectory)"
+      RootNamespace="$(RootNamespace)"
+      IntermediateOutputPath="$(IntermediateOutputPath)">
+      <Output TaskParameter="GeneratedFiles" ItemName="_SpreadsheetAsDataGeneratedCompile" />
+    </Marimo.SpreadSheetAsData.Build.GenerateSpreadsheetAsData>
+
+    <ItemGroup>
+      <Compile
+        Include="@(_SpreadsheetAsDataGeneratedCompile)"
+        AutoGen="true"
+        DesignTime="true"
+        Visible="false" />
+      <FileWrites Include="@(_SpreadsheetAsDataGeneratedCompile)" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup Condition="'@(SpreadsheetAsData)' != '' and '$(DesignTimeBuild)' == 'true' and Exists('$(IntermediateOutputPath)SpreadsheetAsData')">
+    <Compile
+      Include="$(IntermediateOutputPath)SpreadsheetAsData\**\*.g.cs"
+      AutoGen="true"
+      DesignTime="true"
+      Visible="false" />
+  </ItemGroup>
+</Project>

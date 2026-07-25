@@ -6,11 +6,24 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <IsPackable>false</IsPackable>
+    <PackageId>Marimo.SpreadSheetAsData.CodeGeneration</PackageId>
+    <Version>0.2.0</Version>
+    <Authors>HrmsTrsmgs</Authors>
+    <Description>Generates typed C# wrappers from Excel workbook structure for SpreadsheetAsData.</Description>
+    <PackageTags>excel;spreadsheet;openxml;code-generation;xlsx</PackageTags>
+    <PackageProjectUrl>https://github.com/HrmsTrsmgs/SpreadsheetAsData</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/HrmsTrsmgs/SpreadsheetAsData</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SpreadSheetAsData\SpreadSheetAsData.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
   </ItemGroup>
 
 </Project>

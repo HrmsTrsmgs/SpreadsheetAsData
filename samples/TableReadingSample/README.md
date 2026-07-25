@@ -19,8 +19,8 @@
 NuGet.orgへ公開する前は、リポジトリ内で生成したローカルパッケージをNuGetソースとして指定します。
 
 ```powershell
-dotnet pack .\CSharp\SpreadSheetAsData\SpreadSheetAsData.csproj -c Release
-dotnet restore .\samples\TableReadingSample\TableReadingSample.slnx --source .\CSharp\SpreadSheetAsData\bin\Release --source https://api.nuget.org/v3/index.json
+dotnet pack .\CSharp\SpreadSheetAsData.slnx -c Release -o .\artifacts\nupkg
+dotnet restore .\samples\TableReadingSample\TableReadingSample.slnx --source .\artifacts\nupkg --source "https://api.nuget.org/v3/index.json"
 dotnet run --no-restore --project .\samples\TableReadingSample\TableReadingSample\TableReadingSample.csproj
 ```
 

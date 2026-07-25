@@ -12,6 +12,7 @@ CSharp/.vs/
 
 # NuGet package restore output
 CSharp/packages/
+artifacts/
 
 # DocFX generated API metadata and static sites
 docs/api/*/metadata/
