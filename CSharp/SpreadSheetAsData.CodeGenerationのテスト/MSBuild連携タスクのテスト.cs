@@ -7,7 +7,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 public sealed class MSBuild連携タスクのテスト
 {
     [Fact]
-    public void SpreadsheetAsData項目からobj配下へ生成コードを出力します()
+    public void SpreadsheetAsData項目からExcelファイルの隣へ生成コードを出力します()
     {
         using var project = MSBuild連携テストプロジェクト.Create();
         var excelFilePath = project.AddBasicStructureExcel(@"Schemas\BasicStructure.xlsx");
@@ -17,10 +17,23 @@ public sealed class MSBuild連携タスクのテスト
         tested.Succeeded.Should().BeTrue();
         tested.Warnings.Should().BeEmpty();
         tested.GeneratedFilePaths.Should().ContainSingle();
-        tested.SingleGeneratedFilePath.Should().StartWith(project.ObjDirectory);
-        tested.SingleGeneratedFilePath.Should().EndWith(".g.cs");
+        tested.SingleGeneratedFilePath
+            .Should().Be(project.GeneratedFilePathFor(@"Schemas\BasicStructure.xlsx"));
         tested.SingleGeneratedSource
             .Should().Contain("public partial class BasicStructureBook : Workbook");
+    }
+
+    [Fact]
+    public void 生成コードは元Excelファイルへ紐づくメタデータを返します()
+    {
+        using var project = MSBuild連携テストプロジェクト.Create();
+        var excelFilePath = project.AddBasicStructureExcel(@"Schemas\BasicStructure.xlsx");
+
+        var tested = project.Generate(excelFilePath);
+
+        tested.Succeeded.Should().BeTrue();
+        tested.SingleGeneratedFile.GetMetadata("DependentUpon")
+            .Should().Be("BasicStructure.xlsx");
     }
 
     [Fact]

@@ -29,7 +29,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
     public string RootNamespace { get; set; } = "";
 
     /// <summary>
-    /// 生成ファイルを配置する中間出力ディレクトリを取得または設定します。
+    /// 生成ファイルの更新判定に使う中間出力ディレクトリを取得または設定します。
     /// </summary>
     [Required]
     public string IntermediateOutputPath { get; set; } = "";
@@ -64,14 +64,16 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
         var excelFilePath = FullPath(excelFile);
         var outputFilePath = OutputFilePath(excelFilePath);
 
-        generatedFiles.Add(new TaskItem(outputFilePath));
+        generatedFiles.Add(GeneratedFileItem(excelFilePath, outputFilePath));
 
         try
         {
             var dictionaryFilePath = DictionaryFilePath(excelFilePath);
             var fingerprint = Fingerprint(excelFilePath, dictionaryFilePath);
 
-            if (IsUpToDate(outputFilePath, fingerprint))
+            var stampFilePath = StampFilePath(excelFilePath);
+
+            if (IsUpToDate(outputFilePath, stampFilePath, fingerprint))
             {
                 return;
             }
@@ -102,8 +104,9 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
                 options => ConfigureOptions(options, nameMappings));
 
             Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath)!);
+            Directory.CreateDirectory(Path.GetDirectoryName(stampFilePath)!);
             WriteIfChanged(outputFilePath, sources.Single());
-            WriteIfChanged(StampFilePath(outputFilePath), fingerprint);
+            WriteIfChanged(stampFilePath, fingerprint);
         }
         catch (Exception exception)
         {
@@ -245,10 +248,11 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
 
     static bool IsUpToDate(
         string outputFilePath,
+        string stampFilePath,
         string fingerprint) =>
         File.Exists(outputFilePath)
-            && File.Exists(StampFilePath(outputFilePath))
-            && File.ReadAllText(StampFilePath(outputFilePath)) == fingerprint;
+            && File.Exists(stampFilePath)
+            && File.ReadAllText(stampFilePath) == fingerprint;
 
     string FullPath(ITaskItem item)
     {
@@ -261,16 +265,34 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
 
     string OutputFilePath(string excelFilePath)
     {
+        var outputDirectory = Path.GetDirectoryName(excelFilePath)!;
+
+        return Path.Combine(
+            outputDirectory,
+            $"{Path.GetFileNameWithoutExtension(excelFilePath)}.SpreadsheetAsData.g.cs");
+    }
+
+    ITaskItem GeneratedFileItem(
+        string excelFilePath,
+        string outputFilePath)
+    {
+        var item = new TaskItem(outputFilePath);
+        item.SetMetadata("DependentUpon", Path.GetFileName(excelFilePath));
+        return item;
+    }
+
+    string StampFilePath(string excelFilePath)
+    {
         var relativePath = Path.GetRelativePath(ProjectDirectory, excelFilePath);
         var relativeDirectory = Path.GetDirectoryName(relativePath);
-        var outputDirectory = Path.Combine(
+        var stampDirectory = Path.Combine(
             FullIntermediateOutputPath,
             "SpreadsheetAsData",
             relativeDirectory ?? "");
 
         return Path.Combine(
-            outputDirectory,
-            $"{Path.GetFileNameWithoutExtension(excelFilePath)}.SpreadsheetAsData.g.cs");
+            stampDirectory,
+            $"{Path.GetFileNameWithoutExtension(excelFilePath)}.SpreadsheetAsData.g.cs.stamp");
     }
 
     string FullIntermediateOutputPath =>
@@ -278,9 +300,6 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
             Path.IsPathRooted(IntermediateOutputPath)
                 ? IntermediateOutputPath
                 : Path.Combine(ProjectDirectory, IntermediateOutputPath));
-
-    static string StampFilePath(string outputFilePath) =>
-        outputFilePath + ".stamp";
 
     static void WriteIfChanged(
         string path,

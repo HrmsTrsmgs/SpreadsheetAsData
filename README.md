@@ -50,7 +50,8 @@ foreach (var sale in book.SalesDetail)
 `SpreadsheetTutorial` は、新規作成したプロジェクトの既定名前空間です。
 別のプロジェクト名で作成した場合は、そのプロジェクトの名前空間を `using` に指定してください。
 `SalesReportBook`、`SalesDetail`、`ProductName` などは、`sales_report.xlsx` のファイル名、Excelテーブル名、列名から生成されます。
-生成された `.g.cs` は `obj/<Configuration>/<TargetFramework>/SpreadsheetAsData/` 配下へ出力され、同じビルドの `Compile` に自動で追加されます。
+生成された `.g.cs` は `sales_report.xlsx` の隣へ出力され、同じビルドの `Compile` に自動で追加されます。
+このファイルは生成物なので編集せず、通常はGit管理にも含めません。
 
 ### CLIから同じことを行う
 
@@ -168,7 +169,10 @@ NuGetパッケージを参照しているVisual Studioプロジェクトでは�
 通常の `None` や `Content` として追加したExcelファイルは、コード生成対象になりません。
 対象にするファイルだけ、ビルドアクションを `SpreadsheetAsData` へ変更してください。
 
-Excelファイルの隣やソースディレクトリには出力しないため、生成ファイルをGit管理に含める必要はありません。
+生成ファイルはExcelファイルの隣に、`*.SpreadsheetAsData.g.cs` という名前で出力されます。
+Visual Studioでは元Excelファイルに紐づく生成コードとして確認できます。
+生成ファイルは手で編集せず、通常はGit管理に含めません。
+このリポジトリでは `*.SpreadsheetAsData.g.cs` を `.gitignore` に登録しています。
 
 Visual Studio以外で明示的に設定する場合は、プロジェクトファイルへ次の項目を追加します。
 
@@ -399,7 +403,7 @@ dotnet pack .\CSharp\SpreadSheetAsData.slnx -c Release -o .\artifacts\nupkg
 NuGet.orgへ公開する前にローカルで別プロジェクトから確認する場合は、検証先プロジェクトに `PackageReference` を追加し、復元時にローカルパッケージ出力先とNuGet.orgをNuGetソースとして指定します。
 
 ```xml
-<PackageReference Include="Marimo.SpreadSheetAsData" Version="0.2.0" />
+<PackageReference Include="Marimo.SpreadSheetAsData" Version="0.2.1" />
 ```
 
 ```powershell

@@ -5,6 +5,7 @@
 # .NET build output
 bin/
 obj/
+*.SpreadsheetAsData.g.cs
 
 # Visual Studio local workspace files
 .vs/

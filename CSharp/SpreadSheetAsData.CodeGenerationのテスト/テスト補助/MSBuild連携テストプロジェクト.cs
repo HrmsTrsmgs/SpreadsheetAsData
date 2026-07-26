@@ -30,12 +30,6 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
     internal string DirectoryPath { get; }
 
     /// <summary>
-    /// 生成ファイルを配置するobjディレクトリです。
-    /// </summary>
-    internal string ObjDirectory =>
-        Path.Combine(DirectoryPath, "obj");
-
-    /// <summary>
     /// 新しい一時プロジェクトを作成します。
     /// </summary>
     internal static MSBuild連携テストプロジェクト Create() =>
@@ -112,7 +106,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
 
         return new(
             task.Execute(),
-            [.. task.GeneratedFiles.Select(it => it.ItemSpec)],
+            task.GeneratedFiles,
             buildEngine.Errors,
             buildEngine.Warnings);
     }
@@ -125,10 +119,6 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
     internal string GeneratedFilePathFor(string excelRelativePath) =>
         Path.Combine(
             DirectoryPath,
-            "obj",
-            Configuration,
-            TargetFramework,
-            "SpreadsheetAsData",
             Path.GetDirectoryName(excelRelativePath) ?? "",
             $"{Path.GetFileNameWithoutExtension(excelRelativePath)}.SpreadsheetAsData.g.cs");
 
@@ -177,7 +167,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
 
             dotnet msbuild .\SpreadsheetAsData.Generate.proj /t:Build /nologo /v:minimal
 
-            $generatedFile = '.\obj\Debug\net10.0\SpreadsheetAsData\BasicStructure.SpreadsheetAsData.g.cs'
+            $generatedFile = '.\BasicStructure.SpreadsheetAsData.g.cs'
 
             if (-not (Test-Path $generatedFile)) {
                 throw "Generated file was not created: $generatedFile"
@@ -259,10 +249,22 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
 /// </summary>
 sealed record MSBuild連携タスク実行結果(
     bool Succeeded,
-    string[] GeneratedFilePaths,
+    ITaskItem[] GeneratedFiles,
     IReadOnlyList<BuildErrorEventArgs> Errors,
     IReadOnlyList<BuildWarningEventArgs> Warnings)
 {
+    /// <summary>
+    /// 生成ファイルの絶対パス一覧です。
+    /// </summary>
+    internal string[] GeneratedFilePaths =>
+        [.. GeneratedFiles.Select(it => it.ItemSpec)];
+
+    /// <summary>
+    /// 生成ファイルが1つであるテストで、そのタスク項目を取得します。
+    /// </summary>
+    internal ITaskItem SingleGeneratedFile =>
+        GeneratedFiles.Single();
+
     /// <summary>
     /// 生成ファイルが1つであるテストで、そのファイルパスを取得します。
     /// </summary>
