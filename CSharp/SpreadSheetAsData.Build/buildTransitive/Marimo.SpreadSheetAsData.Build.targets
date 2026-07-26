@@ -36,16 +36,20 @@
         Include="@(_SpreadsheetAsDataGeneratedCompile)"
         AutoGen="true"
         DesignTime="true"
-        Visible="false" />
+        DependentUpon="%(_SpreadsheetAsDataGeneratedCompile.DependentUpon)" />
       <FileWrites Include="@(_SpreadsheetAsDataGeneratedCompile)" />
     </ItemGroup>
   </Target>
 
-  <ItemGroup Condition="'@(SpreadsheetAsData)' != '' and '$(DesignTimeBuild)' == 'true' and Exists('$(IntermediateOutputPath)SpreadsheetAsData')">
+  <ItemGroup Condition="'@(SpreadsheetAsData)' != '' and '$(DesignTimeBuild)' == 'true'">
+    <_SpreadsheetAsDataDesignTimeGeneratedCompile
+      Include="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename).SpreadsheetAsData.g.cs')"
+      DependentUpon="%(SpreadsheetAsData.Filename)%(SpreadsheetAsData.Extension)" />
     <Compile
-      Include="$(IntermediateOutputPath)SpreadsheetAsData\**\*.g.cs"
+      Include="@(_SpreadsheetAsDataDesignTimeGeneratedCompile)"
+      Condition="Exists('%(_SpreadsheetAsDataDesignTimeGeneratedCompile.Identity)')"
       AutoGen="true"
       DesignTime="true"
-      Visible="false" />
+      DependentUpon="%(_SpreadsheetAsDataDesignTimeGeneratedCompile.DependentUpon)" />
   </ItemGroup>
 </Project>
