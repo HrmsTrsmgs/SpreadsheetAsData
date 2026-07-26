@@ -3,7 +3,9 @@
     <File Path=".nuget/packages.config" />
   </Folder>
   <Project Path="SpreadSheetAsData/SpreadSheetAsData.csproj" />
+  <Project Path="SpreadSheetAsData.Build/SpreadSheetAsData.Build.csproj" />
   <Project Path="SpreadSheetAsData.CodeGeneration/SpreadSheetAsData.CodeGeneration.csproj" />
   <Project Path="SpreadSheetAsData.CodeGenerationのテスト/SpreadSheetAsData.CodeGenerationのテスト.csproj" />
+  <Project Path="SpreadSheetAsData.Package/SpreadSheetAsData.Package.csproj" />
   <Project Path="SpreadSheetAsDataのテスト/SpreadSheetAsDataのテスト.csproj" />
 </Solution>

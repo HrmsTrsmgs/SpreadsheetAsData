@@ -34,7 +34,17 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SpreadSheetAsData\SpreadSheetAsData.csproj" />
+    <ProjectReference Include="..\SpreadSheetAsData.Build\SpreadSheetAsData.Build.csproj" />
     <ProjectReference Include="..\SpreadSheetAsData.CodeGeneration\SpreadSheetAsData.CodeGeneration.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.Build.Framework">
+      <HintPath>$(MSBuildToolsPath)\Microsoft.Build.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Build.Utilities.Core">
+      <HintPath>$(MSBuildToolsPath)\Microsoft.Build.Utilities.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

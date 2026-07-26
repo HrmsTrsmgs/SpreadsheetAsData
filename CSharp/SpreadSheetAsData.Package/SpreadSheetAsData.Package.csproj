@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <PackageId>Marimo.SpreadSheetAsData</PackageId>
+    <Version>0.2.0</Version>
+    <Authors>HrmsTrsmgs</Authors>
+    <Description>Recommended package for SpreadsheetAsData, including runtime APIs, code generation APIs, and MSBuild integration.</Description>
+    <PackageTags>excel;spreadsheet;openxml;code-generation;msbuild;xlsx</PackageTags>
+    <PackageProjectUrl>https://github.com/HrmsTrsmgs/SpreadsheetAsData</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/HrmsTrsmgs/SpreadsheetAsData</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);AddSpreadsheetAsDataBuildToolsToPackage</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SpreadSheetAsData.CodeGeneration\SpreadSheetAsData.CodeGeneration.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="buildTransitive\Marimo.SpreadSheetAsData.props" Pack="true" PackagePath="buildTransitive\Marimo.SpreadSheetAsData.props" Visible="false" />
+    <None Include="buildTransitive\Marimo.SpreadSheetAsData.targets" Pack="true" PackagePath="buildTransitive\Marimo.SpreadSheetAsData.targets" Visible="false" />
+    <None Include="PackagePlaceholder\_._" Pack="true" PackagePath="lib\net10.0\_._" Visible="false" />
+  </ItemGroup>
+
+  <Target
+    Name="AddSpreadsheetAsDataBuildToolsToPackage"
+    Returns="@(TfmSpecificPackageFile)">
+    <MSBuild
+      Projects="..\SpreadSheetAsData.Build\SpreadSheetAsData.Build.csproj"
+      Targets="Build"
+      Properties="Configuration=$(Configuration);TargetFramework=net10.0" />
+
+    <ItemGroup>
+      <TfmSpecificPackageFile
+        Include="..\SpreadSheetAsData.Build\bin\$(Configuration)\net10.0\**\*.*">
+        <PackagePath>tools\net10.0\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+      </TfmSpecificPackageFile>
+    </ItemGroup>
+  </Target>
+
+</Project>
