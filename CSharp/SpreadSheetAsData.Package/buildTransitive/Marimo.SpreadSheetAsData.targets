@@ -47,7 +47,6 @@
       DependentUpon="%(SpreadsheetAsData.Filename)%(SpreadsheetAsData.Extension)" />
     <Compile
       Include="@(_SpreadsheetAsDataDesignTimeGeneratedCompile)"
-      Condition="Exists('%(_SpreadsheetAsDataDesignTimeGeneratedCompile.Identity)')"
       AutoGen="true"
       DesignTime="true"
       DependentUpon="%(_SpreadsheetAsDataDesignTimeGeneratedCompile.DependentUpon)" />

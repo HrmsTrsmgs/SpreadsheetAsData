@@ -403,7 +403,7 @@ dotnet pack .\CSharp\SpreadSheetAsData.slnx -c Release -o .\artifacts\nupkg
 NuGet.orgへ公開する前にローカルで別プロジェクトから確認する場合は、検証先プロジェクトに `PackageReference` を追加し、復元時にローカルパッケージ出力先とNuGet.orgをNuGetソースとして指定します。
 
 ```xml
-<PackageReference Include="Marimo.SpreadSheetAsData" Version="0.2.1" />
+<PackageReference Include="Marimo.SpreadSheetAsData" Version="0.2.2" />
 ```
 
 ```powershell
