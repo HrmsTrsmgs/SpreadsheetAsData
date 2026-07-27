@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>Marimo.SpreadSheetAsData.CodeGeneration</PackageId>
-    <Version>0.2.4</Version>
+    <Version>0.2.5</Version>
     <Authors>HrmsTrsmgs</Authors>
     <Description>Generates typed C# wrappers from Excel workbook structure for SpreadsheetAsData.</Description>
     <PackageTags>excel;spreadsheet;openxml;code-generation;xlsx</PackageTags>

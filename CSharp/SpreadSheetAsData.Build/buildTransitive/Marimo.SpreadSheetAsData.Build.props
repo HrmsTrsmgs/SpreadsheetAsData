@@ -1,4 +1,8 @@
 <Project>
+  <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);**/*.SpreadsheetAsData.g.cs</DefaultItemExcludes>
+  </PropertyGroup>
+
   <ItemGroup>
     <AvailableItemName Include="SpreadsheetAsData" />
   </ItemGroup>

@@ -11,7 +11,19 @@
     Condition="'$(_SpreadsheetAsDataSupportsNetTaskHost)' == 'true'" />
 
   <ItemGroup Condition="'@(SpreadsheetAsData)' != ''">
+    <SpreadsheetAsData Update="@(SpreadsheetAsData)">
+      <SpreadsheetAsDataDependentUpon>%(Filename)%(Extension)</SpreadsheetAsDataDependentUpon>
+    </SpreadsheetAsData>
+    <_SpreadsheetAsDataGeneratedCompile
+      Include="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename).SpreadsheetAsData.g.cs')"
+      DependentUpon="%(SpreadsheetAsDataDependentUpon)"
+      DesignTimeSharedInput="true"
+      AutoGen="true"
+      DesignTime="true" />
     <Compile Remove="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename).SpreadsheetAsData.g.cs')" />
+    <None Remove="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename).SpreadsheetAsData.g.cs')" />
+    <Content Remove="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename).SpreadsheetAsData.g.cs')" />
+    <Compile Include="@(_SpreadsheetAsDataGeneratedCompile)" />
   </ItemGroup>
 
   <Target
@@ -32,30 +44,11 @@
       ProjectDirectory="$(MSBuildProjectDirectory)"
       RootNamespace="$(RootNamespace)"
       IntermediateOutputPath="$(IntermediateOutputPath)">
-      <Output TaskParameter="GeneratedFiles" ItemName="_SpreadsheetAsDataGeneratedCompile" />
+      <Output TaskParameter="GeneratedFiles" ItemName="_SpreadsheetAsDataGeneratedFileWrites" />
     </Marimo.SpreadSheetAsData.Build.GenerateSpreadsheetAsData>
 
     <ItemGroup>
-      <Compile
-        Include="@(_SpreadsheetAsDataGeneratedCompile)"
-        AutoGen="true"
-        DesignTime="true"
-        DesignTimeSharedInput="%(_SpreadsheetAsDataGeneratedCompile.DesignTimeSharedInput)"
-        DependentUpon="%(_SpreadsheetAsDataGeneratedCompile.DependentUpon)" />
-      <FileWrites Include="@(_SpreadsheetAsDataGeneratedCompile)" />
+      <FileWrites Include="@(_SpreadsheetAsDataGeneratedFileWrites)" />
     </ItemGroup>
   </Target>
-
-  <ItemGroup Condition="'@(SpreadsheetAsData)' != '' and '$(DesignTimeBuild)' == 'true'">
-    <_SpreadsheetAsDataDesignTimeGeneratedCompile
-      Include="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename).SpreadsheetAsData.g.cs')"
-      DependentUpon="%(SpreadsheetAsData.Filename)%(SpreadsheetAsData.Extension)"
-      DesignTimeSharedInput="true" />
-    <Compile
-      Include="@(_SpreadsheetAsDataDesignTimeGeneratedCompile)"
-      AutoGen="true"
-      DesignTime="true"
-      DesignTimeSharedInput="%(_SpreadsheetAsDataDesignTimeGeneratedCompile.DesignTimeSharedInput)"
-      DependentUpon="%(_SpreadsheetAsDataDesignTimeGeneratedCompile.DependentUpon)" />
-  </ItemGroup>
 </Project>

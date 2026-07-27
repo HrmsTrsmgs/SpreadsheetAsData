@@ -271,9 +271,24 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
               <Import Project="Package\buildTransitive\Marimo.SpreadSheetAsData.Build.targets" />
 
               <Target Name="CheckGeneratedCompileMetadata">
+                <ItemGroup>
+                  <_SpreadsheetAsDataExpectedGeneratedCompile
+                    Include="@(Compile)"
+                    Condition="'%(Compile.Filename)%(Compile.Extension)' == 'BasicStructure.SpreadsheetAsData.g.cs' and '%(Compile.DependentUpon)' == 'BasicStructure.xlsx'" />
+                  <_SpreadsheetAsDataVisibleGeneratedNonCompile
+                    Include="@(None);@(Content)"
+                    Condition="'%(Filename)%(Extension)' == 'BasicStructure.SpreadsheetAsData.g.cs'" />
+                </ItemGroup>
+
                 <Error
-                  Condition="'%(Compile.Identity)' == 'BasicStructure.SpreadsheetAsData.g.cs' and '%(Compile.DependentUpon)' != 'BasicStructure.xlsx'"
+                  Condition="'%(Compile.Filename)%(Compile.Extension)' == 'BasicStructure.SpreadsheetAsData.g.cs' and '%(Compile.DependentUpon)' != 'BasicStructure.xlsx'"
                   Text="Generated source was not nested under the Excel file." />
+                <Error
+                  Condition="'@(_SpreadsheetAsDataExpectedGeneratedCompile)' == ''"
+                  Text="Generated source was not declared as Compile with Excel nesting metadata." />
+                <Error
+                  Condition="'@(_SpreadsheetAsDataVisibleGeneratedNonCompile)' != ''"
+                  Text="Generated source was also visible as non-Compile item." />
               </Target>
             </Project>
             """);
@@ -291,6 +306,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
                 }
             }
 
+            Invoke-DotnetMSBuild .\SpreadsheetAsData.SdkProject.csproj /t:CheckGeneratedCompileMetadata /nologo /v:minimal
             Invoke-DotnetMSBuild .\SpreadsheetAsData.SdkProject.csproj /t:GenerateSpreadsheetAsDataSources /nologo /v:minimal
             Invoke-DotnetMSBuild .\SpreadsheetAsData.SdkProject.csproj /t:CheckGeneratedCompileMetadata /nologo /v:minimal /p:DesignTimeBuild=true
             """);
