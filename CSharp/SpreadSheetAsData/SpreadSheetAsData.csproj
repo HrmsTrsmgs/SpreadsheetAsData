@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>Marimo.SpreadSheetAsData.Core</PackageId>
-    <Version>0.2.2</Version>
+    <Version>0.2.3</Version>
     <Authors>HrmsTrsmgs</Authors>
     <Description>Reads Excel workbook data through workbook, worksheet, cell range, and typed table APIs.</Description>
     <PackageTags>excel;spreadsheet;openxml;table;xlsx</PackageTags>

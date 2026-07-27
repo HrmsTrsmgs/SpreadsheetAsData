@@ -36,6 +36,7 @@
         Include="@(_SpreadsheetAsDataGeneratedCompile)"
         AutoGen="true"
         DesignTime="true"
+        DesignTimeSharedInput="%(_SpreadsheetAsDataGeneratedCompile.DesignTimeSharedInput)"
         DependentUpon="%(_SpreadsheetAsDataGeneratedCompile.DependentUpon)" />
       <FileWrites Include="@(_SpreadsheetAsDataGeneratedCompile)" />
     </ItemGroup>
@@ -44,11 +45,13 @@
   <ItemGroup Condition="'@(SpreadsheetAsData)' != '' and '$(DesignTimeBuild)' == 'true'">
     <_SpreadsheetAsDataDesignTimeGeneratedCompile
       Include="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename).SpreadsheetAsData.g.cs')"
-      DependentUpon="%(SpreadsheetAsData.Filename)%(SpreadsheetAsData.Extension)" />
+      DependentUpon="%(SpreadsheetAsData.Filename)%(SpreadsheetAsData.Extension)"
+      DesignTimeSharedInput="true" />
     <Compile
       Include="@(_SpreadsheetAsDataDesignTimeGeneratedCompile)"
       AutoGen="true"
       DesignTime="true"
+      DesignTimeSharedInput="%(_SpreadsheetAsDataDesignTimeGeneratedCompile.DesignTimeSharedInput)"
       DependentUpon="%(_SpreadsheetAsDataDesignTimeGeneratedCompile.DependentUpon)" />
   </ItemGroup>
 </Project>

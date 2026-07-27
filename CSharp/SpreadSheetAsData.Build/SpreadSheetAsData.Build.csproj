@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>Marimo.SpreadSheetAsData.Build</PackageId>
-    <Version>0.2.2</Version>
+    <Version>0.2.3</Version>
     <Authors>HrmsTrsmgs</Authors>
     <Description>Provides MSBuild and Visual Studio integration for SpreadsheetAsData code generation.</Description>
     <PackageTags>excel;spreadsheet;openxml;msbuild;visual-studio;xlsx</PackageTags>

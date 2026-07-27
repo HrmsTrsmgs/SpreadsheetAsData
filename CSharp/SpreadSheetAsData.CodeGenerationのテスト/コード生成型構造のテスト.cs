@@ -35,6 +35,22 @@ public sealed class コード生成型構造のテスト
             .Should().BeAssignableTo<Workbook>();
     }
 
+    [Fact]
+    public void 生成されたBook型は指定ファイルを開く静的Openメソッドを公開します()
+    {
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath))
+            .GeneratedType("BasicStructureBook")
+            .GetMethod("Open", [typeof(string)]);
+
+        tested.Should().NotBeNull();
+        tested.IsStatic.Should().BeTrue();
+        tested.ReturnType.Should().Be(
+            tested.DeclaringType);
+    }
+
     [Theory]
     [InlineData("SalesDataSheet")]
     [InlineData("ProductMasterSheet")]

@@ -25,9 +25,16 @@ static class WorkbookWrapperComponents
         /// </summary>
         public partial class {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book : Workbook
         {
-            public {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book() : base({{StringLiteral(filePath)}})
+            public {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book() : this({{StringLiteral(filePath)}})
             {
             }
+
+            public {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book(string filePath) : base(filePath)
+            {
+            }
+
+            public static new {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book Open(string filePath) =>
+                new(filePath);
         {{ForEach([
             .. from definedName in BookScopedDefinedNames(book)
                where IsSingleCellDefinedName(definedName)

@@ -278,6 +278,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
     {
         var item = new TaskItem(outputFilePath);
         item.SetMetadata("DependentUpon", Path.GetFileName(excelFilePath));
+        item.SetMetadata("DesignTimeSharedInput", "true");
         return item;
     }
 

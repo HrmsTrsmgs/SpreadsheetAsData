@@ -55,9 +55,16 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                 /// </summary>
                 public partial class BasicStructureBook : Workbook
                 {
-                    public BasicStructureBook() : base("TestData\\コード生成\\BasicStructure.xlsx")
+                    public BasicStructureBook() : this("TestData\\コード生成\\BasicStructure.xlsx")
                     {
                     }
+
+                    public BasicStructureBook(string filePath) : base(filePath)
+                    {
+                    }
+
+                    public static new BasicStructureBook Open(string filePath) =>
+                        new(filePath);
 
                     /// <summary>
                     /// ワークシート「SalesData」を取得します。

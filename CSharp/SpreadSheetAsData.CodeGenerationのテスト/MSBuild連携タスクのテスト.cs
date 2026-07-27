@@ -34,6 +34,8 @@ public sealed class MSBuild連携タスクのテスト
         tested.Succeeded.Should().BeTrue();
         tested.SingleGeneratedFile.GetMetadata("DependentUpon")
             .Should().Be("BasicStructure.xlsx");
+        tested.SingleGeneratedFile.GetMetadata("DesignTimeSharedInput")
+            .Should().Be("true");
     }
 
     [Fact]
