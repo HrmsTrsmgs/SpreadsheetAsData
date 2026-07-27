@@ -13,6 +13,7 @@
   <ItemGroup Condition="'@(SpreadsheetAsData)' != ''">
     <SpreadsheetAsData Update="@(SpreadsheetAsData)">
       <SpreadsheetAsDataDependentUpon>%(Filename)%(Extension)</SpreadsheetAsDataDependentUpon>
+      <LastGenOutput>%(Filename).SpreadsheetAsData.g.cs</LastGenOutput>
     </SpreadsheetAsData>
     <_SpreadsheetAsDataGeneratedCompile
       Include="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename).SpreadsheetAsData.g.cs')"

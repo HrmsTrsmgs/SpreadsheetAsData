@@ -278,6 +278,9 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
                   <_SpreadsheetAsDataVisibleGeneratedNonCompile
                     Include="@(None);@(Content)"
                     Condition="'%(Filename)%(Extension)' == 'BasicStructure.SpreadsheetAsData.g.cs'" />
+                  <_SpreadsheetAsDataParentWithLastGeneratedOutput
+                    Include="@(SpreadsheetAsData)"
+                    Condition="'%(SpreadsheetAsData.Filename)%(SpreadsheetAsData.Extension)' == 'BasicStructure.xlsx' and '%(SpreadsheetAsData.LastGenOutput)' == 'BasicStructure.SpreadsheetAsData.g.cs'" />
                 </ItemGroup>
 
                 <Error
@@ -289,6 +292,9 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
                 <Error
                   Condition="'@(_SpreadsheetAsDataVisibleGeneratedNonCompile)' != ''"
                   Text="Generated source was also visible as non-Compile item." />
+                <Error
+                  Condition="'@(_SpreadsheetAsDataParentWithLastGeneratedOutput)' == ''"
+                  Text="Excel file did not declare the generated source as LastGenOutput." />
               </Target>
             </Project>
             """);
