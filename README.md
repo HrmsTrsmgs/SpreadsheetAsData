@@ -9,11 +9,11 @@ Open XML SDKを内部実装として使いながら、利用側コードから�
 
 Visual Studioで新規プロジェクトを作成し、NuGetパッケージとExcelファイルを追加して、生成された型付きAPIからExcelテーブルを読み取る流れを確認できます。
 
-<video controls width="960" src="docs/assets/visual-studio-code-generation-demo.mp4">
+<video controls width="960" src="https://raw.githubusercontent.com/HrmsTrsmgs/SpreadsheetAsData/master/docs/assets/visual-studio-code-generation-demo.mp4">
   Visual StudioでExcelファイルから型付きコードを生成するデモを見る
 </video>
 
-[Visual StudioでExcelファイルから型付きコードを生成するデモを見る](docs/assets/visual-studio-code-generation-demo.mp4)
+[Visual StudioでExcelファイルから型付きコードを生成するデモを見る](https://raw.githubusercontent.com/HrmsTrsmgs/SpreadsheetAsData/master/docs/assets/visual-studio-code-generation-demo.mp4)
 
 ## まずできること
 
