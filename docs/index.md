@@ -18,3 +18,4 @@ Ruby版のAPIリファレンスは、Ruby版の再整備後に追加する予定
 * [初回公開版の範囲](public-release-scope.md)
 * [ロードマップ](roadmap.md)
 * [型付き読み取り](typed-reading.md)
+* [公開運用](release-operations.md)

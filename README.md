@@ -449,6 +449,8 @@ pwsh -NoProfile -File .\scripts\serve-csharp-api-docs.ps1 -BuildOnly
 生成されたHTMLは `docs/api/csharp/_site/` に出力されます。
 DocFXが生成する `docs/api/csharp/metadata/` と `docs/api/csharp/_site/` は、再生成できる成果物としてGit管理に含めません。
 
+公開後のC# APIドキュメントは `https://hrmstrsmgs.github.io/SpreadsheetAsData/api/csharp/` で参照できます。
+
 ## 現在の確認状況
 
 直近の再整備では、次を確認しています。
