@@ -5,6 +5,16 @@ SpreadsheetAsDataは、Excelをインストールしていない環境でもExce
 現在はC#版を再整備中です。
 Open XML SDKを内部実装として使いながら、利用側コードからはワークブック、ワークシート、セルをコレクション操作に近い感覚で扱えるAPIを目指しています。
 
+## 動画で見る
+
+Visual Studioで新規プロジェクトを作成し、NuGetパッケージとExcelファイルを追加して、生成された型付きAPIからExcelテーブルを読み取る流れを確認できます。
+
+<video controls width="960" src="docs/assets/visual-studio-code-generation-demo.mp4">
+  Visual StudioでExcelファイルから型付きコードを生成するデモを見る
+</video>
+
+[Visual StudioでExcelファイルから型付きコードを生成するデモを見る](docs/assets/visual-studio-code-generation-demo.mp4)
+
 ## まずできること
 
 SpreadsheetAsDataは、Excelファイルを低水準のOpen XML要素としてではなく、業務で使う表データとして読み取るためのAPIを優先しています。
