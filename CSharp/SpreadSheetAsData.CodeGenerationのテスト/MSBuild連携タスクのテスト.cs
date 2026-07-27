@@ -173,4 +173,26 @@ public sealed class MSBuild連携タスクのテスト
         project.GeneratedSourceFor("BasicStructure.xlsx")
             .Should().Contain("public partial class BasicStructureBook : Workbook");
     }
+
+    [Fact]
+    public void PowerShellからdotnet_msbuildのDesignTimeBuildで生成コードを参照できます()
+    {
+        using var project = MSBuild連携テストプロジェクト.Create();
+        project.AddBasicStructureExcel("BasicStructure.xlsx");
+        project.Generate(project.ExcelFilePathFor("BasicStructure.xlsx"));
+        var scriptFilePath = project.AddPowerShellDesignTimeBuildSample();
+
+        var tested = PowerShell実行結果.Run(
+            scriptFilePath,
+            project.DirectoryPath);
+
+        tested.ExitCode.Should().Be(0, tested.Output);
+    }
+
+    [Fact]
+    public void DesignTimeBuild用targetsはVisual_Studioが拒否する項目メタデータ条件を使いません()
+    {
+        MSBuild連携テストプロジェクト.BuildTargetsSource
+            .Should().NotContain("%(_SpreadsheetAsDataDesignTimeGeneratedCompile.Identity)");
+    }
 }

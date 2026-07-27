@@ -35,6 +35,13 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
     internal static MSBuild連携テストプロジェクト Create() =>
         new();
 
+    /// <summary>
+    /// パッケージへ含めるMSBuild targetsの内容です。
+    /// </summary>
+    internal static string BuildTargetsSource =>
+        File.ReadAllText(RepositoryFilePath(
+            @"SpreadSheetAsData.Build\buildTransitive\Marimo.SpreadSheetAsData.Build.targets"));
+
     public void Dispose()
     {
         if (Directory.Exists(DirectoryPath))
@@ -131,6 +138,14 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
         File.ReadAllText(GeneratedFilePathFor(excelRelativePath));
 
     /// <summary>
+    /// 指定したExcelファイルの絶対パスを取得します。
+    /// </summary>
+    /// <param name="excelRelativePath">一時プロジェクト内のExcelファイル相対パス。</param>
+    /// <returns>Excelファイルの絶対パス。</returns>
+    internal string ExcelFilePathFor(string excelRelativePath) =>
+        Path.Combine(DirectoryPath, excelRelativePath);
+
+    /// <summary>
     /// PowerShellからdotnet msbuildを起動するサンプルを作成します。
     /// </summary>
     /// <returns>実行するPowerShellスクリプトの絶対パス。</returns>
@@ -181,6 +196,51 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
         return scriptFilePath;
     }
 
+    /// <summary>
+    /// PowerShellからdotnet msbuildのDesignTimeBuildを起動するサンプルを作成します。
+    /// </summary>
+    /// <returns>実行するPowerShellスクリプトの絶対パス。</returns>
+    internal string AddPowerShellDesignTimeBuildSample()
+    {
+        AddPackageLayout();
+        File.WriteAllText(
+            Path.Combine(DirectoryPath, "SpreadsheetAsData.DesignTimeBuild.proj"),
+            """
+            <Project>
+              <Import Project="Package\buildTransitive\Marimo.SpreadSheetAsData.Build.props" />
+
+              <PropertyGroup>
+                <RootNamespace>Generated</RootNamespace>
+                <IntermediateOutputPath>obj\Debug\net10.0\</IntermediateOutputPath>
+                <DesignTimeBuild>true</DesignTimeBuild>
+              </PropertyGroup>
+
+              <ItemGroup>
+                <SpreadsheetAsData Include="BasicStructure.xlsx" />
+              </ItemGroup>
+
+              <Import Project="Package\buildTransitive\Marimo.SpreadSheetAsData.Build.targets" />
+
+              <Target Name="Build">
+                <Error
+                  Condition="'@(Compile)' == ''"
+                  Text="Generated source was not added to Compile." />
+              </Target>
+            </Project>
+            """);
+
+        var scriptFilePath = Path.Combine(DirectoryPath, "DesignTimeBuild.ps1");
+        File.WriteAllText(
+            scriptFilePath,
+            """
+            $ErrorActionPreference = 'Stop'
+
+            dotnet msbuild .\SpreadsheetAsData.DesignTimeBuild.proj /t:Build /nologo /v:minimal
+            """);
+
+        return scriptFilePath;
+    }
+
     void AddPackageLayout()
     {
         var buildTransitiveDirectory = Path.Combine(DirectoryPath, "Package", "buildTransitive");
@@ -219,17 +279,20 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
         string destinationPath)
     {
         File.Copy(
-            Path.GetFullPath(
-                Path.Combine(
-                    AppContext.BaseDirectory,
-                    "..",
-                    "..",
-                    "..",
-                    "..",
-                    relativePathFromCSharpDirectory)),
+            RepositoryFilePath(relativePathFromCSharpDirectory),
             destinationPath,
             true);
     }
+
+    static string RepositoryFilePath(string relativePathFromCSharpDirectory) =>
+        Path.GetFullPath(
+            Path.Combine(
+                AppContext.BaseDirectory,
+                "..",
+                "..",
+                "..",
+                "..",
+                relativePathFromCSharpDirectory));
 
     static string WriteDictionary(
         string filePath,
