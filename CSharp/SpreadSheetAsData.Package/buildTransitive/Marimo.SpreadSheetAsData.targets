@@ -10,6 +10,10 @@
     Runtime="NET"
     Condition="'$(_SpreadsheetAsDataSupportsNetTaskHost)' == 'true'" />
 
+  <ItemGroup Condition="'@(SpreadsheetAsData)' != ''">
+    <Compile Remove="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename).SpreadsheetAsData.g.cs')" />
+  </ItemGroup>
+
   <Target
     Name="_SpreadsheetAsDataUnsupportedMSBuild"
     BeforeTargets="CoreCompile"

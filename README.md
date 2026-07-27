@@ -403,7 +403,7 @@ dotnet pack .\CSharp\SpreadSheetAsData.slnx -c Release -o .\artifacts\nupkg
 NuGet.orgへ公開する前にローカルで別プロジェクトから確認する場合は、検証先プロジェクトに `PackageReference` を追加し、復元時にローカルパッケージ出力先とNuGet.orgをNuGetソースとして指定します。
 
 ```xml
-<PackageReference Include="Marimo.SpreadSheetAsData" Version="0.2.3" />
+<PackageReference Include="Marimo.SpreadSheetAsData" Version="0.2.4" />
 ```
 
 ```powershell
@@ -456,7 +456,7 @@ DocFXが生成する `docs/api/csharp/metadata/` と `docs/api/csharp/_site/` �
 直近の再整備では、次を確認しています。
 
 * ビルド: 成功
-* テスト: 成功、本体176件、コード生成185件
+* テスト: 成功、本体176件、コード生成197件
 * XMLドキュメント生成: 成功、警告なし
 * `dotnet format --verify-no-changes`: 成功
 

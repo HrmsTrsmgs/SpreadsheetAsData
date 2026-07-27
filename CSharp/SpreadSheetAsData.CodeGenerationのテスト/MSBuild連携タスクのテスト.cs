@@ -192,6 +192,20 @@ public sealed class MSBuild連携タスクのテスト
     }
 
     [Fact]
+    public void SDK形式プロジェクトでは生成コードを既定Compileと重複させず元Excelファイルへ紐づけます()
+    {
+        using var project = MSBuild連携テストプロジェクト.Create();
+        project.AddBasicStructureExcel("BasicStructure.xlsx");
+        var scriptFilePath = project.AddPowerShellSdkProjectNestingSample();
+
+        var tested = PowerShell実行結果.Run(
+            scriptFilePath,
+            project.DirectoryPath);
+
+        tested.ExitCode.Should().Be(0, tested.Output);
+    }
+
+    [Fact]
     public void DesignTimeBuild用targetsはVisual_Studioが拒否する項目メタデータ条件を使いません()
     {
         MSBuild連携テストプロジェクト.BuildTargetsSource

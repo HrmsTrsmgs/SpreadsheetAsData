@@ -241,6 +241,63 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
         return scriptFilePath;
     }
 
+    /// <summary>
+    /// SDK形式プロジェクトで、生成コードの重複登録とVisual Studio向けメタデータを確認するサンプルを作成します。
+    /// </summary>
+    /// <returns>実行するPowerShellスクリプトの絶対パス。</returns>
+    internal string AddPowerShellSdkProjectNestingSample()
+    {
+        AddPackageLayout();
+        File.WriteAllText(
+            Path.Combine(DirectoryPath, "SpreadsheetAsData.SdkProject.csproj"),
+            """
+            <Project Sdk="Microsoft.NET.Sdk">
+              <Import Project="Package\buildTransitive\Marimo.SpreadSheetAsData.Build.props" />
+
+              <PropertyGroup>
+                <OutputType>Library</OutputType>
+                <TargetFramework>net10.0</TargetFramework>
+                <ImplicitUsings>enable</ImplicitUsings>
+                <Nullable>enable</Nullable>
+                <RootNamespace>Generated</RootNamespace>
+                <RestoreProjectStyle>None</RestoreProjectStyle>
+              </PropertyGroup>
+
+              <ItemGroup>
+                <Reference Include="SpreadSheetAsData" HintPath="Package\tools\net10.0\SpreadSheetAsData.dll" />
+                <SpreadsheetAsData Include="BasicStructure.xlsx" />
+              </ItemGroup>
+
+              <Import Project="Package\buildTransitive\Marimo.SpreadSheetAsData.Build.targets" />
+
+              <Target Name="CheckGeneratedCompileMetadata">
+                <Error
+                  Condition="'%(Compile.Identity)' == 'BasicStructure.SpreadsheetAsData.g.cs' and '%(Compile.DependentUpon)' != 'BasicStructure.xlsx'"
+                  Text="Generated source was not nested under the Excel file." />
+              </Target>
+            </Project>
+            """);
+
+        var scriptFilePath = Path.Combine(DirectoryPath, "SdkProject.ps1");
+        File.WriteAllText(
+            scriptFilePath,
+            """
+            $ErrorActionPreference = 'Stop'
+
+            function Invoke-DotnetMSBuild {
+                dotnet msbuild @args
+                if ($LASTEXITCODE -ne 0) {
+                    throw "dotnet msbuild $($args -join ' ') failed with exit code $LASTEXITCODE."
+                }
+            }
+
+            Invoke-DotnetMSBuild .\SpreadsheetAsData.SdkProject.csproj /t:GenerateSpreadsheetAsDataSources /nologo /v:minimal
+            Invoke-DotnetMSBuild .\SpreadsheetAsData.SdkProject.csproj /t:CheckGeneratedCompileMetadata /nologo /v:minimal /p:DesignTimeBuild=true
+            """);
+
+        return scriptFilePath;
+    }
+
     void AddPackageLayout()
     {
         var buildTransitiveDirectory = Path.Combine(DirectoryPath, "Package", "buildTransitive");

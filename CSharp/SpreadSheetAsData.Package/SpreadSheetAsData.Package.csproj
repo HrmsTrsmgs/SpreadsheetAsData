@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <PackageId>Marimo.SpreadSheetAsData</PackageId>
-    <Version>0.2.3</Version>
+    <Version>0.2.4</Version>
     <Authors>HrmsTrsmgs</Authors>
     <Description>Recommended package for SpreadsheetAsData, including runtime APIs, code generation APIs, and MSBuild integration.</Description>
     <PackageTags>excel;spreadsheet;openxml;code-generation;msbuild;xlsx</PackageTags>
