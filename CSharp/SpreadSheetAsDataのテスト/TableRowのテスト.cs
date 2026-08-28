@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Marimo.SpreadSheetAsData;
+using Marimo.SpreadSheetAsData.Test.テスト補助;
 using Xunit;
 
 namespace Marimo.SpreadSheetAsData.Test;
@@ -12,6 +13,7 @@ public class TableRowのテスト : IDisposable
     readonly Table table;
     readonly TableRow firstRow;
     readonly TableColumn secondColumn;
+    readonly TemporaryExcelFiles temporaryFiles = new();
 
     public TableRowのテスト()
     {
@@ -24,6 +26,7 @@ public class TableRowのテスト : IDisposable
     public void Dispose()
     {
         book.Close();
+        temporaryFiles.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -92,5 +95,58 @@ public class TableRowのテスト : IDisposable
         var action = () => _ = firstRow[4];
 
         action.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
+    [Fact(Skip = "読み込みAPIと対になるTableRowセル書き込み機能を実装するときに解除する。")]
+    public void 列名を指定して対応するセルへ値を書き込めます()
+    {
+        var filePath = temporaryFiles.Copy("テーブル.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            book.Tables["型付き行マッピング"].Rows.First()["数値2"].Value = 99;
+            book.Save();
+        }
+
+        using var tested = Workbook.Open(filePath);
+
+        (tested.Tables["型付き行マッピング"].Rows.First()["数値2"].Value as object)
+            .Should().Be(99d);
+    }
+
+    [Fact(Skip = "読み込みAPIと対になるTableRowセル書き込み機能を実装するときに解除する。")]
+    public void TableColumnを指定して対応するセルへ値を書き込めます()
+    {
+        var filePath = temporaryFiles.Copy("テーブル.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            var table = book.Tables["型付き行マッピング"];
+
+            table.Rows.First()[table.Columns["数値2"]].Value = 99;
+            book.Save();
+        }
+
+        using var tested = Workbook.Open(filePath);
+
+        (tested.Tables["型付き行マッピング"].Rows.First()["数値2"].Value as object)
+            .Should().Be(99d);
+    }
+
+    [Fact(Skip = "読み込みAPIと対になるTableRowセル書き込み機能を実装するときに解除する。")]
+    public void 列位置を指定して対応するセルへ値を書き込めます()
+    {
+        var filePath = temporaryFiles.Copy("テーブル.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            book.Tables["型付き行マッピング"].Rows.First()[1].Value = 99;
+            book.Save();
+        }
+
+        using var tested = Workbook.Open(filePath);
+
+        (tested.Tables["型付き行マッピング"].Rows.First()[1].Value as object)
+            .Should().Be(99d);
     }
 }

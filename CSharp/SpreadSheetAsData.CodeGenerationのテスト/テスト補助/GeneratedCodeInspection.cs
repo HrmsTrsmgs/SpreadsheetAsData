@@ -81,6 +81,18 @@ static class GeneratedCodeInspection
             Activator.CreateInstance(self.GeneratedType(typeName)) is T instance
                 ? instance
                 : throw new InvalidOperationException(typeName);
+
+        /// <summary>
+        /// 生成コードをコンパイルしたアセンブリから、指定した引数で生成型のインスタンスを作成します。
+        /// </summary>
+        /// <typeparam name="T">作成したインスタンスを扱う型。</typeparam>
+        /// <param name="typeName">既定名前空間を除いた生成型名。</param>
+        /// <param name="arguments">生成型のコンストラクターへ渡す引数。</param>
+        /// <returns>指定した型として扱う生成型のインスタンス。</returns>
+        internal T GeneratedInstance<T>(string typeName, params object?[] arguments) =>
+            Activator.CreateInstance(self.GeneratedType(typeName), arguments) is T instance
+                ? instance
+                : throw new InvalidOperationException(typeName);
     }
 }
 

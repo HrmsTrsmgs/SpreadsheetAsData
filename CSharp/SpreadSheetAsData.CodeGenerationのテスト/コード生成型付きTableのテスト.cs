@@ -5,9 +5,17 @@ using Xunit;
 
 namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
-public sealed class コード生成型付きTableのテスト
+public sealed class コード生成型付きTableのテスト : IDisposable
 {
     const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
+
+    readonly TemporaryExcelFiles temporaryFiles = new();
+
+    public void Dispose()
+    {
+        temporaryFiles.Dispose();
+        GC.SuppressFinalize(this);
+    }
 
     [Fact]
     public void 生成されたTableはPOCOをExcel上の順序で列挙します()
@@ -86,6 +94,48 @@ public sealed class コード生成型付きTableのテスト
                     .Select(ReadHandWrittenRow));
     }
 
+    [Fact(Skip = "読み込みコード生成と対になる型付きTable書き込み機能を実装するときに解除する。")]
+    public void 生成されたTable型のWriteで型付き行を書き込めます()
+    {
+        var filePath = temporaryFiles.Copy(BasicStructureExcelFilePath);
+        var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
+            GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath));
+        var rowType = generatedAssembly.GeneratedType("SalesDetail");
+
+        using (var book = generatedAssembly.GeneratedInstance<Workbook>(
+                   "BasicStructureBook",
+                   filePath))
+        {
+            dynamic bookAccessor = book;
+
+            bookAccessor.SalesDetail.Write(CreateRows(
+                rowType,
+                (10, 1.5, "first"),
+                (20, 2.5, "second")));
+            book.Save();
+        }
+
+        using var tested = Workbook.Open(filePath);
+
+        tested.ReadTable<ReadTableComparison>("sales_detail")
+            .Should().BeEquivalentTo(
+                [
+                    new ReadTableComparison
+                    {
+                        CustomerId = 10,
+                        Amount = 1.5,
+                        Description = "first"
+                    },
+                    new ReadTableComparison
+                    {
+                        CustomerId = 20,
+                        Amount = 2.5,
+                        Description = "second"
+                    }
+                ],
+                options => options.WithStrictOrdering());
+    }
+
     static (object? CustomerId, object? Amount, object? Description) ReadGeneratedRow(object row) =>
         (
             PropertyValue(row, "CustomerId"),
@@ -104,6 +154,34 @@ public sealed class コード生成型付きTableのテスト
             row.Amount,
             row.Description
         );
+
+    static Array CreateRows(
+        Type rowType,
+        params (int CustomerId, double Amount, string Description)[] sourceRows)
+    {
+        var rows = Array.CreateInstance(rowType, sourceRows.Length);
+
+        for (var index = 0; index < sourceRows.Length; index++)
+        {
+            rows.SetValue(CreateRow(rowType, sourceRows[index]), index);
+        }
+
+        return rows;
+    }
+
+    static object CreateRow(
+        Type rowType,
+        (int CustomerId, double Amount, string Description) source)
+    {
+        var row = Activator.CreateInstance(rowType)
+            ?? throw new InvalidOperationException(rowType.Name);
+
+        rowType.GetProperty("CustomerId")?.SetValue(row, source.CustomerId);
+        rowType.GetProperty("Amount")?.SetValue(row, source.Amount);
+        rowType.GetProperty("Description")?.SetValue(row, source.Description);
+
+        return row;
+    }
 
     sealed class ReadTableComparison
     {

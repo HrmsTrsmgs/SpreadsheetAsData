@@ -57,8 +57,10 @@ public class Cell
     /// 空白セルは <see cref="BlankValue"/>、真偽値セルは <see cref="bool"/>、共有文字列セルと文字列セルは
     /// <see cref="string"/>、その他の数値セルは <see cref="double"/> として返します。
     /// </remarks>
-    public dynamic Value =>
-        (Xml.DataType?.Value, Xml.CellValue?.Text) switch
+    [System.Diagnostics.CodeAnalysis.AllowNull]
+    public dynamic Value
+    {
+        get => (Xml.DataType?.Value, Xml.CellValue?.Text) switch
         {
             (null, null) => new BlankValue(),
             (CellValues.Boolean, "0") => false,
@@ -68,6 +70,9 @@ public class Cell
             (_, string text) => double.Parse(text),
             _ => throw new InvalidOperationException()
         };
+
+        set => throw new NotImplementedException();
+    }
 
     /// <summary>
     /// Open XML の共有文字列インデックスを実際の文字列へ解決します。

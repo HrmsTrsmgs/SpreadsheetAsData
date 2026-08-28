@@ -74,6 +74,15 @@ public class CellRange
         (sheet ?? throw new NotImplementedException()).Cells[bottomRight.ToString()];
 
     /// <summary>
+    /// 範囲内のセル値を、左上から右下へ向かう二次元配列として取得または設定します。
+    /// </summary>
+    public object?[,] Values
+    {
+        get => throw new NotImplementedException();
+        set => throw new NotImplementedException();
+    }
+
+    /// <summary>
     /// 名前付き範囲では名前を返し、名前なし範囲では A1 形式のセル範囲を返します。
     /// </summary>
     /// <returns>名前または A1 形式のセル範囲。</returns>

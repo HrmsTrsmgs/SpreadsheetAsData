@@ -5,9 +5,17 @@ using Xunit;
 
 namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
-public sealed class コード生成定義名のテスト
+public sealed class コード生成定義名のテスト : IDisposable
 {
     const string DefinedNamesExcelFilePath = @"TestData\コード生成\定義名.xlsx";
+
+    readonly TemporaryExcelFiles temporaryFiles = new();
+
+    public void Dispose()
+    {
+        temporaryFiles.Dispose();
+        GC.SuppressFinalize(this);
+    }
 
     [Fact]
     public void ブックスコープの単一セル定義名をBookのCellプロパティとして生成します()
@@ -71,5 +79,55 @@ public sealed class コード生成定義名のテスト
             .GetProperty("Total").Should().NotBeNull();
         generatedAssembly.GeneratedType("SalesDataSheet")
             .GetProperty("Total").Should().NotBeNull();
+    }
+
+    [Fact(Skip = "読み込みコード生成と対になる定義名書き込み機能を実装するときに解除する。")]
+    public void 生成されたBook型のCellプロパティから値を書き込めます()
+    {
+        var filePath = temporaryFiles.Copy(DefinedNamesExcelFilePath);
+
+        using (var book = GeneratedCodeInspection
+                   .AssemblyFrom(
+                       GeneratedCodeInspection.GenerateSources(
+                           DefinedNamesExcelFilePath))
+                   .GeneratedInstance<Workbook>(
+                       "定義名Book",
+                       filePath))
+        {
+            dynamic bookAccessor = book;
+
+            bookAccessor.MainCell.Value = "generated";
+            book.Save();
+        }
+
+        using var tested = Workbook.Open(filePath);
+
+        (tested.Cell["book_cell"].Value as object)
+            .Should().Be("generated");
+    }
+
+    [Fact(Skip = "読み込みコード生成と対になる定義名書き込み機能を実装するときに解除する。")]
+    public void 生成されたSheet型のCellプロパティから値を書き込めます()
+    {
+        var filePath = temporaryFiles.Copy(DefinedNamesExcelFilePath);
+
+        using (var book = GeneratedCodeInspection
+                   .AssemblyFrom(
+                       GeneratedCodeInspection.GenerateSources(
+                           DefinedNamesExcelFilePath))
+                   .GeneratedInstance<Workbook>(
+                       "定義名Book",
+                       filePath))
+        {
+            dynamic bookAccessor = book;
+
+            bookAccessor.SalesData.LocalCell.Value = "generated";
+            book.Save();
+        }
+
+        using var tested = Workbook.Open(filePath);
+
+        (tested.Sheets["SalesData"].Cell["local_cell"].Value as object)
+            .Should().Be("generated");
     }
 }

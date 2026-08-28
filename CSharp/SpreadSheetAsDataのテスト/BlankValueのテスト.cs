@@ -29,10 +29,8 @@ public class BlankValueのテスト : IDisposable
     {
         get
         {
-            object testedValue = tested;
-
-            testedValue.Should().BeOfType<BlankValue>();
-            return (BlankValue)testedValue;
+            return (tested as object)
+                .Should().BeOfType<BlankValue>().Which;
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Marimo.SpreadSheetAsData;
+using Marimo.SpreadSheetAsData.Test.テスト補助;
 using Xunit;
 
 namespace Marimo.SpreadSheetAsData.Test;
@@ -11,6 +12,7 @@ public class Tableのテスト : IDisposable
     readonly Workbook book;
     readonly Table table;
     readonly Table typedMappingTable;
+    readonly TemporaryExcelFiles temporaryFiles = new();
 
     public Tableのテスト()
     {
@@ -22,6 +24,7 @@ public class Tableのテスト : IDisposable
     public void Dispose()
     {
         book.Close();
+        temporaryFiles.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -95,5 +98,54 @@ public class Tableのテスト : IDisposable
             .Should().BeEquivalentTo(
                 book.ReadTable<TestMappedRow>("型付き行マッピング"),
                 options => options.WithStrictOrdering());
+    }
+
+    [Fact(Skip = "読み込みAPIと対になるTable単位の型付き書き込み機能を実装するときに解除する。")]
+    public void Writeは属性がないプロパティ名を列名として使用します()
+    {
+        var filePath = temporaryFiles.Copy("テーブル.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            book.Tables["プロパティ名マッピング"].Write(
+                [
+                    new WritablePropertyNameMappedRow
+                    {
+                        @float = 10.1,
+                        @string = "first"
+                    },
+                    new WritablePropertyNameMappedRow
+                    {
+                        @float = 20.2,
+                        @string = "second"
+                    }
+                ]);
+            book.Save();
+        }
+
+        using var tested = Workbook.Open(filePath);
+
+        tested.ReadTable<型付きTableのテスト.PropertyNameMappedRow>("プロパティ名マッピング")
+            .Should().BeEquivalentTo(
+                [
+                    new 型付きTableのテスト.PropertyNameMappedRow
+                    {
+                        @float = 10.1,
+                        @string = "first"
+                    },
+                    new 型付きTableのテスト.PropertyNameMappedRow
+                    {
+                        @float = 20.2,
+                        @string = "second"
+                    }
+                ],
+                options => options.WithStrictOrdering());
+    }
+
+    public sealed class WritablePropertyNameMappedRow
+    {
+        public double @float { get; set; }
+
+        public string @string { get; set; } = "";
     }
 }
