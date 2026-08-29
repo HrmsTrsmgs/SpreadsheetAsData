@@ -71,7 +71,10 @@ public class Cell
             _ => throw new InvalidOperationException()
         };
 
-        set => throw new NotImplementedException();
+        set
+        {
+            Xml.CellValue = new(((double)value).ToString());
+        }
     }
 
     /// <summary>

@@ -16,7 +16,14 @@ sealed class TemporaryExcelFiles : IDisposable
     {
         var copiedPath = NewFilePath();
 
-        File.Copy(Path.Combine("TestData", sourceFileName), copiedPath);
+        using var source = File.Open(
+            Path.Combine("TestData", sourceFileName),
+            FileMode.Open,
+            FileAccess.Read,
+            FileShare.ReadWrite);
+        using var destination = File.Create(copiedPath);
+
+        source.CopyTo(destination);
 
         return copiedPath;
     }
