@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Marimo.SpreadSheetAsData;
 using Marimo.SpreadSheetAsData.Test.テスト補助;
+using System.Globalization;
 using Xunit;
 
 namespace Marimo.SpreadSheetAsData.Test;
@@ -35,6 +36,30 @@ public sealed class Cell書き込みのテスト : IDisposable
         tested.Value = 123;
 
         (tested.Value as object).Should().Be(123d);
+    }
+
+    [Fact]
+    public void Valueプロパティは現在カルチャーに依存せず数値を書き込めます()
+    {
+        var originalCulture = CultureInfo.CurrentCulture;
+
+        try
+        {
+            using var book = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));
+            var tested = book.Sheets["いろいろなデータ"].Cells["A1"];
+
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("de-DE");
+
+            tested.Value = 12.34;
+
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+
+            (tested.Value as object).Should().Be(12.34);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
     }
 
     [Fact(Skip = "読み込みAPIと対になるセル値書き込み機能を実装するときに解除する。")]

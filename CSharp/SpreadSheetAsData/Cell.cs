@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
+using System.Globalization;
 using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Marimo.SpreadSheetAsData;
@@ -73,7 +74,7 @@ public class Cell
 
         set
         {
-            Xml.CellValue = new(((double)value).ToString());
+            Xml.CellValue = new(((double)value).ToString(CultureInfo.InvariantCulture));
         }
     }
 
