@@ -81,6 +81,13 @@ public class Cell
                 return;
             }
 
+            if (value is bool boolean)
+            {
+                Xml.DataType = CellValues.Boolean;
+                Xml.CellValue = new(boolean ? "1" : "0");
+                return;
+            }
+
             Xml.CellValue = new(((double)value).ToString(CultureInfo.InvariantCulture));
         }
     }
