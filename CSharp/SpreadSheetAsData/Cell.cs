@@ -74,6 +74,13 @@ public class Cell
 
         set
         {
+            if (value is string text)
+            {
+                Xml.DataType = CellValues.String;
+                Xml.CellValue = new(text);
+                return;
+            }
+
             Xml.CellValue = new(((double)value).ToString(CultureInfo.InvariantCulture));
         }
     }

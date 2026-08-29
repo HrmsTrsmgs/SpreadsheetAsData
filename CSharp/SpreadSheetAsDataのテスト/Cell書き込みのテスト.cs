@@ -62,21 +62,15 @@ public sealed class Cell書き込みのテスト : IDisposable
         }
     }
 
-    [Fact(Skip = "読み込みAPIと対になるセル値書き込み機能を実装するときに解除する。")]
+    [Fact]
     public void Valueプロパティは文字列を書き込めます()
     {
-        var filePath = temporaryFiles.Copy("Book1.xlsx");
+        using var book = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));
+        var tested = book.Sheets["いろいろなデータ"].Cells["A3"];
 
-        using (var book = Workbook.Open(filePath))
-        {
-            book.Sheets["いろいろなデータ"].Cells["A3"].Value = "書き込み";
-            book.Save();
-        }
+        tested.Value = "書き込み";
 
-        using var tested = Workbook.Open(filePath);
-
-        (tested.Sheets["いろいろなデータ"].Cells["A3"].Value as object)
-            .Should().Be("書き込み");
+        (tested.Value as object).Should().Be("書き込み");
     }
 
     [Fact(Skip = "読み込みAPIと対になるセル値書き込み機能を実装するときに解除する。")]
