@@ -26,21 +26,15 @@ public sealed class Cell書き込みのテスト : IDisposable
         (tested.Value as object).Should().Be(12.34);
     }
 
-    [Fact(Skip = "読み込みAPIと対になるセル値書き込み機能を実装するときに解除する。")]
-    public void Valueプロパティは整数を書き込めます()
+    [Fact]
+    public void Valueプロパティは整数を設定すると同じセルから数値として取得できます()
     {
-        var filePath = temporaryFiles.Copy("Book1.xlsx");
+        using var book = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));
+        var tested = book.Sheets["いろいろなデータ"].Cells["A1"];
 
-        using (var book = Workbook.Open(filePath))
-        {
-            book.Sheets["いろいろなデータ"].Cells["A1"].Value = 123;
-            book.Save();
-        }
+        tested.Value = 123;
 
-        using var tested = Workbook.Open(filePath);
-
-        (tested.Sheets["いろいろなデータ"].Cells["A1"].Value as object)
-            .Should().Be(123d);
+        (tested.Value as object).Should().Be(123d);
     }
 
     [Fact(Skip = "読み込みAPIと対になるセル値書き込み機能を実装するときに解除する。")]
