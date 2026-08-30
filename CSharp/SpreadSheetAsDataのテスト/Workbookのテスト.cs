@@ -19,7 +19,7 @@ public class Workbookのテスト : IDisposable
         {
             File.Copy(@"TestData\Book1.xlsx", コピーパス);
         }
-        book1 = Workbook.Open(@"TestData\Book1.xlsx");
+        book1 = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));
     }
 
     public void Dispose()
@@ -112,7 +112,7 @@ public class Workbookのテスト : IDisposable
             .Should().Throw<KeyNotFoundException>();
     }
 
-    [Fact(Skip = "読み込みAPIと対になる書き込み機能をWorkbook単位で実装するときに解除する。")]
+    [Fact]
     public void Saveは開いているファイルへ変更を保存します()
     {
         var filePath = temporaryFiles.Copy("Book1.xlsx");

@@ -221,7 +221,7 @@ public class Workbook : IDisposable
     /// ブックへの変更を、開いているファイルへ保存します。
     /// </summary>
     public void Save() =>
-        throw new NotImplementedException();
+        Document.Save();
 
     /// <summary>
     /// ブックへの変更を、指定した別ファイルへ保存します。
