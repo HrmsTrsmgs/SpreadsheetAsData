@@ -227,8 +227,10 @@ public class Workbook : IDisposable
     /// ブックへの変更を、指定した別ファイルへ保存します。
     /// </summary>
     /// <param name="filePath">保存先のファイルパス。</param>
-    public void SaveAs(string filePath) =>
-        throw new NotImplementedException();
+    public void SaveAs(string filePath)
+    {
+        using var document = Document.Clone(filePath);
+    }
 
     /// <summary>
     /// ブックが使用しているリソースを解放します。

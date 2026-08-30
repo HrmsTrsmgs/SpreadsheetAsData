@@ -129,7 +129,7 @@ public class Workbookのテスト : IDisposable
             .Should().Be(9.9);
     }
 
-    [Fact(Skip = "読み込みAPIと対になる書き込み機能をWorkbook単位で実装するときに解除する。")]
+    [Fact]
     public void SaveAsは変更したセル値を別ファイルへ保存します()
     {
         var sourcePath = temporaryFiles.Copy("Book1.xlsx");
