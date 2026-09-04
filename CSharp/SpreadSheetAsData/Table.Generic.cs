@@ -223,9 +223,10 @@ public class Table<T> : Table, IEnumerable<T>
     /// プロパティがマッピング対象かどうかを返します。
     /// </summary>
     /// <param name="property">確認するプロパティ。</param>
-    /// <returns>列属性を持つ、または public setter を持つ場合は true。</returns>
+    /// <returns>列属性を持つ、または public getter と public setter を持つ場合は true。</returns>
     static bool IsMappedProperty(PropertyInfo property) =>
-        HasSpreadsheetColumnAttribute(property) || HasPublicSetter(property);
+        HasSpreadsheetColumnAttribute(property)
+            || HasPublicGetter(property) && HasPublicSetter(property);
 
     /// <summary>
     /// マッピング対象になる公開プロパティを取得します。

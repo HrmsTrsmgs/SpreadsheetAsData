@@ -282,7 +282,7 @@ public sealed class 型付きTableのテスト : IDisposable
         action.Should().Throw<TableMappingException>();
     }
 
-    [Fact(Skip = "Table<T>.Replaceで属性のない書き込み専用プロパティを無視するときに解除する。")]
+    [Fact]
     public void Replaceは属性のない書き込み専用プロパティを無視します()
     {
         var filePath = temporaryFiles.Copy("テーブル.xlsx");
