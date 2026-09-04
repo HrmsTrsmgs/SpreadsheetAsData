@@ -8,6 +8,11 @@ namespace Marimo.SpreadSheetAsData;
 public class Workbook : IDisposable
 {
     /// <summary>
+    /// Open XML ドキュメントと、元ファイルへの明示保存に必要な状態を保持します。
+    /// </summary>
+    readonly DocumentSession documentSession;
+
+    /// <summary>
     /// <see cref="Dispose(bool)"/> の多重実行を防ぐための状態です。
     /// </summary>
     bool disposedValue;
@@ -18,23 +23,24 @@ public class Workbook : IDisposable
     /// <param name="filePath">開く Spreadsheet ファイルのパス。</param>
     /// <returns>開いたブック。</returns>
     public static Workbook Open(string filePath) =>
-        new(Packaging.SpreadsheetDocument.Open(filePath, true));
+        new(DocumentSession.Open(filePath));
 
     /// <summary>
     /// 派生した型付きブックから、指定したファイルをブックとして開きます。
     /// </summary>
     /// <param name="filePath">開く Spreadsheet ファイルのパス。</param>
-    protected Workbook(string filePath) : this(Packaging.SpreadsheetDocument.Open(filePath, true))
+    protected Workbook(string filePath) : this(DocumentSession.Open(filePath))
     {
     }
 
     /// <summary>
-    /// 既に開かれた Open XML ドキュメントを所有するブックを作成します。
+    /// 既に開かれた Open XML ドキュメントのセッションを所有するブックを作成します。
     /// </summary>
-    /// <param name="document">ブックとして扱う Open XML ドキュメント。</param>
-    Workbook(Packaging.SpreadsheetDocument document)
+    /// <param name="session">ブックとして扱う Open XML ドキュメントのセッション。</param>
+    Workbook(DocumentSession session)
     {
-        Document = document;
+        documentSession = session;
+        Document = session.Document;
         Range = new(this);
         Cell = new(this);
         Tables = new(this);
@@ -215,21 +221,107 @@ public class Workbook : IDisposable
     /// <summary>
     /// ブックが保持しているファイルを閉じます。
     /// </summary>
-    public void Close() => Document.Close();
+    public void Close() => documentSession.Dispose();
 
     /// <summary>
     /// ブックへの変更を、開いているファイルへ保存します。
     /// </summary>
     public void Save() =>
-        Document.Save();
+        documentSession.Save();
 
     /// <summary>
     /// ブックへの変更を、指定した別ファイルへ保存します。
     /// </summary>
     /// <param name="filePath">保存先のファイルパス。</param>
-    public void SaveAs(string filePath)
+    public void SaveAs(string filePath) =>
+        documentSession.SaveAs(filePath);
+
+    /// <summary>
+    /// ファイルをロックしたまま、編集対象の Open XML ドキュメントをメモリ上に保持します。
+    /// </summary>
+    sealed class DocumentSession : IDisposable
     {
-        using var document = Document.Clone(filePath);
+        readonly string filePath;
+        readonly MemoryStream stream;
+        FileStream fileLock;
+        bool disposedValue;
+
+        DocumentSession(
+            string filePath,
+            FileStream fileLock,
+            MemoryStream stream,
+            Packaging.SpreadsheetDocument document)
+        {
+            this.filePath = filePath;
+            this.fileLock = fileLock;
+            this.stream = stream;
+            Document = document;
+        }
+
+        internal Packaging.SpreadsheetDocument Document { get; }
+
+        internal static DocumentSession Open(string filePath)
+        {
+            var fileLock = Lock(filePath);
+            var stream = new MemoryStream();
+
+            try
+            {
+                fileLock.CopyTo(stream);
+                stream.Position = 0;
+
+                return new(
+                    filePath,
+                    fileLock,
+                    stream,
+                    Packaging.SpreadsheetDocument.Open(
+                        stream,
+                        isEditable: true,
+                        new Packaging.OpenSettings { AutoSave = false }));
+            }
+            catch
+            {
+                stream.Dispose();
+                fileLock.Dispose();
+                throw;
+            }
+        }
+
+        static FileStream Lock(string filePath) =>
+            File.Open(
+                filePath,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.ReadWrite);
+
+        internal void Save()
+        {
+            fileLock.Dispose();
+            try
+            {
+                SaveAs(filePath);
+            }
+            finally
+            {
+                fileLock = Lock(filePath);
+            }
+        }
+
+        internal void SaveAs(string filePath)
+        {
+            using var document = Document.Clone(filePath);
+        }
+
+        public void Dispose()
+        {
+            if (!disposedValue)
+            {
+                Document.Close();
+                stream.Dispose();
+                fileLock.Dispose();
+                disposedValue = true;
+            }
+        }
     }
 
     /// <summary>
