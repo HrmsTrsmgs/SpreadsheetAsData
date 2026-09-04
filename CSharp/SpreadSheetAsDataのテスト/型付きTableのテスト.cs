@@ -208,7 +208,7 @@ public sealed class 型付きTableのテスト : IDisposable
         rows.Select(it => it.TextValue).Should().Equal("さしすせそ", "たちつてと", "なにぬねの");
     }
 
-    [Fact(Skip = "Table<T>.Replaceで既存データ行へワークシート上の順序で値を反映するときに解除する。")]
+    [Fact]
     public void Replaceはワークシート上の順序でデータ行を置き換えます()
     {
         var filePath = temporaryFiles.Copy("テーブル.xlsx");
