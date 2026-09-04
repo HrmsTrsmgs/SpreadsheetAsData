@@ -42,6 +42,8 @@ public class Table<T> : Table, IEnumerable<T>
     /// <param name="items">置き換え後の型付き行。</param>
     public void Replace(IEnumerable<T> items)
     {
+        ValidateAttributedPropertiesHavePublicGetters();
+
         foreach (var (row, item) in base.Rows.Zip(items))
         {
             Replace(row, item);
@@ -156,6 +158,26 @@ public class Table<T> : Table, IEnumerable<T>
     }
 
     /// <summary>
+    /// 属性で対応付けたプロパティから値を読み取れることを検証します。
+    /// </summary>
+    void ValidateAttributedPropertiesHavePublicGetters()
+    {
+        if ((
+            from property in MappedProperties
+            where HasSpreadsheetColumnAttribute(property)
+                && !HasPublicGetter(property)
+            select property
+        ).TryGetFirst(out var propertyWithoutPublicGetter))
+        {
+            throw new TableMappingException(
+                this,
+                typeof(T),
+                GetColumnName(propertyWithoutPublicGetter),
+                propertyWithoutPublicGetter);
+        }
+    }
+
+    /// <summary>
     /// テーブル行から、指定したプロパティに対応する元セル値を取得します。
     /// </summary>
     /// <param name="row">値を取得するテーブル行。</param>
@@ -188,6 +210,14 @@ public class Table<T> : Table, IEnumerable<T>
     /// <returns>public setter がある場合は true。</returns>
     static bool HasPublicSetter(PropertyInfo property) =>
         property.SetMethod?.IsPublic == true;
+
+    /// <summary>
+    /// プロパティに public getter があるかどうかを返します。
+    /// </summary>
+    /// <param name="property">確認するプロパティ。</param>
+    /// <returns>public getter がある場合は true。</returns>
+    static bool HasPublicGetter(PropertyInfo property) =>
+        property.GetMethod?.IsPublic == true;
 
     /// <summary>
     /// プロパティがマッピング対象かどうかを返します。

@@ -268,7 +268,7 @@ public sealed class 型付きTableのテスト : IDisposable
         action.Should().Throw<TableMappingException>();
     }
 
-    [Fact(Skip = "Table<T>.Replaceで属性付きプロパティのpublic getter検証を実装するときに解除する。")]
+    [Fact]
     public void Replaceは属性を付けたプロパティにpublicなgetterがない場合に失敗します()
     {
         using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
