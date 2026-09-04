@@ -300,7 +300,7 @@ public sealed class 型付きTableのテスト : IDisposable
             .Should().Be(10d);
     }
 
-    [Fact(Skip = "Table<T>.Replaceでセル値へ変換できないプロパティ型の場合の失敗を実装するときに解除する。")]
+    [Fact]
     public void Replaceはセル値へ変換できないプロパティ型の場合に失敗します()
     {
         using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));

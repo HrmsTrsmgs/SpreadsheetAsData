@@ -55,11 +55,14 @@ public class Table<T> : Table, IEnumerable<T>
     /// </summary>
     /// <param name="row">書き込み先のテーブル行。</param>
     /// <param name="item">書き込み元の型付き行。</param>
-    static void Replace(TableRow row, T item)
+    void Replace(TableRow row, T item)
     {
         foreach (var property in MappedProperties)
         {
-            row[GetColumnName(property)].Value = property.GetValue(item);
+            var sourceValue = property.GetValue(item);
+
+            row[GetColumnName(property)].Value =
+                ConvertValueToCellValue(sourceValue, row, property);
         }
     }
 
@@ -263,6 +266,32 @@ public class Table<T> : Table, IEnumerable<T>
     }
 
     /// <summary>
+    /// マッピング元のプロパティ値を、セルへ設定できる値へ変換します。
+    /// </summary>
+    /// <param name="sourceValue">変換元のプロパティ値。</param>
+    /// <param name="row">書き込み先のテーブル行。</param>
+    /// <param name="property">変換元プロパティ。</param>
+    /// <returns>セルへ設定する値。</returns>
+    object ConvertValueToCellValue(
+        object? sourceValue,
+        TableRow row,
+        PropertyInfo property)
+    {
+        if (TryConvertValueToCellValue(sourceValue, out var converted))
+        {
+            return converted;
+        }
+
+        throw new TableMappingException(
+            this,
+            typeof(T),
+            GetColumnName(property),
+            property,
+            row,
+            sourceValue ?? new BlankValue());
+    }
+
+    /// <summary>
     /// 元セル値を指定した型へ変換します。
     /// </summary>
     /// <param name="sourceValue">変換元のセル値。</param>
@@ -280,6 +309,30 @@ public class Table<T> : Table, IEnumerable<T>
                 && double.IsInteger(number) => (int)number,
             ({ } type, double number) when type == typeof(double) => number,
             ({ } type, string text) when type == typeof(string) => text,
+            _ => null
+        };
+
+        converted = conversion ?? new();
+
+        return conversion != null;
+    }
+
+    /// <summary>
+    /// プロパティ値をセルへ直接設定できる値へ変換します。
+    /// </summary>
+    /// <param name="sourceValue">変換元のプロパティ値。</param>
+    /// <param name="converted">変換に成功した場合の値。</param>
+    /// <returns>セルへ設定できる値に変換できた場合は true。</returns>
+    static bool TryConvertValueToCellValue(
+        object? sourceValue,
+        out object converted)
+    {
+        object? conversion = sourceValue switch
+        {
+            int number => (double)number,
+            double number => number,
+            string text => text,
+            bool boolean => boolean,
             _ => null
         };
 
