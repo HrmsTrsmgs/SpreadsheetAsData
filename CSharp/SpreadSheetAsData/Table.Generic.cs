@@ -37,6 +37,31 @@ public class Table<T> : Table, IEnumerable<T>
         GetEnumerator();
 
     /// <summary>
+    /// Excel テーブルの内容を、指定した型付き行の内容で置き換えます。
+    /// </summary>
+    /// <param name="items">置き換え後の型付き行。</param>
+    public void Replace(IEnumerable<T> items)
+    {
+        foreach (var (row, item) in base.Rows.Zip(items))
+        {
+            Replace(row, item);
+        }
+    }
+
+    /// <summary>
+    /// 非型付きのテーブル行へ、マッピング元の型付き行から値を書き込みます。
+    /// </summary>
+    /// <param name="row">書き込み先のテーブル行。</param>
+    /// <param name="item">書き込み元の型付き行。</param>
+    static void Replace(TableRow row, T item)
+    {
+        foreach (var property in MappedProperties)
+        {
+            row[GetColumnName(property)].Value = property.GetValue(item);
+        }
+    }
+
+    /// <summary>
     /// マッピング先の型を作成できることを検証します。
     /// </summary>
     void ValidateMappingTypeCanBeCreated()

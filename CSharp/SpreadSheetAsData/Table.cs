@@ -114,14 +114,6 @@ public class Table
         new Table<T>(this);
 
     /// <summary>
-    /// Excel テーブルの既存データ行へ、指定した型付き行をワークシート上の順序で書き込みます。
-    /// </summary>
-    /// <typeparam name="T">各データ行として書き込む型。</typeparam>
-    /// <param name="rows">書き込む型付き行。</param>
-    public void Write<T>(IEnumerable<T> rows) =>
-        throw new NotImplementedException();
-
-    /// <summary>
     /// テーブル行と列定義の交点にあるワークシートセルを取得します。
     /// </summary>
     /// <param name="row">取得するセルが属するテーブル行。</param>

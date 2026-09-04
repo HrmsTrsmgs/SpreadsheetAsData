@@ -196,15 +196,6 @@ public class Workbook : IDisposable
         new(Tables[name]);
 
     /// <summary>
-    /// 指定した名前の Excel テーブルへ、指定した型付き行をワークシート上の順序で書き込みます。
-    /// </summary>
-    /// <typeparam name="T">各データ行として書き込む型。</typeparam>
-    /// <param name="name">書き込み先の Excel テーブル名。</param>
-    /// <param name="rows">書き込む型付き行。</param>
-    public void WriteTable<T>(string name, IEnumerable<T> rows) =>
-        throw new NotImplementedException();
-
-    /// <summary>
     /// 指定した位置のワークシートを取得します。
     /// </summary>
     /// <param name="index">取得するワークシートの 0 始まりの位置。</param>
