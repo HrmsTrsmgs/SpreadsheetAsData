@@ -141,7 +141,7 @@ public sealed class 型付きTableのテスト : IDisposable
                 options => options.WithStrictOrdering());
     }
 
-    [Fact(Skip = "Table<T>.Replaceで属性のないプロパティ名による列対応を実装するときに解除する。")]
+    [Fact]
     public void Replaceは属性がないプロパティ名を列名として使用します()
     {
         var filePath = temporaryFiles.Copy("テーブル.xlsx");
