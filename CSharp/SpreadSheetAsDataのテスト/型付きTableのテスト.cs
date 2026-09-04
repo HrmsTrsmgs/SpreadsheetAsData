@@ -233,7 +233,7 @@ public sealed class 型付きTableのテスト : IDisposable
             .Should().Equal(10d, 20d, 30d);
     }
 
-    [Fact(Skip = "Table<T>.Replaceで属性指定列が存在しない場合の失敗を実装するときに解除する。")]
+    [Fact]
     public void Replaceは属性で指定した列が存在しない場合に失敗します()
     {
         using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
