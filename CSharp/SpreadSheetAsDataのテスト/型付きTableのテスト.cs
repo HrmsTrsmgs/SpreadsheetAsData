@@ -247,7 +247,7 @@ public sealed class 型付きTableのテスト : IDisposable
         action.Should().Throw<TableMappingException>();
     }
 
-    [Fact(Skip = "Table<T>.Replaceで同じ列へ複数プロパティを対応付けた場合の失敗を実装するときに解除する。")]
+    [Fact]
     public void Replaceは複数プロパティが同じ列を指定した場合に失敗します()
     {
         using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
