@@ -156,15 +156,14 @@ public class Cellのテスト : IDisposable
         (tested.Value as object).Should().Be(false);
     }
 
-    [Fact(Skip = "読み込みAPIと対になるセル値書き込み機能を実装するときに解除する。")]
+    [Fact]
     public void Valueプロパティにnullを指定すると空白セルとして保存します()
     {
         var filePath = temporaryFiles.Copy("Book1.xlsx");
-        object? blankValue = null;
 
         using (var book = Workbook.Open(filePath))
         {
-            book.Sheets["いろいろなデータ"].Cells["A1"].Value = blankValue;
+            book.Sheets["いろいろなデータ"].Cells["A1"].Value = null;
             book.Save();
         }
 

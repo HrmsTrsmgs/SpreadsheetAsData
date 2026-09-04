@@ -74,6 +74,13 @@ public class Cell
 
         set
         {
+            if (value is null)
+            {
+                Xml.DataType = null;
+                Xml.CellValue = null;
+                return;
+            }
+
             if (value is string text)
             {
                 Xml.DataType = CellValues.String;
