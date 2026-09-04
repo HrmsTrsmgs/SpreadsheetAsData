@@ -184,7 +184,7 @@ public sealed class 型付きTableのテスト : IDisposable
                 options => options.WithStrictOrdering());
     }
 
-    [Fact(Skip = "Table<T>.Replaceでマッピング対象外のExcel列を維持する仕様を実装するときに解除する。")]
+    [Fact]
     public void Replaceは書き込み元に対応プロパティがない列を変更しません()
     {
         var filePath = temporaryFiles.Copy("テーブル.xlsx");
