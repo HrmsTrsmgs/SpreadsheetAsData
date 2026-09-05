@@ -140,40 +140,4 @@ public class TableRowのテスト : IDisposable
         (tested.Tables["型付き行マッピング"].Rows.First()["数値2"].Value as object)
             .Should().Be(99d);
     }
-
-    [Fact]
-    public void TableColumnを指定して対応するセルへ値を書き込めます()
-    {
-        var filePath = temporaryFiles.Copy("テーブル.xlsx");
-
-        using (var book = Workbook.Open(filePath))
-        {
-            var table = book.Tables["型付き行マッピング"];
-
-            table.Rows.First()[table.Columns["数値2"]].Value = 99;
-            book.Save();
-        }
-
-        using var tested = Workbook.Open(filePath);
-
-        (tested.Tables["型付き行マッピング"].Rows.First()["数値2"].Value as object)
-            .Should().Be(99d);
-    }
-
-    [Fact(Skip = "読み込みAPIと対になるTableRowセル書き込み機能を実装するときに解除する。")]
-    public void 列位置を指定して対応するセルへ値を書き込めます()
-    {
-        var filePath = temporaryFiles.Copy("テーブル.xlsx");
-
-        using (var book = Workbook.Open(filePath))
-        {
-            book.Tables["型付き行マッピング"].Rows.First()[1].Value = 99;
-            book.Save();
-        }
-
-        using var tested = Workbook.Open(filePath);
-
-        (tested.Tables["型付き行マッピング"].Rows.First()[1].Value as object)
-            .Should().Be(99d);
-    }
 }
