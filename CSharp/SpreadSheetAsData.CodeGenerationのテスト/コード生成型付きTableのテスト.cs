@@ -94,8 +94,8 @@ public sealed class コード生成型付きTableのテスト : IDisposable
                     .Select(ReadHandWrittenRow));
     }
 
-    [Fact(Skip = "読み込みコード生成と対になる型付きTable書き込み機能を実装するときに解除する。")]
-    public void 生成されたTable型のWriteで型付き行を書き込めます()
+    [Fact]
+    public void 生成されたTable型のReplaceで型付き行を書き込めます()
     {
         var filePath = temporaryFiles.Copy(BasicStructureExcelFilePath);
         var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
@@ -107,11 +107,12 @@ public sealed class コード生成型付きTableのテスト : IDisposable
                    filePath))
         {
             dynamic bookAccessor = book;
-
-            bookAccessor.SalesDetail.Write(CreateRows(
+            dynamic generatedRows = CreateRows(
                 rowType,
                 (10, 1.5, "first"),
-                (20, 2.5, "second")));
+                (20, 2.5, "second"));
+
+            bookAccessor.SalesDetail.Replace(generatedRows);
             book.Save();
         }
 
