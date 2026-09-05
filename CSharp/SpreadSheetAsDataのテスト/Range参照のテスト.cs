@@ -136,17 +136,31 @@ public class Range参照のテスト : IDisposable
         tested.ToString().Should().Be("book_range");
     }
 
+    [Fact]
+    public void Valuesは範囲内のセル値を行ごとに列挙します()
+    {
+        using var book = Workbook.Open(@"TestData\Book1.xlsx");
+
+        var rows = book.Sheets["いろいろなデータ"].Range["A1:B2"].Values
+            .Select(it => it.ToArray())
+            .ToArray();
+
+        rows.Should().HaveCount(2);
+        rows[0].Should().Equal(1.1, 2.2);
+        rows[1].Should().Equal(true, false);
+    }
+
     [Fact(Skip = "読み込みAPIと対になるCellRange値書き込み機能を実装するときに解除する。")]
-    public void ValuesはA1形式の範囲へ二次元配列を書き込めます()
+    public void ValuesはA1形式の範囲へ行ごとの値を書き込めます()
     {
         using var book = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));
         var sheet = book.Sheets["いろいろなデータ"];
 
-        sheet.Range["A1:B2"].Values = new object?[,]
-        {
-            { 1, "a" },
-            { true, null }
-        };
+        sheet.Range["A1:B2"].Values =
+        [
+            [1, "a"],
+            [true, null]
+        ];
 
         (sheet.Cells["A1"].Value as object).Should().Be(1d);
         (sheet.Cells["B1"].Value as object).Should().Be("a");
@@ -163,10 +177,9 @@ public class Range参照のテスト : IDisposable
         var action = () =>
         {
             tested.Sheets["いろいろなデータ"].Range["A1:B2"].Values =
-                new object?[,]
-                {
-                    { "a" }
-                };
+            [
+                ["a"]
+            ];
         };
 
         action.Should().Throw<ArgumentException>();

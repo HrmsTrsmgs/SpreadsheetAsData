@@ -74,11 +74,21 @@ public class CellRange
         (sheet ?? throw new NotImplementedException()).Cells[bottomRight.ToString()];
 
     /// <summary>
-    /// 範囲内のセル値を、左上から右下へ向かう二次元配列として取得または設定します。
+    /// 範囲内のセル値を、左上から右下へ向かう行ごとの列挙として取得または設定します。
     /// </summary>
-    public object?[,] Values
+    public IEnumerable<IEnumerable<object?>> Values
     {
-        get => throw new NotImplementedException();
+        get =>
+            from rowIndex in Enumerable.Range(
+                (int)topLeft.RowIndex,
+                (int)(bottomRight.RowIndex - topLeft.RowIndex + 1))
+            select
+                from columnIndex in Enumerable.Range(
+                    (int)topLeft.ColumnIndex,
+                    (int)(bottomRight.ColumnIndex - topLeft.ColumnIndex + 1))
+                select (object?)(sheet ?? throw new NotImplementedException())
+                    .Cells[(uint)columnIndex, (uint)rowIndex]
+                    .Value;
         set => throw new NotImplementedException();
     }
 
