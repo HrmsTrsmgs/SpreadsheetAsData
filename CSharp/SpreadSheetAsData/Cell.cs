@@ -134,4 +134,10 @@ public class Cell
     /// セルの列番号を取得します。
     /// </summary>
     public uint ColumnIndex => CellName.Parse(Reference).ColumnIndex;
+
+    /// <summary>
+    /// A1 形式のセル参照を返します。
+    /// </summary>
+    /// <returns>A1 形式のセル参照。</returns>
+    public override string ToString() => Reference;
 }

@@ -132,4 +132,10 @@ public class Worksheet
 
         return Book.TryResolveNamedRange(name, localSheetId, out range);
     }
+
+    /// <summary>
+    /// ワークシート名を返します。
+    /// </summary>
+    /// <returns>ワークシート名。</returns>
+    public override string ToString() => Name;
 }

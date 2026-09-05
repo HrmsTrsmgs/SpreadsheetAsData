@@ -179,6 +179,14 @@ public class Cellのテスト : IDisposable
         a1.Reference.Should().Be("A1");
         b1.Reference.Should().Be("B1");
     }
+
+    [Fact]
+    public void ToStringはA1形式のセル参照を返します()
+    {
+        a1.ToString().Should().Be("A1");
+        b1.ToString().Should().Be("B1");
+    }
+
     [Fact]
     public void RowIndexプロパティが行番号を取得できます()
     {

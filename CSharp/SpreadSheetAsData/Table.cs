@@ -126,4 +126,10 @@ public class Table
                     rangeReference.TopLeft.ColumnIndex + (uint)column.Ordinal,
                     row.WorksheetRowIndex)]
             : throw new ArgumentException(null, nameof(column));
+
+    /// <summary>
+    /// Excel テーブル名を返します。
+    /// </summary>
+    /// <returns>Excel テーブル名。</returns>
+    public override string ToString() => Name;
 }

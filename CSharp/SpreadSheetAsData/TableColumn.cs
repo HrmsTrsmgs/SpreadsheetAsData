@@ -52,4 +52,10 @@ public class TableColumn
     /// </summary>
     public Table Table =>
         table;
+
+    /// <summary>
+    /// Excel テーブル内の列名を返します。
+    /// </summary>
+    /// <returns>Excel テーブル内の列名。</returns>
+    public override string ToString() => Name;
 }

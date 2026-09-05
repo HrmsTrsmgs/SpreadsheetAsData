@@ -32,6 +32,13 @@ public class TableColumnのテスト : IDisposable
     }
 
     [Fact]
+    public void ToStringはExcelテーブルの列名を返します()
+    {
+        column.ToString().Should().Be("数値2");
+        table.Columns["文字列"].ToString().Should().Be("文字列");
+    }
+
+    [Fact]
     public void Ordinalはテーブル内の0始まりの列位置を返します()
     {
         column.Ordinal.Should().Be(1);

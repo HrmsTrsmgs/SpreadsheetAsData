@@ -37,6 +37,13 @@ public class Worksheetのテスト : IDisposable
     }
 
     [Fact]
+    public void ToStringはシート名を返します()
+    {
+        sheet1.ToString().Should().Be("Sheet1");
+        data.ToString().Should().Be("いろいろなデータ");
+    }
+
+    [Fact]
     public void Bookは所属しているWorkbookを取得します()
     {
         sheet1.Book.Should().BeSameAs(book);

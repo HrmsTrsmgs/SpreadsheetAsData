@@ -32,6 +32,13 @@ public class Tableのテスト : IDisposable
     }
 
     [Fact]
+    public void ToStringはExcelテーブル名を返します()
+    {
+        table.ToString().Should().Be("型付き行マッピング");
+        book.Tables["別シート行列挙"].ToString().Should().Be("別シート行列挙");
+    }
+
+    [Fact]
     public void WorksheetはExcelテーブルが属するワークシートを返します()
     {
         table.Worksheet.Should().BeSameAs(

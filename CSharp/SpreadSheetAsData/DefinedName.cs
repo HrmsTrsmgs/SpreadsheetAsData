@@ -34,4 +34,10 @@ public sealed class DefinedName
     /// 定義名が表すセル範囲を取得します。
     /// </summary>
     public CellRange Range { get; }
+
+    /// <summary>
+    /// Excel 上の定義名を返します。
+    /// </summary>
+    /// <returns>Excel 上の定義名。</returns>
+    public override string ToString() => Name;
 }
