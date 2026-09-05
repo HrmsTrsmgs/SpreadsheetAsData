@@ -150,7 +150,7 @@ public class Range参照のテスト : IDisposable
         rows[1].Should().Equal(true, false);
     }
 
-    [Fact(Skip = "読み込みAPIと対になるCellRange値書き込み機能を実装するときに解除する。")]
+    [Fact]
     public void ValuesはA1形式の範囲へ行ごとの値を書き込めます()
     {
         using var book = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));

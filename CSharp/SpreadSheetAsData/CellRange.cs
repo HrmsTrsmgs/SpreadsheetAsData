@@ -89,7 +89,22 @@ public class CellRange
                 select (object?)(sheet ?? throw new NotImplementedException())
                     .Cells[(uint)columnIndex, (uint)rowIndex]
                     .Value;
-        set => throw new NotImplementedException();
+        set
+        {
+            foreach (var (rowIndex, row) in Enumerable.Range(
+                (int)topLeft.RowIndex,
+                (int)(bottomRight.RowIndex - topLeft.RowIndex + 1)).Zip(value))
+            {
+                foreach (var (columnIndex, cellValue) in Enumerable.Range(
+                    (int)topLeft.ColumnIndex,
+                    (int)(bottomRight.ColumnIndex - topLeft.ColumnIndex + 1)).Zip(row))
+                {
+                    (sheet ?? throw new NotImplementedException())
+                        .Cells[(uint)columnIndex, (uint)rowIndex]
+                        .Value = cellValue;
+                }
+            }
+        }
     }
 
     /// <summary>
