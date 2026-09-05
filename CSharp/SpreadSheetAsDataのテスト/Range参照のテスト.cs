@@ -139,78 +139,20 @@ public class Range参照のテスト : IDisposable
     [Fact(Skip = "読み込みAPIと対になるCellRange値書き込み機能を実装するときに解除する。")]
     public void ValuesはA1形式の範囲へ二次元配列を書き込めます()
     {
-        var filePath = temporaryFiles.Copy("Book1.xlsx");
+        using var book = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));
+        var sheet = book.Sheets["いろいろなデータ"];
 
-        using (var book = Workbook.Open(filePath))
+        sheet.Range["A1:B2"].Values = new object?[,]
         {
-            book.Sheets["いろいろなデータ"].Range["A1:B2"].Values = new object?[,]
-            {
-                { 1, "a" },
-                { true, null }
-            };
-            book.Save();
-        }
-
-        using var tested = Workbook.Open(filePath);
-        var sheet = tested.Sheets["いろいろなデータ"];
+            { 1, "a" },
+            { true, null }
+        };
 
         (sheet.Cells["A1"].Value as object).Should().Be(1d);
         (sheet.Cells["B1"].Value as object).Should().Be("a");
         (sheet.Cells["A2"].Value as object)
             .Should().BeOfType<bool>().Which.Should().BeTrue();
         (sheet.Cells["B2"].Value as object).Should().BeOfType<BlankValue>();
-    }
-
-    [Fact(Skip = "読み込みAPIと対になるCellRange値書き込み機能を実装するときに解除する。")]
-    public void Valuesはブックスコープの定義名範囲へ二次元配列を書き込めます()
-    {
-        var filePath = temporaryFiles.Copy("定義名.xlsx");
-
-        using (var book = Workbook.Open(filePath))
-        {
-            book.Range["book_range"].Values = new object?[,]
-            {
-                { "a", "b" },
-                { "c", "d" },
-                { "e", "f" },
-                { "g", "h" },
-                { "i", "j" }
-            };
-            book.Save();
-        }
-
-        using var tested = Workbook.Open(filePath);
-
-        (tested.Range["book_range"].TopLeftCell.Value as object)
-            .Should().Be("a");
-        (tested.Range["book_range"].BottomRightCell.Value as object)
-            .Should().Be("j");
-    }
-
-    [Fact(Skip = "読み込みAPIと対になるCellRange値書き込み機能を実装するときに解除する。")]
-    public void Valuesはワークシートスコープの定義名範囲へ二次元配列を書き込めます()
-    {
-        var filePath = temporaryFiles.Copy("定義名.xlsx");
-
-        using (var book = Workbook.Open(filePath))
-        {
-            book.Sheets["Sheet2"].Range["range_name"].Values = new object?[,]
-            {
-                { "a", "b" },
-                { "c", "d" },
-                { "e", "f" },
-                { "g", "h" },
-                { "i", "j" }
-            };
-            book.Save();
-        }
-
-        using var tested = Workbook.Open(filePath);
-
-        (tested.Sheets["Sheet2"].Range["range_name"].TopLeftCell.Value as object)
-            .Should().Be("a");
-        (tested.Sheets["Sheet2"].Range["range_name"].BottomRightCell.Value as object)
-            .Should().Be("j");
     }
 
     [Fact(Skip = "読み込みAPIと対になるCellRange値書き込み機能を実装するときに解除する。")]

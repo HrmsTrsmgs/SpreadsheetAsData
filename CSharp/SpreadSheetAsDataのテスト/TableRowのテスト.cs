@@ -56,6 +56,15 @@ public class TableRowのテスト : IDisposable
     }
 
     [Fact]
+    public void TableRowの列名とWorksheetのセル参照から取得した同じセルは同一オブジェクトです()
+    {
+        var fromTableRow = firstRow["数値2"];
+        var fromWorksheet = table.Worksheet.Cells["C7"];
+
+        fromTableRow.Should().BeSameAs(fromWorksheet);
+    }
+
+    [Fact]
     public void TableColumnを指定すると対応するセルを返します()
     {
         firstRow[secondColumn]
@@ -63,10 +72,28 @@ public class TableRowのテスト : IDisposable
     }
 
     [Fact]
+    public void TableRowのTableColumnとWorksheetのセル参照から取得した同じセルは同一オブジェクトです()
+    {
+        var fromTableRow = firstRow[secondColumn];
+        var fromWorksheet = table.Worksheet.Cells["C7"];
+
+        fromTableRow.Should().BeSameAs(fromWorksheet);
+    }
+
+    [Fact]
     public void 列位置を指定すると対応するセルを返します()
     {
         firstRow[1]
             .Reference.Should().Be("C7");
+    }
+
+    [Fact]
+    public void TableRowの列位置とWorksheetのセル参照から取得した同じセルは同一オブジェクトです()
+    {
+        var fromTableRow = firstRow[1];
+        var fromWorksheet = table.Worksheet.Cells["C7"];
+
+        fromTableRow.Should().BeSameAs(fromWorksheet);
     }
 
     [Fact]
