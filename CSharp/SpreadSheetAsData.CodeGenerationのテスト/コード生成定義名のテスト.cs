@@ -106,7 +106,7 @@ public sealed class コード生成定義名のテスト : IDisposable
             .Should().Be("generated");
     }
 
-    [Fact(Skip = "読み込みコード生成と対になる定義名書き込み機能を実装するときに解除する。")]
+    [Fact]
     public void 生成されたSheet型のCellプロパティから値を書き込めます()
     {
         var filePath = temporaryFiles.Copy(DefinedNamesExcelFilePath);
@@ -127,7 +127,7 @@ public sealed class コード生成定義名のテスト : IDisposable
 
         using var tested = Workbook.Open(filePath);
 
-        (tested.Sheets["SalesData"].Cell["local_cell"].Value as object)
+        (tested.Sheets["sales_data"].Cell["local_cell"].Value as object)
             .Should().Be("generated");
     }
 }
