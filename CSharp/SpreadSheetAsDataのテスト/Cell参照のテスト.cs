@@ -56,21 +56,14 @@ public class Cell参照のテスト : IDisposable
         action.Should().Throw<InvalidOperationException>();
     }
 
-    [Fact(Skip = "読み込みAPIと対になるCell参照経由の書き込み機能を実装するときに解除する。")]
-    public void WorksheetのCellで取得したセルへ値を書き込めます()
+    [Fact]
+    public void WorksheetのCellはA1形式のセル参照へ値を書き込めます()
     {
-        var filePath = temporaryFiles.Copy("Book1.xlsx");
+        var tested = sheet2.Cell["A1"];
 
-        using (var book = Workbook.Open(filePath))
-        {
-            book.Sheets["いろいろなデータ"].Cell["A1"].Value = 9.9;
-            book.Save();
-        }
+        tested.Value = 9.9;
 
-        using var tested = Workbook.Open(filePath);
-
-        (tested.Sheets["いろいろなデータ"].Cell["A1"].Value as object)
-            .Should().Be(9.9);
+        (tested.Value as object).Should().Be(9.9);
     }
 
     [Fact(Skip = "読み込みAPIと対になるCell参照経由の書き込み機能を実装するときに解除する。")]
