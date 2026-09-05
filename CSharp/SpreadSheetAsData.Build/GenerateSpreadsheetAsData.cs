@@ -85,11 +85,10 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
                 return;
             }
 
-            var diagnostics = WorkbookWrapperGenerator.GenerateDiagnostics(
-                excelFilePath,
-                options => ConfigureOptions(options, nameMappings));
-
-            foreach (var diagnostic in diagnostics)
+            foreach (var diagnostic in
+                WorkbookWrapperGenerator.GenerateDiagnostics(
+                    excelFilePath,
+                    options => ConfigureOptions(options, nameMappings)))
             {
                 LogDiagnostic(excelFilePath, diagnostic);
             }
@@ -237,7 +236,9 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
                 excelFilePath,
                 FileFingerprint(excelFilePath),
                 dictionaryFilePath ?? "",
-                dictionaryFilePath is null ? "" : FileFingerprint(dictionaryFilePath)
+                dictionaryFilePath is null
+                    ? ""
+                    : FileFingerprint(dictionaryFilePath)
             ]);
 
     static string FileFingerprint(string filePath)
