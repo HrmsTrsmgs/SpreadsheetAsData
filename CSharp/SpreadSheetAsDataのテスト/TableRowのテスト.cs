@@ -124,7 +124,7 @@ public class TableRowのテスト : IDisposable
         action.Should().Throw<ArgumentOutOfRangeException>();
     }
 
-    [Fact(Skip = "読み込みAPIと対になるTableRowセル書き込み機能を実装するときに解除する。")]
+    [Fact]
     public void 列名を指定して対応するセルへ値を書き込めます()
     {
         var filePath = temporaryFiles.Copy("テーブル.xlsx");
