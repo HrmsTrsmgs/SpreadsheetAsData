@@ -91,18 +91,27 @@ public class CellRange
                     .Value;
         set
         {
-            foreach (var (rowIndex, row) in Enumerable.Range(
-                (int)topLeft.RowIndex,
-                (int)(bottomRight.RowIndex - topLeft.RowIndex + 1)).Zip(value))
+            var rows = value.Select(it => it.ToArray()).ToArray();
+            var rowCount = (int)(bottomRight.RowIndex - topLeft.RowIndex + 1);
+            var columnCount = (int)(bottomRight.ColumnIndex - topLeft.ColumnIndex + 1);
+
+            if (rows.Length != rowCount
+                || rows.Any(it => it.Length != columnCount))
             {
-                foreach (var (columnIndex, cellValue) in Enumerable.Range(
-                    (int)topLeft.ColumnIndex,
-                    (int)(bottomRight.ColumnIndex - topLeft.ColumnIndex + 1)).Zip(row))
-                {
-                    (sheet ?? throw new NotImplementedException())
-                        .Cells[(uint)columnIndex, (uint)rowIndex]
-                        .Value = cellValue;
-                }
+                throw new ArgumentException();
+            }
+
+            foreach (var (cell, cellValue) in
+                (
+                    from row in rows.WithIndex((int)topLeft.RowIndex)
+                    from item in row.Value.WithIndex((int)topLeft.ColumnIndex)
+                    select (
+                        Cell: (sheet ?? throw new NotImplementedException())
+                            .Cells[(uint)item.Index, (uint)row.Index],
+                        Value: item.Value)
+                ))
+            {
+                cell.Value = cellValue;
             }
         }
     }

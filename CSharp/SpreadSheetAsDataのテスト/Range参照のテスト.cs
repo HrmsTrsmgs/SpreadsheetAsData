@@ -169,7 +169,7 @@ public class Range参照のテスト : IDisposable
         (sheet.Cells["B2"].Value as object).Should().BeOfType<BlankValue>();
     }
 
-    [Fact(Skip = "読み込みAPIと対になるCellRange値書き込み機能を実装するときに解除する。")]
+    [Fact]
     public void Valuesは範囲サイズと値サイズが違う場合に失敗します()
     {
         using var tested = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));
