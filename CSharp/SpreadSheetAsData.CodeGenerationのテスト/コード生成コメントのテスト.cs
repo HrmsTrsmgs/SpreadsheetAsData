@@ -134,6 +134,6 @@ public sealed class コード生成コメントのテスト
             .TypeDeclaration("SalesDataSheet")
             .PropertyDeclaration("LocalRange")
             .SummaryText()
-            .Should().Be("ワークシート「sales_data」の定義名「local_range」が表すセル範囲を取得します。");
+            .Should().Be("ワークシート「sales_data」の定義名「local_range」が表すセル範囲の値を取得します。");
     }
 }

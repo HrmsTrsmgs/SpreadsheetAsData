@@ -427,9 +427,10 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                 """
 
                     /// <summary>
-                    /// ワークシート「sales_data」の定義名「local_range」が表すセル範囲を取得します。
+                    /// ワークシート「sales_data」の定義名「local_range」が表すセル範囲の値を取得します。
                     /// </summary>
-                    public CellRange LocalRange => Range["local_range"];
+                    public IEnumerable<IEnumerable<object?>> LocalRange =>
+                        Range["local_range"].Values;
                 """);
     }
 

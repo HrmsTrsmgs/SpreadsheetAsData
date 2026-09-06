@@ -57,7 +57,7 @@ public sealed class コード生成定義名のテスト : IDisposable
     }
 
     [Fact]
-    public void シートローカルの複数セル定義名をSheetのCellRangeプロパティとして生成します()
+    public void シートローカルの複数セル定義名をSheetの値プロパティとして生成します()
     {
         var tested = GeneratedCodeInspection
             .AssemblyFrom(
@@ -66,7 +66,7 @@ public sealed class コード生成定義名のテスト : IDisposable
             .GetProperty("LocalRange");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(CellRange));
+        tested.PropertyType.Should().Be(typeof(IEnumerable<IEnumerable<object?>>));
     }
 
     [Fact]
@@ -218,5 +218,27 @@ public sealed class コード生成定義名のテスト : IDisposable
         object? tested = bookAccessor.SalesData.LocalCell;
 
         tested.Should().Be(1d);
+    }
+
+    [Fact]
+    public void 生成されたSheet型の複数セル定義名プロパティから値を直接読み取れます()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesExcelFilePath))
+            .GeneratedInstance<Workbook>(
+                "定義名Book",
+                DefinedNamesExcelFilePath);
+        dynamic bookAccessor = book;
+
+        IEnumerable<IEnumerable<object?>> tested = bookAccessor.SalesData.LocalRange;
+        var rows = tested
+            .Select(it => it.ToArray())
+            .ToArray();
+
+        rows.Should().HaveCount(2);
+        rows[0].Should().Equal(1d, 10.5d);
+        rows[1].Should().Equal(2d, 20.5d);
     }
 }
