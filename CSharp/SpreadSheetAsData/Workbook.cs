@@ -213,6 +213,19 @@ public class Workbook : IDisposable
     }
 
     /// <summary>
+    /// オブジェクトのプロパティを、同じ名前のブックスコープ単一セル定義名へ書き込みます。
+    /// </summary>
+    /// <typeparam name="T">ブックへ書き込むデータの型。</typeparam>
+    /// <param name="data">ブックへ書き込むデータ。</param>
+    public void Replace<T>(T data)
+    {
+        foreach (var property in typeof(T).GetProperties())
+        {
+            Cell[property.Name].Value = property.GetValue(data);
+        }
+    }
+
+    /// <summary>
     /// 指定した位置のワークシートを取得します。
     /// </summary>
     /// <param name="index">取得するワークシートの 0 始まりの位置。</param>

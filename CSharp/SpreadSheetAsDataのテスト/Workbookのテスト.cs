@@ -179,6 +179,20 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void Replaceはプロパティ名と同じブックスコープの単一セル定義名へオブジェクトを書き込みます()
+    {
+        using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));
+
+        tested.Replace(
+            new WorkbookData
+            {
+                CustomerName = "佐藤花子"
+            });
+
+        (tested.Cell["CustomerName"].Value as object).Should().Be("佐藤花子");
+    }
+
+    [Fact]
     public void DefinedNamesはブック内の定義名を列挙します()
     {
         using var tested = Workbook.Open(@"TestData\定義名.xlsx");
