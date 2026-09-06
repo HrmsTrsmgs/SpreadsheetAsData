@@ -318,6 +318,22 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void ReadはSpreadsheetDefinedName属性で指定した複数セル定義名からオブジェクトを読み込みます()
+    {
+        using var tested = Workbook.Open(@"TestData\定義名.xlsx");
+        var expected = tested.Range["book_range"].Values
+            .Select(it => it.ToArray())
+            .ToArray();
+
+        tested.Read<AttributedWorkbookRangeData>()
+            .Values
+            .Select(it => it.ToArray())
+            .Should().BeEquivalentTo(
+                expected,
+                options => options.WithStrictOrdering());
+    }
+
+    [Fact]
     public void Replaceはプロパティ名と同じブックスコープの単一セル定義名へオブジェクトを書き込みます()
     {
         using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));
@@ -403,6 +419,12 @@ public class Workbookのテスト : IDisposable
     {
         [SpreadsheetDefinedName("CustomerName")]
         public string Name { get; set; } = "";
+    }
+
+    public sealed class AttributedWorkbookRangeData
+    {
+        [SpreadsheetDefinedName("book_range")]
+        public IEnumerable<IEnumerable<object?>> Values { get; set; } = [];
     }
 
 }

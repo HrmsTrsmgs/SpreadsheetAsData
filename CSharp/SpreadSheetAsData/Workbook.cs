@@ -234,7 +234,7 @@ public class Workbook : IDisposable
         new(Tables[name]);
 
     /// <summary>
-    /// ブックスコープの単一セル定義名を、同じ名前のプロパティへ対応付けて読み込みます。
+    /// ブックスコープの定義名を、同じ名前のプロパティへ対応付けて読み込みます。
     /// </summary>
     /// <typeparam name="T">ブックのデータを読み込む型。</typeparam>
     /// <returns>ブックのデータを読み込んだオブジェクト。</returns>
@@ -244,12 +244,16 @@ public class Workbook : IDisposable
 
         foreach (var property in typeof(T).GetProperties())
         {
+            var definedName =
+                property.GetCustomAttribute<SpreadsheetDefinedNameAttribute>()?.Name
+                    ?? property.Name;
+            var range = Range[definedName];
+
             property.SetValue(
                 data,
-                Cell[
-                    property.GetCustomAttribute<SpreadsheetDefinedNameAttribute>()?.Name
-                        ?? property.Name
-                ].Value);
+                range.TopLeftCell == range.BottomRightCell
+                    ? range.TopLeftCell.Value
+                    : range.Values);
         }
 
         return data;
