@@ -24,6 +24,21 @@ public sealed class コード生成型構造のテスト
             .Should().Contain(generatedTypeName);
     }
 
+    [Theory]
+    [InlineData(BasicStructureExcelFilePath, "BasicStructureData")]
+    [InlineData(IntegratedExcelFilePath, "統合Data")]
+    public void 生成されたブックデータ型はExcelファイル名に対応する型名で生成します(
+        string excelFilePath,
+        string generatedTypeName)
+    {
+        GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(excelFilePath))
+            .DefinedTypes
+            .Select(it => it.Name)
+            .Should().Contain(generatedTypeName);
+    }
+
     [Fact]
     public void 生成されたBook型はWorkbookを継承します()
     {

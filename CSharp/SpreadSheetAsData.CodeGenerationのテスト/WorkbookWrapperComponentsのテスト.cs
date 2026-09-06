@@ -96,6 +96,13 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                 }
 
                 /// <summary>
+                /// Excelブック「BasicStructure」のデータを表します。
+                /// </summary>
+                public partial class BasicStructureData
+                {
+                }
+
+                /// <summary>
                 /// ワークシート「SalesData」を型付きで表します。
                 /// </summary>
                 public partial class SalesDataSheet : Worksheet

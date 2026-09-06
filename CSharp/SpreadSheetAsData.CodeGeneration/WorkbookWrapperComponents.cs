@@ -56,6 +56,7 @@ static class WorkbookWrapperComponents
                select BookTablePropertyDeclaration(table, options)
         ])}}
         }
+        {{BookDataDeclaration(filePath)}}
         {{ForEach(
             from sheet in book.Sheets.Values
             select SheetDeclaration(sheet, options))}}
@@ -65,6 +66,20 @@ static class WorkbookWrapperComponents
         {{ForEach(
             from table in book.Tables
             select RowDeclaration(table, options))}}
+        """;
+
+    /// <summary>
+    /// Excelブック全体のデータを表す型の宣言を生成します。
+    /// </summary>
+    internal static string BookDataDeclaration(string filePath) =>
+        $$"""
+
+        /// <summary>
+        /// Excelブック「{{Path.GetFileNameWithoutExtension(filePath)}}」のデータを表します。
+        /// </summary>
+        public partial class {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Data
+        {
+        }
         """;
 
     /// <summary>
