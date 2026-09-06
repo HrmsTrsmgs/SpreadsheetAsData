@@ -27,6 +27,15 @@ public class Workbook : IDisposable
         new(DocumentSession.Open(filePath));
 
     /// <summary>
+    /// 指定したファイルをブックとして開きます。
+    /// </summary>
+    /// <param name="filePath">開く Spreadsheet ファイルのパス。</param>
+    /// <param name="validate">Open XMLとして検証する場合はtrue。</param>
+    /// <returns>開いたブック。</returns>
+    public static Workbook Open(string filePath, bool validate) =>
+        Open(filePath);
+
+    /// <summary>
     /// 指定したストリーム上の Spreadsheet ファイルをブックとして開きます。
     /// </summary>
     /// <param name="stream">開く Spreadsheet ファイルを格納したストリーム。</param>
