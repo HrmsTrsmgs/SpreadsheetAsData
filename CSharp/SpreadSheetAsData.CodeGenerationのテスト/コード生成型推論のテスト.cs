@@ -59,6 +59,21 @@ public sealed class コード生成型推論のテスト
         tested.PropertyType.Should().Be(typeof(double));
     }
 
+    [Fact]
+    public void シートローカルの複数セル定義名を二次元の値列挙となるDataプロパティとして生成します()
+    {
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesExcelFilePath))
+            .GeneratedType("定義名Data")
+            .GetProperty("LocalRange");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(
+            typeof(IEnumerable<IEnumerable<object?>>));
+    }
+
     [Theory]
     [InlineData("MainCell", "main_cell")]
     [InlineData("MainRange", "main_range")]

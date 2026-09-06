@@ -102,7 +102,11 @@ static class WorkbookWrapperComponents
             .. from sheet in book.Sheets.Values
                from definedName in SheetScopedDefinedNames(sheet)
                where IsSingleCellDefinedName(definedName)
-               select BookDataSheetCellPropertyDeclaration(sheet, definedName, options)
+               select BookDataSheetCellPropertyDeclaration(sheet, definedName, options),
+            .. from sheet in book.Sheets.Values
+               from definedName in SheetScopedDefinedNames(sheet)
+               where !IsSingleCellDefinedName(definedName)
+               select BookDataSheetCellRangePropertyDeclaration(sheet, definedName, options)
         ])}}
         }
         """;
@@ -161,6 +165,21 @@ static class WorkbookWrapperComponents
                 public {{propertyTypeName}} {{options.SheetDefinedName(sheet, definedName)}} { get; }
             """;
     }
+
+    /// <summary>
+    /// ブックデータ型に、シートローカルの複数セル定義名が表すプロパティを生成します。
+    /// </summary>
+    internal static string BookDataSheetCellRangePropertyDeclaration(
+        Worksheet sheet,
+        DefinedName definedName,
+        CodeGenerationOptions options) =>
+        $$"""
+
+            /// <summary>
+            /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセル範囲の値を取得します。
+            /// </summary>
+            public IEnumerable<IEnumerable<object?>> {{options.SheetDefinedName(sheet, definedName)}} { get; }
+        """;
 
     /// <summary>
     /// Book型から指定ワークシート型を取得するプロパティ宣言を生成します。
