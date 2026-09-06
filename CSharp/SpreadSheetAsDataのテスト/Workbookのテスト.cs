@@ -95,6 +95,32 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void Openは検証する場合正常なOOXMLを開きます()
+    {
+        var action = () =>
+        {
+            using var book = Workbook.Open(
+                temporaryFiles.Copy("文字列セル.xlsx"),
+                validate: true);
+        };
+
+        action.Should().NotThrow();
+    }
+
+    [Fact]
+    public void Openは検証する場合不正なOOXMLで失敗します()
+    {
+        var action = () =>
+        {
+            using var book = Workbook.Open(
+                temporaryFiles.Copy("不正なOOXML.xlsx"),
+                validate: true);
+        };
+
+        action.Should().Throw<InvalidDataException>();
+    }
+
+    [Fact]
     public void Disposeは呼び出し側から渡されたStreamを閉じません()
     {
         using var stream = new MemoryStream(

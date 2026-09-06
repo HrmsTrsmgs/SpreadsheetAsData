@@ -1,5 +1,6 @@
 ﻿using Packaging = DocumentFormat.OpenXml.Packaging;
 using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
+using Validation = DocumentFormat.OpenXml.Validation;
 using System.Reflection;
 
 namespace Marimo.SpreadSheetAsData;
@@ -33,7 +34,7 @@ public class Workbook : IDisposable
     /// <param name="validate">Open XMLとして検証する場合はtrue。</param>
     /// <returns>開いたブック。</returns>
     public static Workbook Open(string filePath, bool validate) =>
-        Open(filePath);
+        ValidateIfRequested(Open(filePath), validate);
 
     /// <summary>
     /// 指定したストリーム上の Spreadsheet ファイルをブックとして開きます。
@@ -70,6 +71,17 @@ public class Workbook : IDisposable
         Range = new(this);
         Cell = new(this);
         Tables = new(this);
+    }
+
+    static Workbook ValidateIfRequested(Workbook opened, bool validate)
+    {
+        if (!validate || !new Validation.OpenXmlValidator().Validate(opened.Document).Any())
+        {
+            return opened;
+        }
+
+        opened.Dispose();
+        throw new InvalidDataException();
     }
 
     /// <summary>
