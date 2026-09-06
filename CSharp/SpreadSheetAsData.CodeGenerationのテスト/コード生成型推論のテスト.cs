@@ -94,6 +94,24 @@ public sealed class コード生成型推論のテスト
             .Should().BeNull();
     }
 
+    [Theory]
+    [InlineData("SalesDetail")]
+    [InlineData("ProductList")]
+    public void Excelテーブルを生成行データの列挙となるDataプロパティとして生成します(
+        string generatedName)
+    {
+        var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
+            GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath));
+        var rowType = generatedAssembly.GeneratedType(generatedName);
+        var expectedType = typeof(IEnumerable<>).MakeGenericType(rowType);
+        var tested = generatedAssembly
+            .GeneratedType("BasicStructureData")
+            .GetProperty(generatedName);
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(expectedType);
+    }
+
     [Fact]
     public void 整数値だけを持つ列をintプロパティとして生成します()
     {
