@@ -200,6 +200,10 @@ static class WorkbookWrapperComponents
         CodeGenerationOptions options)
     {
         var propertyName = options.SheetDefinedName(sheet, definedName);
+        var attributeDeclaration =
+            propertyName == definedName.Name.ToCSharpIdentifier()
+                ? ""
+                : $"[SpreadsheetDefinedName({StringLiteral(definedName.Name)}, WorksheetName = {StringLiteral(sheet.Name)})]{Environment.NewLine}    ";
 
         return
             $$"""
@@ -207,7 +211,7 @@ static class WorkbookWrapperComponents
                 /// <summary>
                 /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセル範囲の値を取得または設定します。
                 /// </summary>
-                public IEnumerable<IEnumerable<object?>> {{propertyName}} { get; set; }
+                {{attributeDeclaration}}public IEnumerable<IEnumerable<object?>> {{propertyName}} { get; set; }
             """;
     }
 
