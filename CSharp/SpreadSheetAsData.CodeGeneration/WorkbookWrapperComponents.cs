@@ -49,6 +49,12 @@ static class WorkbookWrapperComponents
             /// </summary>
             public new {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Data Read() =>
                 base.Read<{{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Data>();
+
+            /// <summary>
+            /// Excelブック全体のデータを置換します。
+            /// </summary>
+            public new void Replace({{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Data data) =>
+                base.Replace(data);
         {{ForEach([
             .. from definedName in BookScopedDefinedNames(book)
                where IsSingleCellDefinedName(definedName)

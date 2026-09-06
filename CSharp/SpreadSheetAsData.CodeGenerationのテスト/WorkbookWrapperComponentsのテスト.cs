@@ -81,6 +81,12 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                         base.Read<BasicStructureData>();
 
                     /// <summary>
+                    /// Excelブック全体のデータを置換します。
+                    /// </summary>
+                    public new void Replace(BasicStructureData data) =>
+                        base.Replace(data);
+
+                    /// <summary>
                     /// ワークシート「SalesData」を取得します。
                     /// </summary>
                     public SalesDataSheet SalesData => new(this);

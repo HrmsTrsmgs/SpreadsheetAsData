@@ -119,6 +119,28 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void 生成されたBookはData型を明記せず置換できます()
+    {
+        GeneratedSourceCompiler.Compile(
+            [
+                .. GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesExcelFilePath),
+                """
+                namespace Generated;
+
+                public static class Usage
+                {
+                    public static void Replace(定義名Book book) =>
+                        book.Replace(new()
+                        {
+                            MainCell = "changed"
+                        });
+                }
+                """
+            ]);
+    }
+
+    [Fact]
     public void Sheetはそのシートに属するExcelテーブルを型付きプロパティとして公開します()
     {
         var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
