@@ -164,4 +164,33 @@ public sealed class コード生成名前設定のテスト
         rows[0].Should().Equal("main", "range");
         rows[1].Should().Equal(100d, 200d);
     }
+
+    [Fact]
+    public void NameMappingsで変更した生成Data範囲プロパティから定義名へ書き込みます()
+    {
+        using var temporaryFiles = new TemporaryExcelFiles();
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesWithoutCollisionsExcelFilePath,
+                    options => options.NameMappings["book.main_range"] = "PrimaryRange"))
+            .GeneratedInstance<Workbook>(
+                "定義名Book",
+                temporaryFiles.Copy(DefinedNamesWithoutCollisionsExcelFilePath));
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        IEnumerable<IEnumerable<object?>> replacement =
+        [
+            ["changed", "values"],
+            [300d, 400d]
+        ];
+        dataAccessor.PrimaryRange = replacement;
+
+        bookAccessor.Replace(dataAccessor);
+
+        book.Range["main_range"].Values
+            .Should().BeEquivalentTo(
+                replacement,
+                options => options.WithStrictOrdering());
+    }
 }
