@@ -98,7 +98,11 @@ static class WorkbookWrapperComponents
                select BookDataCellPropertyDeclaration(definedName, options),
             .. from definedName in BookScopedDefinedNames(book)
                where !IsSingleCellDefinedName(definedName)
-               select BookDataCellRangePropertyDeclaration(definedName, options)
+               select BookDataCellRangePropertyDeclaration(definedName, options),
+            .. from sheet in book.Sheets.Values
+               from definedName in SheetScopedDefinedNames(sheet)
+               where IsSingleCellDefinedName(definedName)
+               select BookDataSheetCellPropertyDeclaration(sheet, definedName, options)
         ])}}
         }
         """;
@@ -137,6 +141,26 @@ static class WorkbookWrapperComponents
             [SpreadsheetDefinedName({{StringLiteral(definedName.Name)}})]
             public IEnumerable<IEnumerable<object?>> {{options.BookDefinedName(definedName)}} { get; set; }
         """;
+
+    /// <summary>
+    /// ブックデータ型に、シートローカルの単一セル定義名が表すプロパティを生成します。
+    /// </summary>
+    internal static string BookDataSheetCellPropertyDeclaration(
+        Worksheet sheet,
+        DefinedName definedName,
+        CodeGenerationOptions options)
+    {
+        var propertyTypeName = CellValueTypeName(definedName.Range.TopLeftCell.Value);
+
+        return
+            $$"""
+
+                /// <summary>
+                /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセルの値を取得します。
+                /// </summary>
+                public {{propertyTypeName}} {{options.SheetDefinedName(sheet, definedName)}} { get; }
+            """;
+    }
 
     /// <summary>
     /// Book型から指定ワークシート型を取得するプロパティ宣言を生成します。

@@ -7,7 +7,8 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class コード生成定義名のテスト : IDisposable
 {
-    const string DefinedNamesExcelFilePath = @"TestData\コード生成\定義名.xlsx";
+    const string DefinedNamesExcelFilePath = @"TestData\コード生成\衝突なし\定義名.xlsx";
+    const string SameNameInDifferentScopesExcelFilePath = @"TestData\コード生成\定義名.xlsx";
 
     readonly TemporaryExcelFiles temporaryFiles = new();
 
@@ -72,13 +73,13 @@ public sealed class コード生成定義名のテスト : IDisposable
     [Fact]
     public void ブックスコープとシートローカルで同じ定義名を区別して生成します()
     {
-        var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
-            GeneratedCodeInspection.GenerateSources(DefinedNamesExcelFilePath));
+        var generatedSources = GeneratedCodeInspection.GenerateSources(
+            SameNameInDifferentScopesExcelFilePath);
 
-        generatedAssembly.GeneratedType("定義名Book")
-            .GetProperty("Total").Should().NotBeNull();
-        generatedAssembly.GeneratedType("SalesDataSheet")
-            .GetProperty("Total").Should().NotBeNull();
+        generatedSources.TypeDeclaration("定義名Book")
+            .PropertyDeclaration("Total").Should().NotBeNull();
+        generatedSources.TypeDeclaration("SalesDataSheet")
+            .PropertyDeclaration("Total").Should().NotBeNull();
     }
 
     [Fact]

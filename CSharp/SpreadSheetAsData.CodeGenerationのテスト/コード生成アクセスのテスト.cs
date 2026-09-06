@@ -8,7 +8,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 public sealed class コード生成アクセスのテスト
 {
     const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
-    const string DefinedNamesExcelFilePath = @"TestData\コード生成\定義名.xlsx";
+    const string DefinedNamesExcelFilePath = @"TestData\コード生成\ブックスコープ\定義名.xlsx";
 
     [Fact]
     public void Bookは各ワークシートを型付きプロパティとして公開します()

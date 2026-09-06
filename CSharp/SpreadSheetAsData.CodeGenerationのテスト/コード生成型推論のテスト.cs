@@ -9,7 +9,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 public sealed class コード生成型推論のテスト
 {
     const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
-    const string DefinedNamesExcelFilePath = @"TestData\コード生成\定義名.xlsx";
+    const string DefinedNamesExcelFilePath = @"TestData\コード生成\衝突なし\定義名.xlsx";
     const string IntegratedExcelFilePath = @"TestData\コード生成\統合.xlsx";
 
     [Theory]
@@ -43,6 +43,20 @@ public sealed class コード生成型推論のテスト
         tested.Should().NotBeNull();
         tested.PropertyType.Should().Be(
             typeof(IEnumerable<IEnumerable<object?>>));
+    }
+
+    [Fact]
+    public void シートローカルの単一セル定義名を現在値と同じ型のDataプロパティとして生成します()
+    {
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesExcelFilePath))
+            .GeneratedType("定義名Data")
+            .GetProperty("LocalCell");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(typeof(double));
     }
 
     [Theory]

@@ -7,7 +7,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 public sealed class コード生成コメントのテスト
 {
     const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
-    const string DefinedNamesExcelFilePath = @"TestData\コード生成\定義名.xlsx";
+    const string DefinedNamesExcelFilePath = @"TestData\コード生成\衝突なし\定義名.xlsx";
 
     [Fact]
     public void Book型のコメントを生成します()
