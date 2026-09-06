@@ -31,7 +31,7 @@ public sealed class コード生成定義名のテスト : IDisposable
     }
 
     [Fact]
-    public void ブックスコープの複数セル定義名をBookのCellRangeプロパティとして生成します()
+    public void ブックスコープの複数セル定義名をBookの値プロパティとして生成します()
     {
         var tested = GeneratedCodeInspection
             .AssemblyFrom(
@@ -40,7 +40,7 @@ public sealed class コード生成定義名のテスト : IDisposable
             .GetProperty("MainRange");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(CellRange));
+        tested.PropertyType.Should().Be(typeof(IEnumerable<IEnumerable<object?>>));
     }
 
     [Fact]
@@ -121,6 +121,28 @@ public sealed class コード生成定義名のテスト : IDisposable
         object? tested = bookAccessor.MainCell;
 
         tested.Should().Be("main");
+    }
+
+    [Fact]
+    public void 生成されたBook型の複数セル定義名プロパティから値を直接読み取れます()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesExcelFilePath))
+            .GeneratedInstance<Workbook>(
+                "定義名Book",
+                DefinedNamesExcelFilePath);
+        dynamic bookAccessor = book;
+
+        IEnumerable<IEnumerable<object?>> tested = bookAccessor.MainRange;
+        var rows = tested
+            .Select(it => it.ToArray())
+            .ToArray();
+
+        rows.Should().HaveCount(2);
+        rows[0].Should().Equal("main", "range");
+        rows[1].Should().Equal(100d, 200d);
     }
 
     [Fact]

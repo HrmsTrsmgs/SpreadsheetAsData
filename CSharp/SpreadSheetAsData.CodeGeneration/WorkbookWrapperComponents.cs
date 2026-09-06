@@ -16,6 +16,7 @@ static class WorkbookWrapperComponents
         CodeGenerationOptions options,
         Workbook book) =>
         $$"""
+        using System.Collections.Generic;
         using Marimo.SpreadSheetAsData;
 
         namespace {{options.Namespace}};
@@ -266,7 +267,7 @@ static class WorkbookWrapperComponents
         """;
 
     /// <summary>
-    /// ブックスコープのセル範囲定義名を取得するプロパティ宣言を生成します。
+    /// ブックスコープのセル範囲定義名が表す値を読み取るプロパティ宣言を生成します。
     /// </summary>
     internal static string BookCellRangeDefinedNamePropertyDeclaration(
         DefinedName definedName,
@@ -274,9 +275,10 @@ static class WorkbookWrapperComponents
         $$"""
 
             /// <summary>
-            /// 定義名「{{definedName.Name}}」が表すセル範囲を取得します。
+            /// 定義名「{{definedName.Name}}」が表すセル範囲の値を取得します。
             /// </summary>
-            public CellRange {{options.BookDefinedName(definedName)}} => Range[{{StringLiteral(definedName.Name)}}];
+            public IEnumerable<IEnumerable<object?>> {{options.BookDefinedName(definedName)}} =>
+                Range[{{StringLiteral(definedName.Name)}}].Values;
         """;
 
     /// <summary>

@@ -46,6 +46,7 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
         SourceFile(BasicStructureExcelFilePath, options, basicBook)
             .Should().Be(
                 """
+                using System.Collections.Generic;
                 using Marimo.SpreadSheetAsData;
 
                 namespace Generated;
@@ -384,9 +385,10 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                 """
 
                     /// <summary>
-                    /// 定義名「main_range」が表すセル範囲を取得します。
+                    /// 定義名「main_range」が表すセル範囲の値を取得します。
                     /// </summary>
-                    public CellRange MainRange => Range["main_range"];
+                    public IEnumerable<IEnumerable<object?>> MainRange =>
+                        Range["main_range"].Values;
                 """);
     }
 
