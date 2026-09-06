@@ -120,10 +120,9 @@ static class WorkbookWrapperComponents
     {
         var propertyTypeName = CellValueTypeName(definedName.Range.TopLeftCell.Value);
         var propertyName = options.BookDefinedName(definedName);
-        var attributeDeclaration =
-            propertyName == definedName.Name.ToCSharpIdentifier()
-                ? ""
-                : $"[SpreadsheetDefinedName({StringLiteral(definedName.Name)})]{Environment.NewLine}    ";
+        var attributeDeclaration = BookDataDefinedNameAttribute(
+            definedName,
+            propertyName);
 
         return
             $$"""
@@ -143,6 +142,9 @@ static class WorkbookWrapperComponents
         CodeGenerationOptions options)
     {
         var propertyName = options.BookDefinedName(definedName);
+        var attributeDeclaration = BookDataDefinedNameAttribute(
+            definedName,
+            propertyName);
 
         return
             $$"""
@@ -150,9 +152,19 @@ static class WorkbookWrapperComponents
                 /// <summary>
                 /// 定義名「{{definedName.Name}}」が表すセル範囲の値を取得または設定します。
                 /// </summary>
-                public IEnumerable<IEnumerable<object?>> {{propertyName}} { get; set; }
+                {{attributeDeclaration}}public IEnumerable<IEnumerable<object?>> {{propertyName}} { get; set; }
             """;
     }
+
+    /// <summary>
+    /// 自動名前変換では対応できないブックスコープ定義名の属性を生成します。
+    /// </summary>
+    static string BookDataDefinedNameAttribute(
+        DefinedName definedName,
+        string propertyName) =>
+        propertyName == definedName.Name.ToCSharpIdentifier()
+            ? ""
+            : $"[SpreadsheetDefinedName({StringLiteral(definedName.Name)})]{Environment.NewLine}    ";
 
     /// <summary>
     /// ブックデータ型に、シートローカルの単一セル定義名が表すプロパティを生成します。

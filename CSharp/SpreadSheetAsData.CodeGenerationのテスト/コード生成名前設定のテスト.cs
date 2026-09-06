@@ -142,4 +142,26 @@ public sealed class コード生成名前設定のテスト
 
         (book.Cell["main_cell"].Value as object).Should().Be("changed");
     }
+
+    [Fact]
+    public void NameMappingsで変更した生成Data範囲プロパティへ定義名の値を読み込みます()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesWithoutCollisionsExcelFilePath,
+                    options => options.NameMappings["book.main_range"] = "PrimaryRange"))
+            .GeneratedInstance<Workbook>(
+                "定義名Book",
+                DefinedNamesWithoutCollisionsExcelFilePath);
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        IEnumerable<IEnumerable<object?>> tested = dataAccessor.PrimaryRange;
+        var rows = tested
+            .Select(it => it.ToArray())
+            .ToArray();
+
+        rows[0].Should().Equal("main", "range");
+        rows[1].Should().Equal(100d, 200d);
+    }
 }
