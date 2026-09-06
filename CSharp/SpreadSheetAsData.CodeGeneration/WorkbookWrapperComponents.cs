@@ -82,10 +82,14 @@ static class WorkbookWrapperComponents
         /// </summary>
         public partial class {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Data
         {
-        {{ForEach(
-            from definedName in BookScopedDefinedNames(book)
-            where IsSingleCellDefinedName(definedName)
-            select BookDataCellPropertyDeclaration(definedName, options))}}
+        {{ForEach([
+            .. from definedName in BookScopedDefinedNames(book)
+               where IsSingleCellDefinedName(definedName)
+               select BookDataCellPropertyDeclaration(definedName, options),
+            .. from definedName in BookScopedDefinedNames(book)
+               where !IsSingleCellDefinedName(definedName)
+               select BookDataCellRangePropertyDeclaration(definedName, options)
+        ])}}
         }
         """;
 
@@ -107,6 +111,20 @@ static class WorkbookWrapperComponents
                 public {{propertyTypeName}} {{options.BookDefinedName(definedName)}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
             """;
     }
+
+    /// <summary>
+    /// ブックデータ型に、ブックスコープの複数セル定義名が表すプロパティを生成します。
+    /// </summary>
+    internal static string BookDataCellRangePropertyDeclaration(
+        DefinedName definedName,
+        CodeGenerationOptions options) =>
+        $$"""
+
+            /// <summary>
+            /// 定義名「{{definedName.Name}}」が表すセル範囲の値を取得または設定します。
+            /// </summary>
+            public IEnumerable<IEnumerable<object?>> {{options.BookDefinedName(definedName)}} { get; set; }
+        """;
 
     /// <summary>
     /// Book型から指定ワークシート型を取得するプロパティ宣言を生成します。

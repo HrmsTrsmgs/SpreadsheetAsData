@@ -30,6 +30,21 @@ public sealed class コード生成型推論のテスト
     }
 
     [Fact]
+    public void ブックスコープの複数セル定義名を二次元の値列挙となるDataプロパティとして生成します()
+    {
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesExcelFilePath))
+            .GeneratedType("定義名Data")
+            .GetProperty("MainRange");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(
+            typeof(IEnumerable<IEnumerable<object?>>));
+    }
+
+    [Fact]
     public void 整数値だけを持つ列をintプロパティとして生成します()
     {
         var tested = GeneratedCodeInspection
