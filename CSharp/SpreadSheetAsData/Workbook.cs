@@ -227,7 +227,10 @@ public class Workbook : IDisposable
     {
         foreach (var property in typeof(T).GetProperties())
         {
-            Cell[property.Name].Value = property.GetValue(data);
+            Cell[
+                property.GetCustomAttribute<SpreadsheetDefinedNameAttribute>()?.Name
+                    ?? property.Name
+            ].Value = property.GetValue(data);
         }
     }
 
