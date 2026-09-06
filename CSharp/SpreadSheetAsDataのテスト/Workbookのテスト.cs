@@ -372,6 +372,21 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void ReplaceはSpreadsheetDefinedName属性で指定したシートローカルの単一セル定義名へオブジェクトを書き込みます()
+    {
+        using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));
+
+        tested.Replace(
+            new SheetScopedWorkbookData
+            {
+                Value = "シートローカル"
+            });
+
+        (tested.Sheets["Sheet2"].Cell["cell_name"].Value as object)
+            .Should().Be("シートローカル");
+    }
+
+    [Fact]
     public void ReplaceはSpreadsheetDefinedName属性で指定した複数セル定義名へオブジェクトを書き込みます()
     {
         using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));
