@@ -83,6 +83,21 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void Stream版でも定義名からオブジェクトを読み込みます()
+    {
+        using var stream = new MemoryStream(
+            File.ReadAllBytes(@"TestData\定義名.xlsx"));
+        using var tested = Workbook.Open(stream);
+
+        tested.Read<WorkbookData>()
+            .Should().BeEquivalentTo(
+                new WorkbookData
+                {
+                    CustomerName = "山田太郎"
+                });
+    }
+
+    [Fact]
     public void Closeはファイルの束縛を解除します()
     {
         var tested = Workbook.Open(コピーパス);
