@@ -365,6 +365,27 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void Replaceはプロパティ名と同じExcelテーブルへ行データを書き込みます()
+    {
+        using var tested = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
+
+        tested.Replace(
+            new WorkbookTableData
+            {
+                型付き行マッピング =
+                [
+                    new TestMappedRow { IntegerValue = 4 },
+                    new TestMappedRow { IntegerValue = 5 },
+                    new TestMappedRow { IntegerValue = 6 }
+                ]
+            });
+
+        tested.Tables["型付き行マッピング"].Rows
+            .Select(it => it["数値2"].Value)
+            .Should().Equal(4d, 5d, 6d);
+    }
+
+    [Fact]
     public void Replaceはプロパティ名と同じブックスコープの単一セル定義名へオブジェクトを書き込みます()
     {
         using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));

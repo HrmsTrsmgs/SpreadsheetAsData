@@ -281,7 +281,7 @@ public class Workbook : IDisposable
     }
 
     /// <summary>
-    /// オブジェクトのプロパティを、同じC#識別子となるブック内の定義名へ書き込みます。
+    /// オブジェクトのプロパティを、同じC#識別子となるブック内の定義名またはExcelテーブルへ書き込みます。
     /// <see cref="SpreadsheetDefinedNameAttribute"/> による明示的な対応付けを優先します。
     /// </summary>
     /// <typeparam name="T">ブックへ書き込むデータの型。</typeparam>
@@ -290,6 +290,36 @@ public class Workbook : IDisposable
     {
         foreach (var property in typeof(T).GetProperties())
         {
+            if ((
+                from table in Tables
+                where table.Name.ToCSharpIdentifier() == property.Name
+                select table
+            ).TryGetFirst(out var matchedTable))
+            {
+                var rowType = property.PropertyType.GenericTypeArguments.Single();
+                var enumerateMethod =
+                    (
+                        from method in typeof(Table).GetMethods()
+                        where method.Name == nameof(Table.Enumerate)
+                        where method.IsGenericMethodDefinition
+                        select method
+                    ).Single();
+                var typedTable = enumerateMethod
+                    .MakeGenericMethod(rowType)
+                    .Invoke(matchedTable, null);
+                var replaceMethod =
+                    (
+                        from method in typeof(Table<>).MakeGenericType(rowType).GetMethods()
+                        where method.Name == nameof(Table<object>.Replace)
+                        select method
+                    ).Single();
+
+                replaceMethod.Invoke(
+                    typedTable,
+                    [property.GetValue(data)]);
+                continue;
+            }
+
             var range = DataRange(property);
 
             if (range.TopLeftCell == range.BottomRightCell)
