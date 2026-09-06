@@ -75,26 +75,23 @@ public sealed class コード生成型推論のテスト
     }
 
     [Theory]
-    [InlineData("MainCell", "main_cell")]
-    [InlineData("MainRange", "main_range")]
-    public void 定義名と生成Dataプロパティ名が異なる場合は定義名属性に元のExcel定義名を設定します(
-        string propertyName,
-        string definedName)
+    [InlineData("MainCell")]
+    [InlineData("MainRange")]
+    [InlineData("LocalCell")]
+    [InlineData("LocalRange")]
+    public void 自動名前変換で対応する定義名には定義名属性を生成しません(
+        string propertyName)
     {
-        var generatedProperty = GeneratedCodeInspection
+        var tested = GeneratedCodeInspection
             .AssemblyFrom(
                 GeneratedCodeInspection.GenerateSources(
                     DefinedNamesExcelFilePath))
             .GeneratedType("定義名Data")
             .GetProperty(propertyName);
 
-        generatedProperty.Should().NotBeNull();
-
-        var tested =
-            generatedProperty.GetCustomAttribute<SpreadsheetDefinedNameAttribute>();
-
         tested.Should().NotBeNull();
-        tested.Name.Should().Be(definedName);
+        tested.GetCustomAttribute<SpreadsheetDefinedNameAttribute>()
+            .Should().BeNull();
     }
 
     [Fact]

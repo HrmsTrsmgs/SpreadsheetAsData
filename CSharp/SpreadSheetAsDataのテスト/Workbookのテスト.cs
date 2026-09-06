@@ -328,6 +328,16 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void Readは自動変換したプロパティ名と一致するシートローカル定義名からオブジェクトを読み込みます()
+    {
+        using var tested = Workbook.Open(@"TestData\定義名.xlsx");
+        tested.Sheets["Sheet2"].Cell["cell_name"].Value = "シートローカル";
+
+        tested.Read<ConventionWorkbookData>()
+            .CellName.Should().Be("シートローカル");
+    }
+
+    [Fact]
     public void ReadはSpreadsheetDefinedName属性で指定した複数セル定義名からオブジェクトを読み込みます()
     {
         using var tested = Workbook.Open(@"TestData\定義名.xlsx");
@@ -380,6 +390,21 @@ public class Workbookのテスト : IDisposable
             new SheetScopedWorkbookData
             {
                 Value = "シートローカル"
+            });
+
+        (tested.Sheets["Sheet2"].Cell["cell_name"].Value as object)
+            .Should().Be("シートローカル");
+    }
+
+    [Fact]
+    public void Replaceは自動変換したプロパティ名と一致するシートローカル定義名へオブジェクトを書き込みます()
+    {
+        using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));
+
+        tested.Replace(
+            new ConventionWorkbookData
+            {
+                CellName = "シートローカル"
             });
 
         (tested.Sheets["Sheet2"].Cell["cell_name"].Value as object)
@@ -481,6 +506,11 @@ public class Workbookのテスト : IDisposable
     {
         [SpreadsheetDefinedName("cell_name", WorksheetName = "Sheet2")]
         public string Value { get; set; } = "";
+    }
+
+    public sealed class ConventionWorkbookData
+    {
+        public string CellName { get; set; } = "";
     }
 
 }

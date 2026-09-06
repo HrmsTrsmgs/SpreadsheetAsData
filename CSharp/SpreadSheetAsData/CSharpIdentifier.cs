@@ -1,19 +1,19 @@
 using System.Globalization;
 
-namespace Marimo.SpreadSheetAsData.CodeGeneration;
+namespace Marimo.SpreadSheetAsData;
 
 /// <summary>
 /// Excel由来の名前をC#識別子へ変換します。
 /// </summary>
-static class CSharpIdentifier
+public static class CSharpIdentifier
 {
     extension(string self)
     {
         /// <summary>
-        /// Excel由来の名前を、生成コードで使用するC#識別子へ変換します。
+        /// Excel由来の名前を、生成コードや自動対応で使用するC#識別子へ変換します。
         /// </summary>
         /// <returns>C#識別子として使用できる名前。</returns>
-        internal string ToCSharpIdentifier() =>
+        public string ToCSharpIdentifier() =>
             EnsureValidIdentifierStart(
                 ContainsNonAscii(self)
                     ? CapitalizeFirstLetter(

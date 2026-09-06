@@ -234,7 +234,8 @@ public class Workbook : IDisposable
         new(Tables[name]);
 
     /// <summary>
-    /// ブックスコープの定義名を、同じ名前のプロパティへ対応付けて読み込みます。
+    /// ブック内の定義名を、同じC#識別子となるプロパティへ対応付けて読み込みます。
+    /// <see cref="SpreadsheetDefinedNameAttribute"/> による明示的な対応付けを優先します。
     /// </summary>
     /// <typeparam name="T">ブックのデータを読み込む型。</typeparam>
     /// <returns>ブックのデータを読み込んだオブジェクト。</returns>
@@ -244,12 +245,7 @@ public class Workbook : IDisposable
 
         foreach (var property in typeof(T).GetProperties())
         {
-            var attribute =
-                property.GetCustomAttribute<SpreadsheetDefinedNameAttribute>();
-            var definedName = attribute?.Name ?? property.Name;
-            var range = attribute?.WorksheetName is string worksheetName
-                ? Sheets[worksheetName].Range[definedName]
-                : Range[definedName];
+            var range = DataRange(property);
 
             property.SetValue(
                 data,
@@ -262,7 +258,8 @@ public class Workbook : IDisposable
     }
 
     /// <summary>
-    /// オブジェクトのプロパティを、同じ名前のブックスコープ定義名へ書き込みます。
+    /// オブジェクトのプロパティを、同じC#識別子となるブック内の定義名へ書き込みます。
+    /// <see cref="SpreadsheetDefinedNameAttribute"/> による明示的な対応付けを優先します。
     /// </summary>
     /// <typeparam name="T">ブックへ書き込むデータの型。</typeparam>
     /// <param name="data">ブックへ書き込むデータ。</param>
@@ -270,12 +267,7 @@ public class Workbook : IDisposable
     {
         foreach (var property in typeof(T).GetProperties())
         {
-            var attribute =
-                property.GetCustomAttribute<SpreadsheetDefinedNameAttribute>();
-            var definedName = attribute?.Name ?? property.Name;
-            var range = attribute?.WorksheetName is string worksheetName
-                ? Sheets[worksheetName].Range[definedName]
-                : Range[definedName];
+            var range = DataRange(property);
 
             if (range.TopLeftCell == range.BottomRightCell)
             {
@@ -288,6 +280,26 @@ public class Workbook : IDisposable
                     property.GetValue(data)
                         ?? Array.Empty<IEnumerable<object?>>());
         }
+    }
+
+    CellRange DataRange(PropertyInfo property)
+    {
+        var attribute =
+            property.GetCustomAttribute<SpreadsheetDefinedNameAttribute>();
+
+        if (attribute is not null)
+        {
+            return attribute.WorksheetName is string worksheetName
+                ? Sheets[worksheetName].Range[attribute.Name]
+                : Range[attribute.Name];
+        }
+
+        return
+            (
+                from definedName in DefinedNames
+                where definedName.Name.ToCSharpIdentifier() == property.Name
+                select definedName.Range
+            ).Single();
     }
 
     /// <summary>

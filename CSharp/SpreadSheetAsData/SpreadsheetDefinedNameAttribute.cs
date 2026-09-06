@@ -1,7 +1,7 @@
 namespace Marimo.SpreadSheetAsData;
 
 /// <summary>
-/// プロパティへ対応付ける Excel の定義名を指定します。
+/// 自動名前対応と異なる Excel の定義名をプロパティへ対応付けます。
 /// </summary>
 [AttributeUsage(
     AttributeTargets.Property,

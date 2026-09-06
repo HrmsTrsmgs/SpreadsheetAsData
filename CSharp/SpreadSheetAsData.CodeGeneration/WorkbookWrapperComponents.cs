@@ -119,6 +119,7 @@ static class WorkbookWrapperComponents
         CodeGenerationOptions options)
     {
         var propertyTypeName = CellValueTypeName(definedName.Range.TopLeftCell.Value);
+        var propertyName = options.BookDefinedName(definedName);
 
         return
             $$"""
@@ -126,8 +127,7 @@ static class WorkbookWrapperComponents
                 /// <summary>
                 /// 定義名「{{definedName.Name}}」が表すセルの値を取得または設定します。
                 /// </summary>
-                [SpreadsheetDefinedName({{StringLiteral(definedName.Name)}})]
-                public {{propertyTypeName}} {{options.BookDefinedName(definedName)}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
+                public {{propertyTypeName}} {{propertyName}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
             """;
     }
 
@@ -136,15 +136,19 @@ static class WorkbookWrapperComponents
     /// </summary>
     internal static string BookDataCellRangePropertyDeclaration(
         DefinedName definedName,
-        CodeGenerationOptions options) =>
-        $$"""
+        CodeGenerationOptions options)
+    {
+        var propertyName = options.BookDefinedName(definedName);
 
-            /// <summary>
-            /// 定義名「{{definedName.Name}}」が表すセル範囲の値を取得または設定します。
-            /// </summary>
-            [SpreadsheetDefinedName({{StringLiteral(definedName.Name)}})]
-            public IEnumerable<IEnumerable<object?>> {{options.BookDefinedName(definedName)}} { get; set; }
-        """;
+        return
+            $$"""
+
+                /// <summary>
+                /// 定義名「{{definedName.Name}}」が表すセル範囲の値を取得または設定します。
+                /// </summary>
+                public IEnumerable<IEnumerable<object?>> {{propertyName}} { get; set; }
+            """;
+    }
 
     /// <summary>
     /// ブックデータ型に、シートローカルの単一セル定義名が表すプロパティを生成します。
@@ -155,14 +159,15 @@ static class WorkbookWrapperComponents
         CodeGenerationOptions options)
     {
         var propertyTypeName = CellValueTypeName(definedName.Range.TopLeftCell.Value);
+        var propertyName = options.SheetDefinedName(sheet, definedName);
 
         return
             $$"""
 
                 /// <summary>
-                /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセルの値を取得します。
+                /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセルの値を取得または設定します。
                 /// </summary>
-                public {{propertyTypeName}} {{options.SheetDefinedName(sheet, definedName)}} { get; }
+                public {{propertyTypeName}} {{propertyName}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
             """;
     }
 
@@ -172,14 +177,19 @@ static class WorkbookWrapperComponents
     internal static string BookDataSheetCellRangePropertyDeclaration(
         Worksheet sheet,
         DefinedName definedName,
-        CodeGenerationOptions options) =>
-        $$"""
+        CodeGenerationOptions options)
+    {
+        var propertyName = options.SheetDefinedName(sheet, definedName);
 
-            /// <summary>
-            /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセル範囲の値を取得します。
-            /// </summary>
-            public IEnumerable<IEnumerable<object?>> {{options.SheetDefinedName(sheet, definedName)}} { get; }
-        """;
+        return
+            $$"""
+
+                /// <summary>
+                /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセル範囲の値を取得します。
+                /// </summary>
+                public IEnumerable<IEnumerable<object?>> {{propertyName}} { get; }
+            """;
+    }
 
     /// <summary>
     /// Book型から指定ワークシート型を取得するプロパティ宣言を生成します。
