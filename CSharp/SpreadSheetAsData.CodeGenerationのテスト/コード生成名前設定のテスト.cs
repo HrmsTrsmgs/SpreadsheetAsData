@@ -193,4 +193,22 @@ public sealed class コード生成名前設定のテスト
                 replacement,
                 options => options.WithStrictOrdering());
     }
+
+    [Fact]
+    public void 文脈付きNameMappingsで変更した生成Dataプロパティへシートローカル定義名の値を読み込みます()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesWithoutCollisionsExcelFilePath,
+                    options => options.NameMappings["sales_data.local_cell"] = "PrimaryLocalCell"))
+            .GeneratedInstance<Workbook>(
+                "定義名Book",
+                DefinedNamesWithoutCollisionsExcelFilePath);
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        object? tested = dataAccessor.PrimaryLocalCell;
+
+        tested.Should().Be(1d);
+    }
 }

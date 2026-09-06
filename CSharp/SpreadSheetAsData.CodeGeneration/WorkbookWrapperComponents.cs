@@ -176,6 +176,10 @@ static class WorkbookWrapperComponents
     {
         var propertyTypeName = CellValueTypeName(definedName.Range.TopLeftCell.Value);
         var propertyName = options.SheetDefinedName(sheet, definedName);
+        var attributeDeclaration =
+            propertyName == definedName.Name.ToCSharpIdentifier()
+                ? ""
+                : $"[SpreadsheetDefinedName({StringLiteral(definedName.Name)}, WorksheetName = {StringLiteral(sheet.Name)})]{Environment.NewLine}    ";
 
         return
             $$"""
@@ -183,7 +187,7 @@ static class WorkbookWrapperComponents
                 /// <summary>
                 /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセルの値を取得または設定します。
                 /// </summary>
-                public {{propertyTypeName}} {{propertyName}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
+                {{attributeDeclaration}}public {{propertyTypeName}} {{propertyName}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
             """;
     }
 
