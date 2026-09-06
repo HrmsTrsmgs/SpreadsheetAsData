@@ -248,7 +248,7 @@ static class WorkbookWrapperComponents
         definedName.Range.TopLeftCell == definedName.Range.BottomRightCell;
 
     /// <summary>
-    /// ブックスコープの単一セル定義名が表す値を書き込むプロパティ宣言を生成します。
+    /// ブックスコープの単一セル定義名が表す値を読み書きするプロパティ宣言を生成します。
     /// </summary>
     internal static string BookCellDefinedNamePropertyDeclaration(
         DefinedName definedName,
@@ -256,10 +256,11 @@ static class WorkbookWrapperComponents
         $$"""
 
             /// <summary>
-            /// 定義名「{{definedName.Name}}」が表すセルの値を設定します。
+            /// 定義名「{{definedName.Name}}」が表すセルの値を取得または設定します。
             /// </summary>
             public dynamic {{options.BookDefinedName(definedName)}}
             {
+                get => Cell[{{StringLiteral(definedName.Name)}}].Value;
                 set => Cell[{{StringLiteral(definedName.Name)}}].Value = value;
             }
         """;

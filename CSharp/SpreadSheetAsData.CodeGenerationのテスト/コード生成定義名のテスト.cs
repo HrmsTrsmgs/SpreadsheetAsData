@@ -107,6 +107,23 @@ public sealed class コード生成定義名のテスト : IDisposable
     }
 
     [Fact]
+    public void 生成されたBook型の単一セル定義名プロパティから値を直接読み取れます()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesExcelFilePath))
+            .GeneratedInstance<Workbook>(
+                "定義名Book",
+                DefinedNamesExcelFilePath);
+        dynamic bookAccessor = book;
+
+        object? tested = bookAccessor.MainCell;
+
+        tested.Should().Be("main");
+    }
+
+    [Fact]
     public void 生成されたSheet型のCellプロパティから値を書き込めます()
     {
         var filePath = temporaryFiles.Copy(DefinedNamesExcelFilePath);
