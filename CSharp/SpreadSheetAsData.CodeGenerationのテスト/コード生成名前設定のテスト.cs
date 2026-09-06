@@ -233,4 +233,26 @@ public sealed class コード生成名前設定のテスト
         (book.Sheets["sales_data"].Cell["local_cell"].Value as object)
             .Should().Be(2d);
     }
+
+    [Fact]
+    public void 文脈付きNameMappingsで変更した生成Data範囲プロパティへシートローカル定義名の値を読み込みます()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesWithoutCollisionsExcelFilePath,
+                    options => options.NameMappings["sales_data.local_range"] = "PrimaryLocalRange"))
+            .GeneratedInstance<Workbook>(
+                "定義名Book",
+                DefinedNamesWithoutCollisionsExcelFilePath);
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        IEnumerable<IEnumerable<object?>> tested = dataAccessor.PrimaryLocalRange;
+        var rows = tested
+            .Select(it => it.ToArray())
+            .ToArray();
+
+        rows[0].Should().Equal(1d, 10.5d);
+        rows[1].Should().Equal(2d, 20.5d);
+    }
 }
