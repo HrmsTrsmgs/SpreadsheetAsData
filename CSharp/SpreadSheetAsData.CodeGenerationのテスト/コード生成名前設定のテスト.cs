@@ -121,4 +121,25 @@ public sealed class コード生成名前設定のテスト
 
         tested.Should().Be("main");
     }
+
+    [Fact]
+    public void NameMappingsで変更した生成Dataプロパティから定義名へ書き込みます()
+    {
+        using var temporaryFiles = new TemporaryExcelFiles();
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesWithoutCollisionsExcelFilePath,
+                    options => options.NameMappings["book.main_cell"] = "PrimaryCell"))
+            .GeneratedInstance<Workbook>(
+                "定義名Book",
+                temporaryFiles.Copy(DefinedNamesWithoutCollisionsExcelFilePath));
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        dataAccessor.PrimaryCell = "changed";
+
+        bookAccessor.Replace(dataAccessor);
+
+        (book.Cell["main_cell"].Value as object).Should().Be("changed");
+    }
 }
