@@ -35,6 +35,13 @@ static class WorkbookWrapperComponents
 
             public static new {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book Open(string filePath) =>
                 new(filePath);
+
+            {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book(System.IO.Stream stream) : base(stream)
+            {
+            }
+
+            public static new {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book Open(System.IO.Stream stream) =>
+                new(stream);
         {{ForEach([
             .. from definedName in BookScopedDefinedNames(book)
                where IsSingleCellDefinedName(definedName)

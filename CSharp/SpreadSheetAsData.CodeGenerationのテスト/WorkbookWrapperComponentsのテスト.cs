@@ -66,6 +66,13 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     public static new BasicStructureBook Open(string filePath) =>
                         new(filePath);
 
+                    BasicStructureBook(System.IO.Stream stream) : base(stream)
+                    {
+                    }
+
+                    public static new BasicStructureBook Open(System.IO.Stream stream) =>
+                        new(stream);
+
                     /// <summary>
                     /// ワークシート「SalesData」を取得します。
                     /// </summary>

@@ -43,6 +43,14 @@ public class Workbook : IDisposable
     }
 
     /// <summary>
+    /// 派生した型付きブックから、指定したストリーム上のファイルを開きます。
+    /// </summary>
+    /// <param name="stream">開く Spreadsheet ファイルを格納したストリーム。</param>
+    protected Workbook(Stream stream) : this(DocumentSession.Open(stream))
+    {
+    }
+
+    /// <summary>
     /// 既に開かれた Open XML ドキュメントのセッションを所有するブックを作成します。
     /// </summary>
     /// <param name="session">ブックとして扱う Open XML ドキュメントのセッション。</param>

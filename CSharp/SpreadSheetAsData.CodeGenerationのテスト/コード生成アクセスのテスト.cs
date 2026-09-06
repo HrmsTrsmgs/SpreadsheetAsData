@@ -84,6 +84,23 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void 生成されたBook型はStreamから開けます()
+    {
+        using var stream = new MemoryStream(
+            File.ReadAllBytes(BasicStructureExcelFilePath));
+
+        using var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath))
+            .GeneratedType("BasicStructureBook")
+            .InvokeStaticMethod<Workbook>("Open", stream);
+
+        tested.Sheets.Keys
+            .Should().Equal("SalesData", "ProductMaster");
+    }
+
+    [Fact]
     public void Sheetはそのシートに属するExcelテーブルを型付きプロパティとして公開します()
     {
         var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
