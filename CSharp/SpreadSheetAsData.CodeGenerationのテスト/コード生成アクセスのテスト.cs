@@ -181,6 +181,35 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void 生成されたBookはDataからシートローカルの単一セル定義名を置換します()
+    {
+        using var temporaryFiles = new TemporaryExcelFiles();
+        var filePath = temporaryFiles.Copy(
+            DefinedNamesWithSheetScopeExcelFilePath);
+
+        using (var book = GeneratedCodeInspection
+                   .AssemblyFrom(
+                       GeneratedCodeInspection.GenerateSources(
+                           DefinedNamesWithSheetScopeExcelFilePath))
+                   .GeneratedInstance<Workbook>(
+                       "定義名Book",
+                       filePath))
+        {
+            dynamic bookAccessor = book;
+            dynamic dataAccessor = bookAccessor.Read();
+            dataAccessor.LocalCell = 2d;
+
+            bookAccessor.Replace(dataAccessor);
+            book.Save();
+        }
+
+        using var tested = Workbook.Open(filePath);
+
+        (tested.Sheets["sales_data"].Cell["local_cell"].Value as object)
+            .Should().Be(2d);
+    }
+
+    [Fact]
     public void Sheetはそのシートに属するExcelテーブルを型付きプロパティとして公開します()
     {
         var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
