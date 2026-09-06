@@ -196,6 +196,23 @@ public class Workbook : IDisposable
         new(Tables[name]);
 
     /// <summary>
+    /// ブックスコープの単一セル定義名を、同じ名前のプロパティへ対応付けて読み込みます。
+    /// </summary>
+    /// <typeparam name="T">ブックのデータを読み込む型。</typeparam>
+    /// <returns>ブックのデータを読み込んだオブジェクト。</returns>
+    public T Read<T>()
+    {
+        var data = Activator.CreateInstance<T>();
+
+        foreach (var property in typeof(T).GetProperties())
+        {
+            property.SetValue(data, Cell[property.Name].Value);
+        }
+
+        return data;
+    }
+
+    /// <summary>
     /// 指定した位置のワークシートを取得します。
     /// </summary>
     /// <param name="index">取得するワークシートの 0 始まりの位置。</param>

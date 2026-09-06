@@ -166,13 +166,32 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void Readはプロパティ名と同じブックスコープの単一セル定義名からオブジェクトを読み込みます()
+    {
+        using var tested = Workbook.Open(@"TestData\定義名.xlsx");
+
+        tested.Read<WorkbookData>()
+            .Should().BeEquivalentTo(
+                new WorkbookData
+                {
+                    CustomerName = "山田太郎"
+                });
+    }
+
+    [Fact]
     public void DefinedNamesはブック内の定義名を列挙します()
     {
         using var tested = Workbook.Open(@"TestData\定義名.xlsx");
 
         tested.DefinedNames
             .Select(it => it.Name)
-            .Should().Equal("A1", "book_cell", "book_range", "cell_name", "range_name");
+            .Should().Equal(
+                "A1",
+                "book_cell",
+                "book_range",
+                "cell_name",
+                "range_name",
+                "CustomerName");
     }
 
     [Fact]
@@ -206,6 +225,11 @@ public class Workbookのテスト : IDisposable
 
         tested.Worksheet.Should().BeSameAs(sheet2);
         tested.Range.Should().BeSameAs(sheet2.Range["cell_name"]);
+    }
+
+    public sealed class WorkbookData
+    {
+        public string CustomerName { get; set; } = "";
     }
 
 }
