@@ -362,6 +362,31 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void ReplaceはSpreadsheetDefinedName属性で指定した複数セル定義名へオブジェクトを書き込みます()
+    {
+        using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));
+        IEnumerable<IEnumerable<object?>> replacement =
+        [
+            ["a", "b"],
+            ["c", "d"],
+            ["e", "f"],
+            ["g", "h"],
+            ["i", "j"]
+        ];
+
+        tested.Replace(
+            new AttributedWorkbookRangeData
+            {
+                Values = replacement
+            });
+
+        tested.Range["book_range"].Values
+            .Should().BeEquivalentTo(
+                replacement,
+                options => options.WithStrictOrdering());
+    }
+
+    [Fact]
     public void DefinedNamesはブック内の定義名を列挙します()
     {
         using var tested = Workbook.Open(@"TestData\定義名.xlsx");

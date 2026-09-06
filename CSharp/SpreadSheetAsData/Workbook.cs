@@ -260,7 +260,7 @@ public class Workbook : IDisposable
     }
 
     /// <summary>
-    /// オブジェクトのプロパティを、同じ名前のブックスコープ単一セル定義名へ書き込みます。
+    /// オブジェクトのプロパティを、同じ名前のブックスコープ定義名へ書き込みます。
     /// </summary>
     /// <typeparam name="T">ブックへ書き込むデータの型。</typeparam>
     /// <param name="data">ブックへ書き込むデータ。</param>
@@ -268,10 +268,21 @@ public class Workbook : IDisposable
     {
         foreach (var property in typeof(T).GetProperties())
         {
-            Cell[
+            var definedName =
                 property.GetCustomAttribute<SpreadsheetDefinedNameAttribute>()?.Name
-                    ?? property.Name
-            ].Value = property.GetValue(data);
+                    ?? property.Name;
+            var range = Range[definedName];
+
+            if (range.TopLeftCell == range.BottomRightCell)
+            {
+                range.TopLeftCell.Value = property.GetValue(data);
+                continue;
+            }
+
+            range.Values =
+                (IEnumerable<IEnumerable<object?>>)(
+                    property.GetValue(data)
+                        ?? Array.Empty<IEnumerable<object?>>());
         }
     }
 
