@@ -210,6 +210,36 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void 生成されたBookはDataからシートローカルの複数セル定義名を置換します()
+    {
+        using var temporaryFiles = new TemporaryExcelFiles();
+        var filePath = temporaryFiles.Copy(
+            DefinedNamesWithoutCollisionsExcelFilePath);
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesWithoutCollisionsExcelFilePath))
+            .GeneratedInstance<Workbook>(
+                "定義名Book",
+                filePath);
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        IEnumerable<IEnumerable<object?>> replacement =
+        [
+            [3d, 30.5d],
+            [4d, 40.5d]
+        ];
+        dataAccessor.LocalRange = replacement;
+
+        bookAccessor.Replace(dataAccessor);
+
+        book.Sheets["sales_data"].Range["local_range"].Values
+            .Should().BeEquivalentTo(
+                replacement,
+                options => options.WithStrictOrdering());
+    }
+
+    [Fact]
     public void Sheetはそのシートに属するExcelテーブルを型付きプロパティとして公開します()
     {
         var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
