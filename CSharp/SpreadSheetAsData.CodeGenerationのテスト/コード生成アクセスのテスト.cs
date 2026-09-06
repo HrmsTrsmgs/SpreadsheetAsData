@@ -10,6 +10,7 @@ public sealed class コード生成アクセスのテスト
     const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
     const string DefinedNamesExcelFilePath = @"TestData\コード生成\ブックスコープ\定義名.xlsx";
     const string DefinedNamesWithSheetScopeExcelFilePath = @"TestData\コード生成\シートローカル単一セル\定義名.xlsx";
+    const string DefinedNamesWithoutCollisionsExcelFilePath = @"TestData\コード生成\衝突なし\定義名.xlsx";
 
     [Fact]
     public void Bookは各ワークシートを型付きプロパティとして公開します()
@@ -134,6 +135,27 @@ public sealed class コード生成アクセスのテスト
         object? tested = dataAccessor.LocalCell;
 
         tested.Should().Be(1d);
+    }
+
+    [Fact]
+    public void 生成されたBookはシートローカルの複数セル定義名をDataへ読み込みます()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesWithoutCollisionsExcelFilePath))
+            .GeneratedInstance<Workbook>(
+                "定義名Book",
+                DefinedNamesWithoutCollisionsExcelFilePath);
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        IEnumerable<IEnumerable<object?>> tested = dataAccessor.LocalRange;
+        var rows = tested
+            .Select(it => it.ToArray())
+            .ToArray();
+
+        rows[0].Should().Equal(1d, 10.5d);
+        rows[1].Should().Equal(2d, 20.5d);
     }
 
     [Fact]

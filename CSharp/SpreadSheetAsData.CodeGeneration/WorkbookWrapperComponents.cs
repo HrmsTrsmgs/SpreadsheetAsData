@@ -185,9 +185,9 @@ static class WorkbookWrapperComponents
             $$"""
 
                 /// <summary>
-                /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセル範囲の値を取得します。
+                /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセル範囲の値を取得または設定します。
                 /// </summary>
-                public IEnumerable<IEnumerable<object?>> {{propertyName}} { get; }
+                public IEnumerable<IEnumerable<object?>> {{propertyName}} { get; set; }
             """;
     }
 
