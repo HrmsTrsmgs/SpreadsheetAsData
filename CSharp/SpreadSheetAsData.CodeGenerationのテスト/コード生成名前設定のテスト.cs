@@ -255,4 +255,33 @@ public sealed class コード生成名前設定のテスト
         rows[0].Should().Equal(1d, 10.5d);
         rows[1].Should().Equal(2d, 20.5d);
     }
+
+    [Fact]
+    public void 文脈付きNameMappingsで変更した生成Data範囲プロパティからシートローカル定義名へ書き込みます()
+    {
+        using var temporaryFiles = new TemporaryExcelFiles();
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesWithoutCollisionsExcelFilePath,
+                    options => options.NameMappings["sales_data.local_range"] = "PrimaryLocalRange"))
+            .GeneratedInstance<Workbook>(
+                "定義名Book",
+                temporaryFiles.Copy(DefinedNamesWithoutCollisionsExcelFilePath));
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        IEnumerable<IEnumerable<object?>> replacement =
+        [
+            [3d, 30.5d],
+            [4d, 40.5d]
+        ];
+        dataAccessor.PrimaryLocalRange = replacement;
+
+        bookAccessor.Replace(dataAccessor);
+
+        book.Sheets["sales_data"].Range["local_range"].Values
+            .Should().BeEquivalentTo(
+                replacement,
+                options => options.WithStrictOrdering());
+    }
 }
