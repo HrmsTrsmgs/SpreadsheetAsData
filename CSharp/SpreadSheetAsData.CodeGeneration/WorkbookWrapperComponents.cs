@@ -124,6 +124,7 @@ static class WorkbookWrapperComponents
             /// <summary>
             /// 定義名「{{definedName.Name}}」が表すセル範囲の値を取得または設定します。
             /// </summary>
+            [SpreadsheetDefinedName({{StringLiteral(definedName.Name)}})]
             public IEnumerable<IEnumerable<object?>> {{options.BookDefinedName(definedName)}} { get; set; }
         """;
 
