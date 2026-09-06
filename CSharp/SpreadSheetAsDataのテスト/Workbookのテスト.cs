@@ -70,6 +70,19 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void Disposeは呼び出し側から渡されたStreamを閉じません()
+    {
+        using var stream = new MemoryStream(
+            File.ReadAllBytes(@"TestData\Book1.xlsx"));
+        var tested = Workbook.Open(stream);
+
+        tested.Dispose();
+
+        stream.CanRead.Should().BeTrue();
+        stream.CanWrite.Should().BeTrue();
+    }
+
+    [Fact]
     public void Closeはファイルの束縛を解除します()
     {
         var tested = Workbook.Open(コピーパス);
