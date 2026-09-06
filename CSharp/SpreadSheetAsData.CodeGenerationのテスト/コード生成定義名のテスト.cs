@@ -147,4 +147,21 @@ public sealed class コード生成定義名のテスト : IDisposable
         (tested.Sheets["sales_data"].Cell["local_cell"].Value as object)
             .Should().Be("generated");
     }
+
+    [Fact]
+    public void 生成されたSheet型の単一セル定義名プロパティから値を直接読み取れます()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesExcelFilePath))
+            .GeneratedInstance<Workbook>(
+                "定義名Book",
+                DefinedNamesExcelFilePath);
+        dynamic bookAccessor = book;
+
+        object? tested = bookAccessor.SalesData.LocalCell;
+
+        tested.Should().Be(1d);
+    }
 }
