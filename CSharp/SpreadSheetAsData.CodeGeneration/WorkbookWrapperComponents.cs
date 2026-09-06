@@ -304,7 +304,7 @@ static class WorkbookWrapperComponents
         """;
 
     /// <summary>
-    /// ワークシートスコープのセル範囲定義名が表す値を読み取るプロパティ宣言を生成します。
+    /// ワークシートスコープのセル範囲定義名が表す値を読み書きするプロパティ宣言を生成します。
     /// </summary>
     internal static string SheetCellRangeDefinedNamePropertyDeclaration(
         Worksheet sheet,
@@ -313,10 +313,13 @@ static class WorkbookWrapperComponents
         $$"""
 
             /// <summary>
-            /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセル範囲の値を取得します。
+            /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセル範囲の値を取得または設定します。
             /// </summary>
-            public IEnumerable<IEnumerable<object?>> {{options.SheetDefinedName(sheet, definedName)}} =>
-                Range[{{StringLiteral(definedName.Name)}}].Values;
+            public IEnumerable<IEnumerable<object?>> {{options.SheetDefinedName(sheet, definedName)}}
+            {
+                get => Range[{{StringLiteral(definedName.Name)}}].Values;
+                set => Range[{{StringLiteral(definedName.Name)}}].Values = value;
+            }
         """;
 
     /// <summary>

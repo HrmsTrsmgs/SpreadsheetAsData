@@ -241,4 +241,37 @@ public sealed class コード生成定義名のテスト : IDisposable
         rows[0].Should().Equal(1d, 10.5d);
         rows[1].Should().Equal(2d, 20.5d);
     }
+
+    [Fact]
+    public void 生成されたSheet型の複数セル定義名プロパティへ値を直接書き込めます()
+    {
+        var filePath = temporaryFiles.Copy(DefinedNamesExcelFilePath);
+        IEnumerable<IEnumerable<object?>> replacement =
+        [
+            [3, 30.5],
+            [4, 40.5]
+        ];
+
+        using (var book = GeneratedCodeInspection
+                   .AssemblyFrom(
+                       GeneratedCodeInspection.GenerateSources(
+                           DefinedNamesExcelFilePath))
+                   .GeneratedInstance<Workbook>(
+                       "定義名Book",
+                       filePath))
+        {
+            dynamic bookAccessor = book;
+
+            bookAccessor.SalesData.LocalRange = replacement;
+            book.Save();
+        }
+
+        using var tested = Workbook.Open(filePath);
+        var rows = tested.Sheets["sales_data"].Range["local_range"].Values
+            .Select(it => it.ToArray())
+            .ToArray();
+
+        rows[0].Should().Equal(3d, 30.5d);
+        rows[1].Should().Equal(4d, 40.5d);
+    }
 }
