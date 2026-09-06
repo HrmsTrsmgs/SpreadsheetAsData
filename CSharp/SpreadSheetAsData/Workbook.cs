@@ -27,6 +27,14 @@ public class Workbook : IDisposable
         new(DocumentSession.Open(filePath));
 
     /// <summary>
+    /// 指定したストリーム上の Spreadsheet ファイルをブックとして開きます。
+    /// </summary>
+    /// <param name="stream">開く Spreadsheet ファイルを格納したストリーム。</param>
+    /// <returns>開いたブック。</returns>
+    public static Workbook Open(Stream stream) =>
+        new(DocumentSession.Open(stream));
+
+    /// <summary>
     /// 派生した型付きブックから、指定したファイルをブックとして開きます。
     /// </summary>
     /// <param name="filePath">開く Spreadsheet ファイルのパス。</param>
@@ -267,24 +275,27 @@ public class Workbook : IDisposable
         documentSession.SaveAs(filePath);
 
     /// <summary>
-    /// ファイルをロックしたまま、編集対象の Open XML ドキュメントをメモリ上に保持します。
+    /// ファイルまたはストリーム上の Open XML ドキュメントと保存先を管理します。
     /// </summary>
     sealed class DocumentSession : IDisposable
     {
-        readonly string filePath;
-        readonly MemoryStream stream;
-        FileStream fileLock;
+        readonly string? filePath;
+        readonly Stream stream;
+        readonly bool ownsStream;
+        FileStream? fileLock;
         bool disposedValue;
 
         DocumentSession(
-            string filePath,
-            FileStream fileLock,
-            MemoryStream stream,
-            Packaging.SpreadsheetDocument document)
+            string? filePath,
+            FileStream? fileLock,
+            Stream stream,
+            Packaging.SpreadsheetDocument document,
+            bool ownsStream)
         {
             this.filePath = filePath;
             this.fileLock = fileLock;
             this.stream = stream;
+            this.ownsStream = ownsStream;
             Document = document;
         }
 
@@ -307,7 +318,8 @@ public class Workbook : IDisposable
                     Packaging.SpreadsheetDocument.Open(
                         stream,
                         isEditable: true,
-                        new Packaging.OpenSettings { AutoSave = false }));
+                        new Packaging.OpenSettings { AutoSave = false }),
+                    ownsStream: true);
             }
             catch
             {
@@ -316,6 +328,17 @@ public class Workbook : IDisposable
                 throw;
             }
         }
+
+        internal static DocumentSession Open(Stream stream) =>
+            new(
+                filePath: null,
+                fileLock: null,
+                stream,
+                Packaging.SpreadsheetDocument.Open(
+                    stream,
+                    isEditable: true,
+                    new Packaging.OpenSettings { AutoSave = false }),
+                ownsStream: false);
 
         static FileStream Lock(string filePath) =>
             File.Open(
@@ -326,7 +349,13 @@ public class Workbook : IDisposable
 
         internal void Save()
         {
-            fileLock.Dispose();
+            if (filePath is null)
+            {
+                Document.Save();
+                return;
+            }
+
+            fileLock?.Dispose();
             try
             {
                 SaveAs(filePath);
@@ -347,8 +376,11 @@ public class Workbook : IDisposable
             if (!disposedValue)
             {
                 Document.Close();
-                stream.Dispose();
-                fileLock.Dispose();
+                if (ownsStream)
+                {
+                    stream.Dispose();
+                }
+                fileLock?.Dispose();
                 disposedValue = true;
             }
         }

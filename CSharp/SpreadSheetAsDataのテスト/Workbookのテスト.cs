@@ -46,6 +46,17 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void OpenはMemoryStream上のブックを開きます()
+    {
+        using var stream = new MemoryStream(
+            File.ReadAllBytes(@"TestData\Book1.xlsx"));
+        using var tested = Workbook.Open(stream);
+
+        tested.Sheets.Keys
+            .Should().Equal("Sheet1", "Sheet2", "いろいろなデータ");
+    }
+
+    [Fact]
     public void Closeはファイルの束縛を解除します()
     {
         var tested = Workbook.Open(コピーパス);
