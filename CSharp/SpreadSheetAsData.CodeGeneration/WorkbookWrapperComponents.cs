@@ -120,6 +120,10 @@ static class WorkbookWrapperComponents
     {
         var propertyTypeName = CellValueTypeName(definedName.Range.TopLeftCell.Value);
         var propertyName = options.BookDefinedName(definedName);
+        var attributeDeclaration =
+            propertyName == definedName.Name.ToCSharpIdentifier()
+                ? ""
+                : $"[SpreadsheetDefinedName({StringLiteral(definedName.Name)})]{Environment.NewLine}    ";
 
         return
             $$"""
@@ -127,7 +131,7 @@ static class WorkbookWrapperComponents
                 /// <summary>
                 /// 定義名「{{definedName.Name}}」が表すセルの値を取得または設定します。
                 /// </summary>
-                public {{propertyTypeName}} {{propertyName}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
+                {{attributeDeclaration}}public {{propertyTypeName}} {{propertyName}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
             """;
     }
 

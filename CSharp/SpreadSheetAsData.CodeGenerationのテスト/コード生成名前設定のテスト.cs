@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Marimo.SpreadSheetAsData;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 using Xunit;
 
@@ -8,6 +9,7 @@ public sealed class コード生成名前設定のテスト
 {
     const string SimpleNameMappingsExcelFilePath = @"TestData\コード生成\簡易名前置換.xlsx";
     const string ContextualNameMappingsExcelFilePath = @"TestData\コード生成\文脈付き名前置換.xlsx";
+    const string DefinedNamesWithoutCollisionsExcelFilePath = @"TestData\コード生成\衝突なし\定義名.xlsx";
 
     [Fact]
     public void NameMappingsは自動名前変換より優先されます()
@@ -100,5 +102,23 @@ public sealed class コード生成名前設定のテスト
             .TypeDeclaration("Customers")
             .PropertyDeclaration("CustomerId")
             .Should().NotBeNull();
+    }
+
+    [Fact]
+    public void NameMappingsで変更した生成Dataプロパティへ定義名の値を読み込みます()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesWithoutCollisionsExcelFilePath,
+                    options => options.NameMappings["book.main_cell"] = "PrimaryCell"))
+            .GeneratedInstance<Workbook>(
+                "定義名Book",
+                DefinedNamesWithoutCollisionsExcelFilePath);
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        object? tested = dataAccessor.PrimaryCell;
+
+        tested.Should().Be("main");
     }
 }
