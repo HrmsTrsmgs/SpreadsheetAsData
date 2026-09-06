@@ -95,18 +95,18 @@ static class WorkbookWrapperComponents
         {{ForEach([
             .. from definedName in BookScopedDefinedNames(book)
                where IsSingleCellDefinedName(definedName)
-               select BookDataCellPropertyDeclaration(definedName, options),
+               select BookDataDefinedNamePropertyDeclaration(definedName, options),
             .. from definedName in BookScopedDefinedNames(book)
                where !IsSingleCellDefinedName(definedName)
-               select BookDataCellRangePropertyDeclaration(definedName, options),
+               select BookDataDefinedNamePropertyDeclaration(definedName, options),
             .. from sheet in book.Sheets.Values
                from definedName in SheetScopedDefinedNames(sheet)
                where IsSingleCellDefinedName(definedName)
-               select BookDataSheetCellPropertyDeclaration(sheet, definedName, options),
+               select BookDataDefinedNamePropertyDeclaration(definedName, options),
             .. from sheet in book.Sheets.Values
                from definedName in SheetScopedDefinedNames(sheet)
                where !IsSingleCellDefinedName(definedName)
-               select BookDataSheetCellRangePropertyDeclaration(sheet, definedName, options),
+               select BookDataDefinedNamePropertyDeclaration(definedName, options),
             .. from table in book.Tables
                select BookDataTablePropertyDeclaration(table)
         ])}}
@@ -126,107 +126,58 @@ static class WorkbookWrapperComponents
         """;
 
     /// <summary>
-    /// ブックデータ型に、ブックスコープの単一セル定義名が表すプロパティを生成します。
+    /// ブックデータ型に、定義名が表す値のプロパティを生成します。
     /// </summary>
-    internal static string BookDataCellPropertyDeclaration(
+    internal static string BookDataDefinedNamePropertyDeclaration(
         DefinedName definedName,
         CodeGenerationOptions options)
     {
-        var propertyTypeName = CellValueTypeName(definedName.Range.TopLeftCell.Value);
-        var propertyName = options.BookDefinedName(definedName);
+        var isSingleCell = IsSingleCellDefinedName(definedName);
+        var propertyTypeName = isSingleCell
+            ? CellValueTypeName(definedName.Range.TopLeftCell.Value)
+            : "IEnumerable<IEnumerable<object?>>";
+        var worksheet = definedName.Worksheet;
+        var propertyName = worksheet is null
+            ? options.BookDefinedName(definedName)
+            : options.SheetDefinedName(worksheet, definedName);
         var attributeDeclaration = BookDataDefinedNameAttribute(
             definedName,
             propertyName);
+        var scopeDescription = worksheet is null
+            ? ""
+            : $"ワークシート「{worksheet.Name}」の";
+        var rangeDescription = isSingleCell ? "セル" : "セル範囲";
+        var initializer = isSingleCell
+            ? PropertyInitializer(propertyTypeName)
+            : "";
 
         return
             $$"""
 
                 /// <summary>
-                /// 定義名「{{definedName.Name}}」が表すセルの値を取得または設定します。
+                /// {{scopeDescription}}定義名「{{definedName.Name}}」が表す{{rangeDescription}}の値を取得または設定します。
                 /// </summary>
-                {{attributeDeclaration}}public {{propertyTypeName}} {{propertyName}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
+                {{attributeDeclaration}}public {{propertyTypeName}} {{propertyName}} { get; set; }{{initializer}}
             """;
     }
 
     /// <summary>
-    /// ブックデータ型に、ブックスコープの複数セル定義名が表すプロパティを生成します。
-    /// </summary>
-    internal static string BookDataCellRangePropertyDeclaration(
-        DefinedName definedName,
-        CodeGenerationOptions options)
-    {
-        var propertyName = options.BookDefinedName(definedName);
-        var attributeDeclaration = BookDataDefinedNameAttribute(
-            definedName,
-            propertyName);
-
-        return
-            $$"""
-
-                /// <summary>
-                /// 定義名「{{definedName.Name}}」が表すセル範囲の値を取得または設定します。
-                /// </summary>
-                {{attributeDeclaration}}public IEnumerable<IEnumerable<object?>> {{propertyName}} { get; set; }
-            """;
-    }
-
-    /// <summary>
-    /// 自動名前変換では対応できないブックスコープ定義名の属性を生成します。
+    /// 自動名前変換では対応できない定義名の属性を生成します。
     /// </summary>
     static string BookDataDefinedNameAttribute(
         DefinedName definedName,
-        string propertyName) =>
-        propertyName == definedName.Name.ToCSharpIdentifier()
+        string propertyName)
+    {
+        if (propertyName == definedName.Name.ToCSharpIdentifier())
+        {
+            return "";
+        }
+
+        var worksheetArgument = definedName.Worksheet is null
             ? ""
-            : $"[SpreadsheetDefinedName({StringLiteral(definedName.Name)})]{Environment.NewLine}    ";
+            : $", WorksheetName = {StringLiteral(definedName.Worksheet.Name)}";
 
-    /// <summary>
-    /// ブックデータ型に、シートローカルの単一セル定義名が表すプロパティを生成します。
-    /// </summary>
-    internal static string BookDataSheetCellPropertyDeclaration(
-        Worksheet sheet,
-        DefinedName definedName,
-        CodeGenerationOptions options)
-    {
-        var propertyTypeName = CellValueTypeName(definedName.Range.TopLeftCell.Value);
-        var propertyName = options.SheetDefinedName(sheet, definedName);
-        var attributeDeclaration =
-            propertyName == definedName.Name.ToCSharpIdentifier()
-                ? ""
-                : $"[SpreadsheetDefinedName({StringLiteral(definedName.Name)}, WorksheetName = {StringLiteral(sheet.Name)})]{Environment.NewLine}    ";
-
-        return
-            $$"""
-
-                /// <summary>
-                /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセルの値を取得または設定します。
-                /// </summary>
-                {{attributeDeclaration}}public {{propertyTypeName}} {{propertyName}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
-            """;
-    }
-
-    /// <summary>
-    /// ブックデータ型に、シートローカルの複数セル定義名が表すプロパティを生成します。
-    /// </summary>
-    internal static string BookDataSheetCellRangePropertyDeclaration(
-        Worksheet sheet,
-        DefinedName definedName,
-        CodeGenerationOptions options)
-    {
-        var propertyName = options.SheetDefinedName(sheet, definedName);
-        var attributeDeclaration =
-            propertyName == definedName.Name.ToCSharpIdentifier()
-                ? ""
-                : $"[SpreadsheetDefinedName({StringLiteral(definedName.Name)}, WorksheetName = {StringLiteral(sheet.Name)})]{Environment.NewLine}    ";
-
-        return
-            $$"""
-
-                /// <summary>
-                /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセル範囲の値を取得または設定します。
-                /// </summary>
-                {{attributeDeclaration}}public IEnumerable<IEnumerable<object?>> {{propertyName}} { get; set; }
-            """;
+        return $"[SpreadsheetDefinedName({StringLiteral(definedName.Name)}{worksheetArgument})]{Environment.NewLine}    ";
     }
 
     /// <summary>
