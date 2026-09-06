@@ -70,6 +70,18 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void Openは検証指定を省略した場合不正なOOXMLも開きます()
+    {
+        var action = () =>
+        {
+            using var book = Workbook.Open(
+                temporaryFiles.Copy("不正なOOXML.xlsx"));
+        };
+
+        action.Should().NotThrow();
+    }
+
+    [Fact]
     public void Disposeは呼び出し側から渡されたStreamを閉じません()
     {
         using var stream = new MemoryStream(
