@@ -95,6 +95,46 @@ public sealed class コード生成型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void 生成されたDataはExcelテーブルの行データを読み込みます()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath))
+            .GeneratedInstance<Workbook>("BasicStructureBook");
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        IEnumerable<object> tested = dataAccessor.SalesDetail;
+
+        tested.Select(it => PropertyValue(it, "CustomerId"))
+            .Should().Equal(1, 2);
+    }
+
+    [Fact]
+    public void 生成されたDataからExcelテーブルの行データを置換します()
+    {
+        var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
+            GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath));
+        var rowType = generatedAssembly.GeneratedType("SalesDetail");
+        using var tested = generatedAssembly.GeneratedInstance<Workbook>(
+            "BasicStructureBook",
+            temporaryFiles.Copy(BasicStructureExcelFilePath));
+        dynamic bookAccessor = tested;
+        dynamic dataAccessor = bookAccessor.Read();
+        dynamic replacement = CreateRows(
+            rowType,
+            (10, 1.5, "first"),
+            (20, 2.5, "second"));
+        dataAccessor.SalesDetail = replacement;
+
+        bookAccessor.Replace(dataAccessor);
+
+        tested.Tables["sales_detail"].Rows
+            .Select(it => it["customer_id"].Value)
+            .Should().Equal(10d, 20d);
+    }
+
+    [Fact]
     public void 生成されたTable型のReplaceで型付き行を書き込めます()
     {
         var filePath = temporaryFiles.Copy(BasicStructureExcelFilePath);
