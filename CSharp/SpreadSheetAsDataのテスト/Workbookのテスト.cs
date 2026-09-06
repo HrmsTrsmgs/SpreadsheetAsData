@@ -354,6 +354,17 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void Readはプロパティ名と同じExcelテーブルから行データを読み込みます()
+    {
+        using var tested = Workbook.Open(@"TestData\テーブル.xlsx");
+
+        tested.Read<WorkbookTableData>()
+            .型付き行マッピング
+            .Select(it => it.IntegerValue)
+            .Should().Equal(1, 2, 3);
+    }
+
+    [Fact]
     public void Replaceはプロパティ名と同じブックスコープの単一セル定義名へオブジェクトを書き込みます()
     {
         using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));
@@ -511,6 +522,11 @@ public class Workbookのテスト : IDisposable
     public sealed class ConventionWorkbookData
     {
         public string CellName { get; set; } = "";
+    }
+
+    public sealed class WorkbookTableData
+    {
+        public IEnumerable<TestMappedRow> 型付き行マッピング { get; set; } = [];
     }
 
 }

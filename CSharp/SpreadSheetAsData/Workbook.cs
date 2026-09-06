@@ -234,7 +234,7 @@ public class Workbook : IDisposable
         new(Tables[name]);
 
     /// <summary>
-    /// ブック内の定義名を、同じC#識別子となるプロパティへ対応付けて読み込みます。
+    /// ブック内の定義名とExcelテーブルを、同じC#識別子となるプロパティへ対応付けて読み込みます。
     /// <see cref="SpreadsheetDefinedNameAttribute"/> による明示的な対応付けを優先します。
     /// </summary>
     /// <typeparam name="T">ブックのデータを読み込む型。</typeparam>
@@ -245,6 +245,29 @@ public class Workbook : IDisposable
 
         foreach (var property in typeof(T).GetProperties())
         {
+            if ((
+                from table in Tables
+                where table.Name.ToCSharpIdentifier() == property.Name
+                select table
+            ).TryGetFirst(out var matchedTable))
+            {
+                var rowType = property.PropertyType.GenericTypeArguments.Single();
+                var enumerateMethod =
+                    (
+                        from method in typeof(Table).GetMethods()
+                        where method.Name == nameof(Table.Enumerate)
+                        where method.IsGenericMethodDefinition
+                        select method
+                    ).Single();
+
+                property.SetValue(
+                    data,
+                    enumerateMethod
+                        .MakeGenericMethod(rowType)
+                        .Invoke(matchedTable, null));
+                continue;
+            }
+
             var range = DataRange(property);
 
             property.SetValue(
