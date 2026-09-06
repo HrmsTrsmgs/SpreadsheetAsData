@@ -245,26 +245,11 @@ public class Workbook : IDisposable
 
         foreach (var property in typeof(T).GetProperties())
         {
-            if ((
-                from table in Tables
-                where table.Name.ToCSharpIdentifier() == property.Name
-                select table
-            ).TryGetFirst(out var matchedTable))
+            if (TryGetTable(property, out var table))
             {
-                var rowType = property.PropertyType.GenericTypeArguments.Single();
-                var enumerateMethod =
-                    (
-                        from method in typeof(Table).GetMethods()
-                        where method.Name == nameof(Table.Enumerate)
-                        where method.IsGenericMethodDefinition
-                        select method
-                    ).Single();
-
                 property.SetValue(
                     data,
-                    enumerateMethod
-                        .MakeGenericMethod(rowType)
-                        .Invoke(matchedTable, null));
+                    TypedTable(table, TableRowType(property)));
                 continue;
             }
 
@@ -290,33 +275,12 @@ public class Workbook : IDisposable
     {
         foreach (var property in typeof(T).GetProperties())
         {
-            if ((
-                from table in Tables
-                where table.Name.ToCSharpIdentifier() == property.Name
-                select table
-            ).TryGetFirst(out var matchedTable))
+            if (TryGetTable(property, out var table))
             {
-                var rowType = property.PropertyType.GenericTypeArguments.Single();
-                var enumerateMethod =
-                    (
-                        from method in typeof(Table).GetMethods()
-                        where method.Name == nameof(Table.Enumerate)
-                        where method.IsGenericMethodDefinition
-                        select method
-                    ).Single();
-                var typedTable = enumerateMethod
-                    .MakeGenericMethod(rowType)
-                    .Invoke(matchedTable, null);
-                var replaceMethod =
-                    (
-                        from method in typeof(Table<>).MakeGenericType(rowType).GetMethods()
-                        where method.Name == nameof(Table<object>.Replace)
-                        select method
-                    ).Single();
-
-                replaceMethod.Invoke(
-                    typedTable,
-                    [property.GetValue(data)]);
+                ReplaceTableRows(
+                    table,
+                    TableRowType(property),
+                    property.GetValue(data));
                 continue;
             }
 
@@ -334,6 +298,48 @@ public class Workbook : IDisposable
                         ?? Array.Empty<IEnumerable<object?>>());
         }
     }
+
+    /// <summary>
+    /// プロパティ名と同じC#識別子になるExcelテーブルを検索します。
+    /// </summary>
+    bool TryGetTable(PropertyInfo property, out Table table) =>
+        (
+            from candidate in Tables
+            where candidate.Name.ToCSharpIdentifier() == property.Name
+            select candidate
+        ).TryGetFirst(out table);
+
+    /// <summary>
+    /// Excelテーブルへ対応付けるプロパティから行データ型を取得します。
+    /// </summary>
+    static Type TableRowType(PropertyInfo property) =>
+        property.PropertyType.GenericTypeArguments.Single();
+
+    /// <summary>
+    /// 実行時に決まる行データ型を使用して型付きテーブルを作成します。
+    /// </summary>
+    static object? TypedTable(Table table, Type rowType) =>
+        (
+            from method in typeof(Table).GetMethods()
+            where method.Name == nameof(Table.Enumerate)
+            where method.IsGenericMethodDefinition
+            select method
+        ).Single()
+        .MakeGenericMethod(rowType)
+        .Invoke(table, null);
+
+    /// <summary>
+    /// 実行時に決まる行データ型に対応した置換処理を呼び出します。
+    /// </summary>
+    static void ReplaceTableRows(Table table, Type rowType, object? rows) =>
+        (
+            from method in typeof(Table<>).MakeGenericType(rowType).GetMethods()
+            where method.Name == nameof(Table<object>.Replace)
+            select method
+        ).Single()
+        .Invoke(
+            TypedTable(table, rowType),
+            [rows]);
 
     CellRange DataRange(PropertyInfo property)
     {
