@@ -106,9 +106,23 @@ static class WorkbookWrapperComponents
             .. from sheet in book.Sheets.Values
                from definedName in SheetScopedDefinedNames(sheet)
                where !IsSingleCellDefinedName(definedName)
-               select BookDataSheetCellRangePropertyDeclaration(sheet, definedName, options)
+               select BookDataSheetCellRangePropertyDeclaration(sheet, definedName, options),
+            .. from table in book.Tables
+               select BookDataTablePropertyDeclaration(table)
         ])}}
         }
+        """;
+
+    /// <summary>
+    /// ブックデータ型に、Excelテーブルの行データを表すプロパティを生成します。
+    /// </summary>
+    internal static string BookDataTablePropertyDeclaration(Table table) =>
+        $$"""
+
+            /// <summary>
+            /// Excelテーブル「{{table.Name}}」の行データを取得または設定します。
+            /// </summary>
+            public IEnumerable<{{table.Name.ToCSharpIdentifier()}}> {{table.Name.ToCSharpIdentifier()}} { get; set; }
         """;
 
     /// <summary>

@@ -113,6 +113,15 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                 public partial class BasicStructureData
                 {
 
+                    /// <summary>
+                    /// Excelテーブル「sales_detail」の行データを取得または設定します。
+                    /// </summary>
+                    public IEnumerable<SalesDetail> SalesDetail { get; set; }
+
+                    /// <summary>
+                    /// Excelテーブル「ProductList」の行データを取得または設定します。
+                    /// </summary>
+                    public IEnumerable<ProductList> ProductList { get; set; }
                 }
 
                 /// <summary>
