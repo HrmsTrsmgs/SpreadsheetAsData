@@ -57,6 +57,19 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void OpenはFileStream上のブックを開きます()
+    {
+        using var stream = File.Open(
+            temporaryFiles.Copy("Book1.xlsx"),
+            FileMode.Open,
+            FileAccess.ReadWrite);
+        using var tested = Workbook.Open(stream);
+
+        tested.Sheets.Keys
+            .Should().Equal("Sheet1", "Sheet2", "いろいろなデータ");
+    }
+
+    [Fact]
     public void Closeはファイルの束縛を解除します()
     {
         var tested = Workbook.Open(コピーパス);
