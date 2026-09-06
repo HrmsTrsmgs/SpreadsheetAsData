@@ -22,4 +22,9 @@ public sealed class SpreadsheetDefinedNameAttribute : Attribute
     /// 対応付ける Excel の定義名を取得します。
     /// </summary>
     public string Name { get; }
+
+    /// <summary>
+    /// 定義名が属するワークシート名を取得または設定します。
+    /// </summary>
+    public string? WorksheetName { get; set; }
 }

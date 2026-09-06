@@ -244,10 +244,12 @@ public class Workbook : IDisposable
 
         foreach (var property in typeof(T).GetProperties())
         {
-            var definedName =
-                property.GetCustomAttribute<SpreadsheetDefinedNameAttribute>()?.Name
-                    ?? property.Name;
-            var range = Range[definedName];
+            var attribute =
+                property.GetCustomAttribute<SpreadsheetDefinedNameAttribute>();
+            var definedName = attribute?.Name ?? property.Name;
+            var range = attribute?.WorksheetName is string worksheetName
+                ? Sheets[worksheetName].Range[definedName]
+                : Range[definedName];
 
             property.SetValue(
                 data,
