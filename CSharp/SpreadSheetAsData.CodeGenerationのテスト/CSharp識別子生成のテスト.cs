@@ -18,8 +18,7 @@ public sealed class CSharp識別子生成のテスト
         string excelName,
         string identifierBody)
     {
-        CSharpIdentifier
-            .Identifier(excelName)
+        excelName.ToCSharpIdentifier()
             .Should().Be(identifierBody);
     }
 
@@ -87,32 +86,28 @@ public sealed class CSharp識別子生成のテスト
         string excelName,
         string identifierBody)
     {
-        CSharpIdentifier
-            .Identifier(excelName)
+        excelName.ToCSharpIdentifier()
             .Should().Be(identifierBody);
     }
 
     [Fact]
     public void ASCII名は全大文字の単語をPascalCase識別子へ正規化します()
     {
-        CSharpIdentifier
-            .Identifier("SALES_DETAIL1")
+        "SALES_DETAIL1".ToCSharpIdentifier()
             .Should().Be("SalesDetail1");
     }
 
     [Fact]
     public void ASCII名は二文字頭字語を両方大文字の識別子へ変換します()
     {
-        CSharpIdentifier
-            .Identifier("IO_stream")
+        "IO_stream".ToCSharpIdentifier()
             .Should().Be("IOStream");
     }
 
     [Fact]
     public void ASCII名はIdを二文字頭字語の例外として変換します()
     {
-        CSharpIdentifier
-            .Identifier("customer_ID")
+        "customer_ID".ToCSharpIdentifier()
             .Should().Be("CustomerId");
     }
 
@@ -124,8 +119,7 @@ public sealed class CSharp識別子生成のテスト
         string excelName,
         string identifierBody)
     {
-        CSharpIdentifier
-            .Identifier(excelName)
+        excelName.ToCSharpIdentifier()
             .Should().Be(identifierBody);
     }
 
@@ -160,8 +154,7 @@ public sealed class CSharp識別子生成のテスト
     public void OtherPunctuationに分類されるASCII記号はアンダースコアへ置換します(
         char character)
     {
-        CSharpIdentifier
-            .Identifier($"price{character}rate")
+        $"price{character}rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
@@ -172,32 +165,28 @@ public sealed class CSharp識別子生成のテスト
     public void OpenPunctuationに分類されるASCII記号はアンダースコアへ置換します(
         char character)
     {
-        CSharpIdentifier
-            .Identifier($"price{character}rate")
+        $"price{character}rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
     [Fact]
     public void ClosePunctuationに分類される右丸かっこはアンダースコアへ置換します()
     {
-        CSharpIdentifier
-            .Identifier("price)rate")
+        "price)rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
     [Fact]
     public void ClosePunctuationに分類される右角かっこはアンダースコアへ置換します()
     {
-        CSharpIdentifier
-            .Identifier("price]rate")
+        "price]rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
     [Fact]
     public void ClosePunctuationに分類される右波かっこはアンダースコアへ置換します()
     {
-        CSharpIdentifier
-            .Identifier("price}rate")
+        "price}rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
@@ -211,8 +200,7 @@ public sealed class CSharp識別子生成のテスト
     public void MathSymbolに分類されるASCII記号はアンダースコアへ置換します(
         char character)
     {
-        CSharpIdentifier
-            .Identifier($"price{character}rate")
+        $"price{character}rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
@@ -222,16 +210,14 @@ public sealed class CSharp識別子生成のテスト
     public void ModifierSymbolに分類されるASCII記号はアンダースコアへ置換します(
         char character)
     {
-        CSharpIdentifier
-            .Identifier($"price{character}rate")
+        $"price{character}rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
     [Fact]
     public void CurrencySymbolに分類されるASCII記号はアンダースコアへ置換します()
     {
-        CSharpIdentifier
-            .Identifier("price$rate")
+        "price$rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
@@ -254,8 +240,7 @@ public sealed class CSharp識別子生成のテスト
     public void OtherPunctuationに分類される全角ASCII相当記号はアンダースコアへ置換します(
         char character)
     {
-        CSharpIdentifier
-            .Identifier($"price{character}rate")
+        $"price{character}rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
@@ -266,8 +251,7 @@ public sealed class CSharp識別子生成のテスト
     public void OpenPunctuationに分類される全角ASCII相当記号はアンダースコアへ置換します(
         char character)
     {
-        CSharpIdentifier
-            .Identifier($"price{character}rate")
+        $"price{character}rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
@@ -278,16 +262,14 @@ public sealed class CSharp識別子生成のテスト
     public void ClosePunctuationに分類される全角ASCII相当記号はアンダースコアへ置換します(
         char character)
     {
-        CSharpIdentifier
-            .Identifier($"price{character}rate")
+        $"price{character}rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
     [Fact]
     public void DashPunctuationに分類される全角ASCII相当記号はアンダースコアへ置換します()
     {
-        CSharpIdentifier
-            .Identifier("price－rate")
+        "price－rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
@@ -301,8 +283,7 @@ public sealed class CSharp識別子生成のテスト
     public void MathSymbolに分類される全角ASCII相当記号はアンダースコアへ置換します(
         char character)
     {
-        CSharpIdentifier
-            .Identifier($"price{character}rate")
+        $"price{character}rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
@@ -312,64 +293,56 @@ public sealed class CSharp識別子生成のテスト
     public void ModifierSymbolに分類される全角ASCII相当記号はアンダースコアへ置換します(
         char character)
     {
-        CSharpIdentifier
-            .Identifier($"price{character}rate")
+        $"price{character}rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
     [Fact]
     public void CurrencySymbolに分類される全角ASCII相当記号はアンダースコアへ置換します()
     {
-        CSharpIdentifier
-            .Identifier("price＄rate")
+        "price＄rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
     [Fact]
     public void OtherSymbolに分類される漢字構成記述文字はアンダースコアへ置換します()
     {
-        CSharpIdentifier
-            .Identifier("商品⿰明細")
+        "商品⿰明細".ToCSharpIdentifier()
             .Should().Be("商品_明細");
     }
 
     [Fact]
     public void SpaceSeparatorに分類される全角空白はアンダースコアへ置換します()
     {
-        CSharpIdentifier
-            .Identifier("price\u3000rate")
+        "price\u3000rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
     [Fact]
     public void Controlに分類される制御文字はアンダースコアへ置換します()
     {
-        CSharpIdentifier
-            .Identifier("price\u0001rate")
+        "price\u0001rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
     [Fact]
     public void OtherNumberに分類される数値文字はアンダースコアへ置換します()
     {
-        CSharpIdentifier
-            .Identifier("price\u00B2rate")
+        "price\u00B2rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
     [Fact]
     public void EnclosingMarkに分類される囲み結合記号はアンダースコアへ置換します()
     {
-        CSharpIdentifier
-            .Identifier("price\u20DDrate")
+        "price\u20DDrate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
     [Fact]
     public void PrivateUseに分類される私用領域文字はアンダースコアへ置換します()
     {
-        CSharpIdentifier
-            .Identifier("price\uE000rate")
+        "price\uE000rate".ToCSharpIdentifier()
             .Should().Be("Price_rate");
     }
 
@@ -380,8 +353,7 @@ public sealed class CSharp識別子生成のテスト
         string excelName,
         string identifierBody)
     {
-        CSharpIdentifier
-            .Identifier(excelName)
+        excelName.ToCSharpIdentifier()
             .Should().Be(identifierBody);
     }
 
@@ -394,16 +366,14 @@ public sealed class CSharp識別子生成のテスト
         string excelName,
         string identifierBody)
     {
-        CSharpIdentifier
-            .Identifier(excelName)
+        excelName.ToCSharpIdentifier()
             .Should().Be(identifierBody);
     }
 
     [Fact]
     public void CSharpキーワードと同じExcel名はキーワードでない識別子へ変換します()
     {
-        CSharpIdentifier
-            .Identifier("class")
+        "class".ToCSharpIdentifier()
             .Should().Be("Class");
     }
 }

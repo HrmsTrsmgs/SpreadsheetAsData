@@ -7,18 +7,20 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration;
 /// </summary>
 static class CSharpIdentifier
 {
-    /// <summary>
-    /// Excel由来の名前を、生成コードで使用するC#識別子へ変換します。
-    /// </summary>
-    /// <param name="sourceName">Excelブック内で使用されている名前。</param>
-    /// <returns>C#識別子として使用できる名前。</returns>
-    internal static string Identifier(string sourceName) =>
-        EnsureValidIdentifierStart(
-            ContainsNonAscii(sourceName)
-                ? CapitalizeFirstLetter(
-                    ReplaceInvalidIdentifierPartCharacters(
-                        sourceName.Replace('-', '_').Replace(' ', '_')))
-                : AsciiIdentifier(sourceName));
+    extension(string self)
+    {
+        /// <summary>
+        /// Excel由来の名前を、生成コードで使用するC#識別子へ変換します。
+        /// </summary>
+        /// <returns>C#識別子として使用できる名前。</returns>
+        internal string ToCSharpIdentifier() =>
+            EnsureValidIdentifierStart(
+                ContainsNonAscii(self)
+                    ? CapitalizeFirstLetter(
+                        ReplaceInvalidIdentifierPartCharacters(
+                            self.Replace('-', '_').Replace(' ', '_')))
+                    : AsciiIdentifier(self));
+    }
 
     /// <summary>
     /// ASCIIだけで構成された名前を、区切り文字と大文字小文字からPascalCaseへ変換します。

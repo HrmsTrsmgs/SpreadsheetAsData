@@ -1,5 +1,4 @@
 using Marimo.SpreadSheetAsData;
-using static Marimo.SpreadSheetAsData.CodeGeneration.CSharpIdentifier;
 
 namespace Marimo.SpreadSheetAsData.CodeGeneration;
 
@@ -15,7 +14,7 @@ static class CodeGenerationOptionNames
         /// </summary>
         internal string GeneratedName(string sourceName) =>
             self.NameMappings.GetValueOrDefault(sourceName)
-                ?? Identifier(sourceName);
+                ?? sourceName.ToCSharpIdentifier();
 
         /// <summary>
         /// 文脈付き名前設定を優先して、生成コード上の名前を決定します。

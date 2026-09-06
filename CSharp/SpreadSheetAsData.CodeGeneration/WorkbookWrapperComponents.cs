@@ -1,6 +1,4 @@
 ﻿using Marimo.SpreadSheetAsData;
-using static Marimo.SpreadSheetAsData.CodeGeneration.CSharpIdentifier;
-
 namespace Marimo.SpreadSheetAsData.CodeGeneration;
 
 /// <summary>
@@ -24,36 +22,36 @@ static class WorkbookWrapperComponents
         /// <summary>
         /// Excelブック「{{Path.GetFileNameWithoutExtension(filePath)}}」を型付きで表します。
         /// </summary>
-        public partial class {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book : Workbook
+        public partial class {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Book : Workbook
         {
-            public {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book() : this({{StringLiteral(filePath)}})
+            public {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Book() : this({{StringLiteral(filePath)}})
             {
             }
 
-            public {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book(string filePath) : base(filePath)
+            public {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Book(string filePath) : base(filePath)
             {
             }
 
-            public static new {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book Open(string filePath) =>
+            public static new {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Book Open(string filePath) =>
                 new(filePath);
 
-            {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book(System.IO.Stream stream) : base(stream)
+            {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Book(System.IO.Stream stream) : base(stream)
             {
             }
 
-            public static new {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book Open(System.IO.Stream stream) =>
+            public static new {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Book Open(System.IO.Stream stream) =>
                 new(stream);
 
             /// <summary>
             /// Excelブック全体のデータを読み込みます。
             /// </summary>
-            public new {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Data Read() =>
-                base.Read<{{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Data>();
+            public new {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Data Read() =>
+                base.Read<{{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Data>();
 
             /// <summary>
             /// Excelブック全体のデータを置換します。
             /// </summary>
-            public new void Replace({{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Data data) =>
+            public new void Replace({{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Data data) =>
                 base.Replace(data);
         {{ForEach([
             .. from definedName in BookScopedDefinedNames(book)
@@ -92,7 +90,7 @@ static class WorkbookWrapperComponents
         /// <summary>
         /// Excelブック「{{Path.GetFileNameWithoutExtension(filePath)}}」のデータを表します。
         /// </summary>
-        public partial class {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Data
+        public partial class {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Data
         {
         {{ForEach([
             .. from definedName in BookScopedDefinedNames(book)
@@ -207,9 +205,9 @@ static class WorkbookWrapperComponents
         /// <summary>
         /// Excelテーブル「{{table.Name}}」を型付きで表します。
         /// </summary>
-        public partial class {{Identifier(table.Name)}}Table : Table<{{Identifier(table.Name)}}>
+        public partial class {{table.Name.ToCSharpIdentifier()}}Table : Table<{{table.Name.ToCSharpIdentifier()}}>
         {
-            public {{Identifier(table.Name)}}Table(Table source) : base(source)
+            public {{table.Name.ToCSharpIdentifier()}}Table(Table source) : base(source)
             {
             }
         }
@@ -226,7 +224,7 @@ static class WorkbookWrapperComponents
         /// <summary>
         /// Excelテーブル「{{table.Name}}」の1行を表します。
         /// </summary>
-        public partial class {{Identifier(table.Name)}}
+        public partial class {{table.Name.ToCSharpIdentifier()}}
         {
         {{ForEach(
             from column in table.Columns
