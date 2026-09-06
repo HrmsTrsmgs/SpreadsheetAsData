@@ -364,9 +364,12 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                 """
 
                     /// <summary>
-                    /// 定義名「main_cell」が表すセルを取得します。
+                    /// 定義名「main_cell」が表すセルの値を設定します。
                     /// </summary>
-                    public Cell MainCell => Cell["main_cell"];
+                    public dynamic MainCell
+                    {
+                        set => Cell["main_cell"].Value = value;
+                    }
                 """);
     }
 

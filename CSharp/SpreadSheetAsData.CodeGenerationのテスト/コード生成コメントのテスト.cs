@@ -101,7 +101,7 @@ public sealed class コード生成コメントのテスト
             .TypeDeclaration("定義名Book")
             .PropertyDeclaration("MainCell")
             .SummaryText()
-            .Should().Be("定義名「main_cell」が表すセルを取得します。");
+            .Should().Be("定義名「main_cell」が表すセルの値を設定します。");
     }
 
     [Fact]

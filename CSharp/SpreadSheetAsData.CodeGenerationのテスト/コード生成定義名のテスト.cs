@@ -18,7 +18,7 @@ public sealed class コード生成定義名のテスト : IDisposable
     }
 
     [Fact]
-    public void ブックスコープの単一セル定義名をBookのCellプロパティとして生成します()
+    public void ブックスコープの単一セル定義名をBookの値プロパティとして生成します()
     {
         var tested = GeneratedCodeInspection
             .AssemblyFrom(
@@ -27,7 +27,7 @@ public sealed class コード生成定義名のテスト : IDisposable
             .GetProperty("MainCell");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(Cell));
+        tested.PropertyType.Should().Be(typeof(object));
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public sealed class コード生成定義名のテスト : IDisposable
     }
 
     [Fact]
-    public void 生成されたBook型のCellプロパティから値を書き込めます()
+    public void 生成されたBook型の単一セル定義名プロパティへ値を直接書き込めます()
     {
         var filePath = temporaryFiles.Copy(DefinedNamesExcelFilePath);
 
@@ -96,7 +96,7 @@ public sealed class コード生成定義名のテスト : IDisposable
         {
             dynamic bookAccessor = book;
 
-            bookAccessor.MainCell.Value = "generated";
+            bookAccessor.MainCell = "generated";
             book.Save();
         }
 
