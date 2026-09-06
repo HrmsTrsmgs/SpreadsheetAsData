@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using FluentAssertions;
+using Marimo.SpreadSheetAsData;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 using Xunit;
 
@@ -42,6 +43,25 @@ public sealed class コード生成型推論のテスト
         tested.Should().NotBeNull();
         tested.PropertyType.Should().Be(
             typeof(IEnumerable<IEnumerable<object?>>));
+    }
+
+    [Fact]
+    public void 定義名と生成Dataプロパティ名が異なる場合は定義名属性に元のExcel定義名を設定します()
+    {
+        var generatedProperty = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesExcelFilePath))
+            .GeneratedType("定義名Data")
+            .GetProperty("MainCell");
+
+        generatedProperty.Should().NotBeNull();
+
+        var tested =
+            generatedProperty.GetCustomAttribute<SpreadsheetDefinedNameAttribute>();
+
+        tested.Should().NotBeNull();
+        tested.Name.Should().Be("main_cell");
     }
 
     [Fact]

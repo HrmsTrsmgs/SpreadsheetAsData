@@ -108,6 +108,7 @@ static class WorkbookWrapperComponents
                 /// <summary>
                 /// 定義名「{{definedName.Name}}」が表すセルの値を取得または設定します。
                 /// </summary>
+                [SpreadsheetDefinedName({{StringLiteral(definedName.Name)}})]
                 public {{propertyTypeName}} {{options.BookDefinedName(definedName)}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
             """;
     }
