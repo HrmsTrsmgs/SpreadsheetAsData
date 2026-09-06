@@ -98,6 +98,29 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void Stream版でもReplaceしたオブジェクトを保存します()
+    {
+        using var stream = new MemoryStream(
+            File.ReadAllBytes(@"TestData\定義名.xlsx"));
+
+        using (var book = Workbook.Open(stream))
+        {
+            book.Replace(
+                new WorkbookData
+                {
+                    CustomerName = "佐藤花子"
+                });
+            book.Save();
+        }
+
+        stream.Position = 0;
+        using var tested = Workbook.Open(stream);
+
+        (tested.Cell["CustomerName"].Value as object)
+            .Should().Be("佐藤花子");
+    }
+
+    [Fact]
     public void Closeはファイルの束縛を解除します()
     {
         var tested = Workbook.Open(コピーパス);
