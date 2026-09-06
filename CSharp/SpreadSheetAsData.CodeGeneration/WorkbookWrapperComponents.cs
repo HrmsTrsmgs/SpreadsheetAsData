@@ -43,6 +43,12 @@ static class WorkbookWrapperComponents
 
             public static new {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Book Open(System.IO.Stream stream) =>
                 new(stream);
+
+            /// <summary>
+            /// Excelブック全体のデータを読み込みます。
+            /// </summary>
+            public new {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Data Read() =>
+                base.Read<{{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Data>();
         {{ForEach([
             .. from definedName in BookScopedDefinedNames(book)
                where IsSingleCellDefinedName(definedName)

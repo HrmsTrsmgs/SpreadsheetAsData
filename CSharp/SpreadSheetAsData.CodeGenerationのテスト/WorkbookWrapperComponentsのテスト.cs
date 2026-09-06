@@ -75,6 +75,12 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                         new(stream);
 
                     /// <summary>
+                    /// Excelブック全体のデータを読み込みます。
+                    /// </summary>
+                    public new BasicStructureData Read() =>
+                        base.Read<BasicStructureData>();
+
+                    /// <summary>
                     /// ワークシート「SalesData」を取得します。
                     /// </summary>
                     public SalesDataSheet SalesData => new(this);

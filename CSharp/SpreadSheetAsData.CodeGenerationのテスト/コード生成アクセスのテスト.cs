@@ -8,6 +8,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 public sealed class コード生成アクセスのテスト
 {
     const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
+    const string DefinedNamesExcelFilePath = @"TestData\コード生成\定義名.xlsx";
 
     [Fact]
     public void Bookは各ワークシートを型付きプロパティとして公開します()
@@ -98,6 +99,23 @@ public sealed class コード生成アクセスのテスト
 
         tested.Sheets.Keys
             .Should().Equal("SalesData", "ProductMaster");
+    }
+
+    [Fact]
+    public void 生成されたBookはDataを型引数なしで読み込みます()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesExcelFilePath))
+            .GeneratedInstance<Workbook>(
+                "定義名Book",
+                DefinedNamesExcelFilePath);
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        object? tested = dataAccessor.MainCell;
+
+        tested.Should().Be("main");
     }
 
     [Fact]
