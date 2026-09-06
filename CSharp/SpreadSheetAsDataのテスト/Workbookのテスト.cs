@@ -179,6 +179,19 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void ReadはSpreadsheetDefinedName属性で指定した定義名からオブジェクトを読み込みます()
+    {
+        using var tested = Workbook.Open(@"TestData\定義名.xlsx");
+
+        tested.Read<AttributedWorkbookData>()
+            .Should().BeEquivalentTo(
+                new AttributedWorkbookData
+                {
+                    Name = "山田太郎"
+                });
+    }
+
+    [Fact]
     public void Replaceはプロパティ名と同じブックスコープの単一セル定義名へオブジェクトを書き込みます()
     {
         using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));
@@ -244,6 +257,12 @@ public class Workbookのテスト : IDisposable
     public sealed class WorkbookData
     {
         public string CustomerName { get; set; } = "";
+    }
+
+    public sealed class AttributedWorkbookData
+    {
+        [SpreadsheetDefinedName("CustomerName")]
+        public string Name { get; set; } = "";
     }
 
 }

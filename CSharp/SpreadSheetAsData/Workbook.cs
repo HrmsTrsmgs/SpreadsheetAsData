@@ -1,5 +1,6 @@
 ﻿using Packaging = DocumentFormat.OpenXml.Packaging;
 using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
+using System.Reflection;
 
 namespace Marimo.SpreadSheetAsData;
 /// <summary>
@@ -206,7 +207,12 @@ public class Workbook : IDisposable
 
         foreach (var property in typeof(T).GetProperties())
         {
-            property.SetValue(data, Cell[property.Name].Value);
+            property.SetValue(
+                data,
+                Cell[
+                    property.GetCustomAttribute<SpreadsheetDefinedNameAttribute>()?.Name
+                        ?? property.Name
+                ].Value);
         }
 
         return data;
