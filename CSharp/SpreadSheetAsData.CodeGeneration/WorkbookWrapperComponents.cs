@@ -280,7 +280,7 @@ static class WorkbookWrapperComponents
         """;
 
     /// <summary>
-    /// ワークシートスコープの単一セル定義名を取得するプロパティ宣言を生成します。
+    /// ワークシートスコープの単一セル定義名が表す値を書き込むプロパティ宣言を生成します。
     /// </summary>
     internal static string SheetCellDefinedNamePropertyDeclaration(
         Worksheet sheet,
@@ -289,9 +289,12 @@ static class WorkbookWrapperComponents
         $$"""
 
             /// <summary>
-            /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセルを取得します。
+            /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセルの値を設定します。
             /// </summary>
-            public Cell {{options.SheetDefinedName(sheet, definedName)}} => Cell[{{StringLiteral(definedName.Name)}}];
+            public dynamic {{options.SheetDefinedName(sheet, definedName)}}
+            {
+                set => Cell[{{StringLiteral(definedName.Name)}}].Value = value;
+            }
         """;
 
     /// <summary>

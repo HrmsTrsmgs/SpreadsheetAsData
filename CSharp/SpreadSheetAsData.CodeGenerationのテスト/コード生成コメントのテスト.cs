@@ -123,7 +123,7 @@ public sealed class コード生成コメントのテスト
             .TypeDeclaration("SalesDataSheet")
             .PropertyDeclaration("LocalCell")
             .SummaryText()
-            .Should().Be("ワークシート「sales_data」の定義名「local_cell」が表すセルを取得します。");
+            .Should().Be("ワークシート「sales_data」の定義名「local_cell」が表すセルの値を設定します。");
     }
 
     [Fact]

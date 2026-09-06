@@ -401,9 +401,12 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                 """
 
                     /// <summary>
-                    /// ワークシート「sales_data」の定義名「local_cell」が表すセルを取得します。
+                    /// ワークシート「sales_data」の定義名「local_cell」が表すセルの値を設定します。
                     /// </summary>
-                    public Cell LocalCell => Cell["local_cell"];
+                    public dynamic LocalCell
+                    {
+                        set => Cell["local_cell"].Value = value;
+                    }
                 """);
     }
 

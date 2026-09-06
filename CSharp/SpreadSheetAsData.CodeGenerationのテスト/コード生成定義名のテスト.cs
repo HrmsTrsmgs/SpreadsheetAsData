@@ -44,7 +44,7 @@ public sealed class コード生成定義名のテスト : IDisposable
     }
 
     [Fact]
-    public void シートローカルの単一セル定義名をSheetのCellプロパティとして生成します()
+    public void シートローカルの単一セル定義名をSheetの値プロパティとして生成します()
     {
         var tested = GeneratedCodeInspection
             .AssemblyFrom(
@@ -53,7 +53,7 @@ public sealed class コード生成定義名のテスト : IDisposable
             .GetProperty("LocalCell");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(Cell));
+        tested.PropertyType.Should().Be(typeof(object));
     }
 
     [Fact]
@@ -124,7 +124,7 @@ public sealed class コード生成定義名のテスト : IDisposable
     }
 
     [Fact]
-    public void 生成されたSheet型のCellプロパティから値を書き込めます()
+    public void 生成されたSheet型の単一セル定義名プロパティへ値を直接書き込めます()
     {
         var filePath = temporaryFiles.Copy(DefinedNamesExcelFilePath);
 
@@ -138,7 +138,7 @@ public sealed class コード生成定義名のテスト : IDisposable
         {
             dynamic bookAccessor = book;
 
-            bookAccessor.SalesData.LocalCell.Value = "generated";
+            bookAccessor.SalesData.LocalCell = "generated";
             book.Save();
         }
 
