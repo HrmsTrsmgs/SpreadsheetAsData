@@ -146,6 +146,39 @@ public sealed class コード生成定義名のテスト : IDisposable
     }
 
     [Fact]
+    public void 生成されたBook型の複数セル定義名プロパティへ値を直接書き込めます()
+    {
+        var filePath = temporaryFiles.Copy(DefinedNamesExcelFilePath);
+        IEnumerable<IEnumerable<object?>> replacement =
+        [
+            ["changed", "values"],
+            [300, 400]
+        ];
+
+        using (var book = GeneratedCodeInspection
+                   .AssemblyFrom(
+                       GeneratedCodeInspection.GenerateSources(
+                           DefinedNamesExcelFilePath))
+                   .GeneratedInstance<Workbook>(
+                       "定義名Book",
+                       filePath))
+        {
+            dynamic bookAccessor = book;
+
+            bookAccessor.MainRange = replacement;
+            book.Save();
+        }
+
+        using var tested = Workbook.Open(filePath);
+        var rows = tested.Range["main_range"].Values
+            .Select(it => it.ToArray())
+            .ToArray();
+
+        rows[0].Should().Equal("changed", "values");
+        rows[1].Should().Equal(300d, 400d);
+    }
+
+    [Fact]
     public void 生成されたSheet型の単一セル定義名プロパティへ値を直接書き込めます()
     {
         var filePath = temporaryFiles.Copy(DefinedNamesExcelFilePath);

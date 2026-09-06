@@ -385,10 +385,13 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                 """
 
                     /// <summary>
-                    /// 定義名「main_range」が表すセル範囲の値を取得します。
+                    /// 定義名「main_range」が表すセル範囲の値を取得または設定します。
                     /// </summary>
-                    public IEnumerable<IEnumerable<object?>> MainRange =>
-                        Range["main_range"].Values;
+                    public IEnumerable<IEnumerable<object?>> MainRange
+                    {
+                        get => Range["main_range"].Values;
+                        set => Range["main_range"].Values = value;
+                    }
                 """);
     }
 

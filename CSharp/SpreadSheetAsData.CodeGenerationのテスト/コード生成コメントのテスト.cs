@@ -112,7 +112,7 @@ public sealed class コード生成コメントのテスト
             .TypeDeclaration("定義名Book")
             .PropertyDeclaration("MainRange")
             .SummaryText()
-            .Should().Be("定義名「main_range」が表すセル範囲の値を取得します。");
+            .Should().Be("定義名「main_range」が表すセル範囲の値を取得または設定します。");
     }
 
     [Fact]
