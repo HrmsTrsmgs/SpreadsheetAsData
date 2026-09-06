@@ -100,6 +100,7 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                 /// </summary>
                 public partial class BasicStructureData
                 {
+
                 }
 
                 /// <summary>

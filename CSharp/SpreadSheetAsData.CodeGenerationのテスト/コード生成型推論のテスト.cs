@@ -8,7 +8,26 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 public sealed class コード生成型推論のテスト
 {
     const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
+    const string DefinedNamesExcelFilePath = @"TestData\コード生成\定義名.xlsx";
     const string IntegratedExcelFilePath = @"TestData\コード生成\統合.xlsx";
+
+    [Theory]
+    [InlineData("MainCell", typeof(string))]
+    [InlineData("Total", typeof(double))]
+    public void ブックスコープの単一セル定義名を現在値と同じ型のDataプロパティとして生成します(
+        string propertyName,
+        Type propertyType)
+    {
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesExcelFilePath))
+            .GeneratedType("定義名Data")
+            .GetProperty(propertyName);
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(propertyType);
+    }
 
     [Fact]
     public void 整数値だけを持つ列をintプロパティとして生成します()

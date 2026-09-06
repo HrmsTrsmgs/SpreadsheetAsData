@@ -56,7 +56,7 @@ static class WorkbookWrapperComponents
                select BookTablePropertyDeclaration(table, options)
         ])}}
         }
-        {{BookDataDeclaration(filePath)}}
+        {{BookDataDeclaration(filePath, book, options)}}
         {{ForEach(
             from sheet in book.Sheets.Values
             select SheetDeclaration(sheet, options))}}
@@ -71,7 +71,10 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// Excelブック全体のデータを表す型の宣言を生成します。
     /// </summary>
-    internal static string BookDataDeclaration(string filePath) =>
+    internal static string BookDataDeclaration(
+        string filePath,
+        Workbook book,
+        CodeGenerationOptions options) =>
         $$"""
 
         /// <summary>
@@ -79,8 +82,31 @@ static class WorkbookWrapperComponents
         /// </summary>
         public partial class {{Identifier(Path.GetFileNameWithoutExtension(filePath))}}Data
         {
+        {{ForEach(
+            from definedName in BookScopedDefinedNames(book)
+            where IsSingleCellDefinedName(definedName)
+            select BookDataCellPropertyDeclaration(definedName, options))}}
         }
         """;
+
+    /// <summary>
+    /// ブックデータ型に、ブックスコープの単一セル定義名が表すプロパティを生成します。
+    /// </summary>
+    internal static string BookDataCellPropertyDeclaration(
+        DefinedName definedName,
+        CodeGenerationOptions options)
+    {
+        var propertyTypeName = CellValueTypeName(definedName.Range.TopLeftCell.Value);
+
+        return
+            $$"""
+
+                /// <summary>
+                /// 定義名「{{definedName.Name}}」が表すセルの値を取得または設定します。
+                /// </summary>
+                public {{propertyTypeName}} {{options.BookDefinedName(definedName)}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
+            """;
+    }
 
     /// <summary>
     /// Book型から指定ワークシート型を取得するプロパティ宣言を生成します。
@@ -240,6 +266,17 @@ static class WorkbookWrapperComponents
         propertyTypeName == "string"
             ? " = \"\";"
             : "";
+
+    /// <summary>
+    /// セルの現在値を表すC#プロパティ型名を返します。
+    /// </summary>
+    internal static string CellValueTypeName(object value) =>
+        value switch
+        {
+            string => "string",
+            double => "double",
+            _ => "dynamic"
+        };
 
     /// <summary>
     /// ブック全体から参照できる定義名だけを選びます。
