@@ -110,25 +110,34 @@ static class WorkbookWrapperComponents
         public partial class {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Data
         {
         {{ForEach([
-            .. from definedName in BookScopedDefinedNames(book)
-               where IsSingleCellDefinedName(definedName)
-               select BookDataDefinedNamePropertyDeclaration(definedName, options),
-            .. from definedName in BookScopedDefinedNames(book)
-               where !IsSingleCellDefinedName(definedName)
-               select BookDataDefinedNamePropertyDeclaration(definedName, options),
-            .. from sheet in book.Sheets.Values
-               from definedName in SheetScopedDefinedNames(sheet)
-               where IsSingleCellDefinedName(definedName)
-               select BookDataDefinedNamePropertyDeclaration(definedName, options),
-            .. from sheet in book.Sheets.Values
-               from definedName in SheetScopedDefinedNames(sheet)
-               where !IsSingleCellDefinedName(definedName)
+            .. from definedName in BookDataDefinedNames(book)
                select BookDataDefinedNamePropertyDeclaration(definedName, options),
             .. from table in book.Tables
                select BookDataTablePropertyDeclaration(table)
         ])}}
         }
         """;
+
+    /// <summary>
+    /// BookData型へ平坦化する定義名を、スコープごとに単一セル、セル範囲の順で列挙します。
+    /// </summary>
+    static IEnumerable<DefinedName> BookDataDefinedNames(Workbook book) =>
+    [
+        .. from definedName in BookScopedDefinedNames(book)
+           where IsSingleCellDefinedName(definedName)
+           select definedName,
+        .. from definedName in BookScopedDefinedNames(book)
+           where !IsSingleCellDefinedName(definedName)
+           select definedName,
+        .. from sheet in book.Sheets.Values
+           from definedName in SheetScopedDefinedNames(sheet)
+           where IsSingleCellDefinedName(definedName)
+           select definedName,
+        .. from sheet in book.Sheets.Values
+           from definedName in SheetScopedDefinedNames(sheet)
+           where !IsSingleCellDefinedName(definedName)
+           select definedName
+    ];
 
     /// <summary>
     /// ブックデータ型に、Excelテーブルの行データを表すプロパティを生成します。
