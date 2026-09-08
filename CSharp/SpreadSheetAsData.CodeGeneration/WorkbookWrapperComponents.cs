@@ -38,41 +38,46 @@ static class WorkbookWrapperComponents
     internal static string BookDeclaration(
         string filePath,
         Workbook book,
-        CodeGenerationOptions options) =>
-        $$"""
+        CodeGenerationOptions options)
+    {
+        var bookFileName = Path.GetFileNameWithoutExtension(filePath);
+        var bookFileIdentifier = bookFileName.ToCSharpIdentifier();
+
+        return
+            $$"""
         /// <summary>
-        /// Excelブック「{{Path.GetFileNameWithoutExtension(filePath)}}」を型付きで表します。
+        /// Excelブック「{{bookFileName}}」を型付きで表します。
         /// </summary>
-        public partial class {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Book : Workbook
+        public partial class {{bookFileIdentifier}}Book : Workbook
         {
-            public {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Book() : this({{StringLiteral(filePath)}})
+            public {{bookFileIdentifier}}Book() : this({{StringLiteral(filePath)}})
             {
             }
 
-            public {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Book(string filePath) : base(filePath)
+            public {{bookFileIdentifier}}Book(string filePath) : base(filePath)
             {
             }
 
-            public static new {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Book Open(string filePath) =>
+            public static new {{bookFileIdentifier}}Book Open(string filePath) =>
                 new(filePath);
 
-            {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Book(System.IO.Stream stream) : base(stream)
+            {{bookFileIdentifier}}Book(System.IO.Stream stream) : base(stream)
             {
             }
 
-            public static new {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Book Open(System.IO.Stream stream) =>
+            public static new {{bookFileIdentifier}}Book Open(System.IO.Stream stream) =>
                 new(stream);
 
             /// <summary>
             /// Excelブック全体のデータを読み込みます。
             /// </summary>
-            public new {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Data Read() =>
-                base.Read<{{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Data>();
+            public new {{bookFileIdentifier}}Data Read() =>
+                base.Read<{{bookFileIdentifier}}Data>();
 
             /// <summary>
             /// Excelブック全体のデータを置換します。
             /// </summary>
-            public new void Replace({{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Data data) =>
+            public new void Replace({{bookFileIdentifier}}Data data) =>
                 base.Replace(data);
         {{ForEach([
             .. from definedName in BookScopedDefinedNames(book)
@@ -88,6 +93,7 @@ static class WorkbookWrapperComponents
         ])}}
         }
         """;
+    }
 
     /// <summary>
     /// Excelブック全体のデータを表す型の宣言を生成します。
