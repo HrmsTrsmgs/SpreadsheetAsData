@@ -1,8 +1,6 @@
 ﻿using Packaging = DocumentFormat.OpenXml.Packaging;
 using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
 using Validation = DocumentFormat.OpenXml.Validation;
-using System.Reflection;
-
 namespace Marimo.SpreadSheetAsData;
 /// <summary>
 /// Spreadsheet ファイルとして開いたブックを表します。
@@ -13,6 +11,11 @@ public class Workbook : IDisposable
     /// Open XML ドキュメントと、元ファイルへの明示保存に必要な状態を保持します。
     /// </summary>
     readonly DocumentSession documentSession;
+
+    /// <summary>
+    /// ブック内の定義名とExcelテーブルをデータオブジェクトへ対応付けます。
+    /// </summary>
+    readonly WorkbookDataMapper dataMapper;
 
     /// <summary>
     /// <see cref="Dispose(bool)"/> の多重実行を防ぐための状態です。
@@ -71,6 +74,7 @@ public class Workbook : IDisposable
         Range = new(this);
         Cell = new(this);
         Tables = new(this);
+        dataMapper = new(this);
     }
 
     static Workbook ValidateIfRequested(Workbook opened, bool validate)
@@ -239,31 +243,8 @@ public class Workbook : IDisposable
     /// </summary>
     /// <typeparam name="T">ブックのデータを読み込む型。</typeparam>
     /// <returns>ブックのデータを読み込んだオブジェクト。</returns>
-    public T Read<T>()
-    {
-        var data = Activator.CreateInstance<T>();
-
-        foreach (var property in typeof(T).GetProperties())
-        {
-            if (TryGetTable(property, out var table))
-            {
-                property.SetValue(
-                    data,
-                    TypedTable(table, TableRowType(property)));
-                continue;
-            }
-
-            var range = DataRange(property);
-
-            property.SetValue(
-                data,
-                range.TopLeftCell == range.BottomRightCell
-                    ? range.TopLeftCell.Value
-                    : range.Values);
-        }
-
-        return data;
-    }
+    public T Read<T>() =>
+        dataMapper.Read<T>();
 
     /// <summary>
     /// オブジェクトのプロパティを、同じC#識別子となるブック内の定義名またはExcelテーブルへ書き込みます。
@@ -271,95 +252,8 @@ public class Workbook : IDisposable
     /// </summary>
     /// <typeparam name="T">ブックへ書き込むデータの型。</typeparam>
     /// <param name="data">ブックへ書き込むデータ。</param>
-    public void Replace<T>(T data)
-    {
-        foreach (var property in typeof(T).GetProperties())
-        {
-            if (TryGetTable(property, out var table))
-            {
-                ReplaceTableRows(
-                    table,
-                    TableRowType(property),
-                    property.GetValue(data));
-                continue;
-            }
-
-            var range = DataRange(property);
-
-            if (range.TopLeftCell == range.BottomRightCell)
-            {
-                range.TopLeftCell.Value = property.GetValue(data);
-                continue;
-            }
-
-            range.Values =
-                (IEnumerable<IEnumerable<object?>>)(
-                    property.GetValue(data)
-                        ?? Array.Empty<IEnumerable<object?>>());
-        }
-    }
-
-    /// <summary>
-    /// プロパティ名と同じC#識別子になるExcelテーブルを検索します。
-    /// </summary>
-    bool TryGetTable(PropertyInfo property, out Table table) =>
-        (
-            from candidate in Tables
-            where candidate.Name.ToCSharpIdentifier() == property.Name
-            select candidate
-        ).TryGetFirst(out table);
-
-    /// <summary>
-    /// Excelテーブルへ対応付けるプロパティから行データ型を取得します。
-    /// </summary>
-    static Type TableRowType(PropertyInfo property) =>
-        property.PropertyType.GenericTypeArguments.Single();
-
-    /// <summary>
-    /// 実行時に決まる行データ型を使用して型付きテーブルを作成します。
-    /// </summary>
-    static object? TypedTable(Table table, Type rowType) =>
-        (
-            from method in typeof(Table).GetMethods()
-            where method.Name == nameof(Table.Enumerate)
-            where method.IsGenericMethodDefinition
-            select method
-        ).Single()
-        .MakeGenericMethod(rowType)
-        .Invoke(table, null);
-
-    /// <summary>
-    /// 実行時に決まる行データ型に対応した置換処理を呼び出します。
-    /// </summary>
-    static void ReplaceTableRows(Table table, Type rowType, object? rows) =>
-        (
-            from method in typeof(Table<>).MakeGenericType(rowType).GetMethods()
-            where method.Name == nameof(Table<object>.Replace)
-            select method
-        ).Single()
-        .Invoke(
-            TypedTable(table, rowType),
-            [rows]);
-
-    CellRange DataRange(PropertyInfo property)
-    {
-        var attribute =
-            property.GetCustomAttribute<SpreadsheetDefinedNameAttribute>();
-
-        if (attribute is not null)
-        {
-            return attribute.WorksheetName is string worksheetName
-                ? Sheets[worksheetName].Range[attribute.Name]
-                : Range[attribute.Name];
-        }
-
-        return
-            (
-                from definedName in DefinedNames
-                where definedName.Name.ToCSharpIdentifier() == property.Name
-                select definedName.Range
-            ).Single();
-    }
+    public void Replace<T>(T data) =>
+        dataMapper.Replace(data);
 
     /// <summary>
     /// 指定した位置のワークシートを取得します。
