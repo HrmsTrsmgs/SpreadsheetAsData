@@ -19,6 +19,27 @@ static class WorkbookWrapperComponents
 
         namespace {{options.Namespace}};
 
+        {{BookDeclaration(filePath, book, options)}}
+        {{BookDataDeclaration(filePath, book, options)}}
+        {{ForEach(
+            from sheet in book.Sheets.Values
+            select SheetDeclaration(sheet, options))}}
+        {{ForEach(
+            from table in book.Tables
+            select TableDeclaration(table))}}
+        {{ForEach(
+            from table in book.Tables
+            select RowDeclaration(table, options))}}
+        """;
+
+    /// <summary>
+    /// Excelブックを型付きで表すクラスの宣言を生成します。
+    /// </summary>
+    internal static string BookDeclaration(
+        string filePath,
+        Workbook book,
+        CodeGenerationOptions options) =>
+        $$"""
         /// <summary>
         /// Excelブック「{{Path.GetFileNameWithoutExtension(filePath)}}」を型付きで表します。
         /// </summary>
@@ -66,16 +87,6 @@ static class WorkbookWrapperComponents
                select BookTablePropertyDeclaration(table, options)
         ])}}
         }
-        {{BookDataDeclaration(filePath, book, options)}}
-        {{ForEach(
-            from sheet in book.Sheets.Values
-            select SheetDeclaration(sheet, options))}}
-        {{ForEach(
-            from table in book.Tables
-            select TableDeclaration(table))}}
-        {{ForEach(
-            from table in book.Tables
-            select RowDeclaration(table, options))}}
         """;
 
     /// <summary>
