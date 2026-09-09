@@ -24,6 +24,23 @@ public sealed class コード生成名前設定のテスト
     }
 
     [Fact]
+    public void NameMappingsはExcelテーブル名へ適用されます()
+    {
+        var tested = GeneratedCodeInspection.SyntaxFrom(
+            GeneratedCodeInspection.GenerateSources(
+                SimpleNameMappingsExcelFilePath,
+                options => options.NameMappings["sales_detail"] = "OrderLine"));
+
+        tested.TypeNames.Should().Contain(["OrderLine", "OrderLineTable"]);
+        tested.GeneratedType("簡易名前置換Book")
+            .PropertyNames.Should().Contain("OrderLine");
+        tested.GeneratedType("DataSheet")
+            .PropertyNames.Should().Contain("OrderLine");
+        tested.GeneratedType("簡易名前置換Data")
+            .PropertyNames.Should().Contain("OrderLine");
+    }
+
+    [Fact]
     public void NameMappingsは辞書を代入して設定できます()
     {
         GeneratedCodeInspection
