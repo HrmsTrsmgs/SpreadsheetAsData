@@ -365,6 +365,17 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void ReadはSpreadSheetName属性で指定したExcelテーブルから行データを読み込みます()
+    {
+        using var tested = Workbook.Open(@"TestData\テーブル.xlsx");
+
+        tested.Read<AttributedWorkbookTableData>()
+            .OrderLines
+            .Select(it => it.IntegerValue)
+            .Should().Equal(1, 2, 3);
+    }
+
+    [Fact]
     public void Replaceはプロパティ名と同じExcelテーブルへ行データを書き込みます()
     {
         using var tested = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
@@ -548,6 +559,12 @@ public class Workbookのテスト : IDisposable
     public sealed class WorkbookTableData
     {
         public IEnumerable<TestMappedRow> 型付き行マッピング { get; set; } = [];
+    }
+
+    public sealed class AttributedWorkbookTableData
+    {
+        [SpreadSheetName("型付き行マッピング")]
+        public IEnumerable<TestMappedRow> OrderLines { get; set; } = [];
     }
 
 }
