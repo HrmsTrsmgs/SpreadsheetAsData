@@ -1,19 +1,19 @@
-# 型付き読み取り
+# 型付き読み書き
 
 ## 目的
 
-SpreadsheetAsDataでは、Excelテーブルを単なるセル範囲ではなく、列名と行を持つデータ集合として読み取ります。
+SpreadsheetAsDataでは、Excelテーブルを単なるセル範囲ではなく、列名と行を持つデータ集合として読み書きします。
 
-型付き読み取りは、次の三段階で扱います。
+型付き読み書きは、次の四段階で扱います。
 
-1. Excelテーブルを列名で読む
-2. Excelテーブルを利用者定義型へ対応付けて読む
-3. `.xlsx` から型付き読み取りコードを生成する
+1. Excelテーブルを列名で扱う
+2. Excelテーブルを利用者定義型へ対応付けて読み書きする
+3. ブック全体をデータオブジェクトへ対応付ける
+4. `.xlsx` から型付き読み書きコードを生成する
 
-この文書は、現行C#版で実装済みの読み取りAPIと、現在の制約を記録します。
-書き込み機能は対象外です。
+この文書は、現行C#版で実装済みの型付きAPIと、現在の制約を記録します。
 
-## 1. Excelテーブルを列名で読む
+## 1. Excelテーブルを列名で扱う
 
 `Workbook.Tables` からExcelテーブルを取得し、`Table.Rows` でデータ行を列挙します。
 
@@ -44,10 +44,12 @@ var byColumn = firstRow[table.Columns["ProductName"]];
 ```
 
 列や行の構造を確認したい場合は、`Table.Columns`、`Table.Range`、`Table.Worksheet` を使用します。
+取得したセルの `Value` へ値を設定し、`Workbook.Save()` または `SaveAs()` で保存できます。
 
-## 2. 利用者定義型へ対応付けて読む
+## 2. 利用者定義型へ対応付けて読み書きする
 
 `Workbook.ReadTable<T>(string name)` または `Table.Enumerate<T>()` で、Excelテーブルの各データ行を利用者定義型へ対応付けて列挙できます。
+取得した `Table<T>` の `Replace()` へ型付き行を渡すと、既存のExcelテーブル行をワークシート上の順序で置き換えます。
 
 ```csharp
 using Marimo.SpreadSheetAsData;
@@ -69,6 +71,16 @@ foreach (var order in book.ReadTable<Order>("Orders"))
 }
 ```
 
+```csharp
+var table = book.ReadTable<Order>("Orders");
+var orders = table.ToArray();
+
+orders[0].Quantity = 3;
+
+table.Replace(orders);
+book.Save();
+```
+
 プロパティ名とExcel列名が異なる場合は、`SpreadSheetNameAttribute` で列名を指定します。
 
 ```csharp
@@ -79,7 +91,7 @@ public sealed class Order
 }
 ```
 
-現在の基本規則は次のとおりです。
+読み取り時の基本規則は次のとおりです。
 
 * publicな引数なしコンストラクターが必要
 * public setterを持つプロパティを列へ対応付ける
@@ -91,6 +103,10 @@ public sealed class Order
 * 同じ列へ複数のプロパティを対応付けた場合はエラーにする
 * 指定した列が存在しない場合はエラーにする
 
+書き込み時は、public getterを持つプロパティを同じ列名規則で対応付けます。
+属性がない書き込み専用プロパティは無視し、属性があるのにpublic getterがない場合はエラーにします。
+`Table<T>.Replace()` は既存行を置き換えるAPIであり、行の追加、挿入、削除は行いません。
+
 現在対応している変換は、`int`、`double`、`string` です。
 
 * 整数値の `double` は `int` へ変換できる
@@ -101,7 +117,35 @@ public sealed class Order
 マッピングに失敗した場合は `TableMappingException` を投げます。
 例外には、可能な範囲でテーブル名、列名、プロパティ名、ワークシート上の行番号、元セル値が設定されます。
 
-## 3. `.xlsx` から型付き読み取りコードを生成する
+## 3. ブック全体をデータオブジェクトへ対応付ける
+
+`Workbook.Read<T>()` は、ブック内の定義名とExcelテーブルをデータオブジェクトのプロパティへ読み込みます。
+プロパティを変更して `Workbook.Replace<T>()` へ渡すと、同じ対応規則で書き戻せます。
+
+```csharp
+public sealed class OrderBookData
+{
+    [SpreadSheetName("Orders")]
+    public IEnumerable<Order> OrderLines { get; set; } = [];
+
+    [SpreadSheetName("ReportTitle")]
+    public string Title { get; set; } = "";
+}
+
+using var book = Workbook.Open("orders.xlsx");
+var data = book.Read<OrderBookData>();
+
+data.Title = "Updated orders";
+
+book.Replace(data);
+book.Save();
+```
+
+`SpreadSheetNameAttribute` は、Excelテーブル名、列名、定義名の明示的な対応付けに共通して使用します。
+シートローカル定義名では、`WorksheetName` も指定します。
+複数セル定義名に対応するプロパティの型は `IEnumerable<IEnumerable<object?>>` です。
+
+## 4. `.xlsx` から型付き読み書きコードを生成する
 
 `Marimo.SpreadSheetAsData.CodeGeneration` では、Excelブックから型付きラッパーのC#ソースコードを生成します。
 
@@ -146,6 +190,13 @@ foreach (var order in book.Orders)
 {
     Console.WriteLine(order.ProductName);
 }
+
+var data = book.Read();
+data.Orders = data.Orders.ToArray();
+data.Orders.First().Quantity = 3;
+
+book.Replace(data);
+book.Save();
 ```
 
 ## 名前変換
@@ -184,16 +235,15 @@ options.NameMappings = new()
 
 ## 現在の制約
 
-現行のコード生成は、読み取り用ラッパーの初期実装です。
+現行のコード生成は、基本的な読み取りと書き戻しに使用するラッパーを生成します。
 
 次はまだ対象外です。
 
-* 生成コードを使った書き込み
-* 生成後にExcelファイルパスを差し替えるAPI
 * 複数ソースファイルへの分割生成
 * bool、日付、nullable型、decimalなどの型推論
 * 数式、書式、構造化参照からの型生成
 * 複数テーブル間の関連推測
 * 任意のセル範囲からの型生成
+* 行の追加、挿入、削除とテーブル範囲の拡張
 
-初回公開版では、Excelテーブルを独立した型付きデータ集合として読み取ることに集中します。
+現行版では、Excelテーブルを独立した型付きデータ集合として読み書きすることに集中します。

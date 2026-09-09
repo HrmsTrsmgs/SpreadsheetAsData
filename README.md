@@ -13,22 +13,22 @@ Visual Studioで新規プロジェクトを作成し、NuGetパッケージとEx
 
 ## まずできること
 
-SpreadsheetAsDataは、Excelファイルを低水準のOpen XML要素としてではなく、業務で使う表データとして読み取るためのAPIを優先しています。
+SpreadsheetAsDataは、Excelファイルを低水準のOpen XML要素としてではなく、業務で使う表データとして読み書きするためのAPIを優先しています。
 
 * Excelテーブルを、型付きのC#オブジェクトとして列挙する
 * Excelファイルから、ブック、シート、テーブル、行データを表すC#コードを生成する
 * Visual Studioでは、Excelファイルのビルドアクションを `SpreadsheetAsData` にするだけで生成コードを利用する
 * 型を用意せず、Excelテーブル、列、行、セルを直接読む
 * 定義名、A1形式、シート名、セル位置からセルや範囲を取得する
-* Excelをインストールしていない環境で `.xlsx` を読む
+* セル、セル範囲、既存のExcelテーブル行を書き換えて保存する
+* Excelをインストールしていない環境で `.xlsx` を読み書きする
 
-現在のC#版は、読み取り機能を中心に再整備している段階です。
-書き込みは、このライブラリの主要な拡張対象です。
-書式、日付、数式、広範なExcel機能への対応は、基本的なデータ読み書きを整えた後の補助機能として扱います。
+現在のC#版では、基本的なデータの読み取り、書き込み、保存を利用できます。
+行の追加や削除、書式、日付、数式、広範なExcel機能への対応は、基本的なデータ操作を整えた後の拡張として扱います。
 
 ## 最初のチュートリアル
 
-このチュートリアルでは、リポジトリに含めている `SampleData/sales_report.xlsx` から型付き読み取りコードを生成し、`Program.cs` からExcelテーブルを読み取ります。
+このチュートリアルでは、リポジトリに含めている `SampleData/sales_report.xlsx` から型付きコードを生成し、`Program.cs` からExcelテーブルを読み取ります。
 サンプルデータには、`sales_summary` シートと `sales_detail` Excelテーブルが含まれています。
 
 ### Visual Studioから使う
@@ -94,7 +94,7 @@ foreach (var sale in book.SalesDetail)
 }
 ```
 
-ビルドまたは実行すると、Excelファイルから型付き読み取りコードが生成されます。
+ビルドまたは実行すると、Excelファイルから型付きコードが生成されます。
 
 ```powershell
 dotnet run
@@ -106,7 +106,7 @@ SpreadsheetAsDataは、Excelファイルを低水準のシート、行、セル�
 
 ### 生成された型付きコードで読む
 
-NuGetパッケージを参照しているVisual Studioプロジェクトでは、Excelファイルのビルドアクションから型付き読み取りコードを生成できます。
+NuGetパッケージを参照しているVisual Studioプロジェクトでは、Excelファイルのビルドアクションから型付きコードを生成できます。
 たとえば `orders.xlsx` を `SpreadsheetAsData` ビルドアクションにすると、ブック、ワークシート、定義名、Excelテーブル、行データを表す型を利用できます。
 
 ```csharp
@@ -171,7 +171,7 @@ var customers = book.ReadTable<CustomerRow>("Customers");
 
 ### コード生成の詳しい設定
 
-NuGetパッケージを参照しているVisual Studioプロジェクトでは、Excelファイルのビルドアクションから型付き読み取りコードを生成できます。
+NuGetパッケージを参照しているVisual Studioプロジェクトでは、Excelファイルのビルドアクションから型付きコードを生成できます。
 通常の `None` や `Content` として追加したExcelファイルは、コード生成対象になりません。
 対象にするファイルだけ、ビルドアクションを `SpreadsheetAsData` へ変更してください。
 
@@ -229,7 +229,7 @@ MSBuild連携も同じ生成処理と診断処理を使用します。
 
 現在の生成コードは、生成元ExcelファイルのパスをBook型の引数なしコンストラクターに埋め込みます。
 生成前に検出できる名前衝突や無効名は `WorkbookWrapperGenerator.GenerateDiagnostics` で確認できます。
-詳しい規則は [型付き読み取り](docs/typed-reading.md) を参照してください。
+詳しい規則は [型付き読み書き](docs/typed-reading.md) を参照してください。
 
 ### Excelテーブルを直接読む
 
@@ -328,6 +328,46 @@ Console.WriteLine(cell.ColumnIndex);
 * 真偽値セル: `bool`
 * 共有文字列セル: `string`
 
+## 書き込みと保存
+
+生成された型付きTableでは、読み取った行を変更して既存のExcelテーブル行へ書き戻せます。
+
+```csharp
+using MyApp;
+
+using var book = OrdersBook.Open("orders.xlsx");
+var orders = book.Orders.ToArray();
+
+orders[0].Quantity = 3;
+
+book.Orders.Replace(orders);
+book.Save();
+```
+
+`Workbook.Read<T>()` でブック全体をデータオブジェクトへ読み込み、変更後に `Workbook.Replace<T>()` で定義名とExcelテーブルへ書き戻すこともできます。
+生成されたBook型では、型引数を指定せずに `Read()` と `Replace()` を呼び出せます。
+
+セルとセル範囲は、非型付きAPIから直接書き換えられます。
+
+```csharp
+using Marimo.SpreadSheetAsData;
+
+using var book = Workbook.Open("orders.xlsx");
+
+book.Sheets["Input"].Cells["B2"].Value = "Confirmed";
+book.Range["InputRange"].Values =
+[
+    ["A", 1],
+    ["B", 2]
+];
+
+book.SaveAs("updated-orders.xlsx");
+```
+
+`Save()` は開いているファイルまたは `Stream` へ変更を保存し、`SaveAs()` は別のファイルへ保存します。
+`CellRange.Values` へ設定する値は、対象範囲と同じ行数・列数である必要があります。
+`Table<T>.Replace()` は既存行をワークシート上の順序で置き換えます。行の追加、挿入、削除、テーブル範囲の拡張はまだ扱いません。
+
 ## 設計方針
 
 * Open XML SDKの型や要素構造を、公開APIへできるだけ露出させない
@@ -343,9 +383,9 @@ Console.WriteLine(cell.ColumnIndex);
 
 * [プロジェクト概要](docs/project-overview.md)
 * [設計方針](docs/design.md)
-* [初回公開版の範囲](docs/public-release-scope.md)
+* [現行公開版の範囲](docs/public-release-scope.md)
 * [ロードマップ](docs/roadmap.md)
-* [型付き読み取り](docs/typed-reading.md)
+* [型付き読み書き](docs/typed-reading.md)
 
 ## ビルドとテスト
 
@@ -385,14 +425,14 @@ dotnet format .\CSharp\SpreadSheetAsData.slnx --verify-no-changes --no-restore -
 
 ## NuGetパッケージ
 
-C#版は、NuGetパッケージとして公開できるように準備しています。
+C#版は、NuGet.orgでパッケージとして公開しています。
 推奨パッケージIDは `Marimo.SpreadSheetAsData` です。
 この短い名前のパッケージは、実行時ライブラリ、コード生成API、Visual Studio/MSBuild連携をまとめる全部入りパッケージです。
 
 内部の責務は、次のパッケージに分けています。
 
 * `Marimo.SpreadSheetAsData.Core`: `Workbook`、`Worksheet`、`Table` などの実行時ライブラリ
-* `Marimo.SpreadSheetAsData.CodeGeneration`: `.xlsx` から型付き読み取りコードを生成するAPI
+* `Marimo.SpreadSheetAsData.CodeGeneration`: `.xlsx` から型付き読み書きコードを生成するAPI
 * `Marimo.SpreadSheetAsData.Build`: Visual StudioとMSBuildからコード生成を起動するビルドタスク
 
 通常の利用者は `Marimo.SpreadSheetAsData` を参照してください。
@@ -462,17 +502,16 @@ DocFXが生成する `docs/api/csharp/metadata/` と `docs/api/csharp/_site/` �
 直近の再整備では、次を確認しています。
 
 * ビルド: 成功
-* テスト: 成功、本体176件、コード生成197件
+* テスト: 成功、本体とコード生成の全テスト
 * XMLドキュメント生成: 成功、警告なし
 * `dotnet format --verify-no-changes`: 成功
 
 ## 制約
 
-NuGetパッケージは公開準備中です。
-現時点では、ローカルで生成したパッケージと、リポジトリを取得してC#プロジェクトを直接参照する形で確認しています。
+NuGetパッケージ公開後も、リポジトリの最新コードには未公開の変更が含まれる場合があります。
 
-現行C#版には、まだセル値を書き込む公開APIはありません。
-過去のRuby版には書き込み機能がありましたが、C#版では再設計しながら追加する予定です。
+現行C#版は、セル値、セル範囲、既存のExcelテーブル行の書き換えと保存に対応しています。
+行の追加、挿入、削除、テーブル範囲の拡張、数式計算、書式操作はまだ扱いません。
 
 Ruby版は過去実装です。
 現在はC#版を優先して再整備していますが、余裕ができたらRuby版もC#版と同等の機能へ整備する予定です。
