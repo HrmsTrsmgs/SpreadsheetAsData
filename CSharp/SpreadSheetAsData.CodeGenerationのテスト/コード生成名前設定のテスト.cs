@@ -147,6 +147,34 @@ public sealed class コード生成名前設定のテスト
     }
 
     [Fact]
+    public void NameMappingsで変更した生成DataプロパティからExcelテーブルへ書き込みます()
+    {
+        using var temporaryFiles = new TemporaryExcelFiles();
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    SimpleNameMappingsExcelFilePath,
+                    options =>
+                        options.NameMappings = new()
+                        {
+                            ["sales_detail"] = "OrderLine",
+                            ["sales_detail.sales_detail"] = "SalesDetailValue"
+                        }))
+            .GeneratedInstance<Workbook>(
+                "簡易名前置換Book",
+                temporaryFiles.Copy(SimpleNameMappingsExcelFilePath));
+        dynamic bookAccessor = book;
+        var data = bookAccessor.Read();
+        data.OrderLine = Enumerable.ToArray(data.OrderLine);
+        data.OrderLine[0].CustId = 2;
+
+        bookAccessor.Replace(data);
+
+        (book.Tables["sales_detail"].Rows.Single()["cust_id"].Value as object)
+            .Should().Be(2d);
+    }
+
+    [Fact]
     public void NameMappingsで変更した生成Dataプロパティへ定義名の値を読み込みます()
     {
         using var book = GeneratedCodeInspection
