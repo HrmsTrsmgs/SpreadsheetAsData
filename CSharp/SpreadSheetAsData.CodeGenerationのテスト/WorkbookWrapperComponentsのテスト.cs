@@ -183,7 +183,7 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     /// <summary>
                     /// Excel列「customer_id」の値を取得または設定します。
                     /// </summary>
-                    [SpreadsheetColumn("customer_id")]
+                    [SpreadSheetName("customer_id")]
                     public int CustomerId { get; set; }
 
                     /// <summary>
@@ -303,7 +303,7 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     /// <summary>
                     /// Excel列「customer_id」の値を取得または設定します。
                     /// </summary>
-                    [SpreadsheetColumn("customer_id")]
+                    [SpreadSheetName("customer_id")]
                     public int CustomerId { get; set; }
 
                     /// <summary>
@@ -332,20 +332,20 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     /// <summary>
                     /// Excel列「customer_id」の値を取得または設定します。
                     /// </summary>
-                    [SpreadsheetColumn("customer_id")]
+                    [SpreadSheetName("customer_id")]
                     public int CustomerId { get; set; }
                 """);
     }
 
     [Fact]
-    public void ColumnAttributeDeclarationは列名とプロパティ名が異なる場合にSpreadsheetColumn属性を生成します()
+    public void ColumnAttributeDeclarationは列名とプロパティ名が異なる場合にSpreadSheetName属性を生成します()
     {
         ColumnAttributeDeclaration(
                 basicBook.Tables["sales_detail"].Columns["customer_id"],
                 "CustomerId")
             .Should().Be(
                 """
-                    [SpreadsheetColumn("customer_id")]
+                    [SpreadSheetName("customer_id")]
 
                 """);
     }

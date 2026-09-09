@@ -123,20 +123,20 @@ foreach (var order in book.Orders)
 ### 型付きテーブルとして読む
 
 Excelテーブルの列名とC#のプロパティを対応付けると、各データ行を利用者定義型として列挙できます。
-列名とプロパティ名が異なる場合は、`SpreadsheetColumn` 属性でExcelテーブル列名を指定します。
+列名とプロパティ名が異なる場合は、`SpreadSheetName` 属性でExcelテーブル列名を指定します。
 
 ```csharp
 using Marimo.SpreadSheetAsData;
 
 public sealed class OrderRow
 {
-    [SpreadsheetColumn("商品名")]
+    [SpreadSheetName("商品名")]
     public string ProductName { get; set; } = "";
 
-    [SpreadsheetColumn("数量")]
+    [SpreadSheetName("数量")]
     public int Quantity { get; set; }
 
-    [SpreadsheetColumn("単価")]
+    [SpreadSheetName("単価")]
     public double UnitPrice { get; set; }
 }
 

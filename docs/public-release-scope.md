@@ -75,7 +75,7 @@ IEnumerable<Order> orders = book.ReadTable<Order>("Orders");
 
 初回公開版では、プロパティ名と列名の一致を基本規則とします。
 
-列名とプロパティ名が異なる場合は、`SpreadsheetColumnAttribute` で列名を指定します。
+列名とプロパティ名が異なる場合は、`SpreadSheetNameAttribute` で列名を指定します。
 
 ### 型付き読み取りコードの生成
 

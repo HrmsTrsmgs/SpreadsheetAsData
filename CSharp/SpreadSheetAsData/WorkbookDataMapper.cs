@@ -62,14 +62,23 @@ sealed class WorkbookDataMapper(Workbook book)
     }
 
     /// <summary>
-    /// プロパティ名と同じC#識別子になるExcelテーブルを検索します。
+    /// 属性で指定した名前を優先し、対応するExcelテーブルを検索します。
     /// </summary>
-    bool TryGetTable(PropertyInfo property, out Table table) =>
-        (
-            from candidate in book.Tables
-            where candidate.Name.ToCSharpIdentifier() == property.Name
-            select candidate
-        ).TryGetFirst(out table);
+    bool TryGetTable(PropertyInfo property, out Table table)
+    {
+        var tableName = property
+            .GetCustomAttribute<SpreadSheetNameAttribute>()
+            ?.Name;
+
+        return
+            (
+                from candidate in book.Tables
+                where tableName is not null
+                    ? candidate.Name == tableName
+                    : candidate.Name.ToCSharpIdentifier() == property.Name
+                select candidate
+            ).TryGetFirst(out table);
+    }
 
     /// <summary>
     /// Excelテーブルへ対応付けるプロパティから行データ型を取得します。
@@ -106,7 +115,7 @@ sealed class WorkbookDataMapper(Workbook book)
     CellRange DefinedNameRange(PropertyInfo property)
     {
         var attribute =
-            property.GetCustomAttribute<SpreadsheetDefinedNameAttribute>();
+            property.GetCustomAttribute<SpreadSheetNameAttribute>();
 
         if (attribute is not null)
         {

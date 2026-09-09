@@ -477,13 +477,13 @@ public sealed class 型付きTableのテスト : IDisposable
 
     public sealed class WritableMappedRow
     {
-        [SpreadsheetColumn("数値2")]
+        [SpreadSheetName("数値2")]
         public int IntegerValue { get; set; }
 
-        [SpreadsheetColumn("数値")]
+        [SpreadSheetName("数値")]
         public double FloatingPointValue { get; set; }
 
-        [SpreadsheetColumn("文字列")]
+        [SpreadSheetName("文字列")]
         public string TextValue { get; set; } = "";
     }
 
@@ -496,28 +496,28 @@ public sealed class 型付きTableのテスト : IDisposable
 
     public sealed class WritableIntegerOnlyRow
     {
-        [SpreadsheetColumn("数値2")]
+        [SpreadSheetName("数値2")]
         public int IntegerValue { get; set; }
     }
 
     public sealed class WritableMissingColumnRow
     {
-        [SpreadsheetColumn("missing")]
+        [SpreadSheetName("missing")]
         public int Value { get; set; }
     }
 
     public sealed class WritableDuplicateColumnRow
     {
-        [SpreadsheetColumn("数値2")]
+        [SpreadSheetName("数値2")]
         public int FirstValue { get; set; }
 
-        [SpreadsheetColumn("数値2")]
+        [SpreadSheetName("数値2")]
         public int SecondValue { get; set; }
     }
 
     public sealed class WritableAttributedPropertyWithoutPublicGetterRow
     {
-        [SpreadsheetColumn("数値2")]
+        [SpreadSheetName("数値2")]
         public int IntegerValue
         {
             set { }
@@ -526,7 +526,7 @@ public sealed class 型付きTableのテスト : IDisposable
 
     public sealed class WritableRowWithWriteOnlyProperty
     {
-        [SpreadsheetColumn("数値2")]
+        [SpreadSheetName("数値2")]
         public int IntegerValue { get; set; }
 
         public string Description
@@ -537,61 +537,61 @@ public sealed class 型付きTableのテスト : IDisposable
 
     public sealed class WritableUnsupportedValueRow
     {
-        [SpreadsheetColumn("数値2")]
+        [SpreadSheetName("数値2")]
         public DateTime Value { get; set; }
     }
 
     public sealed class IntegerOnlyRow
     {
-        [SpreadsheetColumn("数値2")]
+        [SpreadSheetName("数値2")]
         public int IntegerValue { get; set; }
     }
 
     public sealed class MissingColumnRow
     {
-        [SpreadsheetColumn("missing")]
+        [SpreadSheetName("missing")]
         public int Value { get; set; }
     }
 
     public sealed class StringAsIntegerRow
     {
-        [SpreadsheetColumn("文字列")]
+        [SpreadSheetName("文字列")]
         public int Value { get; set; }
     }
 
     public sealed class FloatingPointAsIntegerRow
     {
-        [SpreadsheetColumn("数値")]
+        [SpreadSheetName("数値")]
         public int Value { get; set; }
     }
 
     public sealed class EmptyTableRow
     {
-        [SpreadsheetColumn("列1")]
+        [SpreadSheetName("列1")]
         public string FirstValue { get; set; } = "";
 
-        [SpreadsheetColumn("列2")]
+        [SpreadSheetName("列2")]
         public string SecondValue { get; set; } = "";
     }
 
     public sealed class DuplicateColumnRow
     {
-        [SpreadsheetColumn("数値2")]
+        [SpreadSheetName("数値2")]
         public int FirstValue { get; set; }
 
-        [SpreadsheetColumn("数値2")]
+        [SpreadSheetName("数値2")]
         public int SecondValue { get; set; }
     }
 
     public sealed class AttributedPropertyWithoutPublicSetterRow
     {
-        [SpreadsheetColumn("数値2")]
+        [SpreadSheetName("数値2")]
         public int IntegerValue { get; private set; }
     }
 
     public sealed class RowWithReadOnlyProperty
     {
-        [SpreadsheetColumn("数値2")]
+        [SpreadSheetName("数値2")]
         public int IntegerValue { get; set; }
 
         public string Description => "computed";
@@ -604,7 +604,7 @@ public sealed class 型付きTableのテスト : IDisposable
             Value = value;
         }
 
-        [SpreadsheetColumn("数値2")]
+        [SpreadSheetName("数値2")]
         public int Value { get; set; }
     }
 }

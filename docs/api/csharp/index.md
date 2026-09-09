@@ -9,7 +9,7 @@ SpreadsheetAsDataは、Excelファイルを低水準のOpen XML要素ではな�
 開いたワークブックから、ワークシート、定義名、Excelテーブル、セル、セル範囲を取得できます。
 
 ExcelテーブルをC#の利用者定義型へ変換する場合は、`Workbook.ReadTable<T>` または `Table.Enumerate<T>` を使用します。
-列名とプロパティ名が異なる場合は、`SpreadsheetColumnAttribute` で対応するExcel列名を指定します。
+列名とプロパティ名が異なる場合は、`SpreadSheetNameAttribute` で対応するExcel列名を指定します。
 
 ## 型付きコード生成
 

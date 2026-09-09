@@ -226,7 +226,7 @@ public sealed class コード生成型付きTableのテスト : IDisposable
 
     sealed class ReadTableComparison
     {
-        [SpreadsheetColumn("customer_id")]
+        [SpreadSheetName("customer_id")]
         public int CustomerId { get; set; }
 
         public double Amount { get; set; }

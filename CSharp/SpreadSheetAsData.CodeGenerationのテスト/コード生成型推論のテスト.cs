@@ -79,7 +79,7 @@ public sealed class コード生成型推論のテスト
     [InlineData("MainRange")]
     [InlineData("LocalCell")]
     [InlineData("LocalRange")]
-    public void 自動名前変換で対応する定義名には定義名属性を生成しません(
+    public void 自動名前変換で対応する定義名にはSpreadSheetName属性を生成しません(
         string propertyName)
     {
         var tested = GeneratedCodeInspection
@@ -90,7 +90,7 @@ public sealed class コード生成型推論のテスト
             .GetProperty(propertyName);
 
         tested.Should().NotBeNull();
-        tested.GetCustomAttribute<SpreadsheetDefinedNameAttribute>()
+        tested.GetCustomAttribute<SpreadSheetNameAttribute>()
             .Should().BeNull();
     }
 
@@ -161,7 +161,7 @@ public sealed class コード生成型推論のテスト
             .GetProperty("Amount");
 
         tested.Should().NotBeNull();
-        tested.GetCustomAttribute<SpreadsheetColumnAttribute>()
+        tested.GetCustomAttribute<SpreadSheetNameAttribute>()
             .Should().BeNull();
     }
 
@@ -177,7 +177,7 @@ public sealed class コード生成型推論のテスト
         generatedProperty.Should().NotBeNull();
 
         var tested =
-            generatedProperty.GetCustomAttribute<SpreadsheetColumnAttribute>();
+            generatedProperty.GetCustomAttribute<SpreadSheetNameAttribute>();
 
         tested.Should().NotBeNull();
         tested.Name.Should().Be("customer_id");

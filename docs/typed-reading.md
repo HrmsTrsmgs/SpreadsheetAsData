@@ -69,12 +69,12 @@ foreach (var order in book.ReadTable<Order>("Orders"))
 }
 ```
 
-プロパティ名とExcel列名が異なる場合は、`SpreadsheetColumnAttribute` で列名を指定します。
+プロパティ名とExcel列名が異なる場合は、`SpreadSheetNameAttribute` で列名を指定します。
 
 ```csharp
 public sealed class Order
 {
-    [SpreadsheetColumn("商品名")]
+    [SpreadSheetName("商品名")]
     public string ProductName { get; set; } = "";
 }
 ```
@@ -83,7 +83,7 @@ public sealed class Order
 
 * publicな引数なしコンストラクターが必要
 * public setterを持つプロパティを列へ対応付ける
-* `SpreadsheetColumnAttribute` がある場合は、属性の列名を使用する
+* `SpreadSheetNameAttribute` がある場合は、属性の列名を使用する
 * 属性がない場合は、プロパティ名を列名として使用する
 * 属性がない読み取り専用プロパティは無視する
 * 属性がある読み取り専用プロパティはエラーにする

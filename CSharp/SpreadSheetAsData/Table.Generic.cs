@@ -147,7 +147,7 @@ public class Table<T> : Table, IEnumerable<T>
     {
         if ((
             from property in MappedProperties
-            where HasSpreadsheetColumnAttribute(property)
+            where HasSpreadSheetNameAttribute(property)
                 && !HasPublicSetter(property)
             select property
         ).TryGetFirst(out var propertyWithoutPublicSetter))
@@ -167,7 +167,7 @@ public class Table<T> : Table, IEnumerable<T>
     {
         if ((
             from property in MappedProperties
-            where HasSpreadsheetColumnAttribute(property)
+            where HasSpreadSheetNameAttribute(property)
                 && !HasPublicGetter(property)
             select property
         ).TryGetFirst(out var propertyWithoutPublicGetter))
@@ -195,7 +195,7 @@ public class Table<T> : Table, IEnumerable<T>
     /// <param name="property">列名を取得するプロパティ。</param>
     /// <returns>属性で指定した列名。属性がない場合はプロパティ名。</returns>
     static string GetColumnName(PropertyInfo property) =>
-        property.GetCustomAttribute<SpreadsheetColumnAttribute>()?.Name
+        property.GetCustomAttribute<SpreadSheetNameAttribute>()?.Name
             ?? property.Name;
 
     /// <summary>
@@ -203,8 +203,8 @@ public class Table<T> : Table, IEnumerable<T>
     /// </summary>
     /// <param name="property">確認するプロパティ。</param>
     /// <returns>列名を明示する属性がある場合は true。</returns>
-    static bool HasSpreadsheetColumnAttribute(PropertyInfo property) =>
-        property.GetCustomAttribute<SpreadsheetColumnAttribute>() is not null;
+    static bool HasSpreadSheetNameAttribute(PropertyInfo property) =>
+        property.GetCustomAttribute<SpreadSheetNameAttribute>() is not null;
 
     /// <summary>
     /// プロパティに public setter があるかどうかを返します。
@@ -228,7 +228,7 @@ public class Table<T> : Table, IEnumerable<T>
     /// <param name="property">確認するプロパティ。</param>
     /// <returns>列属性を持つ、または public getter と public setter を持つ場合は true。</returns>
     static bool IsMappedProperty(PropertyInfo property) =>
-        HasSpreadsheetColumnAttribute(property)
+        HasSpreadSheetNameAttribute(property)
             || HasPublicGetter(property) && HasPublicSetter(property);
 
     /// <summary>

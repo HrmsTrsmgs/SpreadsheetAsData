@@ -32,13 +32,13 @@ foreach (var row in table.Rows)
 
 public sealed class OrderRow
 {
-    [SpreadsheetColumn("商品名")]
+    [SpreadSheetName("商品名")]
     public string ProductName { get; set; } = "";
 
-    [SpreadsheetColumn("数量")]
+    [SpreadSheetName("数量")]
     public int Quantity { get; set; }
 
-    [SpreadsheetColumn("単価")]
+    [SpreadSheetName("単価")]
     public double UnitPrice { get; set; }
 
     public double TotalPrice => Quantity * UnitPrice;

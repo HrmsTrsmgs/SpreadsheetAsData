@@ -122,6 +122,31 @@ public sealed class コード生成名前設定のテスト
     }
 
     [Fact]
+    public void NameMappingsで変更した生成DataプロパティへExcelテーブルの行データを読み込みます()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    SimpleNameMappingsExcelFilePath,
+                    options =>
+                        options.NameMappings = new()
+                        {
+                            ["sales_detail"] = "OrderLine",
+                            ["sales_detail.sales_detail"] = "SalesDetailValue"
+                        }))
+            .GeneratedInstance<Workbook>(
+                "簡易名前置換Book",
+                SimpleNameMappingsExcelFilePath);
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        IEnumerable<object> rows = dataAccessor.OrderLine;
+        dynamic rowAccessor = rows.Single();
+        object? tested = rowAccessor.CustId;
+
+        tested.Should().Be(1);
+    }
+
+    [Fact]
     public void NameMappingsで変更した生成Dataプロパティへ定義名の値を読み込みます()
     {
         using var book = GeneratedCodeInspection

@@ -144,14 +144,21 @@ static class WorkbookWrapperComponents
     /// </summary>
     internal static string BookDataTablePropertyDeclaration(
         Table table,
-        CodeGenerationOptions options) =>
-        $$"""
+        CodeGenerationOptions options)
+    {
+        var propertyName = options.GeneratedName(table.Name);
+        var attributeDeclaration = table.Name.ToCSharpIdentifier() == propertyName
+            ? ""
+            : $"    [SpreadSheetName({StringLiteral(table.Name)})]{Environment.NewLine}";
+
+        return $$"""
 
             /// <summary>
             /// Excelテーブル「{{table.Name}}」の行データを取得または設定します。
             /// </summary>
-            public IEnumerable<{{options.GeneratedName(table.Name)}}> {{options.GeneratedName(table.Name)}} { get; set; }
+        {{attributeDeclaration}}    public IEnumerable<{{propertyName}}> {{propertyName}} { get; set; }
         """;
+    }
 
     /// <summary>
     /// ブックデータ型に、定義名が表す値のプロパティを生成します。
@@ -205,7 +212,7 @@ static class WorkbookWrapperComponents
             ? ""
             : $", WorksheetName = {StringLiteral(definedName.Worksheet.Name)}";
 
-        return $"[SpreadsheetDefinedName({StringLiteral(definedName.Name)}{worksheetArgument})]{Environment.NewLine}    ";
+        return $"[SpreadSheetName({StringLiteral(definedName.Name)}{worksheetArgument})]{Environment.NewLine}    ";
     }
 
     /// <summary>
@@ -335,7 +342,7 @@ static class WorkbookWrapperComponents
     internal static string ColumnAttributeDeclaration(TableColumn column, string propertyName) =>
         column.Name == propertyName
             ? ""
-            : $"    [SpreadsheetColumn({StringLiteral(column.Name)})]{Environment.NewLine}";
+            : $"    [SpreadSheetName({StringLiteral(column.Name)})]{Environment.NewLine}";
 
     /// <summary>
     /// 既存の型付きTableマッピングで読み込めるプロパティ型名を、列の値から決定します。

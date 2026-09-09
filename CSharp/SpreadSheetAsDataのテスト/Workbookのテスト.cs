@@ -305,7 +305,7 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
-    public void ReadはSpreadsheetDefinedName属性で指定した定義名からオブジェクトを読み込みます()
+    public void ReadはSpreadSheetName属性で指定した定義名からオブジェクトを読み込みます()
     {
         using var tested = Workbook.Open(@"TestData\定義名.xlsx");
 
@@ -318,7 +318,7 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
-    public void ReadはSpreadsheetDefinedName属性で指定したシートローカルの単一セル定義名からオブジェクトを読み込みます()
+    public void ReadはSpreadSheetName属性で指定したシートローカルの単一セル定義名からオブジェクトを読み込みます()
     {
         using var tested = Workbook.Open(@"TestData\定義名.xlsx");
         tested.Sheets["Sheet2"].Cell["cell_name"].Value = "シートローカル";
@@ -338,7 +338,7 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
-    public void ReadはSpreadsheetDefinedName属性で指定した複数セル定義名からオブジェクトを読み込みます()
+    public void ReadはSpreadSheetName属性で指定した複数セル定義名からオブジェクトを読み込みます()
     {
         using var tested = Workbook.Open(@"TestData\定義名.xlsx");
         var expected = tested.Range["book_range"].Values
@@ -400,7 +400,7 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
-    public void ReplaceはSpreadsheetDefinedName属性で指定した定義名へオブジェクトを書き込みます()
+    public void ReplaceはSpreadSheetName属性で指定した定義名へオブジェクトを書き込みます()
     {
         using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));
 
@@ -414,7 +414,7 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
-    public void ReplaceはSpreadsheetDefinedName属性で指定したシートローカルの単一セル定義名へオブジェクトを書き込みます()
+    public void ReplaceはSpreadSheetName属性で指定したシートローカルの単一セル定義名へオブジェクトを書き込みます()
     {
         using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));
 
@@ -444,7 +444,7 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
-    public void ReplaceはSpreadsheetDefinedName属性で指定した複数セル定義名へオブジェクトを書き込みます()
+    public void ReplaceはSpreadSheetName属性で指定した複数セル定義名へオブジェクトを書き込みます()
     {
         using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));
         IEnumerable<IEnumerable<object?>> replacement =
@@ -524,19 +524,19 @@ public class Workbookのテスト : IDisposable
 
     public sealed class AttributedWorkbookData
     {
-        [SpreadsheetDefinedName("CustomerName")]
+        [SpreadSheetName("CustomerName")]
         public string Name { get; set; } = "";
     }
 
     public sealed class AttributedWorkbookRangeData
     {
-        [SpreadsheetDefinedName("book_range")]
+        [SpreadSheetName("book_range")]
         public IEnumerable<IEnumerable<object?>> Values { get; set; } = [];
     }
 
     public sealed class SheetScopedWorkbookData
     {
-        [SpreadsheetDefinedName("cell_name", WorksheetName = "Sheet2")]
+        [SpreadSheetName("cell_name", WorksheetName = "Sheet2")]
         public string Value { get; set; } = "";
     }
 
