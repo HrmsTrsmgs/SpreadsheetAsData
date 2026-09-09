@@ -271,7 +271,7 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
     [Fact]
     public void TableDeclarationはTable型宣言を生成します()
     {
-        TableDeclaration(basicBook.Tables["sales_detail"])
+        TableDeclaration(basicBook.Tables["sales_detail"], options)
             .Should().Be(
                 """
 

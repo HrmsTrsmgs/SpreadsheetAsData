@@ -26,7 +26,7 @@ static class WorkbookWrapperComponents
             select SheetDeclaration(sheet, options))}}
         {{ForEach(
             from table in book.Tables
-            select TableDeclaration(table))}}
+            select TableDeclaration(table, options))}}
         {{ForEach(
             from table in book.Tables
             select RowDeclaration(table, options))}}
@@ -113,7 +113,7 @@ static class WorkbookWrapperComponents
             .. from definedName in BookDataDefinedNames(book)
                select BookDataDefinedNamePropertyDeclaration(definedName, options),
             .. from table in book.Tables
-               select BookDataTablePropertyDeclaration(table)
+               select BookDataTablePropertyDeclaration(table, options)
         ])}}
         }
         """;
@@ -142,13 +142,15 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// ブックデータ型に、Excelテーブルの行データを表すプロパティを生成します。
     /// </summary>
-    internal static string BookDataTablePropertyDeclaration(Table table) =>
+    internal static string BookDataTablePropertyDeclaration(
+        Table table,
+        CodeGenerationOptions options) =>
         $$"""
 
             /// <summary>
             /// Excelテーブル「{{table.Name}}」の行データを取得または設定します。
             /// </summary>
-            public IEnumerable<{{table.Name.ToCSharpIdentifier()}}> {{table.Name.ToCSharpIdentifier()}} { get; set; }
+            public IEnumerable<{{options.GeneratedName(table.Name)}}> {{options.GeneratedName(table.Name)}} { get; set; }
         """;
 
     /// <summary>
@@ -267,19 +269,25 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// Excelテーブルを表す派生Table型の宣言を生成します。
     /// </summary>
-    internal static string TableDeclaration(Table table)
-        => $$"""
+    internal static string TableDeclaration(
+        Table table,
+        CodeGenerationOptions options)
+    {
+        var tableIdentifier = options.GeneratedName(table.Name);
+
+        return $$"""
 
         /// <summary>
         /// Excelテーブル「{{table.Name}}」を型付きで表します。
         /// </summary>
-        public partial class {{table.Name.ToCSharpIdentifier()}}Table : Table<{{table.Name.ToCSharpIdentifier()}}>
+        public partial class {{tableIdentifier}}Table : Table<{{tableIdentifier}}>
         {
-            public {{table.Name.ToCSharpIdentifier()}}Table(Table source) : base(source)
+            public {{tableIdentifier}}Table(Table source) : base(source)
             {
             }
         }
         """;
+    }
 
     /// <summary>
     /// Excelテーブルの1行を表す行データ型の宣言を生成します。
@@ -292,7 +300,7 @@ static class WorkbookWrapperComponents
         /// <summary>
         /// Excelテーブル「{{table.Name}}」の1行を表します。
         /// </summary>
-        public partial class {{table.Name.ToCSharpIdentifier()}}
+        public partial class {{options.GeneratedName(table.Name)}}
         {
         {{ForEach(
             from column in table.Columns
