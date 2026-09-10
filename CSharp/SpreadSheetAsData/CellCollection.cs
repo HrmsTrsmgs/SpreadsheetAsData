@@ -7,11 +7,6 @@ namespace Marimo.SpreadSheetAsData;
 public class CellCollection
 {
     /// <summary>
-    /// ブックスコープの名前参照を解決するためのブックです。
-    /// </summary>
-    readonly Workbook? book;
-
-    /// <summary>
     /// 同じセル参照に対して同じ <see cref="Cell"/> インスタンスを返すためのキャッシュです。
     /// </summary>
     readonly Dictionary<CellName, Cell> cache = [];
@@ -24,7 +19,7 @@ public class CellCollection
     /// <summary>
     /// セル参照とワークシートスコープの名前参照を解決するためのワークシートです。
     /// </summary>
-    readonly Worksheet? sheet;
+    readonly Worksheet sheet;
 
     /// <summary>
     /// 指定したワークシートのセルコレクションを作成します。
@@ -33,15 +28,6 @@ public class CellCollection
     public CellCollection(Worksheet sheet)
     {
         this.sheet = sheet;
-    }
-
-    /// <summary>
-    /// 指定したブックのセルコレクションを作成します。
-    /// </summary>
-    /// <param name="book">名前参照を解決するブック。</param>
-    internal CellCollection(Workbook book)
-    {
-        this.book = book;
     }
 
     /// <summary>
@@ -63,12 +49,7 @@ public class CellCollection
     {
         get
         {
-            if (book != null)
-            {
-                return book.ResolveNamedRange(cellReference).SingleCell;
-            }
-
-            if (resolvesWorksheetNames && sheet != null)
+            if (resolvesWorksheetNames)
             {
                 try
                 {
@@ -108,5 +89,5 @@ public class CellCollection
     Cell GetItem(CellName cellName) =>
         cache.GetValue(
             cellName,
-            () => (sheet ?? throw new NotImplementedException()).ResolveCell(cellName));
+            () => sheet.ResolveCell(cellName));
 }

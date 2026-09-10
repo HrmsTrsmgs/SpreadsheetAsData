@@ -219,7 +219,7 @@ public class Workbook : IDisposable
     /// <summary>
     /// ブック上で有効なセル参照を解決するコレクションを取得します。
     /// </summary>
-    public CellCollection Cell { get; }
+    public WorkbookCellCollection Cell { get; }
 
     /// <summary>
     /// ブック内の Excel テーブルを取得するコレクションを取得します。
