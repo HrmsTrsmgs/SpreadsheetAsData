@@ -13,47 +13,38 @@ public class Worksheet
     readonly Dictionary<CellName, Cell> cellCache = [];
 
     /// <summary>
-    /// ブックから作成されたワークシートだけが保持する親ブックです。
+    /// このワークシートが属する親ブックです。
     /// </summary>
-    readonly Workbook? book;
+    readonly Workbook book;
 
     /// <summary>
-    /// ブックから作成されたワークシートだけが保持するシート名です。
+    /// 親ブック内でこのワークシートを特定する名前です。
     /// </summary>
-    readonly string? name;
-
-    /// <summary>
-    /// ワークシートが持つコレクションを初期化します。
-    /// </summary>
-    Worksheet()
-    {
-        Cells = new CellCollection(this);
-        Cell = new(this, resolvesWorksheetNames: true);
-        Range = new(this);
-    }
+    readonly string name;
 
     /// <summary>
     /// 指定したブック内のワークシートを作成します。
     /// </summary>
     /// <param name="book">ワークシートが属するブック。</param>
     /// <param name="name">ワークシート名。</param>
-    protected internal Worksheet(Workbook book, string name) : this()
+    protected internal Worksheet(Workbook book, string name)
     {
         this.book = book;
         this.name = name;
+        Cells = new CellCollection(this);
+        Cell = new(this, resolvesWorksheetNames: true);
+        Range = new(this);
     }
 
     /// <summary>
     /// このワークシートが属するブックを取得します。
     /// </summary>
-    public Workbook Book =>
-        book ?? throw new InvalidOperationException();
+    public Workbook Book => book;
 
     /// <summary>
     /// ワークシート名を取得します。
     /// </summary>
-    public string Name =>
-        name ?? throw new InvalidOperationException();
+    public string Name => name;
 
     /// <summary>
     /// ワークシート上のセルを取得するコレクションを取得します。
