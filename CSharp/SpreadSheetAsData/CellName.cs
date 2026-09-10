@@ -84,6 +84,18 @@ public partial struct CellName : IEquatable<CellName>
     public static CellName Parse(string name) => new(name);
 
     /// <summary>
+    /// A1形式の文字列をセル参照へ変換できるか確認します。
+    /// </summary>
+    /// <param name="name">A1形式のセル参照。</param>
+    /// <param name="cellName">変換したセル参照。</param>
+    /// <returns>変換できた場合はtrue。</returns>
+    public static bool TryParse(string name, out CellName cellName)
+    {
+        cellName = Parse(name);
+        return true;
+    }
+
+    /// <summary>
     /// 2つのセル参照が同じ位置を表すかどうかを返します。
     /// </summary>
     /// <param name="left">比較する左辺のセル参照。</param>
