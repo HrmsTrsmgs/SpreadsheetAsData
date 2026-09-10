@@ -24,6 +24,12 @@ public class CellNameのテスト
     }
 
     [Fact]
+    public void TryParseは行番号が0の場合にfalseを返します()
+    {
+        CellName.TryParse("A0", out _).Should().BeFalse();
+    }
+
+    [Fact]
     public void ParseメソッドでCellNameが生成できます()
     {
         FluentActions.Invoking(
