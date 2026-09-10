@@ -66,7 +66,7 @@ public class TableColumnCollection : IReadOnlyList<TableColumn>
     /// <summary>
     /// Excel テーブル内の列数を取得します。
     /// </summary>
-    public int Count => throw new NotImplementedException();
+    public int Count => items.Length;
 
     /// <summary>
     /// Excel テーブル内の列定義を列挙します。

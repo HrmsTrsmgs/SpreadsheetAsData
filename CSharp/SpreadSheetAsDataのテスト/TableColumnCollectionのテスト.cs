@@ -64,6 +64,12 @@ public class TableColumnCollectionのテスト : IDisposable
     }
 
     [Fact]
+    public void CountはExcelテーブルの列数を返します()
+    {
+        columns.Count.Should().Be(4);
+    }
+
+    [Fact]
     public void Columnsは範囲外の位置を指定した場合に失敗します()
     {
         var action = () => _ = columns[4];
