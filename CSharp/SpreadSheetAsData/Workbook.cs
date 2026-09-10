@@ -214,7 +214,7 @@ public class Workbook : IDisposable
     /// <summary>
     /// ブック上で有効な範囲参照を解決するコレクションを取得します。
     /// </summary>
-    public CellRangeCollection Range { get; }
+    public WorkbookCellRangeCollection Range { get; }
 
     /// <summary>
     /// ブック上で有効なセル参照を解決するコレクションを取得します。

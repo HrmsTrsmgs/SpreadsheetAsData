@@ -68,6 +68,24 @@ public class Range参照のテスト : IDisposable
     }
 
     [Fact]
+    public void WorkbookのRangeはシート名と両端のA1形式のセル参照からWorksheetと同じ範囲を取得します()
+    {
+        var fromBook = book.Range["Sheet2", "C32", "D36"];
+        var fromWorksheet = sheet2.Range["C32", "D36"];
+
+        fromBook.Should().BeSameAs(fromWorksheet);
+    }
+
+    [Fact(Skip = "ブックからシート名と両端のCellNameで取得するAPIは仕様レビュー待ち。A1形式の両端指定の確認後にこの取得方法を確認する。")]
+    public void WorkbookのRangeはシート名と両端のCellNameからWorksheetと同じ範囲を取得します()
+    {
+        var fromBook = book.Range["Sheet2", CellName.Parse("C32"), CellName.Parse("D36")];
+        var fromWorksheet = sheet2.Range["C32", "D36"];
+
+        fromBook.Should().BeSameAs(fromWorksheet);
+    }
+
+    [Fact]
     public void Rangeは無効なA1形式の範囲参照を指定した場合に失敗します()
     {
         var action = () => _ = sheet2.Range["A1:B2:C3"];

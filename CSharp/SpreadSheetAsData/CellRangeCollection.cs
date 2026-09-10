@@ -6,11 +6,6 @@ namespace Marimo.SpreadSheetAsData;
 public class CellRangeCollection
 {
     /// <summary>
-    /// ブックスコープの名前参照を解決するためのブックです。
-    /// </summary>
-    readonly Workbook? book;
-
-    /// <summary>
     /// 同じ範囲指定に対して同じ <see cref="CellRange"/> インスタンスを返すためのキャッシュです。
     /// </summary>
     readonly Dictionary<(CellName TopLeft, CellName BottomRight), CellRange> cache = [];
@@ -23,16 +18,7 @@ public class CellRangeCollection
     /// <summary>
     /// セル範囲が属するワークシートです。
     /// </summary>
-    readonly Worksheet? sheet;
-
-    /// <summary>
-    /// 指定したブック上のセル範囲コレクションを作成します。
-    /// </summary>
-    /// <param name="book">範囲参照を解決するブック。</param>
-    internal CellRangeCollection(Workbook book)
-    {
-        this.book = book;
-    }
+    readonly Worksheet sheet;
 
     /// <summary>
     /// 指定したワークシート上のセル範囲コレクションを作成します。
@@ -64,7 +50,7 @@ public class CellRangeCollection
         cache.GetValue(
             (topLeft, bottomRight),
             () => new CellRange(
-                sheet ?? throw new InvalidOperationException(),
+                sheet,
                 topLeft,
                 bottomRight));
 
@@ -73,7 +59,6 @@ public class CellRangeCollection
     /// </summary>
     /// <param name="reference">解決する範囲参照。</param>
     /// <returns>指定した範囲参照が表すセル範囲。</returns>
-    /// <exception cref="InvalidOperationException">参照先のワークシートを特定できない場合。</exception>
     public CellRange this[string reference]
     {
         get
@@ -90,14 +75,10 @@ public class CellRangeCollection
 
             if (rangeReference.SheetName != null)
             {
-                var referenceBook = book ?? sheet?.Book;
-
-                return referenceBook != null
-                    ? new(
-                        referenceBook.Sheets[rangeReference.SheetName],
-                        rangeReference.TopLeft,
-                        rangeReference.BottomRight)
-                    : throw new NotImplementedException();
+                return new(
+                    sheet.Book.Sheets[rangeReference.SheetName],
+                    rangeReference.TopLeft,
+                    rangeReference.BottomRight);
             }
 
             return this[rangeReference.TopLeft, rangeReference.BottomRight];
@@ -118,15 +99,9 @@ public class CellRangeCollection
             return true;
         }
 
-        if (sheet?.TryResolveNamedRange(reference, out var sheetRange) == true)
+        if (sheet.TryResolveNamedRange(reference, out var sheetRange))
         {
             range = namedRangeCache.GetValue(reference, () => sheetRange);
-            return true;
-        }
-
-        if (book?.TryResolveNamedRange(reference, out var bookRange) == true)
-        {
-            range = namedRangeCache.GetValue(reference, () => bookRange);
             return true;
         }
 
