@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Marimo.SpreadSheetAsData;
 
@@ -105,7 +105,7 @@ sealed class WorkbookDataMapper(Workbook book)
     static void ReplaceTableRows(Table table, Type rowType, object? rows) =>
         (
             from method in typeof(Table<>).MakeGenericType(rowType).GetMethods()
-            where method.Name == nameof(Table<object>.Replace)
+            where method.Name == nameof(Table<>.Replace)
             select method
         ).Single()
         .Invoke(
