@@ -42,6 +42,15 @@ public class Range参照のテスト : IDisposable
     }
 
     [Fact]
+    public void WorksheetのRangeはシート名の有無によらず同じ範囲を取得します()
+    {
+        var qualified = sheet2.Range["Sheet2!C32:D36"];
+        var unqualified = sheet2.Range["C32:D36"];
+
+        qualified.Should().BeSameAs(unqualified);
+    }
+
+    [Fact]
     public void WorkbookのRangeは参照先シートを特定できないA1形式の範囲参照を拒否します()
     {
         var action = () => book.Range["C32:D36"];

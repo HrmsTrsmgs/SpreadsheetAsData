@@ -75,10 +75,10 @@ public class CellRangeCollection
 
             if (rangeReference.SheetName != null)
             {
-                return new(
-                    sheet.Book.Sheets[rangeReference.SheetName],
+                return sheet.Book.Range[
+                    rangeReference.SheetName,
                     rangeReference.TopLeft,
-                    rangeReference.BottomRight);
+                    rangeReference.BottomRight];
             }
 
             return this[rangeReference.TopLeft, rangeReference.BottomRight];
