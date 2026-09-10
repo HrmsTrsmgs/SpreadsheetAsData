@@ -43,7 +43,7 @@ readonly partial struct CellRangeReference
     public static CellRangeReference Parse(string reference) =>
         TryParse(reference, out var result)
             ? result
-            : throw new NotImplementedException();
+            : throw new FormatException();
 
     [GeneratedRegex(
 @"^\$?[A-Z]+\$?\d+$")]

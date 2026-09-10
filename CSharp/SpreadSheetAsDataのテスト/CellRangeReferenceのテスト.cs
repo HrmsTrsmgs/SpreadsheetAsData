@@ -96,6 +96,14 @@ public class CellRangeReferenceのテスト
         tested.BottomRight.Should().Be(CellName.Parse("A1"));
     }
 
+    [Fact]
+    public void ParseはA1形式でない範囲参照を指定した場合に失敗します()
+    {
+        var action = () => CellRangeReference.Parse("A1:B2:C3");
+
+        action.Should().Throw<FormatException>();
+    }
+
     [Theory]
     [InlineData("abc:def")]
     [InlineData("A$$1:B2")]
