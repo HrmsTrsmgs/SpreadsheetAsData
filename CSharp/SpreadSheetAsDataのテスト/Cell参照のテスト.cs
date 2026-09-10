@@ -88,7 +88,7 @@ public class Cell参照のテスト : IDisposable
         fromCell.Should().BeSameAs(fromCells);
     }
 
-    [Fact(Skip = "Cells経由のCellName指定は確認済みだが、Cell経由でも同じセルを返すことは未レビューのため、取得APIの確認時に解除する。")]
+    [Fact]
     public void WorksheetのCellはCellNameからCellsと同じセルを取得します()
     {
         var fromCell = sheet2.Cell[CellName.Parse("F33")];
