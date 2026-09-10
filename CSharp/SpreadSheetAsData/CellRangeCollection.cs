@@ -63,13 +63,17 @@ public class CellRangeCollection
     public CellRange this[CellName topLeft, CellName bottomRight] =>
         cache.GetValue(
             (topLeft, bottomRight),
-            () => new CellRange(sheet, topLeft, bottomRight));
+            () => new CellRange(
+                sheet ?? throw new InvalidOperationException(),
+                topLeft,
+                bottomRight));
 
     /// <summary>
     /// A1形式または名前による範囲参照からセル範囲を取得します。
     /// </summary>
     /// <param name="reference">解決する範囲参照。</param>
     /// <returns>指定した範囲参照が表すセル範囲。</returns>
+    /// <exception cref="InvalidOperationException">参照先のワークシートを特定できない場合。</exception>
     public CellRange this[string reference]
     {
         get

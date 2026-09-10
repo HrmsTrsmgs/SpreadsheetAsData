@@ -42,6 +42,14 @@ public class Range参照のテスト : IDisposable
     }
 
     [Fact]
+    public void WorkbookのRangeは参照先シートを特定できないA1形式の範囲参照を拒否します()
+    {
+        var action = () => book.Range["C32:D36"];
+
+        action.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
     public void WorkbookのRangeはシート名付きA1形式の範囲参照から範囲を取得します()
     {
         var tested = book.Range["Sheet2!C32:D36"];
