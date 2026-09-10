@@ -38,6 +38,22 @@ public class Cell参照のテスト : IDisposable
     }
 
     [Fact]
+    public void Cellは存在しないブックスコープの名前を指定した場合に失敗します()
+    {
+        var action = () => book.Cell["not_found"];
+
+        action.Should().Throw<KeyNotFoundException>();
+    }
+
+    [Fact]
+    public void Cellは存在しないワークシートスコープの名前を指定した場合に失敗します()
+    {
+        var action = () => sheet2.Cell["not_found"];
+
+        action.Should().Throw<KeyNotFoundException>();
+    }
+
+    [Fact]
     public void Cellはブックスコープの複数セル名では失敗します()
     {
         var action = () => book.Cell["book_range"];

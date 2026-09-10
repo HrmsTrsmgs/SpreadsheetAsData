@@ -166,12 +166,10 @@ public class Workbook : IDisposable
     internal bool TryResolveNamedRange(string name, uint localSheetId, out CellRange range) =>
         TryResolveNamedRange(name, (uint?)localSheetId, out range);
 
-    CellRange ResolveNamedRange(string name, uint? localSheetId)
-    {
-        return TryResolveNamedRange(name, localSheetId, out var range)
+    CellRange ResolveNamedRange(string name, uint? localSheetId) =>
+        TryResolveNamedRange(name, localSheetId, out var range)
             ? range
-            : throw new NotImplementedException();
-    }
+            : throw new KeyNotFoundException();
 
     bool TryResolveNamedRange(string name, uint? localSheetId, out CellRange range)
     {
