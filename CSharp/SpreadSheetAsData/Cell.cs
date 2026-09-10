@@ -25,7 +25,7 @@ public class Cell
     /// </summary>
     /// <param name="sheet">セルが属するワークシート。</param>
     /// <param name="cellReference">A1 形式のセル参照。</param>
-    public Cell(Worksheet sheet, string cellReference) :
+    internal Cell(Worksheet sheet, string cellReference) :
         this(
             sheet,
             new Spreadsheet.Cell(new Value { })

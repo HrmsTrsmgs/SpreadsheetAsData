@@ -26,14 +26,6 @@ public class CellRange
     readonly CellName topLeft;
 
     /// <summary>
-    /// 指定した左上セルと右下セルでセル範囲を作成します。
-    /// </summary>
-    /// <param name="topLeft">範囲の左上セル参照。</param>
-    /// <param name="bottomRight">範囲の右下セル参照。</param>
-    public CellRange(CellName topLeft, CellName bottomRight) : this(null, topLeft, bottomRight)
-    { }
-
-    /// <summary>
     /// 指定したワークシート上の左上セルと右下セルでセル範囲を作成します。
     /// </summary>
     /// <param name="sheet">範囲が属するワークシート。</param>

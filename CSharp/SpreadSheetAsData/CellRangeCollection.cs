@@ -26,12 +26,6 @@ public class CellRangeCollection
     readonly Worksheet? sheet;
 
     /// <summary>
-    /// 親を持たないセル範囲コレクションを作成します。
-    /// </summary>
-    public CellRangeCollection()
-    { }
-
-    /// <summary>
     /// 指定したブック上のセル範囲コレクションを作成します。
     /// </summary>
     /// <param name="book">範囲参照を解決するブック。</param>
