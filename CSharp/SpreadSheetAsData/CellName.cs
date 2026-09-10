@@ -92,7 +92,8 @@ public partial struct CellName : IEquatable<CellName>
     public static bool TryParse(string name, out CellName cellName)
     {
         var match = CellNamePattern.Match(name);
-        if (!match.Success || uint.Parse(match.Groups["row"].Value) == 0)
+        if (!match.Success
+            || uint.Parse(match.Groups["row"].Value) is < 1 or > MaxRowIndex)
         {
             cellName = default;
             return false;

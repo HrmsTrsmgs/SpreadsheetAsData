@@ -30,6 +30,12 @@ public class CellNameのテスト
     }
 
     [Fact]
+    public void TryParseは最大行番号を超える場合にfalseを返します()
+    {
+        CellName.TryParse("A1048577", out _).Should().BeFalse();
+    }
+
+    [Fact]
     public void ParseメソッドでCellNameが生成できます()
     {
         FluentActions.Invoking(
