@@ -91,6 +91,12 @@ public partial struct CellName : IEquatable<CellName>
     /// <returns>変換できた場合はtrue。</returns>
     public static bool TryParse(string name, out CellName cellName)
     {
+        if (!CellNamePattern.IsMatch(name))
+        {
+            cellName = default;
+            return false;
+        }
+
         cellName = Parse(name);
         return true;
     }

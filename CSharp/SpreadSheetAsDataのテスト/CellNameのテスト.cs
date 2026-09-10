@@ -17,7 +17,7 @@ public class CellNameのテスト
         tested.Should().Be(new CellName(3, 3));
     }
 
-    [Fact(Skip = "TryParseの正常系を先に確認しているため、不正形式をfalseで返す仕様のレビュー後に解除する。")]
+    [Fact]
     public void TryParseはA1形式でない文字列の場合にfalseを返します()
     {
         CellName.TryParse("cell_name", out _).Should().BeFalse();
