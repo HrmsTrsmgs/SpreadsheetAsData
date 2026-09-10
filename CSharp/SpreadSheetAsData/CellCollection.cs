@@ -48,7 +48,7 @@ public class CellCollection
             {
                 try
                 {
-                    return GetItem(CellName.Parse(cellReference));
+                    return sheet.ResolveCell(CellName.Parse(cellReference));
                 }
                 catch (FormatException)
                 {
@@ -56,7 +56,7 @@ public class CellCollection
                 }
             }
 
-            return GetItem(CellName.Parse(cellReference));
+            return sheet.ResolveCell(CellName.Parse(cellReference));
         }
     }
 
@@ -67,19 +67,12 @@ public class CellCollection
     /// <param name="rowIndex">1 始まりの行番号。</param>
     /// <returns>指定したセル。</returns>
     public Cell this[uint columnIndex, uint rowIndex] =>
-        GetItem(new CellName(columnIndex, rowIndex));
+        sheet.ResolveCell(new CellName(columnIndex, rowIndex));
 
     /// <summary>
     /// セル参照でセルを取得します。
     /// </summary>
     /// <param name="cellName">取得するセル参照。</param>
     /// <returns>指定したセル。</returns>
-    public Cell this[CellName cellName] => GetItem(cellName);
-
-    /// <summary>
-    /// ワークシートの共通キャッシュを使うセル解決へ委譲します。
-    /// </summary>
-    /// <param name="cellName">取得するセル参照。</param>
-    /// <returns>指定したセル。</returns>
-    Cell GetItem(CellName cellName) => sheet.ResolveCell(cellName);
+    public Cell this[CellName cellName] => sheet.ResolveCell(cellName);
 }
