@@ -37,6 +37,24 @@ public class Cell参照のテスト : IDisposable
         tested.Should().BeSameAs(sheet2.Cells["E25"]);
     }
 
+    [Fact(Skip = "ブックからシート名と列・行番号で取得するAPIは仕様レビュー待ち。取得先とセルの同一性を確認してから実装する。")]
+    public void WorkbookのCellはシート名と列番号と行番号からWorksheetと同じセルを取得します()
+    {
+        var fromBook = book.Cell["Sheet2", 6, 33];
+        var fromWorksheet = sheet2.Cells["F33"];
+
+        fromBook.Should().BeSameAs(fromWorksheet);
+    }
+
+    [Fact(Skip = "ブックからシート名とCellNameで取得するAPIは仕様レビュー待ち。列・行番号指定の確認後にこの取得方法を確認する。")]
+    public void WorkbookのCellはシート名とCellNameからWorksheetと同じセルを取得します()
+    {
+        var fromBook = book.Cell["Sheet2", CellName.Parse("F33")];
+        var fromWorksheet = sheet2.Cells["F33"];
+
+        fromBook.Should().BeSameAs(fromWorksheet);
+    }
+
     [Fact]
     public void Cellは存在しないブックスコープの名前を指定した場合に失敗します()
     {
