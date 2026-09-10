@@ -15,8 +15,9 @@ static class GeneratedSourceCompiler
     /// 指定したC#ソースコードを、SpreadsheetAsData本体を参照したアセンブリとしてコンパイルします。
     /// </summary>
     /// <param name="sources">コンパイルするC#ソースコード。</param>
+    /// <param name="warningsAsErrors">エラーとして扱う警告ID。</param>
     /// <returns>コンパイルしたアセンブリ。</returns>
-    internal static Assembly Compile(IEnumerable<string> sources)
+    internal static Assembly Compile(IEnumerable<string> sources, string[]? warningsAsErrors = null)
     {
         var syntaxTrees =
             from source in sources
@@ -26,7 +27,11 @@ static class GeneratedSourceCompiler
             $"SpreadsheetAsData.Generated.{Guid.NewGuid():N}",
             syntaxTrees,
             References,
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+            new CSharpCompilationOptions(
+                OutputKind.DynamicallyLinkedLibrary,
+                specificDiagnosticOptions:
+                    from id in warningsAsErrors ?? []
+                    select new KeyValuePair<string, ReportDiagnostic>(id, ReportDiagnostic.Error)));
 
         using var stream = new MemoryStream();
         var result = compilation.Emit(stream);
@@ -66,5 +71,3 @@ static class GeneratedSourceCompiler
             ?.Split(Path.PathSeparator)
             ?? [];
 }
-
-

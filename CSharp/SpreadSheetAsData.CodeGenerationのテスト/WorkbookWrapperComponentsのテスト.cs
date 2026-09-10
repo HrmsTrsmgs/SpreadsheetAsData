@@ -77,13 +77,13 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     /// <summary>
                     /// Excelブック全体のデータを読み込みます。
                     /// </summary>
-                    public new BasicStructureData Read() =>
+                    public BasicStructureData Read() =>
                         base.Read<BasicStructureData>();
 
                     /// <summary>
                     /// Excelブック全体のデータを置換します。
                     /// </summary>
-                    public new void Replace(BasicStructureData data) =>
+                    public void Replace(BasicStructureData data) =>
                         base.Replace(data);
 
                     /// <summary>

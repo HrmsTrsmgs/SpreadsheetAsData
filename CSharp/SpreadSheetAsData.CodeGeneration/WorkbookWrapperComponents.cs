@@ -71,13 +71,13 @@ static class WorkbookWrapperComponents
             /// <summary>
             /// Excelブック全体のデータを読み込みます。
             /// </summary>
-            public new {{bookFileIdentifier}}Data Read() =>
+            public {{bookFileIdentifier}}Data Read() =>
                 base.Read<{{bookFileIdentifier}}Data>();
 
             /// <summary>
             /// Excelブック全体のデータを置換します。
             /// </summary>
-            public new void Replace({{bookFileIdentifier}}Data data) =>
+            public void Replace({{bookFileIdentifier}}Data data) =>
                 base.Replace(data);
         {{ForEach([
             .. from definedName in BookScopedDefinedNames(book)

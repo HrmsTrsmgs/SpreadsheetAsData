@@ -104,6 +104,16 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void 生成されたBookのReadとReplaceはCS0109をエラーとしてもコンパイルできます()
+    {
+        var action = () => GeneratedSourceCompiler.Compile(
+            GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath),
+            warningsAsErrors: ["CS0109"]);
+
+        action.Should().NotThrow();
+    }
+
+    [Fact]
     public void 生成されたBookはDataを型引数なしで読み込みます()
     {
         using var book = GeneratedCodeInspection
