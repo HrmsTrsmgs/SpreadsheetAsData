@@ -33,6 +33,14 @@ public class Range参照のテスト : IDisposable
     }
 
     [Fact]
+    public void Rangeは無効なA1形式の範囲参照を指定した場合に失敗します()
+    {
+        var action = () => _ = sheet2.Range["A1:B2:C3"];
+
+        action.Should().Throw<FormatException>();
+    }
+
+    [Fact]
     public void Rangeはブックスコープの名前参照から名前付き範囲を取得します()
     {
         var tested = book.Range["book_range"];

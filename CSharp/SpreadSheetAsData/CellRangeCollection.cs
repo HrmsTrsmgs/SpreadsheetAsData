@@ -87,7 +87,7 @@ public class CellRangeCollection
 
             if (!CellRangeReference.TryParse(reference, out var rangeReference))
             {
-                throw new NotImplementedException();
+                throw new FormatException();
             }
 
             if (rangeReference.SheetName != null)
