@@ -76,7 +76,7 @@ public class Range参照のテスト : IDisposable
         fromBook.Should().BeSameAs(fromWorksheet);
     }
 
-    [Fact(Skip = "ブックからシート名と両端のCellNameで取得するAPIは仕様レビュー待ち。A1形式の両端指定の確認後にこの取得方法を確認する。")]
+    [Fact]
     public void WorkbookのRangeはシート名と両端のCellNameからWorksheetと同じ範囲を取得します()
     {
         var fromBook = book.Range["Sheet2", CellName.Parse("C32"), CellName.Parse("D36")];

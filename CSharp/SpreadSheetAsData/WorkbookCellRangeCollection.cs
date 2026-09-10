@@ -71,5 +71,5 @@ public class WorkbookCellRangeCollection
     /// <param name="bottomRight">範囲の右下セル参照。</param>
     /// <returns>指定したシート上のセル範囲。</returns>
     public CellRange this[string sheetName, CellName topLeft, CellName bottomRight] =>
-        throw new NotImplementedException();
+        book.Sheets[sheetName].Range[topLeft, bottomRight];
 }
