@@ -59,6 +59,15 @@ public class Range参照のテスト : IDisposable
     }
 
     [Fact]
+    public void WorkbookのRangeはシート名付きA1形式の範囲参照からWorksheetと同じ範囲を取得します()
+    {
+        var fromBook = book.Range["Sheet2!C32:D36"];
+        var fromWorksheet = sheet2.Range["C32", "D36"];
+
+        fromBook.Should().BeSameAs(fromWorksheet);
+    }
+
+    [Fact]
     public void WorksheetのRangeは別シートを指定したA1形式の範囲参照から範囲を取得します()
     {
         var tested = book.Sheets["Sheet1"].Range["Sheet2!C32:D36"];

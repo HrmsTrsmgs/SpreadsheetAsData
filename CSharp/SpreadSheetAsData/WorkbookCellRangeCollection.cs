@@ -46,10 +46,10 @@ public class WorkbookCellRangeCollection
                 throw new FormatException();
             }
 
-            return new(
-                book.Sheets[rangeReference.SheetName ?? throw new InvalidOperationException()],
+            return this[
+                rangeReference.SheetName ?? throw new InvalidOperationException(),
                 rangeReference.TopLeft,
-                rangeReference.BottomRight);
+                rangeReference.BottomRight];
         }
     }
 
