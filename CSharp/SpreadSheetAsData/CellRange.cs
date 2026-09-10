@@ -18,7 +18,7 @@ public class CellRange
     /// <summary>
     /// 範囲のセル解決に使用するワークシートです。
     /// </summary>
-    readonly Worksheet? sheet;
+    readonly Worksheet sheet;
 
     /// <summary>
     /// <see cref="ToString"/> で A1 形式の範囲を復元するための左上セル参照です。
@@ -32,7 +32,7 @@ public class CellRange
     /// <param name="topLeft">範囲の左上セル参照。</param>
     /// <param name="bottomRight">範囲の右下セル参照。</param>
     /// <param name="name">名前付き範囲として取得された場合の名前。</param>
-    internal CellRange(Worksheet? sheet, CellName topLeft, CellName bottomRight, string? name = null)
+    internal CellRange(Worksheet sheet, CellName topLeft, CellName bottomRight, string? name = null)
     {
         this.sheet = sheet;
         this.topLeft = topLeft;
@@ -48,8 +48,7 @@ public class CellRange
     /// <summary>
     /// 範囲の左上セルを取得します。
     /// </summary>
-    public Cell TopLeftCell =>
-        (sheet ?? throw new NotImplementedException()).Cells[topLeft.ToString()];
+    public Cell TopLeftCell => sheet.Cells[topLeft.ToString()];
 
     /// <summary>
     /// 範囲が単一セルを表す場合に、そのセルを取得します。
@@ -62,8 +61,7 @@ public class CellRange
     /// <summary>
     /// 範囲の右下セルを取得します。
     /// </summary>
-    public Cell BottomRightCell =>
-        (sheet ?? throw new NotImplementedException()).Cells[bottomRight.ToString()];
+    public Cell BottomRightCell => sheet.Cells[bottomRight.ToString()];
 
     /// <summary>
     /// 範囲内のセル値を、左上から右下へ向かう行ごとの列挙として取得または設定します。
@@ -78,9 +76,7 @@ public class CellRange
                 from columnIndex in Enumerable.Range(
                     (int)topLeft.ColumnIndex,
                     (int)(bottomRight.ColumnIndex - topLeft.ColumnIndex + 1))
-                select (object?)(sheet ?? throw new NotImplementedException())
-                    .Cells[(uint)columnIndex, (uint)rowIndex]
-                    .Value;
+                select (object?)sheet.Cells[(uint)columnIndex, (uint)rowIndex].Value;
         set
         {
             var rows = value.Select(it => it.ToArray()).ToArray();
@@ -98,8 +94,7 @@ public class CellRange
                     from row in rows.WithIndex((int)topLeft.RowIndex)
                     from item in row.Value.WithIndex((int)topLeft.ColumnIndex)
                     select (
-                        Cell: (sheet ?? throw new NotImplementedException())
-                            .Cells[(uint)item.Index, (uint)row.Index],
+                        Cell: sheet.Cells[(uint)item.Index, (uint)row.Index],
                         Value: item.Value)
                 ))
             {
