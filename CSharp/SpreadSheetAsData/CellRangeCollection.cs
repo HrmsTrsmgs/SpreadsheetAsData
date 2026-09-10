@@ -92,9 +92,11 @@ public class CellRangeCollection
 
             if (rangeReference.SheetName != null)
             {
-                return book != null
+                var referenceBook = book ?? sheet?.Book;
+
+                return referenceBook != null
                     ? new(
-                        book.Sheets[rangeReference.SheetName],
+                        referenceBook.Sheets[rangeReference.SheetName],
                         rangeReference.TopLeft,
                         rangeReference.BottomRight)
                     : throw new NotImplementedException();

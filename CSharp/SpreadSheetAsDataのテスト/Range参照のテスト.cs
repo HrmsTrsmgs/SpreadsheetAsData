@@ -33,6 +33,33 @@ public class Range参照のテスト : IDisposable
     }
 
     [Fact]
+    public void WorksheetのRangeはシート名付きA1形式の範囲参照から範囲を取得します()
+    {
+        var tested = sheet2.Range["Sheet2!C32:D36"];
+
+        tested.TopLeftCell.Should().BeSameAs(sheet2.Cells["C32"]);
+        tested.BottomRightCell.Should().BeSameAs(sheet2.Cells["D36"]);
+    }
+
+    [Fact]
+    public void WorkbookのRangeはシート名付きA1形式の範囲参照から範囲を取得します()
+    {
+        var tested = book.Range["Sheet2!C32:D36"];
+
+        tested.TopLeftCell.Should().BeSameAs(sheet2.Cells["C32"]);
+        tested.BottomRightCell.Should().BeSameAs(sheet2.Cells["D36"]);
+    }
+
+    [Fact]
+    public void WorksheetのRangeは別シートを指定したA1形式の範囲参照から範囲を取得します()
+    {
+        var tested = book.Sheets["Sheet1"].Range["Sheet2!C32:D36"];
+
+        tested.TopLeftCell.Should().BeSameAs(sheet2.Cells["C32"]);
+        tested.BottomRightCell.Should().BeSameAs(sheet2.Cells["D36"]);
+    }
+
+    [Fact]
     public void Rangeは無効なA1形式の範囲参照を指定した場合に失敗します()
     {
         var action = () => _ = sheet2.Range["A1:B2:C3"];
