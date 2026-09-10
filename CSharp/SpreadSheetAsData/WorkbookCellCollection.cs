@@ -42,5 +42,5 @@ public class WorkbookCellCollection
     /// <param name="cellName">取得するセル参照。</param>
     /// <returns>指定したシート上のセル。</returns>
     public Cell this[string sheetName, CellName cellName] =>
-        throw new NotImplementedException();
+        book.Sheets[sheetName].Cells[cellName];
 }

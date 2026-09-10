@@ -46,7 +46,7 @@ public class Cell参照のテスト : IDisposable
         fromBook.Should().BeSameAs(fromWorksheet);
     }
 
-    [Fact(Skip = "ブックからシート名とCellNameで取得するAPIは仕様レビュー待ち。列・行番号指定の確認後にこの取得方法を確認する。")]
+    [Fact]
     public void WorkbookのCellはシート名とCellNameからWorksheetと同じセルを取得します()
     {
         var fromBook = book.Cell["Sheet2", CellName.Parse("F33")];
