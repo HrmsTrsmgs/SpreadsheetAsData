@@ -8,6 +8,11 @@ namespace Marimo.SpreadSheetAsData;
 public class Worksheet
 {
     /// <summary>
+    /// CellとCellsのどちらから取得しても同じセルを返すための共有キャッシュです。
+    /// </summary>
+    readonly Dictionary<CellName, Cell> cellCache = [];
+
+    /// <summary>
     /// ブックから作成されたワークシートだけが保持する親ブックです。
     /// </summary>
     readonly Workbook? book;
@@ -83,11 +88,19 @@ public class Worksheet
             ?? throw new InvalidOperationException();
 
     /// <summary>
-    /// キャッシュに存在しないセルを、既存の Open XML セルまたは空白セルとして解決します。
+    /// 取得経路によらず、同じセル参照に対して同じインスタンスを返します。
     /// </summary>
     /// <param name="cellName">取得するセル参照。</param>
     /// <returns>指定したセル。</returns>
-    internal Cell ResolveCell(CellName cellName)
+    internal Cell ResolveCell(CellName cellName) =>
+        cellCache.GetValue(cellName, () => CreateCell(cellName));
+
+    /// <summary>
+    /// キャッシュに存在しないセルを、既存の Open XML セルまたは空白セルとして作成します。
+    /// </summary>
+    /// <param name="cellName">取得するセル参照。</param>
+    /// <returns>指定したセル。</returns>
+    Cell CreateCell(CellName cellName)
     {
         var cellReference = cellName.ToString();
         var cellXml =

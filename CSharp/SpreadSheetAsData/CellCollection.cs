@@ -7,11 +7,6 @@ namespace Marimo.SpreadSheetAsData;
 public class CellCollection
 {
     /// <summary>
-    /// 同じセル参照に対して同じ <see cref="Cell"/> インスタンスを返すためのキャッシュです。
-    /// </summary>
-    readonly Dictionary<CellName, Cell> cache = [];
-
-    /// <summary>
     /// ワークシートスコープの名前参照を解決するかどうかを表します。
     /// </summary>
     readonly bool resolvesWorksheetNames;
@@ -82,12 +77,9 @@ public class CellCollection
     public Cell this[CellName cellName] => GetItem(cellName);
 
     /// <summary>
-    /// キャッシュを確認してから、ワークシートへセル解決を委譲します。
+    /// ワークシートの共通キャッシュを使うセル解決へ委譲します。
     /// </summary>
     /// <param name="cellName">取得するセル参照。</param>
     /// <returns>指定したセル。</returns>
-    Cell GetItem(CellName cellName) =>
-        cache.GetValue(
-            cellName,
-            () => sheet.ResolveCell(cellName));
+    Cell GetItem(CellName cellName) => sheet.ResolveCell(cellName);
 }

@@ -79,7 +79,7 @@ public class Cell参照のテスト : IDisposable
         (tested.Value as object).Should().Be(9.9);
     }
 
-    [Fact(Skip = "Cells経由の座標取得は確認済みだが、Cell経由でも同じセルを返すことは未レビューのため、取得APIの確認時に解除する。")]
+    [Fact]
     public void WorksheetのCellは列番号と行番号からCellsと同じセルを取得します()
     {
         var fromCell = sheet2.Cell[6, 33];
