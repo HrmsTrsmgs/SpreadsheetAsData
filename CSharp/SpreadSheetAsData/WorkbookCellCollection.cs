@@ -33,7 +33,7 @@ public class WorkbookCellCollection
     /// <param name="rowIndex">1始まりの行番号。</param>
     /// <returns>指定したシート上のセル。</returns>
     public Cell this[string sheetName, uint columnIndex, uint rowIndex] =>
-        throw new NotImplementedException();
+        book.Sheets[sheetName].Cells[columnIndex, rowIndex];
 
     /// <summary>
     /// シート名とセル参照からセルを取得します。
