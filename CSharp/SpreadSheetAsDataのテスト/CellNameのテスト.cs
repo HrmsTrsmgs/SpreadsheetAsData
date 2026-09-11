@@ -36,6 +36,12 @@ public class CellNameのテスト
     }
 
     [Fact]
+    public void TryParseは最大列番号を超える場合にfalseを返します()
+    {
+        CellName.TryParse("XFE1", out _).Should().BeFalse();
+    }
+
+    [Fact]
     public void ParseメソッドでCellNameが生成できます()
     {
         FluentActions.Invoking(
