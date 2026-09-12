@@ -263,6 +263,24 @@ public sealed class 型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void Replaceは文字列プロパティの空文字列を空白セルとして書き込みます()
+    {
+        using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
+
+        book.ReadTable<StringOnlyRow>(MappingTableName)
+            .Replace(
+                [
+                    new StringOnlyRow { TextValue = "" },
+                    new StringOnlyRow { TextValue = " " },
+                    new StringOnlyRow { TextValue = "text" }
+                ]);
+
+        book.Tables[MappingTableName].Rows
+            .Select(it => it["文字列"].Value as object)
+            .Should().Equal(new BlankValue(), " ", "text");
+    }
+
+    [Fact]
     public void Replaceは属性がないプロパティ名を列名として使用します()
     {
         var filePath = temporaryFiles.Copy("テーブル.xlsx");

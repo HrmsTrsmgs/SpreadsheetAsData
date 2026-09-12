@@ -340,7 +340,7 @@ public class Table<T> : Table, IEnumerable<T>
         object? sourceValue,
         out object? converted)
     {
-        if (sourceValue is null)
+        if (sourceValue is null or "")
         {
             converted = null;
             return true;
