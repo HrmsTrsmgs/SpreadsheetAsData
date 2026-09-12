@@ -152,6 +152,26 @@ public sealed class コード生成型推論のテスト
     }
 
     [Fact]
+    public void 文字列値と空白を持つ列をstringプロパティとして生成します()
+    {
+        using var temporaryFiles = new TemporaryExcelFiles();
+        var excelFilePath = temporaryFiles.Copy(@"TestData\テーブル.xlsx");
+        using (var book = Workbook.Open(excelFilePath))
+        {
+            book.Tables["型付き行マッピング"].Rows.First()["文字列"].Value = null;
+            book.Save();
+        }
+
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(excelFilePath))
+            .GeneratedType("型付き行マッピング")
+            .GetProperty("文字列");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(typeof(string));
+    }
+
+    [Fact]
     public void 真偽値だけを持つ列をboolプロパティとして生成します()
     {
         var tested = GeneratedCodeInspection
