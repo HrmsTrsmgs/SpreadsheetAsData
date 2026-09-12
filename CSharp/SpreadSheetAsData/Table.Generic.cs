@@ -304,7 +304,9 @@ public class Table<T> : Table, IEnumerable<T>
         out object? converted)
     {
         if (sourceValue is BlankValue
-            && (propertyType == typeof(double?) || propertyType == typeof(int?)))
+            && (propertyType == typeof(double?)
+                || propertyType == typeof(int?)
+                || propertyType == typeof(bool?)))
         {
             converted = null;
             return true;
