@@ -182,6 +182,14 @@ public class CellNameのテスト
     }
 
     [Fact]
+    public void Parseはuintに収まらない行番号の場合にFormatExceptionを投げます()
+    {
+        var action = () => CellName.Parse("A4294967296");
+
+        action.Should().Throw<FormatException>();
+    }
+
+    [Fact]
     public void コンストラクタに大きすぎる行番号を指定した場合はFormatExceptionを投げます()
     {
         FluentActions.Invoking(

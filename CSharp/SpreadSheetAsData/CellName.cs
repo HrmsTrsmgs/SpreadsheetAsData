@@ -44,12 +44,13 @@ public partial struct CellName : IEquatable<CellName>
     CellName(string name)
     {
         var match = CellNamePattern.Match(name);
-        if (!match.Success)
+        if (!match.Success
+            || !uint.TryParse(match.Groups["row"].Value, out var rowIndex))
         {
             throw new FormatException();
         }
         ColumnIndex = GetColumnIndex(match.Groups["column"].Value);
-        RowIndex = uint.Parse(match.Groups["row"].Value);
+        RowIndex = rowIndex;
 
         if (RowIndex is < 1 or > MaxRowIndex
             || ColumnIndex is > MaxColumnIndex)
