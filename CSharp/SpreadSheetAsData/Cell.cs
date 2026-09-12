@@ -68,7 +68,7 @@ public class Cell
             (CellValues.Boolean, _) => true,
             (CellValues.SharedString, _) => SharedStringValue,
             (CellValues.String, string text) => text,
-            (_, string text) => double.Parse(text),
+            (_, string text) => double.Parse(text, CultureInfo.InvariantCulture),
             _ => throw new InvalidOperationException()
         };
 
