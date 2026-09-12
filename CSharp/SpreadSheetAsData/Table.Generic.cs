@@ -272,7 +272,7 @@ public class Table<T> : Table, IEnumerable<T>
     /// <param name="row">書き込み先のテーブル行。</param>
     /// <param name="property">変換元プロパティ。</param>
     /// <returns>セルへ設定する値。</returns>
-    object ConvertValueToCellValue(
+    object? ConvertValueToCellValue(
         object? sourceValue,
         TableRow row,
         PropertyInfo property)
@@ -337,8 +337,14 @@ public class Table<T> : Table, IEnumerable<T>
     /// <returns>セルへ設定できる値に変換できた場合は true。</returns>
     static bool TryConvertValueToCellValue(
         object? sourceValue,
-        out object converted)
+        out object? converted)
     {
+        if (sourceValue is null)
+        {
+            converted = null;
+            return true;
+        }
+
         object? conversion = sourceValue switch
         {
             int number => (double)number,

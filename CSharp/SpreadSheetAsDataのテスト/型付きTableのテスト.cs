@@ -198,6 +198,24 @@ public sealed class 型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void Replaceはnullableなdoubleの値とnullを数値と空白として書き込みます()
+    {
+        using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
+
+        book.ReadTable<NullableDoubleRow>(MappingTableName)
+            .Replace(
+                [
+                    new NullableDoubleRow { FloatingPointValue = 1.5 },
+                    new NullableDoubleRow { FloatingPointValue = null },
+                    new NullableDoubleRow { FloatingPointValue = 3.5 }
+                ]);
+
+        book.Tables[MappingTableName].Rows
+            .Select(it => it["数値"].Value as object)
+            .Should().Equal(1.5, new BlankValue(), 3.5);
+    }
+
+    [Fact]
     public void Replaceは属性がないプロパティ名を列名として使用します()
     {
         var filePath = temporaryFiles.Copy("テーブル.xlsx");
