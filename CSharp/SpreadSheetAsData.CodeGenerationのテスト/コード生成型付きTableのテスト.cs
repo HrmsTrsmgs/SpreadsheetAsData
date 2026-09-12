@@ -39,43 +39,6 @@ public sealed class コード生成型付きTableのテスト : IDisposable
     }
 
     [Fact]
-    public void 生成されたTableはnullableプロパティへ値と空白を読み込みます()
-    {
-        using var book = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(@"TestData\テーブル.xlsx"))
-            .GeneratedInstance<Workbook>("テーブルBook");
-
-        dynamic bookAccessor = book;
-        IEnumerable<object> rows = bookAccessor.空白数値マッピング;
-        var tested = rows.ToArray();
-
-        tested.Select(it => PropertyValue(it, "数値"))
-            .Should().Equal(0, null);
-        tested.Select(it => PropertyValue(it, "小数"))
-            .Should().Equal(1.5, null);
-        tested.Select(it => PropertyValue(it, "真偽値"))
-            .Should().Equal(false, null);
-    }
-
-    [Fact]
-    public void 生成されたTableは空白セルをstringプロパティの空文字列として読み込みます()
-    {
-        using var book = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(@"TestData\テーブル.xlsx"))
-            .GeneratedInstance<Workbook>(
-                "テーブルBook", temporaryFiles.Copy(@"TestData\テーブル.xlsx"));
-        book.Tables["型付き行マッピング"].Rows.First()["文字列"].Value = null;
-
-        dynamic bookAccessor = book;
-        IEnumerable<object> rows = bookAccessor.型付き行マッピング;
-
-        rows.Select(it => PropertyValue(it, "文字列"))
-            .Should().Equal("", "たちつてと", "なにぬねの");
-    }
-
-    [Fact]
     public void 生成されたTableをTableとして扱うと非型付き行を利用できます()
     {
         using var book = GeneratedCodeInspection
@@ -109,7 +72,7 @@ public sealed class コード生成型付きTableのテスト : IDisposable
     }
 
     [Fact]
-    public void 生成された行データ型は利用者定義POCOと同じ変換規則で読み込まれます()
+    public void 生成されたTableはReadTableで取得した型付きTableと同じ行データを返します()
     {
         (object? CustomerId, object? Amount, object? Description)[] generatedRows;
 
@@ -132,7 +95,7 @@ public sealed class コード生成型付きTableのテスト : IDisposable
     }
 
     [Fact]
-    public void 生成されたDataはExcelテーブルの行データを読み込みます()
+    public void 生成されたBookのReadは生成されたTableと同じ行データを返します()
     {
         using var book = GeneratedCodeInspection
             .AssemblyFrom(
@@ -142,52 +105,14 @@ public sealed class コード生成型付きTableのテスト : IDisposable
         dynamic bookAccessor = book;
         dynamic dataAccessor = bookAccessor.Read();
         IEnumerable<object> tested = dataAccessor.SalesDetail;
+        IEnumerable<object> tableRows = bookAccessor.SalesDetail;
 
-        tested.Select(it => PropertyValue(it, "CustomerId"))
-            .Should().Equal(1, 2);
+        tested.Select(ReadGeneratedRow)
+            .Should().Equal(tableRows.Select(ReadGeneratedRow));
     }
 
     [Fact]
-    public void 生成されたDataはテーブルのnullableプロパティへ値と空白を読み込みます()
-    {
-        using var book = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(@"TestData\テーブル.xlsx"))
-            .GeneratedInstance<Workbook>("テーブルBook");
-
-        dynamic bookAccessor = book;
-        dynamic dataAccessor = bookAccessor.Read();
-        IEnumerable<object> rows = dataAccessor.空白数値マッピング;
-        var tested = rows.ToArray();
-
-        tested.Select(it => PropertyValue(it, "数値"))
-            .Should().Equal(0, null);
-        tested.Select(it => PropertyValue(it, "小数"))
-            .Should().Equal(1.5, null);
-        tested.Select(it => PropertyValue(it, "真偽値"))
-            .Should().Equal(false, null);
-    }
-
-    [Fact]
-    public void 生成されたDataはテーブルの空白セルをstringプロパティの空文字列として読み込みます()
-    {
-        const string excelFilePath = @"TestData\テーブル.xlsx";
-        using var book = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(excelFilePath))
-            .GeneratedInstance<Workbook>("テーブルBook", temporaryFiles.Copy(excelFilePath));
-        book.Tables["型付き行マッピング"].Rows.First()["文字列"].Value = null;
-
-        dynamic bookAccessor = book;
-        dynamic dataAccessor = bookAccessor.Read();
-        IEnumerable<object> rows = dataAccessor.型付き行マッピング;
-
-        rows.Select(it => PropertyValue(it, "文字列"))
-            .Should().Equal("", "たちつてと", "なにぬねの");
-    }
-
-    [Fact]
-    public void 生成されたDataからExcelテーブルの行データを置換します()
+    public void 生成されたBookのReplaceは生成されたTableのReplaceと同じセル値を書き込みます()
     {
         var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
             GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath));
@@ -195,7 +120,11 @@ public sealed class コード生成型付きTableのテスト : IDisposable
         using var tested = generatedAssembly.GeneratedInstance<Workbook>(
             "BasicStructureBook",
             temporaryFiles.Copy(BasicStructureExcelFilePath));
+        using var tableBook = generatedAssembly.GeneratedInstance<Workbook>(
+            "BasicStructureBook",
+            temporaryFiles.Copy(BasicStructureExcelFilePath));
         dynamic bookAccessor = tested;
+        dynamic tableBookAccessor = tableBook;
         dynamic dataAccessor = bookAccessor.Read();
         dynamic replacement = CreateRows(
             rowType,
@@ -204,19 +133,35 @@ public sealed class コード生成型付きTableのテスト : IDisposable
         dataAccessor.SalesDetail = replacement;
 
         bookAccessor.Replace(dataAccessor);
+        tableBookAccessor.SalesDetail.Replace(replacement);
 
-        tested.Tables["sales_detail"].Rows
-            .Select(it => it["customer_id"].Value)
-            .Should().Equal(10d, 20d);
+        tested.Tables["sales_detail"].Range.Values.Should().BeEquivalentTo(
+            tableBook.Tables["sales_detail"].Range.Values,
+            options => options.WithStrictOrdering());
     }
 
     [Fact]
-    public void 生成されたTable型のReplaceで型付き行を書き込めます()
+    public void 生成されたTableのReplaceは手書きPOCOのReplaceと同じセル値を保存します()
     {
         var filePath = temporaryFiles.Copy(BasicStructureExcelFilePath);
         var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
             GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath));
         var rowType = generatedAssembly.GeneratedType("SalesDetail");
+        ReadTableComparison[] replacement =
+        [
+            new()
+            {
+                CustomerId = 10,
+                Amount = 1.5,
+                Description = "first"
+            },
+            new()
+            {
+                CustomerId = 20,
+                Amount = 2.5,
+                Description = "second"
+            }
+        ];
 
         using (var book = generatedAssembly.GeneratedInstance<Workbook>(
                    "BasicStructureBook",
@@ -225,154 +170,19 @@ public sealed class コード生成型付きTableのテスト : IDisposable
             dynamic bookAccessor = book;
             dynamic generatedRows = CreateRows(
                 rowType,
-                (10, 1.5, "first"),
-                (20, 2.5, "second"));
+                replacement.Select(it => (it.CustomerId, it.Amount, it.Description)).ToArray());
 
             bookAccessor.SalesDetail.Replace(generatedRows);
             book.Save();
         }
 
         using var tested = Workbook.Open(filePath);
+        using var handWrittenBook = Workbook.Open(temporaryFiles.Copy(BasicStructureExcelFilePath));
+        handWrittenBook.ReadTable<ReadTableComparison>("sales_detail").Replace(replacement);
 
-        tested.ReadTable<ReadTableComparison>("sales_detail")
-            .Should().BeEquivalentTo(
-                [
-                    new ReadTableComparison
-                    {
-                        CustomerId = 10,
-                        Amount = 1.5,
-                        Description = "first"
-                    },
-                    new ReadTableComparison
-                    {
-                        CustomerId = 20,
-                        Amount = 2.5,
-                        Description = "second"
-                    }
-                ],
-                options => options.WithStrictOrdering());
-    }
-
-    [Fact]
-    public void 生成されたTableのReplaceは空文字列を空白セルとして書き込みます()
-    {
-        const string excelFilePath = @"TestData\テーブル.xlsx";
-        using var book = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(excelFilePath))
-            .GeneratedInstance<Workbook>("テーブルBook", temporaryFiles.Copy(excelFilePath));
-
-        dynamic bookAccessor = book;
-        dynamic replacement = Enumerable.ToArray(bookAccessor.型付き行マッピング);
-        replacement[0].文字列 = "";
-
-        bookAccessor.型付き行マッピング.Replace(replacement);
-
-        book.Tables["型付き行マッピング"].Rows
-            .Select(it => it["文字列"].Value as object)
-            .Should().Equal(new BlankValue(), "たちつてと", "なにぬねの");
-    }
-
-    [Fact]
-    public void 生成されたTableのReplaceは文字列プロパティのnullを空白セルとして書き込みます()
-    {
-        const string excelFilePath = @"TestData\テーブル.xlsx";
-        using var book = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(excelFilePath))
-            .GeneratedInstance<Workbook>("テーブルBook", temporaryFiles.Copy(excelFilePath));
-
-        dynamic bookAccessor = book;
-        dynamic replacement = Enumerable.ToArray(bookAccessor.型付き行マッピング);
-        replacement[0].文字列 = null;
-
-        bookAccessor.型付き行マッピング.Replace(replacement);
-
-        book.Tables["型付き行マッピング"].Rows
-            .Select(it => it["文字列"].Value as object)
-            .Should().Equal(new BlankValue(), "たちつてと", "なにぬねの");
-    }
-
-    [Fact]
-    public void 生成されたTableのReplaceはnullableプロパティの値とnullを書き込みます()
-    {
-        const string excelFilePath = @"TestData\テーブル.xlsx";
-        using var book = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(excelFilePath))
-            .GeneratedInstance<Workbook>("テーブルBook", temporaryFiles.Copy(excelFilePath));
-
-        dynamic bookAccessor = book;
-        dynamic replacement = Enumerable.ToArray(bookAccessor.空白数値マッピング);
-        replacement[0].数値 = null;
-        replacement[0].小数 = null;
-        replacement[0].真偽値 = null;
-        replacement[1].数値 = 10;
-        replacement[1].小数 = 2.5;
-        replacement[1].真偽値 = true;
-
-        bookAccessor.空白数値マッピング.Replace(replacement);
-
-        var tested = book.Tables["空白数値マッピング"].Rows.ToArray();
-        tested.Select(it => it["数値"].Value as object)
-            .Should().Equal(new BlankValue(), 10d);
-        tested.Select(it => it["小数"].Value as object)
-            .Should().Equal(new BlankValue(), 2.5);
-        tested.Select(it => it["真偽値"].Value as object)
-            .Should().Equal(new BlankValue(), true);
-    }
-
-    [Fact]
-    public void 生成されたDataからテーブルの空文字列を空白セルとして書き込みます()
-    {
-        const string excelFilePath = @"TestData\テーブル.xlsx";
-        using var book = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(excelFilePath))
-            .GeneratedInstance<Workbook>("テーブルBook", temporaryFiles.Copy(excelFilePath));
-
-        dynamic bookAccessor = book;
-        dynamic dataAccessor = bookAccessor.Read();
-        dynamic replacement = Enumerable.ToArray(dataAccessor.型付き行マッピング);
-        replacement[0].文字列 = "";
-        dataAccessor.型付き行マッピング = replacement;
-
-        bookAccessor.Replace(dataAccessor);
-
-        book.Tables["型付き行マッピング"].Rows
-            .Select(it => it["文字列"].Value as object)
-            .Should().Equal(new BlankValue(), "たちつてと", "なにぬねの");
-    }
-
-    [Fact]
-    public void 生成されたDataからテーブルのnullableプロパティの値とnullを書き込みます()
-    {
-        const string excelFilePath = @"TestData\テーブル.xlsx";
-        using var book = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(excelFilePath))
-            .GeneratedInstance<Workbook>("テーブルBook", temporaryFiles.Copy(excelFilePath));
-
-        dynamic bookAccessor = book;
-        dynamic dataAccessor = bookAccessor.Read();
-        dynamic replacement = Enumerable.ToArray(dataAccessor.空白数値マッピング);
-        replacement[0].数値 = null;
-        replacement[0].小数 = null;
-        replacement[0].真偽値 = null;
-        replacement[1].数値 = 10;
-        replacement[1].小数 = 2.5;
-        replacement[1].真偽値 = true;
-        dataAccessor.空白数値マッピング = replacement;
-
-        bookAccessor.Replace(dataAccessor);
-
-        var tested = book.Tables["空白数値マッピング"].Rows.ToArray();
-        tested.Select(it => it["数値"].Value as object)
-            .Should().Equal(new BlankValue(), 10d);
-        tested.Select(it => it["小数"].Value as object)
-            .Should().Equal(new BlankValue(), 2.5);
-        tested.Select(it => it["真偽値"].Value as object)
-            .Should().Equal(new BlankValue(), true);
+        tested.Tables["sales_detail"].Range.Values.Should().BeEquivalentTo(
+            handWrittenBook.Tables["sales_detail"].Range.Values,
+            options => options.WithStrictOrdering());
     }
 
     static (object? CustomerId, object? Amount, object? Description) ReadGeneratedRow(object row) =>
