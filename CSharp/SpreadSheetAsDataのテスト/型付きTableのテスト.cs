@@ -96,6 +96,14 @@ public sealed class 型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void 型付きTableは真偽値をnullableなboolプロパティへ読み込みます()
+    {
+        book.ReadTable<NullableBooleanRow>(MappingTableName)
+            .Select(it => it.BooleanValue)
+            .Should().Equal(false, true, false);
+    }
+
+    [Fact]
     public void 型付きTableはデータ行がない場合に空の列挙になります()
     {
         book.ReadTable<EmptyTableRow>("空行マッピング")
@@ -597,6 +605,12 @@ public sealed class 型付きTableのテスト : IDisposable
     {
         [SpreadSheetName("数値")]
         public int? IntegerValue { get; set; }
+    }
+
+    public sealed class NullableBooleanRow
+    {
+        [SpreadSheetName("真偽値")]
+        public bool? BooleanValue { get; set; }
     }
 
     public sealed class BooleanOnlyRow
