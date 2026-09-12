@@ -380,6 +380,11 @@ static class WorkbookWrapperComponents
             return "bool";
         }
 
+        if (values.All(it => it is bool or BlankValue))
+        {
+            return "bool?";
+        }
+
         return "object?";
     }
 
