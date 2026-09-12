@@ -80,6 +80,14 @@ public sealed class 型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void 型付きTableは整数値をnullableなintプロパティへ読み込みます()
+    {
+        book.ReadTable<NullableIntegerRow>(MappingTableName)
+            .Select(it => it.IntegerValue)
+            .Should().Equal(1, 2, 3);
+    }
+
+    [Fact]
     public void 型付きTableはデータ行がない場合に空の列挙になります()
     {
         book.ReadTable<EmptyTableRow>("空行マッピング")
@@ -569,6 +577,12 @@ public sealed class 型付きTableのテスト : IDisposable
     {
         [SpreadSheetName("数値")]
         public double? FloatingPointValue { get; set; }
+    }
+
+    public sealed class NullableIntegerRow
+    {
+        [SpreadSheetName("数値2")]
+        public int? IntegerValue { get; set; }
     }
 
     public sealed class BooleanOnlyRow

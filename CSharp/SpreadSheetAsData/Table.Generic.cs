@@ -311,7 +311,7 @@ public class Table<T> : Table, IEnumerable<T>
 
         object? conversion = (propertyType, sourceValue) switch
         {
-            ({ } type, double number) when type == typeof(int)
+            ({ } type, double number) when (type == typeof(int) || type == typeof(int?))
                 && double.IsInteger(number) => (int)number,
             ({ } type, double number) when type == typeof(double)
                 || type == typeof(double?) => number,
