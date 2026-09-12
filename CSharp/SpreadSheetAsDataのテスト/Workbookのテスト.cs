@@ -365,6 +365,41 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void Readはテーブルのnullableプロパティへ値と空白を読み込みます()
+    {
+        using var book = Workbook.Open(@"TestData\テーブル.xlsx");
+        var tested = book.Read<NullableWorkbookTableData>().空白数値マッピング.ToArray();
+
+        tested.Select(it => it.数値).Should().Equal(0, null);
+        tested.Select(it => it.小数).Should().Equal(1.5, null);
+        tested.Select(it => it.真偽値).Should().Equal(false, null);
+    }
+
+    [Fact]
+    public void Replaceはテーブルのnullableプロパティの値とnullを書き込みます()
+    {
+        using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
+
+        book.Replace(
+            new NullableWorkbookTableData
+            {
+                空白数値マッピング =
+                [
+                    new NullableTableRowData { 数値 = null, 小数 = null, 真偽値 = null },
+                    new NullableTableRowData { 数値 = 10, 小数 = 2.5, 真偽値 = true }
+                ]
+            });
+
+        var tested = book.Tables["空白数値マッピング"].Rows.ToArray();
+        tested.Select(it => it["数値"].Value as object)
+            .Should().Equal(new BlankValue(), 10d);
+        tested.Select(it => it["小数"].Value as object)
+            .Should().Equal(new BlankValue(), 2.5);
+        tested.Select(it => it["真偽値"].Value as object)
+            .Should().Equal(new BlankValue(), true);
+    }
+
+    [Fact]
     public void ReadはSpreadSheetName属性で指定したExcelテーブルから行データを読み込みます()
     {
         using var tested = Workbook.Open(@"TestData\テーブル.xlsx");
@@ -580,6 +615,18 @@ public class Workbookのテスト : IDisposable
     public sealed class WorkbookTableData
     {
         public IEnumerable<TestMappedRow> 型付き行マッピング { get; set; } = [];
+    }
+
+    public sealed class NullableWorkbookTableData
+    {
+        public IEnumerable<NullableTableRowData> 空白数値マッピング { get; set; } = [];
+    }
+
+    public sealed class NullableTableRowData
+    {
+        public int? 数値 { get; set; }
+        public double? 小数 { get; set; }
+        public bool? 真偽値 { get; set; }
     }
 
     public sealed class AttributedWorkbookTableData

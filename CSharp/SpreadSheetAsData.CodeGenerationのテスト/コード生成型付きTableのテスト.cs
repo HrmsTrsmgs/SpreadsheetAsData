@@ -247,6 +247,37 @@ public sealed class コード生成型付きTableのテスト : IDisposable
             .Should().Equal(new BlankValue(), true);
     }
 
+    [Fact]
+    public void 生成されたDataからテーブルのnullableプロパティの値とnullを書き込みます()
+    {
+        const string excelFilePath = @"TestData\テーブル.xlsx";
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(excelFilePath))
+            .GeneratedInstance<Workbook>("テーブルBook", temporaryFiles.Copy(excelFilePath));
+
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        dynamic replacement = Enumerable.ToArray(dataAccessor.空白数値マッピング);
+        replacement[0].数値 = null;
+        replacement[0].小数 = null;
+        replacement[0].真偽値 = null;
+        replacement[1].数値 = 10;
+        replacement[1].小数 = 2.5;
+        replacement[1].真偽値 = true;
+        dataAccessor.空白数値マッピング = replacement;
+
+        bookAccessor.Replace(dataAccessor);
+
+        var tested = book.Tables["空白数値マッピング"].Rows.ToArray();
+        tested.Select(it => it["数値"].Value as object)
+            .Should().Equal(new BlankValue(), 10d);
+        tested.Select(it => it["小数"].Value as object)
+            .Should().Equal(new BlankValue(), 2.5);
+        tested.Select(it => it["真偽値"].Value as object)
+            .Should().Equal(new BlankValue(), true);
+    }
+
     static (object? CustomerId, object? Amount, object? Description) ReadGeneratedRow(object row) =>
         (
             PropertyValue(row, "CustomerId"),
