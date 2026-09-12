@@ -134,6 +134,17 @@ public sealed class 型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void 型付きTableは空白セルをdoubleプロパティの0として読み込みます()
+    {
+        using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
+        book.Tables[MappingTableName].Rows.ElementAt(1)["数値"].Value = null;
+
+        book.ReadTable<TestMappedRow>(MappingTableName)
+            .Select(it => it.FloatingPointValue)
+            .Should().Equal(4.4, 0d, 6.6);
+    }
+
+    [Fact]
     public void 型付きTableはデータ行がない場合に空の列挙になります()
     {
         book.ReadTable<EmptyTableRow>("空行マッピング")

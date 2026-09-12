@@ -321,6 +321,7 @@ public class Table<T> : Table, IEnumerable<T>
             ({ } type, string text) when type == typeof(string) => text,
             ({ } type, BlankValue) when type == typeof(string) => "",
             ({ } type, BlankValue) when type == typeof(int) => 0,
+            ({ } type, BlankValue) when type == typeof(double) => 0d,
             ({ } type, bool boolean) when type == typeof(bool)
                 || type == typeof(bool?) => boolean,
             _ => null
