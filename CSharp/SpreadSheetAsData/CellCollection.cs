@@ -40,25 +40,12 @@ public class CellCollection
     /// </summary>
     /// <param name="cellReference">A1 形式のセル参照。</param>
     /// <returns>指定したセル。</returns>
-    public Cell this[string cellReference]
-    {
-        get
-        {
-            if (resolvesWorksheetNames)
-            {
-                try
-                {
-                    return sheet.ResolveCell(CellName.Parse(cellReference));
-                }
-                catch (FormatException)
-                {
-                    return sheet.ResolveNamedRange(cellReference).SingleCell;
-                }
-            }
-
-            return sheet.ResolveCell(CellName.Parse(cellReference));
-        }
-    }
+    public Cell this[string cellReference] =>
+        !resolvesWorksheetNames
+            ? sheet.ResolveCell(CellName.Parse(cellReference))
+        : CellName.TryParse(cellReference, out var cellName)
+            ? sheet.ResolveCell(cellName)
+        : sheet.ResolveNamedRange(cellReference).SingleCell;
 
     /// <summary>
     /// 列番号と行番号でセルを取得します。
