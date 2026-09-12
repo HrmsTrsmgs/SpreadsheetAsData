@@ -37,29 +37,6 @@ public partial struct CellName : IEquatable<CellName>
     public uint RowIndex { get; private set; }
 
     /// <summary>
-    /// A1 形式の文字列を列番号と行番号へ分解してセル参照を作成します。
-    /// </summary>
-    /// <param name="name">A1 形式のセル参照。</param>
-    /// <exception cref="FormatException">文字列がA1形式でない、または使用可能範囲を超えています。</exception>
-    CellName(string name)
-    {
-        var match = CellNamePattern.Match(name);
-        if (!match.Success
-            || !uint.TryParse(match.Groups["row"].Value, out var rowIndex))
-        {
-            throw new FormatException();
-        }
-        ColumnIndex = GetColumnIndex(match.Groups["column"].Value);
-        RowIndex = rowIndex;
-
-        if (RowIndex is < 1 or > MaxRowIndex
-            || ColumnIndex is > MaxColumnIndex)
-        {
-            throw new FormatException();
-        }
-    }
-
-    /// <summary>
     /// 列番号と行番号からセル参照を作成します。
     /// </summary>
     /// <param name="columnIndex">1 始まりの列番号。</param>
@@ -82,7 +59,10 @@ public partial struct CellName : IEquatable<CellName>
     /// <param name="name">A1 形式のセル参照。</param>
     /// <returns>変換したセル参照。</returns>
     /// <exception cref="FormatException">文字列がA1形式でない、または使用可能範囲を超えています。</exception>
-    public static CellName Parse(string name) => new(name);
+    public static CellName Parse(string name) =>
+        TryParse(name, out var cellName)
+            ? cellName
+            : throw new FormatException();
 
     /// <summary>
     /// A1形式の文字列をセル参照へ変換できるか確認します。
@@ -92,17 +72,22 @@ public partial struct CellName : IEquatable<CellName>
     /// <returns>変換できた場合はtrue。</returns>
     public static bool TryParse(string name, out CellName cellName)
     {
+        cellName = default;
         var match = CellNamePattern.Match(name);
         if (!match.Success
             || !uint.TryParse(match.Groups["row"].Value, out var rowIndex)
-            || rowIndex is < 1 or > MaxRowIndex
-            || GetColumnIndex(match.Groups["column"].Value) > MaxColumnIndex)
+            || rowIndex is < 1 or > MaxRowIndex)
         {
-            cellName = default;
             return false;
         }
 
-        cellName = Parse(name);
+        var columnIndex = GetColumnIndex(match.Groups["column"].Value);
+        if (columnIndex > MaxColumnIndex)
+        {
+            return false;
+        }
+
+        cellName = new(columnIndex, rowIndex);
         return true;
     }
 
