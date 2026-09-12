@@ -319,6 +319,7 @@ public class Table<T> : Table, IEnumerable<T>
             ({ } type, double number) when type == typeof(double)
                 || type == typeof(double?) => number,
             ({ } type, string text) when type == typeof(string) => text,
+            ({ } type, BlankValue) when type == typeof(string) => "",
             ({ } type, bool boolean) when type == typeof(bool)
                 || type == typeof(bool?) => boolean,
             _ => null

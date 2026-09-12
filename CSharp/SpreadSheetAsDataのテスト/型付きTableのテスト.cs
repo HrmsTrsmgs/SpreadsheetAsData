@@ -112,6 +112,17 @@ public sealed class 型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void 型付きTableは空白セルをstringプロパティの空文字列として読み込みます()
+    {
+        using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
+        book.Tables[MappingTableName].Rows.First()["文字列"].Value = null;
+
+        book.ReadTable<StringOnlyRow>(MappingTableName)
+            .Select(it => it.TextValue)
+            .Should().Equal("", "たちつてと", "なにぬねの");
+    }
+
+    [Fact]
     public void 型付きTableはデータ行がない場合に空の列挙になります()
     {
         book.ReadTable<EmptyTableRow>("空行マッピング")
@@ -664,6 +675,12 @@ public sealed class 型付きTableのテスト : IDisposable
     {
         [SpreadSheetName("数値2")]
         public DateTime Value { get; set; }
+    }
+
+    public sealed class StringOnlyRow
+    {
+        [SpreadSheetName("文字列")]
+        public string TextValue { get; set; } = "";
     }
 
     public sealed class NullableDoubleRow
