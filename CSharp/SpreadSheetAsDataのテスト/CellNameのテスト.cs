@@ -42,6 +42,12 @@ public class CellNameのテスト
     }
 
     [Fact]
+    public void TryParseはuintに収まらない行番号の場合にfalseを返します()
+    {
+        CellName.TryParse("A4294967296", out _).Should().BeFalse();
+    }
+
+    [Fact]
     public void ParseメソッドでCellNameが生成できます()
     {
         FluentActions.Invoking(
