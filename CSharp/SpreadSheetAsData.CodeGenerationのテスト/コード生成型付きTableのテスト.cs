@@ -59,6 +59,23 @@ public sealed class コード生成型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void 生成されたTableは空白セルをstringプロパティの空文字列として読み込みます()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(@"TestData\テーブル.xlsx"))
+            .GeneratedInstance<Workbook>(
+                "テーブルBook", temporaryFiles.Copy(@"TestData\テーブル.xlsx"));
+        book.Tables["型付き行マッピング"].Rows.First()["文字列"].Value = null;
+
+        dynamic bookAccessor = book;
+        IEnumerable<object> rows = bookAccessor.型付き行マッピング;
+
+        rows.Select(it => PropertyValue(it, "文字列"))
+            .Should().Equal("", "たちつてと", "なにぬねの");
+    }
+
+    [Fact]
     public void 生成されたTableをTableとして扱うと非型付き行を利用できます()
     {
         using var book = GeneratedCodeInspection
