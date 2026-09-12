@@ -4,7 +4,8 @@ namespace Marimo.SpreadSheetAsData;
 /// <summary>
 /// ワークシート上のセルを取得するコレクションです。
 /// </summary>
-public class CellCollection
+/// <param name="sheet">対象のワークシート。</param>
+public class CellCollection(Worksheet sheet)
 {
     /// <summary>
     /// ワークシートスコープの名前参照を解決するかどうかを表します。
@@ -14,16 +15,7 @@ public class CellCollection
     /// <summary>
     /// セル参照とワークシートスコープの名前参照を解決するためのワークシートです。
     /// </summary>
-    readonly Worksheet sheet;
-
-    /// <summary>
-    /// 指定したワークシートのセルコレクションを作成します。
-    /// </summary>
-    /// <param name="sheet">対象のワークシート。</param>
-    public CellCollection(Worksheet sheet)
-    {
-        this.sheet = sheet;
-    }
+    readonly Worksheet sheet = sheet;
 
     /// <summary>
     /// 指定したワークシートのセルコレクションを作成します。
