@@ -319,9 +319,9 @@ public class Table<T> : Table, IEnumerable<T>
             ({ } type, double number) when type == typeof(double)
                 || type == typeof(double?) => number,
             ({ } type, string text) when type == typeof(string) => text,
-            ({ } type, BlankValue) when type == typeof(string) => "",
+            ({ } type, BlankValue blank) when type == typeof(string) => (string)blank,
             ({ } type, BlankValue) when type == typeof(int) => 0,
-            ({ } type, BlankValue) when type == typeof(double) => 0d,
+            ({ } type, BlankValue blank) when type == typeof(double) => (double)blank,
             ({ } type, BlankValue) when type == typeof(bool) => false,
             ({ } type, bool boolean) when type == typeof(bool)
                 || type == typeof(bool?) => boolean,
