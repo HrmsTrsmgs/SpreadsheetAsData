@@ -191,6 +191,19 @@ public sealed class コード生成型推論のテスト
     }
 
     [Fact]
+    public void 小数値と空白を持つ列をnullableなdoubleプロパティとして生成します()
+    {
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(@"TestData\テーブル.xlsx"))
+            .GeneratedType("空白数値マッピング")
+            .GetProperty("小数");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(typeof(double?));
+    }
+
+    [Fact]
     public void 列名と生成プロパティ名が一致する場合は列属性を生成しません()
     {
         var tested = GeneratedCodeInspection

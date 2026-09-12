@@ -375,6 +375,11 @@ static class WorkbookWrapperComponents
             return "double";
         }
 
+        if (values.All(it => it is double or BlankValue))
+        {
+            return "double?";
+        }
+
         if (values.All(it => it is bool))
         {
             return "bool";
