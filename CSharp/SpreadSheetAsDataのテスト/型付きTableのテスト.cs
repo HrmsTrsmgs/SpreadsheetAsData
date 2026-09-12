@@ -216,6 +216,42 @@ public sealed class 型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void Replaceはnullableなintの値とnullを数値と空白として書き込みます()
+    {
+        using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
+
+        book.ReadTable<NullableIntegerRow>(MappingTableName)
+            .Replace(
+                [
+                    new NullableIntegerRow { IntegerValue = 10 },
+                    new NullableIntegerRow { IntegerValue = null },
+                    new NullableIntegerRow { IntegerValue = 30 }
+                ]);
+
+        book.Tables[MappingTableName].Rows
+            .Select(it => it["数値2"].Value as object)
+            .Should().Equal(10d, new BlankValue(), 30d);
+    }
+
+    [Fact]
+    public void Replaceはnullableなboolの値とnullを真偽値と空白として書き込みます()
+    {
+        using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
+
+        book.ReadTable<NullableBooleanRow>(MappingTableName)
+            .Replace(
+                [
+                    new NullableBooleanRow { BooleanValue = true },
+                    new NullableBooleanRow { BooleanValue = null },
+                    new NullableBooleanRow { BooleanValue = false }
+                ]);
+
+        book.Tables[MappingTableName].Rows
+            .Select(it => it["真偽値"].Value as object)
+            .Should().Equal(true, new BlankValue(), false);
+    }
+
+    [Fact]
     public void Replaceは属性がないプロパティ名を列名として使用します()
     {
         var filePath = temporaryFiles.Copy("テーブル.xlsx");
