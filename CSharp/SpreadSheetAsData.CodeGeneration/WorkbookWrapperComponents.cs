@@ -364,6 +364,12 @@ static class WorkbookWrapperComponents
             return "int";
         }
 
+        if (values.All(it => it is BlankValue
+            || it is double number && double.IsInteger(number)))
+        {
+            return "int?";
+        }
+
         if (values.All(it => it is double))
         {
             return "double";
