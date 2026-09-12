@@ -131,6 +131,27 @@ public sealed class コード生成型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void 生成されたDataはテーブルのnullableプロパティへ値と空白を読み込みます()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(@"TestData\テーブル.xlsx"))
+            .GeneratedInstance<Workbook>("テーブルBook");
+
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        IEnumerable<object> rows = dataAccessor.空白数値マッピング;
+        var tested = rows.ToArray();
+
+        tested.Select(it => PropertyValue(it, "数値"))
+            .Should().Equal(0, null);
+        tested.Select(it => PropertyValue(it, "小数"))
+            .Should().Equal(1.5, null);
+        tested.Select(it => PropertyValue(it, "真偽値"))
+            .Should().Equal(false, null);
+    }
+
+    [Fact]
     public void 生成されたDataからExcelテーブルの行データを置換します()
     {
         var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
