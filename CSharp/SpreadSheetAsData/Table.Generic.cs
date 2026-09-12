@@ -309,6 +309,7 @@ public class Table<T> : Table, IEnumerable<T>
                 && double.IsInteger(number) => (int)number,
             ({ } type, double number) when type == typeof(double) => number,
             ({ } type, string text) when type == typeof(string) => text,
+            ({ } type, bool boolean) when type == typeof(bool) => boolean,
             _ => null
         };
 
