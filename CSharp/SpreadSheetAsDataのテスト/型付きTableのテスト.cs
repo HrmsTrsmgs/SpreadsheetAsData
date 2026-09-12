@@ -444,6 +444,21 @@ public sealed class 型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void 型付きTableは小数をnullableなintへ変換しようとした場合に失敗します()
+    {
+        var action = () =>
+        {
+            book.ReadTable<NullableIntegerWithBlankRow>(MappingTableName)
+                .ToArray();
+        };
+
+        var thrown = action.Should().Throw<TableMappingException>();
+
+        thrown.Which.PropertyType.Should().Be(typeof(int?));
+        thrown.Which.SourceValue.Should().Be(4.4);
+    }
+
+    [Fact]
     public void 型付きTableは複数のプロパティが同じ列を指定した場合に失敗します()
     {
         var action = () =>
