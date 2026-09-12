@@ -152,6 +152,19 @@ public sealed class コード生成型推論のテスト
     }
 
     [Fact]
+    public void 真偽値だけを持つ列をboolプロパティとして生成します()
+    {
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(@"TestData\テーブル.xlsx"))
+            .GeneratedType("型付き行マッピング")
+            .GetProperty("真偽値");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(typeof(bool));
+    }
+
+    [Fact]
     public void 列名と生成プロパティ名が一致する場合は列属性を生成しません()
     {
         var tested = GeneratedCodeInspection
