@@ -320,6 +320,7 @@ public class Table<T> : Table, IEnumerable<T>
                 || type == typeof(double?) => number,
             ({ } type, string text) when type == typeof(string) => text,
             ({ } type, BlankValue) when type == typeof(string) => "",
+            ({ } type, BlankValue) when type == typeof(int) => 0,
             ({ } type, bool boolean) when type == typeof(bool)
                 || type == typeof(bool?) => boolean,
             _ => null
