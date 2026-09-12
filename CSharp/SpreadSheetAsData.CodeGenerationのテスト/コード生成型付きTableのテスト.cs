@@ -256,6 +256,26 @@ public sealed class コード生成型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void 生成されたTableのReplaceは文字列プロパティのnullを空白セルとして書き込みます()
+    {
+        const string excelFilePath = @"TestData\テーブル.xlsx";
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(excelFilePath))
+            .GeneratedInstance<Workbook>("テーブルBook", temporaryFiles.Copy(excelFilePath));
+
+        dynamic bookAccessor = book;
+        dynamic replacement = Enumerable.ToArray(bookAccessor.型付き行マッピング);
+        replacement[0].文字列 = null;
+
+        bookAccessor.型付き行マッピング.Replace(replacement);
+
+        book.Tables["型付き行マッピング"].Rows
+            .Select(it => it["文字列"].Value as object)
+            .Should().Equal(new BlankValue(), "たちつてと", "なにぬねの");
+    }
+
+    [Fact]
     public void 生成されたTableのReplaceはnullableプロパティの値とnullを書き込みます()
     {
         const string excelFilePath = @"TestData\テーブル.xlsx";
