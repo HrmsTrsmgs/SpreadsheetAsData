@@ -328,6 +328,11 @@ Console.WriteLine(cell.ColumnIndex);
 * 真偽値セル: `bool`
 * 共有文字列セル: `string`
 
+型付きテーブルでは、空白を `string` には空文字列、`int`・`double` には0、`bool` にはfalseとして読み込みます。
+`int?`・`double?`・`bool?` では空白をnullとして保持します。
+型付き `Replace()` はnullと空文字列を空白セルとして書き込みます。低水準の `Cell.Value` の扱いとは区別しています。
+列型の自動生成も含めた詳細は、[型付き読み書き](docs/typed-reading.md)を参照してください。
+
 ## 書き込みと保存
 
 生成された型付きTableでは、読み取った行を変更して既存のExcelテーブル行へ書き戻せます。
