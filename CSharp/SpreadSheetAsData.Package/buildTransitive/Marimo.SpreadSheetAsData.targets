@@ -52,4 +52,9 @@
       <FileWrites Include="@(_SpreadsheetAsDataGeneratedFileWrites)" />
     </ItemGroup>
   </Target>
+
+  <!-- Excelの隣の生成物もClean対象にし、元Excelと手書きコードは残します。 -->
+  <Target Name="CleanSpreadsheetAsDataSources" AfterTargets="CoreClean">
+    <Delete Files="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename).SpreadsheetAsData.g.cs')" />
+  </Target>
 </Project>

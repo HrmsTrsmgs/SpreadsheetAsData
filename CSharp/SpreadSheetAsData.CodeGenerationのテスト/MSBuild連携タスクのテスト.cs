@@ -6,6 +6,101 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class MSBuild連携タスクのテスト
 {
+    [Theory]
+    [InlineData("Marimo.SpreadSheetAsData")]
+    [InlineData("Marimo.SpreadSheetAsData.Build")]
+    public void パッケージ参照で生成した型をコンパイルしてExcelを読み書きできます(string packageId)
+    {
+        using var project = MSBuild連携テストプロジェクト.Create();
+        project.AddBasicStructureExcel("BasicStructure.xlsx");
+        var scriptFilePath = project.AddPowerShellPackageReferenceSample(packageId,
+            """
+            Invoke-MSBuild /t:Build
+            Invoke-Dotnet run --project ./Consumer.csproj --no-build --no-restore
+            Invoke-MSBuild /t:InspectProject
+            """);
+
+        var tested = PowerShell実行結果.Run(scriptFilePath, project.DirectoryPath);
+
+        tested.ExitCode.Should().Be(0, tested.Output);
+        tested.Output.Should().Contain("SalesData").And.Contain("saved:Updated");
+        File.ReadAllLines(Path.Combine(project.DirectoryPath, "References.txt"))
+            .Should().Contain("SpreadSheetAsData.dll").And.NotContain("SpreadSheetAsData.Build.dll");
+    }
+
+    [Theory]
+    [InlineData("Marimo.SpreadSheetAsData")]
+    [InlineData("Marimo.SpreadSheetAsData.Build")]
+    public void パッケージ参照のデザイン時ビルドは再生成せずExcelと生成コードを紐づけます(string packageId)
+    {
+        using var project = MSBuild連携テストプロジェクト.Create();
+        project.AddBasicStructureExcel("BasicStructure.xlsx");
+        var scriptFilePath = project.AddPowerShellPackageReferenceSample(packageId,
+            """
+            Invoke-MSBuild /t:Build
+            # デザイン時にExcelを再度開いた場合は失敗する入力に置き換えます。
+            Set-Content ./BasicStructure.xlsx 'Not an Excel workbook'
+            Invoke-MSBuild /t:Compile /p:DesignTimeBuild=true /p:SkipCompilerExecution=true
+            Invoke-MSBuild /t:InspectProject /p:DesignTimeBuild=true
+            """);
+
+        var tested = PowerShell実行結果.Run(scriptFilePath, project.DirectoryPath);
+
+        tested.ExitCode.Should().Be(0, tested.Output);
+        File.ReadAllLines(Path.Combine(project.DirectoryPath, "Compile.txt"))
+            .Should().ContainSingle(it => it == "BasicStructure.SpreadsheetAsData.g.cs|BasicStructure.xlsx");
+        File.ReadAllLines(Path.Combine(project.DirectoryPath, "Workbooks.txt"))
+            .Should().Contain("BasicStructure.xlsx|BasicStructure.SpreadsheetAsData.g.cs");
+        File.ReadAllLines(Path.Combine(project.DirectoryPath, "OtherItems.txt"))
+            .Should().NotContain(it => it.EndsWith(".SpreadsheetAsData.g.cs"));
+        File.ReadAllLines(Path.Combine(project.DirectoryPath, "AvailableItems.txt"))
+            .Should().Contain("SpreadsheetAsData");
+    }
+
+    [Theory]
+    [InlineData("Marimo.SpreadSheetAsData")]
+    [InlineData("Marimo.SpreadSheetAsData.Build")]
+    public void パッケージ利用プロジェクトのCleanは元Excelと手書きコードを残して生成ソースを削除します(string packageId)
+    {
+        using var project = MSBuild連携テストプロジェクト.Create();
+        var excelFilePath = project.AddBasicStructureExcel("BasicStructure.xlsx");
+        var original = File.ReadAllBytes(excelFilePath);
+        var scriptFilePath = project.AddPowerShellPackageReferenceSample(packageId,
+            """
+            Invoke-MSBuild /t:Build
+            if (-not (Test-Path ./BasicStructure.SpreadsheetAsData.g.cs)) { throw 'Generation did not run' }
+            Invoke-MSBuild /t:Clean
+            """);
+
+        var tested = PowerShell実行結果.Run(scriptFilePath, project.DirectoryPath);
+
+        tested.ExitCode.Should().Be(0, tested.Output);
+        File.Exists(project.GeneratedFilePathFor("BasicStructure.xlsx")).Should().BeFalse();
+        File.ReadAllBytes(excelFilePath).Should().Equal(original);
+        File.Exists(Path.Combine(project.DirectoryPath, "Program.cs")).Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData("Marimo.SpreadSheetAsData")]
+    [InlineData("Marimo.SpreadSheetAsData.Build")]
+    public void パッケージ参照で生成対象から外したExcelの生成コードはCompileに含めません(string packageId)
+    {
+        using var project = MSBuild連携テストプロジェクト.Create();
+        project.AddBasicStructureExcel("BasicStructure.xlsx");
+        var scriptFilePath = project.AddPowerShellPackageReferenceSample(packageId,
+            """
+            Invoke-MSBuild /t:Build
+            Invoke-MSBuild /t:InspectProject /p:IncludeWorkbook=false
+            """);
+
+        var tested = PowerShell実行結果.Run(scriptFilePath, project.DirectoryPath);
+
+        tested.ExitCode.Should().Be(0, tested.Output);
+        File.Exists(project.GeneratedFilePathFor("BasicStructure.xlsx")).Should().BeTrue();
+        File.ReadAllLines(Path.Combine(project.DirectoryPath, "Compile.txt"))
+            .Should().NotContain(it => it.StartsWith("BasicStructure.SpreadsheetAsData.g.cs|"));
+    }
+
     [Fact]
     public void SpreadsheetAsData項目からExcelファイルの隣へ生成コードを出力します()
     {

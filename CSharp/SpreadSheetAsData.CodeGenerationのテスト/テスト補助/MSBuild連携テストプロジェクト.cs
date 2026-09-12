@@ -1,5 +1,8 @@
 ﻿using System.Collections;
 using System.Diagnostics;
+using System.Reflection;
+using System.Text.Json;
+using System.Xml.Linq;
 using FluentAssertions;
 using Marimo.SpreadSheetAsData.Build;
 using Microsoft.Build.Framework;
@@ -317,6 +320,108 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
             Invoke-DotnetMSBuild .\SpreadsheetAsData.SdkProject.csproj /t:CheckGeneratedCompileMetadata /nologo /v:minimal /p:DesignTimeBuild=true
             """);
 
+        return scriptFilePath;
+    }
+
+    /// <summary>
+    /// 実パッケージから復元する利用者プロジェクトと、指定された検証コマンドを実行するスクリプトを作ります。
+    /// 外部依存は復元済みキャッシュから取得し、今回のパッケージと復元先をテストごとに分離します。
+    /// </summary>
+    /// <param name="packageId">全部入りまたはBuild単体のパッケージID。</param>
+    /// <param name="commands">復元後に実行するPowerShellコマンド。</param>
+    /// <returns>pack、restore、検証の順で実行するスクリプトのパス。</returns>
+    internal string AddPowerShellPackageReferenceSample(string packageId, string commands)
+    {
+        Directory.CreateDirectory(DirectoryPath);
+        using var assets = JsonDocument.Parse(File.ReadAllText(
+            RepositoryFilePath(@"SpreadSheetAsData.Build\obj\project.assets.json")));
+        File.WriteAllText(
+            Path.Combine(DirectoryPath, "NuGet.Config"),
+            new XElement("configuration",
+                new XElement("packageSources",
+                    new XElement("clear"),
+                    new XElement("add", new XAttribute("key", "local"), new XAttribute("value", "packages")),
+                    assets.RootElement.GetProperty("packageFolders").EnumerateObject().Select((it, index) =>
+                        new XElement("add", new XAttribute("key", $"cache{index}"), new XAttribute("value", it.Name)))),
+                new XElement("packageSourceMapping",
+                    new XElement("packageSource", new XAttribute("key", "local"),
+                        new XElement("package", new XAttribute("pattern", "Marimo.SpreadSheetAsData*"))),
+                    assets.RootElement.GetProperty("packageFolders").EnumerateObject().Select((it, index) =>
+                        new XElement("packageSource", new XAttribute("key", $"cache{index}"),
+                            new XElement("package", new XAttribute("pattern", "*"))))))
+                .ToString());
+        var version = XDocument.Load(RepositoryFilePath(@"SpreadSheetAsData.Package\SpreadSheetAsData.Package.csproj"))
+            .Descendants("Version").Single().Value;
+        File.WriteAllText(
+            Path.Combine(DirectoryPath, "Consumer.csproj"),
+            $$"""
+            <Project Sdk="Microsoft.NET.Sdk">
+              <PropertyGroup>
+                <TargetFramework>net10.0</TargetFramework>
+                <OutputType>Exe</OutputType>
+                <RootNamespace>ConsumerModel</RootNamespace>
+                <UseSharedCompilation>false</UseSharedCompilation>
+                <RestorePackagesPath>$(MSBuildProjectDirectory)/restored</RestorePackagesPath>
+                <!-- テスト専用のオフライン復元。通常の利用者の監査設定は変更しません。 -->
+                <NuGetAudit>false</NuGetAudit>
+                <IncludeWorkbook Condition="'$(IncludeWorkbook)' == ''">true</IncludeWorkbook>
+              </PropertyGroup>
+              <ItemGroup>
+                <PackageReference Include="{{packageId}}" Version="{{version}}" />
+                <SpreadsheetAsData Include="BasicStructure.xlsx" Condition="'$(IncludeWorkbook)' == 'true'" />
+              </ItemGroup>
+              <Target Name="InspectProject" DependsOnTargets="ResolveReferences">
+                <WriteLinesToFile File="Compile.txt" Lines="@(Compile->'%(Filename)%(Extension)|%(DependentUpon)')" Overwrite="true" />
+                <WriteLinesToFile File="OtherItems.txt" Lines="@(None);@(Content)" Overwrite="true" />
+                <WriteLinesToFile File="Workbooks.txt" Lines="@(SpreadsheetAsData->'%(Filename)%(Extension)|%(LastGenOutput)')" Overwrite="true" />
+                <WriteLinesToFile File="AvailableItems.txt" Lines="@(AvailableItemName)" Overwrite="true" />
+                <WriteLinesToFile File="References.txt" Lines="@(ReferencePath->'%(Filename)%(Extension)')" Overwrite="true" />
+              </Target>
+            </Project>
+            """);
+        File.WriteAllText(
+            Path.Combine(DirectoryPath, "Program.cs"),
+            """
+            using ConsumerModel;
+
+            using (var book = BasicStructureBook.Open("BasicStructure.xlsx"))
+            {
+                System.Console.WriteLine(book.SalesData.Name);
+                book.SalesData.Cells["A1"].Value = "Updated";
+                book.SaveAs("Updated.xlsx");
+            }
+            using var saved = BasicStructureBook.Open("Updated.xlsx");
+            string value = saved.SalesData.Cells["A1"].Value;
+            System.Console.WriteLine($"saved:{value}");
+            """);
+        var configuration = typeof(GenerateSpreadsheetAsData).Assembly
+            .GetCustomAttributes<AssemblyConfigurationAttribute>().Single().Configuration;
+        var scriptFilePath = Path.Combine(DirectoryPath, "PackageReference.ps1");
+        File.WriteAllText(
+            scriptFilePath,
+            $$"""
+            $ErrorActionPreference = 'Stop'
+            [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+            function Invoke-Dotnet {
+                dotnet @args
+                if ($LASTEXITCODE -ne 0) { throw "dotnet failed: $LASTEXITCODE" }
+            }
+            # 任意指定のVisual Studio版MSBuildでも、同じ利用プロジェクトを検証できます。
+            function Invoke-MSBuild {
+                if ($env:SPREADSHEETASDATA_TEST_MSBUILD) {
+                    & $env:SPREADSHEETASDATA_TEST_MSBUILD ./Consumer.csproj /nr:false /nologo /v:minimal @args
+                } else {
+                    dotnet msbuild ./Consumer.csproj /nr:false /nologo /v:minimal @args
+                }
+                if ($LASTEXITCODE -ne 0) { throw "MSBuild failed: $LASTEXITCODE" }
+            }
+            foreach ($projectName in @('SpreadSheetAsData', 'SpreadSheetAsData.CodeGeneration', 'SpreadSheetAsData.Build', 'SpreadSheetAsData.Package')) {
+                $projectPath = Join-Path '{{RepositoryFilePath("").Replace("'", "''")}}' "$projectName/$projectName.csproj"
+                Invoke-Dotnet pack $projectPath --no-build --no-restore --disable-build-servers --configuration '{{configuration}}' --output ./packages --verbosity quiet '-p:TreatWarningsAsErrors=true'
+            }
+            Invoke-Dotnet restore ./Consumer.csproj --configfile ./NuGet.Config --verbosity quiet
+            {{commands}}
+            """);
         return scriptFilePath;
     }
 
