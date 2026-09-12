@@ -246,7 +246,7 @@ public class Table<T> : Table, IEnumerable<T>
     /// <param name="row">変換元のテーブル行。</param>
     /// <param name="property">変換先プロパティ。</param>
     /// <returns>プロパティへ設定する値。</returns>
-    object ConvertValue(
+    object? ConvertValue(
         object sourceValue,
         TableRow row,
         PropertyInfo property)
@@ -301,8 +301,14 @@ public class Table<T> : Table, IEnumerable<T>
     static bool TryConvertValue(
         object sourceValue,
         Type propertyType,
-        out object converted)
+        out object? converted)
     {
+        if (sourceValue is BlankValue && propertyType == typeof(double?))
+        {
+            converted = null;
+            return true;
+        }
+
         object? conversion = (propertyType, sourceValue) switch
         {
             ({ } type, double number) when type == typeof(int)

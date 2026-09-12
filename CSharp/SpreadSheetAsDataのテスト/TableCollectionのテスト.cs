@@ -24,7 +24,7 @@ public class TableCollectionのテスト : IDisposable
     [Fact]
     public void Tablesはブック内のExcelテーブルを列挙します()
     {
-        book.Tables.Should().HaveCount(8);
+        book.Tables.Should().HaveCount(9);
     }
 
     [Fact]

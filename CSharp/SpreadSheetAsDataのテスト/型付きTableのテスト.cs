@@ -72,6 +72,14 @@ public sealed class 型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void 型付きTableは空白セルをnullableなdoubleプロパティのnullとして読み込みます()
+    {
+        book.ReadTable<NullableDoubleRow>("空白数値マッピング")
+            .Select(it => it.FloatingPointValue)
+            .Should().Equal(0d, null);
+    }
+
+    [Fact]
     public void 型付きTableはデータ行がない場合に空の列挙になります()
     {
         book.ReadTable<EmptyTableRow>("空行マッピング")
