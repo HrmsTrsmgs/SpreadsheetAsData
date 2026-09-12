@@ -59,6 +59,23 @@ public class Cellのテスト : IDisposable
         b1Value.Should().BeOfType<double>().Which.Should().Be(2.2);
     }
 
+    [Fact(Skip = "de-DEで数値の読み取り結果が変わるRedを確認済み。読み取りをカルチャー非依存にするGreen実装時に解除する。")]
+    public void Valueプロパティは現在カルチャーに依存せず数値を読み込めます()
+    {
+        var originalCulture = CultureInfo.CurrentCulture;
+
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("de-DE");
+
+            (a1.Value as object).Should().Be(1.1);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
+    }
+
     [Fact]
     public void Valueプロパティはboolの値を取得できます()
     {
