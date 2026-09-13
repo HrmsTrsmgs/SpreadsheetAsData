@@ -178,6 +178,32 @@ public sealed class コード生成型推論のテスト
     }
 
     [Fact]
+    public void 空白だけを持つ列をstringプロパティとして生成します()
+    {
+        using var temporaryFiles = new TemporaryExcelFiles();
+        var excelFilePath = temporaryFiles.Copy(BasicStructureExcelFilePath);
+        using (var book = Workbook.Open(excelFilePath))
+        {
+            foreach (var cell in
+                from row in book.Tables["sales_detail"].Rows
+                select row["Description"])
+            {
+                cell.Value = null;
+            }
+
+            book.Save();
+        }
+
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(excelFilePath))
+            .GeneratedType("SalesDetail")
+            .GetProperty("Description");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(typeof(string));
+    }
+
+    [Fact]
     public void 文字列値と空白を持つ列をstringプロパティとして生成します()
     {
         using var temporaryFiles = new TemporaryExcelFiles();

@@ -395,7 +395,7 @@ static class WorkbookWrapperComponents
             select row[column].Value
         ).ToArray();
 
-        if (values.All(it => it is string))
+        if (values.All(it => it is string) || values.All(it => it is BlankValue))
         {
             return "string";
         }
