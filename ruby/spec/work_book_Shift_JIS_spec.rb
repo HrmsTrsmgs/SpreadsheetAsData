@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe WorkBook, 'がShift_JISのコードから開かれた場合' do
-  subject{WorkBook.open('./spec/test_data/Book1.xlsx')}
+  subject{WorkBook.open(File.expand_path('../../TestData/Book1.xlsx', __dir__))}
 
   after do
     subject.close
