@@ -101,6 +101,20 @@ public sealed class コード生成診断のテスト
     }
 
     [Fact]
+    public void シートローカルの定義名が生成Sheetの型名と衝突した場合に診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                @"TestData\コード生成\衝突なし\定義名.xlsx",
+                options => options.NameMappings = new() { ["sales_data.local_cell"] = "SalesDataSheet" })
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "SalesDataSheet",
+                    ["local_cell"]));
+    }
+
+    [Fact]
     public void 区切り文字だけのシート名はCSharp識別子を生成できないため診断します()
     {
         GeneratedCodeInspection

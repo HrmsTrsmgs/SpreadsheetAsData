@@ -47,6 +47,7 @@ public static class WorkbookWrapperGenerator
             .. InvalidBookSheetPropertyNameDiagnostics(book, options),
             .. BookPropertyNameDiagnostics(book, options),
             .. BookDefinedNameDiagnostics(filePath, book, options),
+            .. SheetDefinedNameDiagnostics(book, options),
             .. from table in book.Tables
                from diagnostic in ColumnPropertyNameDiagnostics(table, options)
                select diagnostic
@@ -99,6 +100,22 @@ public static class WorkbookWrapperGenerator
         where propertyName == $"{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}Book"
             || propertyName is nameof(Workbook.Read) or nameof(Workbook.Open)
                 or nameof(Workbook.Replace) or "ValidateStructure"
+        select new CodeGenerationDiagnostic(
+            true,
+            propertyName,
+            [definedName.Name]);
+
+    /// <summary>
+    /// Sheet型名と、そのシートの定義名由来のプロパティ名の衝突を検出します。
+    /// </summary>
+    static IEnumerable<CodeGenerationDiagnostic> SheetDefinedNameDiagnostics(
+        Workbook book,
+        CodeGenerationOptions options) =>
+        from definedName in book.DefinedNames
+        let sheet = definedName.Worksheet
+        where sheet is not null
+        let propertyName = options.SheetDefinedName(sheet, definedName)
+        where propertyName == $"{options.GeneratedName(sheet.Name)}Sheet"
         select new CodeGenerationDiagnostic(
             true,
             propertyName,
