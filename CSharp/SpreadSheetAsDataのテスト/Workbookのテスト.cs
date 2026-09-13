@@ -48,15 +48,8 @@ public class Workbookのテスト : IDisposable
     [Fact]
     public void OpenはMemoryStream上のブックを開きます()
     {
-        var filePath = temporaryFiles.Copy(@"Stream\Book1.xlsx");
-        // SDKで保存済みのデータを使い、終了時の再圧縮によるStreamの容量不足を避けます。
-        using (var book = Workbook.Open(filePath))
-        {
-            book.Save();
-        }
-
         using var stream = new MemoryStream(
-            File.ReadAllBytes(filePath));
+            File.ReadAllBytes(@"TestData\Book1.xlsx"));
         using var tested = Workbook.Open(stream);
 
         tested.Sheets.Keys
@@ -144,15 +137,8 @@ public class Workbookのテスト : IDisposable
     [Fact]
     public void Disposeは呼び出し側から渡されたStreamを閉じません()
     {
-        var filePath = temporaryFiles.Copy(@"Stream\Book1.xlsx");
-        // SDKで保存済みのデータを使い、終了時の再圧縮によるStreamの容量不足を避けます。
-        using (var book = Workbook.Open(filePath))
-        {
-            book.Save();
-        }
-
         using var stream = new MemoryStream(
-            File.ReadAllBytes(filePath));
+            File.ReadAllBytes(@"TestData\Book1.xlsx"));
         var tested = Workbook.Open(stream);
 
         tested.Dispose();
