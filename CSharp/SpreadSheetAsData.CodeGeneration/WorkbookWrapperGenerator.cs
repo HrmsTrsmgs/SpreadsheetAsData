@@ -87,7 +87,7 @@ public static class WorkbookWrapperGenerator
             [.. sourceNamesByPropertyName]);
 
     /// <summary>
-    /// Book型のReadメソッドと定義名由来のプロパティ名の衝突を検出します。
+    /// Book型自身が宣言するメソッドと定義名由来のプロパティ名の衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> BookDefinedNameDiagnostics(
         Workbook book,
@@ -95,7 +95,8 @@ public static class WorkbookWrapperGenerator
         from definedName in book.DefinedNames
         where definedName.Worksheet is null
         let propertyName = options.BookDefinedName(definedName)
-        where propertyName == nameof(Workbook.Read)
+        where propertyName is nameof(Workbook.Read) or nameof(Workbook.Open)
+            or nameof(Workbook.Replace) or "ValidateStructure"
         select new CodeGenerationDiagnostic(
             true,
             propertyName,

@@ -68,17 +68,21 @@ public sealed class コード生成診断のテスト
                     ["SalesData", "sales_detail"]));
     }
 
-    [Fact]
-    public void ブックスコープの定義名が生成BookのReadメソッド名と衝突した場合に診断します()
+    [Theory]
+    [InlineData("Read")]
+    [InlineData("Open")]
+    [InlineData("Replace")]
+    [InlineData("ValidateStructure")]
+    public void ブックスコープの定義名が生成Bookのメソッド名と衝突した場合に診断します(string generatedName)
     {
         GeneratedCodeInspection
             .GenerateDiagnostics(
                 @"TestData\コード生成\衝突なし\定義名.xlsx",
-                options => options.NameMappings = new() { ["book.main_cell"] = "Read" })
+                options => options.NameMappings = new() { ["book.main_cell"] = generatedName })
             .Should().ContainEquivalentOf(
                 new CodeGenerationDiagnostic(
                     true,
-                    "Read",
+                    generatedName,
                     ["main_cell"]));
     }
 
