@@ -344,6 +344,19 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void SaveはDispose後に呼び出すとファイルを再束縛せずに失敗します()
+    {
+        var filePath = temporaryFiles.Copy("Book1.xlsx");
+        using var book = Workbook.Open(filePath);
+        book.Dispose();
+
+        var tested = () => book.Save();
+
+        tested.Should().Throw<ObjectDisposedException>();
+        FluentActions.Invoking(() => File.Delete(filePath)).Should().NotThrow();
+    }
+
+    [Fact]
     public void SaveAsは変更したセル値を別ファイルへ保存します()
     {
         var sourcePath = temporaryFiles.Copy("Book1.xlsx");

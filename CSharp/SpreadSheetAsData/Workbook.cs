@@ -285,6 +285,7 @@ public class Workbook : IDisposable
     /// Streamから開いた場合は元Streamを変更する前に拒否します。SaveAsで別ファイルへ保存してください。
     /// </remarks>
     /// <exception cref="NotSupportedException">Streamから開いたブックの場合。</exception>
+    /// <exception cref="ObjectDisposedException">ファイルから開いたブックを既に閉じている場合。</exception>
     public void Save() =>
         documentSession.Save();
 
@@ -387,6 +388,7 @@ public class Workbook : IDisposable
                 throw new NotSupportedException();
             }
 
+            ObjectDisposedException.ThrowIf(disposedValue, this);
             fileLock?.Dispose();
             try
             {
