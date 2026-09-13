@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Marimo.SpreadSheetAsData;
+using System.Reflection;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
 using Xunit;
 
@@ -84,6 +85,26 @@ public sealed class コード生成アクセスのテスト
         tested.Cell.Should().NotBeNull();
         tested.Range.Should().NotBeNull();
         tested["SalesData"].Should().NotBeNull();
+    }
+
+    [Fact]
+    public void 生成されたBook型は必要なシートがないファイルをOpenすると失敗します()
+    {
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
+            .GeneratedType("BasicStructureBook");
+
+        // 生成元のSalesDataとProductMasterは、開くファイルには存在しません。
+        var tested = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>(
+                "Open", DefinedNamesExcelFilePath);
+        };
+
+        // リフレクション経由の呼び出しでは、Openの例外がInnerExceptionに入ります。
+        tested.Should().Throw<TargetInvocationException>()
+            .WithInnerException<InvalidDataException>();
     }
 
     [Fact]

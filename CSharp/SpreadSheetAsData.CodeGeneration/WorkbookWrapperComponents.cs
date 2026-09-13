@@ -15,6 +15,7 @@ static class WorkbookWrapperComponents
         Workbook book) =>
         $$"""
         using System.Collections.Generic;
+        using System.Linq;
         using Marimo.SpreadSheetAsData;
 
         namespace {{options.Namespace}};
@@ -58,8 +59,25 @@ static class WorkbookWrapperComponents
             {
             }
 
-            public static new {{bookFileIdentifier}}Book Open(string filePath) =>
-                new(filePath);
+            /// <summary>
+            /// 生成元のシートが揃っていることを確認して、Excelブックを開きます。
+            /// </summary>
+            /// <exception cref="System.IO.InvalidDataException">生成元のシートが存在しません。</exception>
+            public static new {{bookFileIdentifier}}Book Open(string filePath)
+            {
+                var book = new {{bookFileIdentifier}}Book(filePath);
+                if (new string[] { {{string.Join(
+                    ", ",
+                    from sheet in book.Sheets.Values
+                    select StringLiteral(sheet.Name))}} }
+                    .Any(sheetName => !book.Sheets.ContainsKey(sheetName)))
+                {
+                    book.Dispose();
+                    throw new System.IO.InvalidDataException();
+                }
+
+                return book;
+            }
 
             {{bookFileIdentifier}}Book(System.IO.Stream stream) : base(stream)
             {

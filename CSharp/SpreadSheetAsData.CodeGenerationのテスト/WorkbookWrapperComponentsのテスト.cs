@@ -47,6 +47,7 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
             .Should().Be(
                 """
                 using System.Collections.Generic;
+                using System.Linq;
                 using Marimo.SpreadSheetAsData;
 
                 namespace Generated;
@@ -64,8 +65,22 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     {
                     }
 
-                    public static new BasicStructureBook Open(string filePath) =>
-                        new(filePath);
+                    /// <summary>
+                    /// 生成元のシートが揃っていることを確認して、Excelブックを開きます。
+                    /// </summary>
+                    /// <exception cref="System.IO.InvalidDataException">生成元のシートが存在しません。</exception>
+                    public static new BasicStructureBook Open(string filePath)
+                    {
+                        var book = new BasicStructureBook(filePath);
+                        if (new string[] { "SalesData", "ProductMaster" }
+                            .Any(sheetName => !book.Sheets.ContainsKey(sheetName)))
+                        {
+                            book.Dispose();
+                            throw new System.IO.InvalidDataException();
+                        }
+
+                        return book;
+                    }
 
                     BasicStructureBook(System.IO.Stream stream) : base(stream)
                     {
