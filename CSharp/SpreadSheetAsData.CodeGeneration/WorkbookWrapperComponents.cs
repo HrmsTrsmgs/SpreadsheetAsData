@@ -60,9 +60,9 @@ static class WorkbookWrapperComponents
             }
 
             /// <summary>
-            /// 生成元のシートとテーブルが揃っていることを確認して、Excelブックを開きます。
+            /// 生成元のシート、テーブル、ブックスコープの定義名を確認して、Excelブックを開きます。
             /// </summary>
-            /// <exception cref="System.IO.InvalidDataException">生成元のシートまたはテーブルが存在しません。</exception>
+            /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブル、ブックスコープの定義名のいずれかが存在しません。</exception>
             public static new {{bookFileIdentifier}}Book Open(string filePath) =>
                 ValidateStructure(new(filePath));
 
@@ -71,14 +71,14 @@ static class WorkbookWrapperComponents
             }
 
             /// <summary>
-            /// 生成元のシートとテーブルが揃っていることを確認して、Stream上のExcelブックを開きます。
+            /// 生成元のシート、テーブル、ブックスコープの定義名を確認して、Stream上のExcelブックを開きます。
             /// </summary>
-            /// <exception cref="System.IO.InvalidDataException">生成元のシートまたはテーブルが存在しません。</exception>
+            /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブル、ブックスコープの定義名のいずれかが存在しません。</exception>
             public static new {{bookFileIdentifier}}Book Open(System.IO.Stream stream) =>
                 ValidateStructure(new(stream));
 
             /// <summary>
-            /// 生成元に対応するシートとテーブルを確認し、不足時は開いたブックを破棄します。
+            /// 生成元に対応するシート、テーブル、ブックスコープの定義名を確認し、不足時は開いたブックを破棄します。
             /// </summary>
             static {{bookFileIdentifier}}Book ValidateStructure({{bookFileIdentifier}}Book book)
             {
@@ -91,7 +91,13 @@ static class WorkbookWrapperComponents
                         ", ",
                         from table in book.Tables
                         select StringLiteral(table.Name))}} }
-                        .Any(tableName => !book.Tables.Any(table => table.Name == tableName)))
+                        .Any(tableName => !book.Tables.Any(table => table.Name == tableName))
+                    || new string[] { {{string.Join(
+                        ", ",
+                        from definedName in BookScopedDefinedNames(book)
+                        select StringLiteral(definedName.Name))}} }
+                        .Any(name => !book.DefinedNames.Any(
+                            definedName => definedName.Worksheet is null && definedName.Name == name)))
                 {
                     book.Dispose();
                     throw new System.IO.InvalidDataException();
