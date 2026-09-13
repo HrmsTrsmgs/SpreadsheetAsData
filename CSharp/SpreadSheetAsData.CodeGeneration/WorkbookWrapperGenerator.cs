@@ -88,7 +88,8 @@ public static class WorkbookWrapperGenerator
             [.. sourceNamesByPropertyName]);
 
     /// <summary>
-    /// Book型名、自身が宣言するメソッド名、継承したCell・Range・Tablesプロパティ名との定義名の衝突を検出します。
+    /// Book型名、自身が宣言するメソッド名、継承したCell・Range・Tables・DefinedNames
+    /// プロパティ名との定義名の衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> BookDefinedNameDiagnostics(
         string filePath,
@@ -101,6 +102,7 @@ public static class WorkbookWrapperGenerator
             || propertyName is nameof(Workbook.Read) or nameof(Workbook.Open)
                 or nameof(Workbook.Replace) or "ValidateStructure"
                 or nameof(Workbook.Cell) or nameof(Workbook.Range) or nameof(Workbook.Tables)
+                or nameof(Workbook.DefinedNames)
         select new CodeGenerationDiagnostic(
             true,
             propertyName,
