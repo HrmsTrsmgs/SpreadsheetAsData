@@ -122,7 +122,7 @@ public static class WorkbookWrapperGenerator
             [definedName.Name]);
 
     /// <summary>
-    /// 同じTable行データ型の中で、複数のExcel列が同じ生成プロパティ名になる衝突を検出します。
+    /// 列プロパティ同士の名前衝突と、行データ型名との衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> ColumnPropertyNameDiagnostics(
         Table table,
@@ -131,6 +131,7 @@ public static class WorkbookWrapperGenerator
             from column in table.Columns
             group column.Name by options.TableColumn(table, column)
         where columnsByPropertyName.Skip(1).Any()
+            || columnsByPropertyName.Key == options.GeneratedName(table.Name)
         select new CodeGenerationDiagnostic(
             true,
             columnsByPropertyName.Key,

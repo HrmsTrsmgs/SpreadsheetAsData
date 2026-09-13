@@ -25,6 +25,20 @@ public sealed class コード生成診断のテスト
     }
 
     [Fact]
+    public void 列プロパティ名が生成行データの型名と衝突した場合に診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                BasicStructureExcelFilePath,
+                options => options.NameMappings = new() { ["sales_detail.customer_id"] = "SalesDetail" })
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "SalesDetail",
+                    ["customer_id"]));
+    }
+
+    [Fact]
     public void 名前衝突を自動的な連番追加では解消しません()
     {
         GeneratedCodeInspection
