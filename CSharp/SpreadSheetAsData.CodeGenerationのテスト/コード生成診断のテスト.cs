@@ -115,6 +115,20 @@ public sealed class コード生成診断のテスト
     }
 
     [Fact]
+    public void ブックスコープの定義名がWorkbookのRangeプロパティ名と衝突した場合に診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                @"TestData\コード生成\衝突なし\定義名.xlsx",
+                options => options.NameMappings = new() { ["book.main_range"] = "Range" })
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "Range",
+                    ["main_range"]));
+    }
+
+    [Fact]
     public void ブックスコープの定義名が生成Bookの型名と衝突した場合に診断します()
     {
         GeneratedCodeInspection
