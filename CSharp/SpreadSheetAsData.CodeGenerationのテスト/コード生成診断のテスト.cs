@@ -7,6 +7,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class コード生成診断のテスト
 {
+    const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
     const string ColumnNameCollisionExcelFilePath = @"TestData\コード生成\列名衝突.xlsx";
     const string BookMemberNameCollisionExcelFilePath = @"TestData\コード生成\Bookメンバー名衝突.xlsx";
     const string InvalidNameExcelFilePath = @"TestData\コード生成\無効名.xlsx";
@@ -51,6 +52,20 @@ public sealed class コード生成診断のテスト
                 && it.GeneratedName == "SalesData"
                 && it.SourceNames.Contains("sales_data")
                 && it.SourceNames.Contains("sales-data"));
+    }
+
+    [Fact]
+    public void 同じBook型のシートとテーブルの生成プロパティ名が衝突した場合に診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                BasicStructureExcelFilePath,
+                options => options.NameMappings = new() { ["SalesData"] = "SalesDetail" })
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "SalesDetail",
+                    ["SalesData", "sales_detail"]));
     }
 
     [Fact]
