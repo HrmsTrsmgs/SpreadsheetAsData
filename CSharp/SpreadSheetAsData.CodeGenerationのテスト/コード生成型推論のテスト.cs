@@ -178,6 +178,17 @@ public sealed class コード生成型推論のテスト
     }
 
     [Fact]
+    public void データ行がないテーブルは列プロパティを持たない行データ型を生成します()
+    {
+        GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(@"TestData\テーブル.xlsx"))
+            .GeneratedType("空行マッピング")
+            .GetProperties()
+            .Should().BeEmpty();
+    }
+
+    [Fact]
     public void 空白だけを持つ列をstringプロパティとして生成します()
     {
         using var temporaryFiles = new TemporaryExcelFiles();

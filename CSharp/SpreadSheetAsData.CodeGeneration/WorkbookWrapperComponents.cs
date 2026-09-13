@@ -352,6 +352,7 @@ static class WorkbookWrapperComponents
         {
         {{ForEach(
             from column in table.Columns
+            where table.Rows.Any()
             select RowPropertyDeclaration(table, column, options))}}
         }
         """;
