@@ -47,7 +47,7 @@ public static class WorkbookWrapperGenerator
             .. InvalidBookSheetPropertyNameDiagnostics(book, options),
             .. BookPropertyNameDiagnostics(filePath, book, options),
             .. BookDefinedNameDiagnostics(filePath, book, options),
-            .. BookDefinedNameSheetDiagnostics(book, options),
+            .. BookDefinedNamePropertyDiagnostics(book, options),
             .. SheetDefinedNameDiagnostics(book, options),
             .. from table in book.Tables
                from diagnostic in ColumnPropertyNameDiagnostics(table, options)
@@ -115,20 +115,23 @@ public static class WorkbookWrapperGenerator
             [definedName.Name]);
 
     /// <summary>
-    /// Book型の定義名とシートから生成するプロパティ名の衝突を検出します。
+    /// Book型の定義名とシート・テーブルから生成するプロパティ名の衝突を検出します。
     /// </summary>
-    static IEnumerable<CodeGenerationDiagnostic> BookDefinedNameSheetDiagnostics(
+    static IEnumerable<CodeGenerationDiagnostic> BookDefinedNamePropertyDiagnostics(
         Workbook book,
         CodeGenerationOptions options) =>
         from definedName in book.DefinedNames
         where definedName.Worksheet is null
         let propertyName = options.BookDefinedName(definedName)
-        from sheet in book.Sheets.Values
-        where propertyName == options.GeneratedName(sheet.Name)
+        from sourceName in
+            Enumerable.Concat(
+                from sheet in book.Sheets.Values select sheet.Name,
+                from table in book.Tables select table.Name)
+        where propertyName == options.GeneratedName(sourceName)
         select new CodeGenerationDiagnostic(
             true,
             propertyName,
-            [definedName.Name, sheet.Name]);
+            [definedName.Name, sourceName]);
 
     /// <summary>
     /// Sheet型名、継承したCell・Rangeプロパティ名とのシートローカル定義名の衝突を検出します。

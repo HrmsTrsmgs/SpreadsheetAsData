@@ -236,6 +236,20 @@ public sealed class コード生成診断のテスト
                     ["main_cell", "sales_data"]));
     }
 
+    [Fact]
+    public void 同じBook型の定義名とテーブルの生成プロパティ名が衝突した場合に診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                @"TestData\コード生成\衝突なし\定義名.xlsx",
+                options => options.NameMappings = new() { ["book.main_cell"] = "SalesDetail" })
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "SalesDetail",
+                    ["main_cell", "sales_detail"]));
+    }
+
     [Theory]
     [InlineData("Read")]
     [InlineData("Open")]
