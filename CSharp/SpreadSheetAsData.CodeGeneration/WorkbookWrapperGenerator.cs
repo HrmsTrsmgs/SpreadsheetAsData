@@ -46,6 +46,7 @@ public static class WorkbookWrapperGenerator
         [
             .. InvalidBookSheetPropertyNameDiagnostics(book, options),
             .. BookPropertyNameDiagnostics(book, options),
+            .. BookDefinedNameDiagnostics(book, options),
             .. from table in book.Tables
                from diagnostic in ColumnPropertyNameDiagnostics(table, options)
                select diagnostic
@@ -84,6 +85,21 @@ public static class WorkbookWrapperGenerator
             true,
             sourceNamesByPropertyName.Key,
             [.. sourceNamesByPropertyName]);
+
+    /// <summary>
+    /// Book型のReadメソッドと定義名由来のプロパティ名の衝突を検出します。
+    /// </summary>
+    static IEnumerable<CodeGenerationDiagnostic> BookDefinedNameDiagnostics(
+        Workbook book,
+        CodeGenerationOptions options) =>
+        from definedName in book.DefinedNames
+        where definedName.Worksheet is null
+        let propertyName = options.BookDefinedName(definedName)
+        where propertyName == nameof(Workbook.Read)
+        select new CodeGenerationDiagnostic(
+            true,
+            propertyName,
+            [definedName.Name]);
 
     /// <summary>
     /// 同じTable行データ型の中で、複数のExcel列が同じ生成プロパティ名になる衝突を検出します。
