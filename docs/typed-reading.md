@@ -144,27 +144,46 @@ nullable値型に値がある場合も、対応する非nullable型と同じ規�
 `Workbook.Read<T>()` は、ブック内の定義名とExcelテーブルをデータオブジェクトのプロパティへ読み込みます。
 プロパティを変更して `Workbook.Replace<T>()` へ渡すと、同じ対応規則で書き戻せます。
 
+この対応付けは、生成されたData型だけでなく、手書きのクラスでも利用できます。
+属性がない場合は、元のExcel名を `ToCSharpIdentifier()` でC#識別子へ変換して、プロパティ名と照合します。
+例えば、Excelテーブル `orders` と単一セル定義名 `report_title` は、次のプロパティへ属性なしで対応します。
+
 ```csharp
 public sealed class OrderBookData
 {
-    [SpreadSheetName("Orders")]
-    public IEnumerable<Order> OrderLines { get; set; } = [];
+    public IEnumerable<Order> Orders { get; set; } = [];
 
-    [SpreadSheetName("ReportTitle")]
-    public string Title { get; set; } = "";
+    public string ReportTitle { get; set; } = "";
 }
 
 using var book = Workbook.Open("orders.xlsx");
 var data = book.Read<OrderBookData>();
 
-data.Title = "Updated orders";
+data.ReportTitle = "Updated orders";
 
 book.Replace(data);
 book.Save();
 ```
 
+別のプロパティ名を使いたい場合は、元のExcel名を属性で明示します。属性の指定は自動対応より優先されます。
+
+```csharp
+public sealed class OrderBookData
+{
+    [SpreadSheetName("orders")]
+    public IEnumerable<Order> OrderLines { get; set; } = [];
+
+    [SpreadSheetName("report_title")]
+    public string Title { get; set; } = "";
+}
+```
+
+定義名の自動対応では、ブックスコープとシートローカルの両方を検索します。
+例えば、シートローカルの `cell_name` も、変換後の名前に一致する定義名がブック全体で一つなら `CellName` へ対応します。
+同じ名前へ変換される定義名が複数ある場合は一意に決まらないため失敗します。シートローカル定義名を明示する場合は、`[SpreadSheetName("cell_name", WorksheetName = "Sheet2")]` のように指定します。
+
 `SpreadSheetNameAttribute` は、Excelテーブル名、列名、定義名の明示的な対応付けに共通して使用します。
-シートローカル定義名では、`WorksheetName` も指定します。
+ここで説明した自動変換は、ブックのデータオブジェクトと定義名・テーブル名の対応規則です。行データ型 `Order` の列プロパティは、前節の列名規則に従います。
 複数セル定義名に対応するプロパティの型は `IEnumerable<IEnumerable<object?>>` です。
 
 ## 4. `.xlsx` から型付き読み書きコードを生成する

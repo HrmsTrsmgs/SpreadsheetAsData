@@ -245,6 +245,10 @@ public class Workbook : IDisposable
     /// </summary>
     /// <typeparam name="T">ブックのデータを読み込む型。</typeparam>
     /// <returns>ブックのデータを読み込んだオブジェクト。</returns>
+    /// <remarks>
+    /// 手書きの型でも、属性なしでExcel名をC#識別子へ自動変換して対応付けます。
+    /// 例えば定義名cell_nameはCellNameへ対応します。シートローカル定義名も検索対象で、一意に対応する必要があります。
+    /// </remarks>
     public T Read<T>() =>
         dataMapper.Read<T>();
 
@@ -254,6 +258,10 @@ public class Workbook : IDisposable
     /// </summary>
     /// <typeparam name="T">ブックへ書き込むデータの型。</typeparam>
     /// <param name="data">ブックへ書き込むデータ。</param>
+    /// <remarks>
+    /// 読み取りと同じ名前対応を使用します。例えば属性のないCellNameは、cell_nameという定義名へ書き込みます。
+    /// シートローカル定義名を明示する場合は、属性のWorksheetNameも指定してください。
+    /// </remarks>
     public void Replace<T>(T data) =>
         dataMapper.Replace(data);
 
