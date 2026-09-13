@@ -66,30 +66,32 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     }
 
                     /// <summary>
-                    /// 生成元のシートが揃っていることを確認して、Excelブックを開きます。
+                    /// 生成元のシートとテーブルが揃っていることを確認して、Excelブックを開きます。
                     /// </summary>
-                    /// <exception cref="System.IO.InvalidDataException">生成元のシートが存在しません。</exception>
+                    /// <exception cref="System.IO.InvalidDataException">生成元のシートまたはテーブルが存在しません。</exception>
                     public static new BasicStructureBook Open(string filePath) =>
-                        ValidateRequiredSheets(new(filePath));
+                        ValidateStructure(new(filePath));
 
                     BasicStructureBook(System.IO.Stream stream) : base(stream)
                     {
                     }
 
                     /// <summary>
-                    /// 生成元のシートが揃っていることを確認して、Stream上のExcelブックを開きます。
+                    /// 生成元のシートとテーブルが揃っていることを確認して、Stream上のExcelブックを開きます。
                     /// </summary>
-                    /// <exception cref="System.IO.InvalidDataException">生成元のシートが存在しません。</exception>
+                    /// <exception cref="System.IO.InvalidDataException">生成元のシートまたはテーブルが存在しません。</exception>
                     public static new BasicStructureBook Open(System.IO.Stream stream) =>
-                        ValidateRequiredSheets(new(stream));
+                        ValidateStructure(new(stream));
 
                     /// <summary>
-                    /// 生成元に対応するシートを確認し、不足時は開いたブックを破棄します。
+                    /// 生成元に対応するシートとテーブルを確認し、不足時は開いたブックを破棄します。
                     /// </summary>
-                    static BasicStructureBook ValidateRequiredSheets(BasicStructureBook book)
+                    static BasicStructureBook ValidateStructure(BasicStructureBook book)
                     {
                         if (new string[] { "SalesData", "ProductMaster" }
-                            .Any(sheetName => !book.Sheets.ContainsKey(sheetName)))
+                            .Any(sheetName => !book.Sheets.ContainsKey(sheetName))
+                            || new string[] { "sales_detail", "ProductList" }
+                                .Any(tableName => !book.Tables.Any(table => table.Name == tableName)))
                         {
                             book.Dispose();
                             throw new System.IO.InvalidDataException();

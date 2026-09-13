@@ -9,6 +9,7 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 public sealed class コード生成アクセスのテスト
 {
     const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
+    const string WithoutTablesExcelFilePath = @"TestData\コード生成\テーブルなし.xlsx";
     const string DefinedNamesExcelFilePath = @"TestData\コード生成\ブックスコープ\定義名.xlsx";
     const string DefinedNamesWithSheetScopeExcelFilePath = @"TestData\コード生成\シートローカル単一セル\定義名.xlsx";
     const string DefinedNamesWithoutCollisionsExcelFilePath = @"TestData\コード生成\衝突なし\定義名.xlsx";
@@ -103,6 +104,25 @@ public sealed class コード生成アクセスのテスト
         };
 
         // リフレクション経由の呼び出しでは、Openの例外がInnerExceptionに入ります。
+        tested.Should().Throw<TargetInvocationException>()
+            .WithInnerException<InvalidDataException>();
+    }
+
+    [Fact]
+    public void 生成されたBook型は必要なテーブルがないファイルをOpenすると失敗します()
+    {
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
+            .GeneratedType("BasicStructureBook");
+
+        // SalesDataとProductMasterはありますが、sales_detailとProductListはありません。
+        var tested = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>(
+                "Open", WithoutTablesExcelFilePath);
+        };
+
         tested.Should().Throw<TargetInvocationException>()
             .WithInnerException<InvalidDataException>();
     }

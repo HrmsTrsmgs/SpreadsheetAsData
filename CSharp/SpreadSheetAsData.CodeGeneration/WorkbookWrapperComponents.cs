@@ -60,33 +60,38 @@ static class WorkbookWrapperComponents
             }
 
             /// <summary>
-            /// 生成元のシートが揃っていることを確認して、Excelブックを開きます。
+            /// 生成元のシートとテーブルが揃っていることを確認して、Excelブックを開きます。
             /// </summary>
-            /// <exception cref="System.IO.InvalidDataException">生成元のシートが存在しません。</exception>
+            /// <exception cref="System.IO.InvalidDataException">生成元のシートまたはテーブルが存在しません。</exception>
             public static new {{bookFileIdentifier}}Book Open(string filePath) =>
-                ValidateRequiredSheets(new(filePath));
+                ValidateStructure(new(filePath));
 
             {{bookFileIdentifier}}Book(System.IO.Stream stream) : base(stream)
             {
             }
 
             /// <summary>
-            /// 生成元のシートが揃っていることを確認して、Stream上のExcelブックを開きます。
+            /// 生成元のシートとテーブルが揃っていることを確認して、Stream上のExcelブックを開きます。
             /// </summary>
-            /// <exception cref="System.IO.InvalidDataException">生成元のシートが存在しません。</exception>
+            /// <exception cref="System.IO.InvalidDataException">生成元のシートまたはテーブルが存在しません。</exception>
             public static new {{bookFileIdentifier}}Book Open(System.IO.Stream stream) =>
-                ValidateRequiredSheets(new(stream));
+                ValidateStructure(new(stream));
 
             /// <summary>
-            /// 生成元に対応するシートを確認し、不足時は開いたブックを破棄します。
+            /// 生成元に対応するシートとテーブルを確認し、不足時は開いたブックを破棄します。
             /// </summary>
-            static {{bookFileIdentifier}}Book ValidateRequiredSheets({{bookFileIdentifier}}Book book)
+            static {{bookFileIdentifier}}Book ValidateStructure({{bookFileIdentifier}}Book book)
             {
                 if (new string[] { {{string.Join(
                     ", ",
                     from sheet in book.Sheets.Values
                     select StringLiteral(sheet.Name))}} }
-                    .Any(sheetName => !book.Sheets.ContainsKey(sheetName)))
+                    .Any(sheetName => !book.Sheets.ContainsKey(sheetName))
+                    || new string[] { {{string.Join(
+                        ", ",
+                        from table in book.Tables
+                        select StringLiteral(table.Name))}} }
+                        .Any(tableName => !book.Tables.Any(table => table.Name == tableName)))
                 {
                     book.Dispose();
                     throw new System.IO.InvalidDataException();
