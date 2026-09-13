@@ -58,6 +58,76 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void Openは読み取り専用のStream上のブックを開きます()
+    {
+        using var stream = new MemoryStream(
+            File.ReadAllBytes(@"TestData\文字列セル.xlsx"), writable: false);
+        using var tested = Workbook.Open(stream);
+
+        (tested.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("直接文字列");
+    }
+
+    [Fact]
+    public void OpenはシークできないStream上のブックを開きます()
+    {
+        using var stream = new NonSeekableReadStream(
+            File.OpenRead(@"TestData\文字列セル.xlsx"));
+        using var tested = Workbook.Open(stream);
+
+        (tested.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("直接文字列");
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(17)]
+    public void OpenはStreamの現在位置をブックの先頭として読み込みます(int prefixLength)
+    {
+        using var stream = new MemoryStream(
+            [.. new byte[prefixLength], .. File.ReadAllBytes(@"TestData\文字列セル.xlsx")]);
+        stream.Position = prefixLength;
+        using var tested = Workbook.Open(stream);
+
+        (tested.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("直接文字列");
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void Openは空のStreamで失敗しても呼び出し側のStreamを閉じません(bool seekable)
+    {
+        using var source = new MemoryStream();
+        using Stream stream = seekable ? source : new NonSeekableReadStream(source);
+        var tested = () =>
+        {
+            using var book = Workbook.Open(stream);
+        };
+
+        tested.Should().Throw<Exception>();
+        stream.CanRead.Should().BeTrue();
+        source.ToArray().Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Openは読み取り不可のStreamを内容を変更せず閉じずに拒否します()
+    {
+        var filePath = temporaryFiles.Copy("文字列セル.xlsx");
+        var original = File.ReadAllBytes(filePath);
+
+        using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Write))
+        {
+            var tested = () =>
+            {
+                using var book = Workbook.Open(stream);
+            };
+
+            tested.Should().Throw<Exception>();
+            stream.CanWrite.Should().BeTrue();
+        }
+
+        File.ReadAllBytes(filePath).Should().Equal(original);
+    }
+
+    [Fact]
     public void Openは再圧縮でサイズが増えるブックも固定容量のMemoryStreamで開いて閉じられます()
     {
         using var stream = new MemoryStream(
@@ -179,13 +249,119 @@ public class Workbookのテスト : IDisposable
                 });
             book.SaveAs(savedPath);
             stream.ToArray().Should().Equal(original);
+
+            using var tested = Workbook.Open(savedPath);
+
+            (tested.Cell["CustomerName"].Value as object).Should().Be("佐藤花子");
         }
 
         stream.ToArray().Should().Equal(original);
-        using var tested = Workbook.Open(savedPath);
+    }
 
-        (tested.Cell["CustomerName"].Value as object)
-            .Should().Be("佐藤花子");
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void SaveAsは書き込み不可のStreamからも元データを変更せず編集結果を保存します(bool seekable)
+    {
+        var original = File.ReadAllBytes(@"TestData\文字列セル.xlsx");
+        using var source = new MemoryStream(original.ToArray(), writable: false);
+        using Stream stream = seekable ? source : new NonSeekableReadStream(source);
+        var savedPath = temporaryFiles.NewFilePath();
+
+        using (var book = Workbook.Open(stream))
+        {
+            book.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
+            book.SaveAs(savedPath);
+
+            using var tested = Workbook.Open(savedPath);
+
+            (tested.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
+            source.ToArray().Should().Equal(original);
+        }
+
+        source.ToArray().Should().Equal(original);
+        stream.CanRead.Should().BeTrue();
+    }
+
+    [Fact]
+    public void SaveAsは途中位置から開いたStreamの前置データと元ブックを変更せず編集結果を保存します()
+    {
+        byte[] prefix = [1, 2, 3, 4];
+        byte[] original = [.. prefix, .. File.ReadAllBytes(@"TestData\文字列セル.xlsx")];
+        using var stream = new MemoryStream(original.ToArray());
+        stream.Position = prefix.Length;
+        var savedPath = temporaryFiles.NewFilePath();
+
+        using (var book = Workbook.Open(stream))
+        {
+            book.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
+            book.SaveAs(savedPath);
+
+            using var tested = Workbook.Open(savedPath);
+
+            (tested.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
+            stream.ToArray().Should().Equal(original);
+        }
+
+        stream.ToArray().Should().Equal(original);
+        stream.CanRead.Should().BeTrue();
+    }
+
+    [Fact]
+    public void SaveAs後に編集して再びSaveAsすると各保存時点の内容を別々に保持します()
+    {
+        var original = File.ReadAllBytes(@"TestData\文字列セル.xlsx");
+        using var stream = new MemoryStream(original.ToArray());
+        var firstPath = temporaryFiles.NewFilePath();
+        var secondPath = temporaryFiles.NewFilePath();
+
+        using (var book = Workbook.Open(stream))
+        {
+            book.Sheets["Sheet1"].Cell["A1"].Value = "一回目";
+            book.SaveAs(firstPath);
+            book.Sheets["Sheet1"].Cell["A1"].Value = "二回目";
+            book.SaveAs(secondPath);
+            book.Sheets["Sheet1"].Cell["A1"].Value = "保存しない変更";
+        }
+
+        using var first = Workbook.Open(firstPath);
+        using var second = Workbook.Open(secondPath);
+
+        (first.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("一回目");
+        (second.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("二回目");
+        stream.ToArray().Should().Equal(original);
+    }
+
+    [Fact]
+    public void SaveAsが保存先を開けず失敗しても元Streamと編集内容を保持して再保存できます()
+    {
+        var original = File.ReadAllBytes(@"TestData\文字列セル.xlsx");
+        using var stream = new MemoryStream(original.ToArray());
+        var blockedPath = temporaryFiles.NewFilePath();
+        var savedPath = temporaryFiles.NewFilePath();
+
+        using (var book = Workbook.Open(stream))
+        {
+            book.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
+
+            using (var blockedFile = File.Create(blockedPath))
+            {
+                var tested = () => book.SaveAs(blockedPath);
+
+                tested.Should().Throw<IOException>();
+            }
+
+            stream.CanRead.Should().BeTrue();
+            stream.ToArray().Should().Equal(original);
+            book.SaveAs(savedPath);
+
+            using var saved = Workbook.Open(savedPath);
+
+            (saved.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
+        }
+
+        stream.ToArray().Should().Equal(original);
+        stream.CanRead.Should().BeTrue();
     }
 
     [Fact]
