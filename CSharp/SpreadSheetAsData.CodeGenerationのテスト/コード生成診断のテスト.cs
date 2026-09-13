@@ -87,6 +87,20 @@ public sealed class コード生成診断のテスト
     }
 
     [Fact]
+    public void ブックスコープの定義名が生成Bookの型名と衝突した場合に診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                @"TestData\コード生成\衝突なし\定義名.xlsx",
+                options => options.NameMappings = new() { ["book.main_cell"] = "定義名Book" })
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "定義名Book",
+                    ["main_cell"]));
+    }
+
+    [Fact]
     public void 区切り文字だけのシート名はCSharp識別子を生成できないため診断します()
     {
         GeneratedCodeInspection
