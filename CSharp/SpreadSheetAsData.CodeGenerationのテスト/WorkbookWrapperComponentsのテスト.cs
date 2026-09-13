@@ -69,9 +69,25 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     /// 生成元のシートが揃っていることを確認して、Excelブックを開きます。
                     /// </summary>
                     /// <exception cref="System.IO.InvalidDataException">生成元のシートが存在しません。</exception>
-                    public static new BasicStructureBook Open(string filePath)
+                    public static new BasicStructureBook Open(string filePath) =>
+                        ValidateRequiredSheets(new(filePath));
+
+                    BasicStructureBook(System.IO.Stream stream) : base(stream)
                     {
-                        var book = new BasicStructureBook(filePath);
+                    }
+
+                    /// <summary>
+                    /// 生成元のシートが揃っていることを確認して、Stream上のExcelブックを開きます。
+                    /// </summary>
+                    /// <exception cref="System.IO.InvalidDataException">生成元のシートが存在しません。</exception>
+                    public static new BasicStructureBook Open(System.IO.Stream stream) =>
+                        ValidateRequiredSheets(new(stream));
+
+                    /// <summary>
+                    /// 生成元に対応するシートを確認し、不足時は開いたブックを破棄します。
+                    /// </summary>
+                    static BasicStructureBook ValidateRequiredSheets(BasicStructureBook book)
+                    {
                         if (new string[] { "SalesData", "ProductMaster" }
                             .Any(sheetName => !book.Sheets.ContainsKey(sheetName)))
                         {
@@ -81,13 +97,6 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
 
                         return book;
                     }
-
-                    BasicStructureBook(System.IO.Stream stream) : base(stream)
-                    {
-                    }
-
-                    public static new BasicStructureBook Open(System.IO.Stream stream) =>
-                        new(stream);
 
                     /// <summary>
                     /// Excelブック全体のデータを読み込みます。

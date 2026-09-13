@@ -108,6 +108,26 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void 生成されたBook型は必要なシートがないStreamをOpenすると失敗します()
+    {
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
+            .GeneratedType("BasicStructureBook");
+
+        // 生成元のSalesDataとProductMasterは、開くStreamには存在しません。
+        using var stream = new MemoryStream(File.ReadAllBytes(DefinedNamesExcelFilePath));
+        var tested = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>("Open", stream);
+        };
+
+        // リフレクション経由の呼び出しでは、Openの例外がInnerExceptionに入ります。
+        tested.Should().Throw<TargetInvocationException>()
+            .WithInnerException<InvalidDataException>();
+    }
+
+    [Fact]
     public void 生成されたBook型はStreamから開けます()
     {
         using var stream = new MemoryStream(
