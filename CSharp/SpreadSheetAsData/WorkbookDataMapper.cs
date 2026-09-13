@@ -13,24 +13,36 @@ sealed class WorkbookDataMapper(Workbook book)
 
         foreach (var property in typeof(T).GetProperties())
         {
+            property.SetValue(data, ReadPropertyValue(property));
+        }
+
+        return data;
+
+        // プロパティに対応するテーブル、単一セル、範囲から設定する値を読み取ります。
+        object? ReadPropertyValue(PropertyInfo property)
+        {
             if (TryGetTable(property, out var table))
             {
-                property.SetValue(
-                    data,
-                    CreateTypedTable(table, TableRowType(property)));
-                continue;
+                return CreateTypedTable(table, TableRowType(property));
             }
 
             var range = DefinedNameRange(property);
 
-            property.SetValue(
-                data,
-                range.TopLeftCell == range.BottomRightCell
-                    ? range.TopLeftCell.Value
-                    : range.Values);
+            if (range.TopLeftCell == range.BottomRightCell)
+            {
+                return ConvertValue(range.TopLeftCell.Value, property.PropertyType);
+            }
+
+            return range.Values;
         }
 
-        return data;
+        // 空白値をstringプロパティへ設定できる値に変換します。
+        static object ConvertValue(object value, Type propertyType) =>
+            (value, propertyType) switch
+            {
+                (BlankValue, var type) when type == typeof(string) => "",
+                _ => value
+            };
     }
 
     internal void Replace<T>(T data)

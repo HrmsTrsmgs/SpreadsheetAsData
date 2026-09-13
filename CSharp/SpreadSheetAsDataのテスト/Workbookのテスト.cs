@@ -356,6 +356,15 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void Readは空白の単一セル定義名をstringプロパティの空文字列として読み込みます()
+    {
+        using var tested = Workbook.Open(@"TestData\定義名.xlsx");
+        tested.Cell["CustomerName"].Value = null;
+
+        tested.Read<WorkbookData>().CustomerName.Should().BeEmpty();
+    }
+
+    [Fact]
     public void ReadはSpreadSheetName属性で指定した定義名からオブジェクトを読み込みます()
     {
         using var tested = Workbook.Open(@"TestData\定義名.xlsx");
