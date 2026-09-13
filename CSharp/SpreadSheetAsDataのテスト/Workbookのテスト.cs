@@ -163,10 +163,11 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
-    public void Stream版でもReplaceしたオブジェクトを保存します()
+    public void Stream版のSaveAsは元のStreamを変更せず別ファイルへ保存します()
     {
-        using var stream = new MemoryStream(
-            File.ReadAllBytes(@"TestData\定義名.xlsx"));
+        var original = File.ReadAllBytes(@"TestData\定義名.xlsx");
+        using var stream = new MemoryStream(original.ToArray());
+        var savedPath = temporaryFiles.NewFilePath();
 
         using (var book = Workbook.Open(stream))
         {
@@ -175,11 +176,12 @@ public class Workbookのテスト : IDisposable
                 {
                     CustomerName = "佐藤花子"
                 });
-            book.Save();
+            book.SaveAs(savedPath);
+            stream.ToArray().Should().Equal(original);
         }
 
-        stream.Position = 0;
-        using var tested = Workbook.Open(stream);
+        stream.ToArray().Should().Equal(original);
+        using var tested = Workbook.Open(savedPath);
 
         (tested.Cell["CustomerName"].Value as object)
             .Should().Be("佐藤花子");
@@ -199,66 +201,28 @@ public class Workbookのテスト : IDisposable
         stream.ToArray().Should().Equal(original);
     }
 
-    [Fact]
-    public void Stream版のSaveは元のStreamを変更せずClose時に書き戻します()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void Stream版のSaveは拡張可否によらず元のStreamを変更せずに拒否します(bool expandable)
     {
         var original = File.ReadAllBytes(@"TestData\定義名.xlsx");
-        using var stream = new MemoryStream(original.ToArray());
-        using var book = Workbook.Open(stream);
-
-        book.Cell["CustomerName"].Value = "佐藤花子";
-        book.Save();
-
-        stream.ToArray().Should().Equal(original);
-
-        book.Close();
+        using var stream = expandable
+            ? new MemoryStream()
+            : new MemoryStream(new byte[original.Length]);
+        stream.Write(original);
         stream.Position = 0;
-        using var tested = Workbook.Open(stream);
-
-        (tested.Cell["CustomerName"].Value as object)
-            .Should().Be("佐藤花子");
-    }
-
-    [Fact]
-    public void Stream版のSave後に再度Saveしなかった変更はDispose時に書き戻しません()
-    {
-        using var stream = new MemoryStream(
-            File.ReadAllBytes(@"TestData\定義名.xlsx"));
 
         using (var book = Workbook.Open(stream))
         {
             book.Cell["CustomerName"].Value = "佐藤花子";
-            book.Save();
-            book.Cell["CustomerName"].Value = "保存しない変更";
+            var tested = () => book.Save();
+
+            tested.Should().Throw<NotSupportedException>();
+            stream.ToArray().Should().Equal(original);
         }
 
-        stream.Position = 0;
-        using var tested = Workbook.Open(stream);
-
-        (tested.Cell["CustomerName"].Value as object)
-            .Should().Be("佐藤花子");
-    }
-
-    [Fact]
-    public void Stream版のSaveは保存結果が短くなった場合に元のStreamを切り詰めます()
-    {
-        using var stream = new MemoryStream(
-            File.ReadAllBytes(@"TestData\文字列セル.xlsx"));
-        var originalLength = stream.Length;
-
-        using (var book = Workbook.Open(stream))
-        {
-            book.Sheets["Sheet1"].Cells["A1"].Value = "x";
-            book.Save();
-        }
-
-        stream.Length.Should().BeLessThan(originalLength);
-
-        stream.Position = 0;
-        using var tested = Workbook.Open(stream);
-
-        (tested.Sheets["Sheet1"].Cells["A1"].Value as object)
-            .Should().Be("x");
+        stream.ToArray().Should().Equal(original);
     }
 
     [Fact]
@@ -329,15 +293,12 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
-    public void Saveは開いているファイルへ変更を保存します()
+    public void Saveはブックを閉じる前に元ファイルへ変更を反映します()
     {
         var filePath = temporaryFiles.Copy("Book1.xlsx");
-
-        using (var book = Workbook.Open(filePath))
-        {
-            book.Sheets["いろいろなデータ"].Cells["A1"].Value = 9.9;
-            book.Save();
-        }
+        using var book = Workbook.Open(filePath);
+        book.Sheets["いろいろなデータ"].Cells["A1"].Value = 9.9;
+        book.Save();
 
         using var tested = Workbook.Open(filePath);
 

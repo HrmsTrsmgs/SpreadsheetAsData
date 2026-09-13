@@ -44,7 +44,9 @@ var byColumn = firstRow[table.Columns["ProductName"]];
 ```
 
 列や行の構造を確認したい場合は、`Table.Columns`、`Table.Range`、`Table.Worksheet` を使用します。
-取得したセルの `Value` へ値を設定し、`Workbook.Save()` または `SaveAs()` で保存できます。
+取得したセルの `Value` へ値を設定し、ファイルパスから開いた場合は `Workbook.Save()`、別ファイルへ出力する場合は `SaveAs(path)` で保存できます。
+`Save()` は正常終了時点で元ファイルへの保存を完了します。Streamから開いた場合の `Save()` は `NotSupportedException` になります。
+Close/Disposeは保存を行いません。Streamだけで編集結果の出力まで完結するAPIは、現時点では提供していません。
 
 ## 2. 利用者定義型へ対応付けて読み書きする
 

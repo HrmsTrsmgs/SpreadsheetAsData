@@ -135,8 +135,11 @@ IEnumerable<Order> orders = book.ReadTable<Order>("Orders");
 - [x] 型付きオブジェクトから既存のExcelテーブル行を置き換える
 - [x] ブック全体のデータオブジェクトを読み書きする
 - [x] 生成型から定義名とExcelテーブルを書き換える
-- [x] 開いているファイルまたは `Stream` へ上書き保存する
+- [x] ファイルパスから開いた場合、`Save()` の正常終了時点で元ファイルへの保存を完了する
 - [x] 別ファイルへ保存する
+
+Stream版の `Save()` は元Streamを変更する前に拒否し、Close/Disposeでも保存しない。
+Stream入力の編集結果は `SaveAs(path)` で出力できるが、Streamだけで出力まで完結するAPIは現行範囲に含めない。
 
 ## 初回公開後の候補
 

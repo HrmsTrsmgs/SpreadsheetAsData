@@ -44,6 +44,10 @@ public class Workbook : IDisposable
     /// </summary>
     /// <param name="stream">開く Spreadsheet ファイルを格納したストリーム。</param>
     /// <returns>開いたブック。</returns>
+    /// <remarks>
+    /// 元Streamの内容は変更せず、CloseまたはDisposeでも元Stream自体は閉じません。
+    /// Saveは使用できません。編集結果を出力する場合はSaveAsでファイルへ保存してください。
+    /// </remarks>
     public static Workbook Open(Stream stream) =>
         new(DocumentSession.Open(stream));
 
@@ -268,17 +272,19 @@ public class Workbook : IDisposable
     public Worksheet this[string sheetName] => Sheets[sheetName];
 
     /// <summary>
-    /// ブックが保持しているファイルを閉じます。
+    /// 変更を保存せず、ブックが使用しているリソースを解放します。
     /// </summary>
+    /// <remarks>呼び出し側から渡されたStream自体は閉じません。</remarks>
     public void Close() => documentSession.Dispose();
 
     /// <summary>
-    /// ブックへの変更を、開いているファイルまたはStreamへ保存します。
+    /// ブックへの変更を、開いているファイルへ保存します。
     /// </summary>
     /// <remarks>
-    /// Stream版では、この時点の変更を保存対象とし、CloseまたはDispose時に元のStreamへ書き戻します。
-    /// その後の変更は再度Saveしない限り保存されません。元のStream自体は閉じません。
+    /// 正常終了時点で保存を完了します。CloseまたはDisposeを待つ必要はありません。
+    /// Streamから開いた場合は元Streamを変更する前に拒否します。SaveAsで別ファイルへ保存してください。
     /// </remarks>
+    /// <exception cref="NotSupportedException">Streamから開いたブックの場合。</exception>
     public void Save() =>
         documentSession.Save();
 
@@ -286,6 +292,7 @@ public class Workbook : IDisposable
     /// ブックへの変更を、指定した別ファイルへ保存します。
     /// </summary>
     /// <param name="filePath">保存先のファイルパス。</param>
+    /// <remarks>Streamから開いた場合も利用できます。元Streamの内容は変更しません。</remarks>
     public void SaveAs(string filePath) =>
         documentSession.SaveAs(filePath);
 
@@ -297,11 +304,10 @@ public class Workbook : IDisposable
         readonly string? filePath;
 
         /// <summary>
-        /// SDKへ渡すStreamです。作業用コピーと元のStreamへの書き戻しを管理します。
+        /// SDKによるZIPの書き直しを元データへ漏らさない作業用Streamです。
         /// </summary>
         readonly CopyOnWriteStream stream;
         FileStream? fileLock;
-        bool saveStream;
         bool disposedValue;
 
         DocumentSession(
@@ -377,9 +383,7 @@ public class Workbook : IDisposable
         {
             if (filePath is null)
             {
-                Document.Save();
-                saveStream = true;
-                return;
+                throw new NotSupportedException();
             }
 
             fileLock?.Dispose();
@@ -403,11 +407,6 @@ public class Workbook : IDisposable
             if (!disposedValue)
             {
                 Document.Close();
-                // ZIPへの反映が完了してから、明示的なSaveの結果だけを元のStreamへ戻します。
-                if (saveStream)
-                {
-                    stream.WriteBack();
-                }
                 stream.Dispose();
                 fileLock?.Dispose();
                 disposedValue = true;
@@ -417,7 +416,7 @@ public class Workbook : IDisposable
 
     /// <summary>
     /// 元のStreamを借りて読み込み、最初の変更から拡張可能なコピーへ切り替えます。
-    /// コピーだけを所有し、元のStreamへの反映は明示的な書き戻しに限定します。
+    /// コピーだけを所有し、元のStreamへの書き込みと破棄は行いません。
     /// </summary>
     sealed class CopyOnWriteStream : Stream
     {
@@ -502,20 +501,6 @@ public class Workbook : IDisposable
             return workingCopy;
         }
 
-        /// <summary>
-        /// SDKがZIPを書き終えた後、保存が指定された場合にだけ元のStreamへ反映します。
-        /// </summary>
-        internal void WriteBack()
-        {
-            if (workingCopy is not null)
-            {
-                workingCopy.Position = 0;
-                source.Position = 0;
-                workingCopy.CopyTo(source);
-                source.SetLength(workingCopy.Length);
-            }
-        }
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -543,8 +528,9 @@ public class Workbook : IDisposable
     }
 
     /// <summary>
-    /// ブックが使用しているリソースを解放します。
+    /// 変更を保存せず、ブックが使用しているリソースを解放します。
     /// </summary>
+    /// <remarks>呼び出し側から渡されたStream自体は閉じません。</remarks>
     public void Dispose()
     {
         Dispose(disposing: true);
