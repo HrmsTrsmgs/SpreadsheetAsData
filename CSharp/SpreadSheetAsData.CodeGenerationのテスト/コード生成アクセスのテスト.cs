@@ -167,6 +167,28 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void 生成されたBook型は同名のブック定義名があっても必要なシートローカル定義名がなければOpenに失敗します()
+    {
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    @"TestData\コード生成\定義名.xlsx",
+                    options => options.NameMappings = new() { ["sales_data.total"] = "SheetTotal" }))
+            .GeneratedType("定義名Book");
+
+        // totalはブックスコープにだけ存在し、sales_dataではsheet_totalという別名です。
+        // その他のシート、テーブル、定義名は生成元と一致します。
+        var tested = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>(
+                "Open", DefinedNamesWithoutCollisionsExcelFilePath);
+        };
+
+        tested.Should().Throw<TargetInvocationException>()
+            .WithInnerException<InvalidDataException>();
+    }
+
+    [Fact]
     public void 生成されたBook型は必要なシートがないStreamをOpenすると失敗します()
     {
         var generatedType = GeneratedCodeInspection
