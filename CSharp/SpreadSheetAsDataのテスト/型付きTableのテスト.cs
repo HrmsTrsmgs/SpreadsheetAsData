@@ -571,6 +571,32 @@ public sealed class 型付きTableのテスト : IDisposable
         thrown.Which.SourceValue.Should().Be(4.4);
     }
 
+    [Theory]
+    [InlineData((double)int.MinValue - 1)]
+    [InlineData((double)int.MaxValue + 1)]
+    public void 型付きTableはintの範囲外の整数値をintへ変換しようとした場合に失敗します(double value)
+    {
+        using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
+        book.Tables[MappingTableName].Rows.First()["数値2"].Value = value;
+
+        var tested = () => book.ReadTable<IntegerOnlyRow>(MappingTableName).ToArray();
+
+        tested.Should().Throw<TableMappingException>()
+            .Which.SourceValue.Should().Be(value);
+    }
+
+    [Theory]
+    [InlineData(int.MinValue)]
+    [InlineData(int.MaxValue)]
+    public void 型付きTableはintの最小値と最大値を読み込めます(int value)
+    {
+        using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
+        book.Tables[MappingTableName].Rows.First()["数値2"].Value = value;
+
+        book.ReadTable<IntegerOnlyRow>(MappingTableName).First().IntegerValue
+            .Should().Be(value);
+    }
+
     [Fact]
     public void 型付きTableは複数のプロパティが同じ列を指定した場合に失敗します()
     {
