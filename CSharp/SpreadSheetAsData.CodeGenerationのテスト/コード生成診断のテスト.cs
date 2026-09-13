@@ -152,6 +152,20 @@ public sealed class コード生成診断のテスト
                     ["SalesData"]));
     }
 
+    [Fact]
+    public void テーブルの生成プロパティ名が生成BookのReplaceメソッド名と衝突した場合に診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                BasicStructureExcelFilePath,
+                options => options.NameMappings = new() { ["sales_detail"] = "Replace" })
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "Replace",
+                    ["sales_detail"]));
+    }
+
     [Theory]
     [InlineData("Read")]
     [InlineData("Open")]
