@@ -107,7 +107,7 @@ public static class WorkbookWrapperGenerator
             [definedName.Name]);
 
     /// <summary>
-    /// Sheet型名、継承したCellプロパティ名とのシートローカル定義名の衝突を検出します。
+    /// Sheet型名、継承したCell・Rangeプロパティ名とのシートローカル定義名の衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> SheetDefinedNameDiagnostics(
         Workbook book,
@@ -117,7 +117,7 @@ public static class WorkbookWrapperGenerator
         where sheet is not null
         let propertyName = options.SheetDefinedName(sheet, definedName)
         where propertyName == $"{options.GeneratedName(sheet.Name)}Sheet"
-            || propertyName == nameof(Worksheet.Cell)
+            || propertyName is nameof(Worksheet.Cell) or nameof(Worksheet.Range)
         select new CodeGenerationDiagnostic(
             true,
             propertyName,

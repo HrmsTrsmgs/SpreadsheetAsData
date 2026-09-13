@@ -157,6 +157,20 @@ public sealed class コード生成診断のテスト
     }
 
     [Fact]
+    public void シートローカルの定義名がWorksheetのRangeプロパティ名と衝突した場合に診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                @"TestData\コード生成\衝突なし\定義名.xlsx",
+                options => options.NameMappings = new() { ["sales_data.local_range"] = "Range" })
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "Range",
+                    ["local_range"]));
+    }
+
+    [Fact]
     public void シートローカルの定義名が生成Sheetの型名と衝突した場合に診断します()
     {
         GeneratedCodeInspection
