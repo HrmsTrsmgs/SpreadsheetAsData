@@ -12,6 +12,20 @@ public sealed class コード生成名前設定のテスト
     const string DefinedNamesWithoutCollisionsExcelFilePath = @"TestData\コード生成\衝突なし\定義名.xlsx";
 
     [Fact]
+    public void 書式文字を含む定義名から生成Dataプロパティへ値を読み込みます()
+    {
+        const string excelFilePath = @"TestData\コード生成\FormattingCharacter.xlsx";
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(excelFilePath))
+            .GeneratedInstance<Workbook>("FormattingCharacterBook", excelFilePath);
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        object tested = dataAccessor.CustomerName;
+
+        tested.Should().Be("直接文字列");
+    }
+
+    [Fact]
     public void NameMappingsは自動名前変換より優先されます()
     {
         GeneratedCodeInspection

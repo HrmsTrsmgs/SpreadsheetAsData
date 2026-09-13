@@ -1,4 +1,5 @@
-﻿using Marimo.SpreadSheetAsData;
+﻿using System.Globalization;
+using Marimo.SpreadSheetAsData;
 namespace Marimo.SpreadSheetAsData.CodeGeneration;
 
 /// <summary>
@@ -241,7 +242,9 @@ static class WorkbookWrapperComponents
         DefinedName definedName,
         string propertyName)
     {
-        if (propertyName == definedName.Name.ToCSharpIdentifier())
+        // コンパイル後の識別子では書式文字が無視されるため、属性で元の定義名を保持します。
+        if (propertyName == definedName.Name.ToCSharpIdentifier()
+            && !propertyName.Any(it => char.GetUnicodeCategory(it) == UnicodeCategory.Format))
         {
             return "";
         }
