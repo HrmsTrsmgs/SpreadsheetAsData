@@ -6,9 +6,6 @@ namespace Marimo.SpreadSheetAsData.Test;
 
 public class CellNameのテスト
 {
-    const string セル参照のゼロ行列検証保留理由 =
-        "CellNameが1始まりの行番号と列番号を保証する実装時に解除する。";
-
     [Fact]
     public void TryParseはA1形式のセル参照を解析します()
     {

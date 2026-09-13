@@ -27,9 +27,9 @@
 - [x] セル値とテーブル行マッピングでの空白の扱いを整理する
 - [x] テーブル行の文字列、数値、真偽値の変換規則を整理する
 - [ ] 日付の変換規則を整理する
-- [ ] 存在しない行やセルを読み取る場合の動作を決める
+- [x] 未格納の行やセルの位置を空白セルとして読み取る
 - [ ] Open XML SDK固有処理を内部実装へ集約する
-- [ ] セル読み取りのテストケースを追加する
+- [x] セル読み取りのテストケースを追加する（数値、真偽値、共有文字列、直接文字列、カルチャー非依存）
 
 ## フェーズ2: 定義名
 
@@ -50,7 +50,7 @@
 - [x] テーブルの列定義を取得する
 - [x] ヘッダー名を取得する
 - [x] データ行を列挙する
-- [ ] 空のテーブルを扱う
+- [x] 値を持つデータ行がないテーブルを空の列挙として扱う
 - [x] 複数テーブルを含むワークブックを扱う
 - [x] テーブル読み取りのテストと使用例を追加する
 
@@ -68,7 +68,7 @@
 ```csharp
 foreach (var row in book.Tables["Orders"].Rows)
 {
-    Console.WriteLine(row["ProductName"]);
+    Console.WriteLine(row["ProductName"].Value);
 }
 ```
 
@@ -107,6 +107,9 @@ IEnumerable<Order> orders = book.ReadTable<Order>("Orders");
 - [x] 型名や列名の衝突を検出する
 - [x] 生成コードのテストを追加する
 - [x] 型付き読み書きのサンプルを追加する
+
+生成元スキーマとの不一致については、生成Bookの `Open` で必要なシート、Excelテーブル、ブックスコープの定義名の不足を検出するところまで実装・テスト済みです。
+これだけで列構造や値の型など、すべての不一致を検出できるわけではないため、項目全体は未完了としています。
 
 コード生成APIは `Marimo.SpreadSheetAsData.CodeGeneration`、Visual StudioとMSBuildの連携は `Marimo.SpreadSheetAsData.Build` で提供します。
 通常の利用では、実行時APIとコード生成機能をまとめた `Marimo.SpreadSheetAsData` を使用します。
