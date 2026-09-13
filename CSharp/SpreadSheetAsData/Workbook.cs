@@ -326,6 +326,7 @@ public class Workbook : IDisposable
 
         internal static DocumentSession Open(string filePath)
         {
+            filePath = Path.GetFullPath(filePath);
             var fileLock = Lock(filePath);
             var stream = new CopyOnWriteStream(fileLock);
 

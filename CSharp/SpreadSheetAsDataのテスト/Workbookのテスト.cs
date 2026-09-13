@@ -5,6 +5,7 @@ using Xunit;
 
 namespace Marimo.SpreadSheetAsData.Test;
 
+[Collection(nameof(CurrentDirectoryCollection))]
 public class Workbookのテスト : IDisposable
 {
 
@@ -304,6 +305,42 @@ public class Workbookのテスト : IDisposable
 
         (tested.Sheets["いろいろなデータ"].Cells["A1"].Value as object)
             .Should().Be(9.9);
+    }
+
+    [Fact]
+    public void Saveは相対パスで開いた後に作業ディレクトリを変更しても元ファイルだけを更新します()
+    {
+        var originalDirectory = Environment.CurrentDirectory;
+        var temporaryDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        var openedDirectory = Directory.CreateDirectory(Path.Combine(temporaryDirectory, "opened")).FullName;
+        var changedDirectory = Directory.CreateDirectory(Path.Combine(temporaryDirectory, "changed")).FullName;
+        var openedFilePath = Path.Combine(openedDirectory, "Book1.xlsx");
+        var otherFilePath = Path.Combine(changedDirectory, "Book1.xlsx");
+
+        try
+        {
+            File.Copy(@"TestData\Book1.xlsx", openedFilePath);
+            File.Copy(@"TestData\Book1.xlsx", otherFilePath);
+            Environment.CurrentDirectory = openedDirectory;
+
+            using (var book = Workbook.Open("Book1.xlsx"))
+            {
+                book.Sheets["いろいろなデータ"].Cells["A1"].Value = 9.9;
+                Environment.CurrentDirectory = changedDirectory;
+                book.Save();
+            }
+
+            using var savedBook = Workbook.Open(openedFilePath);
+            using var otherBook = Workbook.Open(otherFilePath);
+
+            (savedBook.Sheets["いろいろなデータ"].Cells["A1"].Value as object).Should().Be(9.9);
+            (otherBook.Sheets["いろいろなデータ"].Cells["A1"].Value as object).Should().Be(1.1);
+        }
+        finally
+        {
+            Environment.CurrentDirectory = originalDirectory;
+            Directory.Delete(temporaryDirectory, recursive: true);
+        }
     }
 
     [Fact]
