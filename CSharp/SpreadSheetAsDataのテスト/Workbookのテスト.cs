@@ -186,6 +186,82 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void DisposeはSaveしていない変更を元のStreamへ書き込みません()
+    {
+        var original = File.ReadAllBytes(@"TestData\定義名.xlsx");
+        using var stream = new MemoryStream(original.ToArray());
+
+        using (var book = Workbook.Open(stream))
+        {
+            book.Cell["CustomerName"].Value = "保存しない変更";
+        }
+
+        stream.ToArray().Should().Equal(original);
+    }
+
+    [Fact]
+    public void Stream版のSaveは元のStreamを変更せずClose時に書き戻します()
+    {
+        var original = File.ReadAllBytes(@"TestData\定義名.xlsx");
+        using var stream = new MemoryStream(original.ToArray());
+        using var book = Workbook.Open(stream);
+
+        book.Cell["CustomerName"].Value = "佐藤花子";
+        book.Save();
+
+        stream.ToArray().Should().Equal(original);
+
+        book.Close();
+        stream.Position = 0;
+        using var tested = Workbook.Open(stream);
+
+        (tested.Cell["CustomerName"].Value as object)
+            .Should().Be("佐藤花子");
+    }
+
+    [Fact]
+    public void Stream版のSave後に再度Saveしなかった変更はDispose時に書き戻しません()
+    {
+        using var stream = new MemoryStream(
+            File.ReadAllBytes(@"TestData\定義名.xlsx"));
+
+        using (var book = Workbook.Open(stream))
+        {
+            book.Cell["CustomerName"].Value = "佐藤花子";
+            book.Save();
+            book.Cell["CustomerName"].Value = "保存しない変更";
+        }
+
+        stream.Position = 0;
+        using var tested = Workbook.Open(stream);
+
+        (tested.Cell["CustomerName"].Value as object)
+            .Should().Be("佐藤花子");
+    }
+
+    [Fact]
+    public void Stream版のSaveは保存結果が短くなった場合に元のStreamを切り詰めます()
+    {
+        using var stream = new MemoryStream(
+            File.ReadAllBytes(@"TestData\文字列セル.xlsx"));
+        var originalLength = stream.Length;
+
+        using (var book = Workbook.Open(stream))
+        {
+            book.Sheets["Sheet1"].Cells["A1"].Value = "x";
+            book.Save();
+        }
+
+        stream.Length.Should().BeLessThan(originalLength);
+
+        stream.Position = 0;
+        using var tested = Workbook.Open(stream);
+
+        (tested.Sheets["Sheet1"].Cells["A1"].Value as object)
+            .Should().Be("x");
+    }
+
+    [Fact]
     public void Closeはファイルの束縛を解除します()
     {
         var tested = Workbook.Open(コピーパス);

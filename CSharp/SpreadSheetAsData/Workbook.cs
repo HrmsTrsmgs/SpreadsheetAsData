@@ -273,8 +273,12 @@ public class Workbook : IDisposable
     public void Close() => documentSession.Dispose();
 
     /// <summary>
-    /// ブックへの変更を、開いているファイルへ保存します。
+    /// ブックへの変更を、開いているファイルまたはStreamへ保存します。
     /// </summary>
+    /// <remarks>
+    /// Stream版では、この時点の変更を保存対象とし、CloseまたはDispose時に元のStreamへ書き戻します。
+    /// その後の変更は再度Saveしない限り保存されません。元のStream自体は閉じません。
+    /// </remarks>
     public void Save() =>
         documentSession.Save();
 
@@ -508,6 +512,7 @@ public class Workbook : IDisposable
                 workingCopy.Position = 0;
                 source.Position = 0;
                 workingCopy.CopyTo(source);
+                source.SetLength(workingCopy.Length);
             }
         }
 
