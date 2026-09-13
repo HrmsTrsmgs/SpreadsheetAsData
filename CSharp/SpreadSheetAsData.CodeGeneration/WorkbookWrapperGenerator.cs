@@ -70,7 +70,7 @@ public static class WorkbookWrapperGenerator
             sheet.Name);
 
     /// <summary>
-    /// Book型の中で、ワークシートとExcelテーブルの生成プロパティ名の衝突を検出します。
+    /// Book型の中で、ワークシートとExcelテーブルの生成プロパティ名同士、およびReadメソッド名との衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> BookPropertyNameDiagnostics(
         Workbook book,
@@ -82,6 +82,7 @@ public static class WorkbookWrapperGenerator
                     from table in book.Tables select table.Name)
             group sourceName by options.GeneratedName(sourceName)
         where sourceNamesByPropertyName.Skip(1).Any()
+            || sourceNamesByPropertyName.Key == nameof(Workbook.Read)
         select new CodeGenerationDiagnostic(
             true,
             sourceNamesByPropertyName.Key,

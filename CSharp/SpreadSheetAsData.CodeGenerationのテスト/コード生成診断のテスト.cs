@@ -82,6 +82,20 @@ public sealed class コード生成診断のテスト
                     ["SalesData", "sales_detail"]));
     }
 
+    [Fact]
+    public void シートの生成プロパティ名が生成BookのReadメソッド名と衝突した場合に診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                BasicStructureExcelFilePath,
+                options => options.NameMappings = new() { ["SalesData"] = "Read" })
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "Read",
+                    ["SalesData"]));
+    }
+
     [Theory]
     [InlineData("Read")]
     [InlineData("Open")]
