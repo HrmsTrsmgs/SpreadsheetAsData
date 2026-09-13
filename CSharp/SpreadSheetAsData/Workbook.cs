@@ -293,14 +293,9 @@ public class Workbook : IDisposable
         readonly string? filePath;
 
         /// <summary>
-        /// 呼び出し側から借りた保存結果の書き戻し先です。ファイル版ではnullで、このクラスでは閉じません。
+        /// SDKへ渡すStreamです。作業用コピーと元のStreamへの書き戻しを管理します。
         /// </summary>
-        readonly Stream? saveDestinationStream;
-
-        /// <summary>
-        /// SDKが編集する作業領域です。このクラスが所有し、終了時に閉じます。
-        /// </summary>
-        readonly MemoryStream workingStream;
+        readonly CopyOnWriteStream stream;
         FileStream? fileLock;
         bool saveStream;
         bool disposedValue;
@@ -308,14 +303,12 @@ public class Workbook : IDisposable
         DocumentSession(
             string? filePath,
             FileStream? fileLock,
-            Stream? saveDestinationStream,
-            MemoryStream workingStream,
+            CopyOnWriteStream stream,
             Packaging.SpreadsheetDocument document)
         {
             this.filePath = filePath;
             this.fileLock = fileLock;
-            this.saveDestinationStream = saveDestinationStream;
-            this.workingStream = workingStream;
+            this.stream = stream;
             Document = document;
         }
 
@@ -324,26 +317,25 @@ public class Workbook : IDisposable
         internal static DocumentSession Open(string filePath)
         {
             var fileLock = Lock(filePath);
-            var workingStream = new MemoryStream();
+            var stream = new CopyOnWriteStream(fileLock);
 
             try
             {
-                fileLock.CopyTo(workingStream);
-                workingStream.Position = 0;
+                // ファイル版は、Open時点の内容を元ファイルと切り離して保持します。
+                stream.CreateWorkingCopy();
 
                 return new(
                     filePath,
                     fileLock,
-                    saveDestinationStream: null,
-                    workingStream,
+                    stream,
                     Packaging.SpreadsheetDocument.Open(
-                        workingStream,
+                        stream,
                         isEditable: true,
                         new Packaging.OpenSettings { AutoSave = false }));
             }
             catch
             {
-                workingStream.Dispose();
+                stream.Dispose();
                 fileLock.Dispose();
                 throw;
             }
@@ -351,26 +343,21 @@ public class Workbook : IDisposable
 
         internal static DocumentSession Open(Stream stream)
         {
-            // 終了時の再圧縮で呼び出し側のStreamを拡張しないよう、編集用コピーを使用します。
-            var workingStream = new MemoryStream();
+            var documentStream = new CopyOnWriteStream(stream);
             try
             {
-                stream.CopyTo(workingStream);
-                workingStream.Position = 0;
-
                 return new(
                     filePath: null,
                     fileLock: null,
-                    saveDestinationStream: stream,
-                    workingStream,
+                    documentStream,
                     Packaging.SpreadsheetDocument.Open(
-                        workingStream,
+                        documentStream,
                         isEditable: true,
                         new Packaging.OpenSettings { AutoSave = false }));
             }
             catch
             {
-                workingStream.Dispose();
+                documentStream.Dispose();
                 throw;
             }
         }
@@ -413,16 +400,124 @@ public class Workbook : IDisposable
             {
                 Document.Close();
                 // ZIPへの反映が完了してから、明示的なSaveの結果だけを元のStreamへ戻します。
-                if (saveStream && saveDestinationStream is not null)
+                if (saveStream)
                 {
-                    workingStream.Position = 0;
-                    saveDestinationStream.Position = 0;
-                    workingStream.CopyTo(saveDestinationStream);
+                    stream.WriteBack();
                 }
-                workingStream.Dispose();
+                stream.Dispose();
                 fileLock?.Dispose();
                 disposedValue = true;
             }
+        }
+    }
+
+    /// <summary>
+    /// 元のStreamを借りて読み込み、最初の変更から拡張可能なコピーへ切り替えます。
+    /// コピーだけを所有し、元のStreamへの反映は明示的な書き戻しに限定します。
+    /// </summary>
+    sealed class CopyOnWriteStream : Stream
+    {
+        readonly Stream source;
+
+        /// <summary>
+        /// Openへ渡された時点の位置を、文書の先頭として扱います。
+        /// </summary>
+        readonly long sourceOffset;
+        MemoryStream? workingCopy;
+
+        internal CopyOnWriteStream(Stream source)
+        {
+            this.source = source;
+            if (source.CanSeek)
+            {
+                sourceOffset = source.Position;
+            }
+            else
+            {
+                // SDKがランダムアクセスできるよう、シーク不可の場合は先にコピーします。
+                CreateWorkingCopy();
+            }
+        }
+
+        Stream Current => workingCopy ?? source;
+
+        public override bool CanRead => Current.CanRead;
+        public override bool CanSeek => Current.CanSeek;
+        public override bool CanWrite => workingCopy?.CanWrite ?? true;
+        public override long Length => workingCopy?.Length ?? source.Length - sourceOffset;
+
+        public override long Position
+        {
+            get => workingCopy?.Position ?? source.Position - sourceOffset;
+            set => Current.Position = workingCopy is null ? sourceOffset + value : value;
+        }
+
+        public override int Read(byte[] buffer, int offset, int count) =>
+            Current.Read(buffer, offset, count);
+
+        public override long Seek(long offset, SeekOrigin origin) =>
+            workingCopy is not null
+                ? workingCopy.Seek(offset, origin)
+                : source.Seek(origin == SeekOrigin.Begin ? sourceOffset + offset : offset, origin) - sourceOffset;
+
+        public override void Write(byte[] buffer, int offset, int count) =>
+            CreateWorkingCopy().Write(buffer, offset, count);
+
+        public override void SetLength(long value) =>
+            CreateWorkingCopy().SetLength(value);
+
+        public override void Flush() => workingCopy?.Flush();
+
+        /// <summary>
+        /// 読み書き位置を維持したままコピーへ切り替え、以降は同じコピーを使います。
+        /// </summary>
+        internal MemoryStream CreateWorkingCopy()
+        {
+            if (workingCopy is null)
+            {
+                var position = source.CanSeek ? Position : 0;
+                if (source.CanSeek)
+                {
+                    source.Position = sourceOffset;
+                }
+
+                var copy = new MemoryStream();
+                try
+                {
+                    source.CopyTo(copy);
+                    copy.Position = position;
+                    workingCopy = copy;
+                }
+                catch
+                {
+                    copy.Dispose();
+                    throw;
+                }
+            }
+
+            return workingCopy;
+        }
+
+        /// <summary>
+        /// SDKがZIPを書き終えた後、保存が指定された場合にだけ元のStreamへ反映します。
+        /// </summary>
+        internal void WriteBack()
+        {
+            if (workingCopy is not null)
+            {
+                workingCopy.Position = 0;
+                source.Position = 0;
+                workingCopy.CopyTo(source);
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                workingCopy?.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 
