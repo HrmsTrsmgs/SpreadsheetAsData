@@ -95,6 +95,7 @@ public class Cell
                 return;
             }
 
+            Xml.DataType = CellValues.Number;
             Xml.CellValue = new(((double)value).ToString(CultureInfo.InvariantCulture));
         }
     }

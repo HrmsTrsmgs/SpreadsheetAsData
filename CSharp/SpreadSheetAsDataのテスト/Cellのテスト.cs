@@ -127,6 +127,23 @@ public class Cellのテスト : IDisposable
         (tested.Value as object).Should().Be(123d);
     }
 
+    [Theory]
+    [InlineData("Book1.xlsx", "いろいろなデータ", "A3")]
+    [InlineData("文字列セル.xlsx", "Sheet1", "A1")]
+    [InlineData("Book1.xlsx", "いろいろなデータ", "A2")]
+    public void Valueプロパティは文字列や真偽値のセルを数値で上書きできます(
+        string excelFileName,
+        string sheetName,
+        string cellReference)
+    {
+        using var book = Workbook.Open(temporaryFiles.Copy(excelFileName));
+        var tested = book.Sheets[sheetName].Cells[cellReference];
+
+        tested.Value = 12.34;
+
+        (tested.Value as object).Should().Be(12.34);
+    }
+
     [Fact]
     public void Valueプロパティは現在カルチャーに依存せず数値を書き込めます()
     {
