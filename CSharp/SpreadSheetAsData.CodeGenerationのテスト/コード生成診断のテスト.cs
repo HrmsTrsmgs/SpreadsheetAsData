@@ -194,6 +194,20 @@ public sealed class コード生成診断のテスト
                     ["sales_detail"]));
     }
 
+    [Fact]
+    public void シートの生成プロパティ名が生成Bookの型名と衝突した場合に診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                BasicStructureExcelFilePath,
+                options => options.NameMappings = new() { ["SalesData"] = "BasicStructureBook" })
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "BasicStructureBook",
+                    ["SalesData"]));
+    }
+
     [Theory]
     [InlineData("Read")]
     [InlineData("Open")]

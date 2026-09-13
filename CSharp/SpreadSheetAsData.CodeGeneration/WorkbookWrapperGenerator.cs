@@ -45,7 +45,7 @@ public static class WorkbookWrapperGenerator
         return
         [
             .. InvalidBookSheetPropertyNameDiagnostics(book, options),
-            .. BookPropertyNameDiagnostics(book, options),
+            .. BookPropertyNameDiagnostics(filePath, book, options),
             .. BookDefinedNameDiagnostics(filePath, book, options),
             .. SheetDefinedNameDiagnostics(book, options),
             .. from table in book.Tables
@@ -71,9 +71,10 @@ public static class WorkbookWrapperGenerator
 
     /// <summary>
     /// Book型の中で、ワークシートとExcelテーブルの生成プロパティ名同士、
-    /// およびRead・Open・Replace・ValidateStructureメソッド名との衝突を検出します。
+    /// およびBook型名とRead・Open・Replace・ValidateStructureメソッド名との衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> BookPropertyNameDiagnostics(
+        string filePath,
         Workbook book,
         CodeGenerationOptions options) =>
         from sourceNamesByPropertyName in
@@ -83,6 +84,7 @@ public static class WorkbookWrapperGenerator
                     from table in book.Tables select table.Name)
             group sourceName by options.GeneratedName(sourceName)
         where sourceNamesByPropertyName.Skip(1).Any()
+            || sourceNamesByPropertyName.Key == $"{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}Book"
             || sourceNamesByPropertyName.Key is nameof(Workbook.Read) or nameof(Workbook.Open)
                 or nameof(Workbook.Replace) or "ValidateStructure"
         select new CodeGenerationDiagnostic(
