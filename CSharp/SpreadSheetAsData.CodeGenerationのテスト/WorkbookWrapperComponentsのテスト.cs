@@ -66,9 +66,9 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     }
 
                     /// <summary>
-                    /// 生成元のシート、テーブル、ブックスコープの定義名を確認して、Excelブックを開きます。
+                    /// 生成元のシート、テーブル、両スコープの定義名を確認して、Excelブックを開きます。
                     /// </summary>
-                    /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブル、ブックスコープの定義名のいずれかが存在しません。</exception>
+                    /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブル、両スコープの定義名のいずれかが存在しません。</exception>
                     public static new BasicStructureBook Open(string filePath) =>
                         ValidateStructure(new(filePath));
 
@@ -77,14 +77,14 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     }
 
                     /// <summary>
-                    /// 生成元のシート、テーブル、ブックスコープの定義名を確認して、Stream上のExcelブックを開きます。
+                    /// 生成元のシート、テーブル、両スコープの定義名を確認して、Stream上のExcelブックを開きます。
                     /// </summary>
-                    /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブル、ブックスコープの定義名のいずれかが存在しません。</exception>
+                    /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブル、両スコープの定義名のいずれかが存在しません。</exception>
                     public static new BasicStructureBook Open(System.IO.Stream stream) =>
                         ValidateStructure(new(stream));
 
                     /// <summary>
-                    /// 生成元に対応するシート、テーブル、ブックスコープの定義名を確認し、不足時は開いたブックを破棄します。
+                    /// 生成元に対応するシート、テーブル、両スコープの定義名を確認し、不足時は開いたブックを破棄します。
                     /// </summary>
                     static BasicStructureBook ValidateStructure(BasicStructureBook book)
                     {
@@ -94,7 +94,10 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                                 .Any(tableName => !book.Tables.Any(table => table.Name == tableName))
                             || new string[] {  }
                                 .Any(name => !book.DefinedNames.Any(
-                                    definedName => definedName.Worksheet is null && definedName.Name == name)))
+                                    definedName => definedName.Worksheet is null && definedName.Name == name))
+                            || new (string SheetName, string Name)[] {  }
+                                .Any(name => !book.DefinedNames.Any(
+                                    definedName => definedName.Worksheet?.Name == name.SheetName && definedName.Name == name.Name)))
                         {
                             book.Dispose();
                             throw new System.IO.InvalidDataException();

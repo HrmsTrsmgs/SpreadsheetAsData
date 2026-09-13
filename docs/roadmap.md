@@ -109,7 +109,7 @@ IEnumerable<Order> orders = book.ReadTable<Order>("Orders");
 - [x] 生成コードのテストを追加する
 - [x] 型付き読み書きのサンプルを追加する
 
-生成元スキーマとの不一致については、生成Bookの `Open` で必要なシート、Excelテーブル、ブックスコープの定義名の不足を検出するところまで実装・テスト済みです。
+生成元スキーマとの不一致については、生成Bookの `Open` で必要なシート、Excelテーブル、ブックスコープとシートローカルの定義名の不足を検出するところまで実装・テスト済みです。
 これだけで列構造や値の型など、すべての不一致を検出できるわけではないため、項目全体は未完了としています。
 
 コード生成APIは `Marimo.SpreadSheetAsData.CodeGeneration`、Visual StudioとMSBuildの連携は `Marimo.SpreadSheetAsData.Build` で提供します。
