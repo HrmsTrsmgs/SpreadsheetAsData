@@ -397,13 +397,12 @@ static class WorkbookWrapperComponents
             return "string";
         }
 
-        if (values.All(it => it is double number && double.IsInteger(number)))
+        if (values.All(CanConvertToInt32))
         {
             return "int";
         }
 
-        if (values.All(it => it is BlankValue
-            || it is double number && double.IsInteger(number)))
+        if (values.All(it => it is BlankValue || CanConvertToInt32(it)))
         {
             return "int?";
         }
@@ -434,6 +433,12 @@ static class WorkbookWrapperComponents
         }
 
         return "object?";
+
+        // セル値がintの範囲に収まる整数値かどうかを判定します。
+        static bool CanConvertToInt32(object value) =>
+            value is double number
+            && double.IsInteger(number)
+            && number is >= int.MinValue and <= int.MaxValue;
     }
 
     /// <summary>

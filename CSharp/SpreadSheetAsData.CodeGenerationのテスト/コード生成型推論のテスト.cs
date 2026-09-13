@@ -138,6 +138,32 @@ public sealed class コード生成型推論のテスト
         tested.PropertyType.Should().Be(typeof(double));
     }
 
+    [Theory]
+    [InlineData((double)int.MinValue, typeof(int))]
+    [InlineData((double)int.MaxValue, typeof(int))]
+    [InlineData((double)int.MinValue - 1, typeof(double))]
+    [InlineData((double)int.MaxValue + 1, typeof(double))]
+    public void 整数値の列はintに収まる場合だけintプロパティとし範囲外ならdoubleプロパティとして生成します(
+        double value,
+        Type propertyType)
+    {
+        using var temporaryFiles = new TemporaryExcelFiles();
+        var excelFilePath = temporaryFiles.Copy(BasicStructureExcelFilePath);
+        using (var book = Workbook.Open(excelFilePath))
+        {
+            book.Tables["sales_detail"].Rows.First()["customer_id"].Value = value;
+            book.Save();
+        }
+
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(excelFilePath))
+            .GeneratedType("SalesDetail")
+            .GetProperty("CustomerId");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(propertyType);
+    }
+
     [Fact]
     public void 文字列値を持つ列をstringプロパティとして生成します()
     {
