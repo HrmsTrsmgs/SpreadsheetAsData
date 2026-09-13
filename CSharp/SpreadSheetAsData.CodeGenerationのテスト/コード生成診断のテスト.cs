@@ -180,6 +180,20 @@ public sealed class コード生成診断のテスト
                     ["SalesData"]));
     }
 
+    [Fact]
+    public void テーブルの生成プロパティ名が生成BookのValidateStructureメソッド名と衝突した場合に診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                BasicStructureExcelFilePath,
+                options => options.NameMappings = new() { ["sales_detail"] = "ValidateStructure" })
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "ValidateStructure",
+                    ["sales_detail"]));
+    }
+
     [Theory]
     [InlineData("Read")]
     [InlineData("Open")]
