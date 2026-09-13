@@ -291,22 +291,31 @@ public class Workbook : IDisposable
     sealed class DocumentSession : IDisposable
     {
         readonly string? filePath;
-        readonly Stream stream;
-        readonly bool ownsStream;
+
+        /// <summary>
+        /// 呼び出し側から借りた保存結果の書き戻し先です。ファイル版ではnullで、このクラスでは閉じません。
+        /// </summary>
+        readonly Stream? saveDestinationStream;
+
+        /// <summary>
+        /// SDKが編集する作業領域です。このクラスが所有し、終了時に閉じます。
+        /// </summary>
+        readonly MemoryStream workingStream;
         FileStream? fileLock;
+        bool saveStream;
         bool disposedValue;
 
         DocumentSession(
             string? filePath,
             FileStream? fileLock,
-            Stream stream,
-            Packaging.SpreadsheetDocument document,
-            bool ownsStream)
+            Stream? saveDestinationStream,
+            MemoryStream workingStream,
+            Packaging.SpreadsheetDocument document)
         {
             this.filePath = filePath;
             this.fileLock = fileLock;
-            this.stream = stream;
-            this.ownsStream = ownsStream;
+            this.saveDestinationStream = saveDestinationStream;
+            this.workingStream = workingStream;
             Document = document;
         }
 
@@ -315,41 +324,56 @@ public class Workbook : IDisposable
         internal static DocumentSession Open(string filePath)
         {
             var fileLock = Lock(filePath);
-            var stream = new MemoryStream();
+            var workingStream = new MemoryStream();
 
             try
             {
-                fileLock.CopyTo(stream);
-                stream.Position = 0;
+                fileLock.CopyTo(workingStream);
+                workingStream.Position = 0;
 
                 return new(
                     filePath,
                     fileLock,
-                    stream,
+                    saveDestinationStream: null,
+                    workingStream,
                     Packaging.SpreadsheetDocument.Open(
-                        stream,
+                        workingStream,
                         isEditable: true,
-                        new Packaging.OpenSettings { AutoSave = false }),
-                    ownsStream: true);
+                        new Packaging.OpenSettings { AutoSave = false }));
             }
             catch
             {
-                stream.Dispose();
+                workingStream.Dispose();
                 fileLock.Dispose();
                 throw;
             }
         }
 
-        internal static DocumentSession Open(Stream stream) =>
-            new(
-                filePath: null,
-                fileLock: null,
-                stream,
-                Packaging.SpreadsheetDocument.Open(
-                    stream,
-                    isEditable: true,
-                    new Packaging.OpenSettings { AutoSave = false }),
-                ownsStream: false);
+        internal static DocumentSession Open(Stream stream)
+        {
+            // 終了時の再圧縮で呼び出し側のStreamを拡張しないよう、編集用コピーを使用します。
+            var workingStream = new MemoryStream();
+            try
+            {
+                stream.CopyTo(workingStream);
+                workingStream.Position = 0;
+
+                return new(
+                    filePath: null,
+                    fileLock: null,
+                    saveDestinationStream: stream,
+                    workingStream,
+                    Packaging.SpreadsheetDocument.Open(
+                        workingStream,
+                        isEditable: true,
+                        new Packaging.OpenSettings { AutoSave = false }));
+            }
+            catch
+            {
+                workingStream.Dispose();
+                throw;
+            }
+        }
 
         static FileStream Lock(string filePath) =>
             File.Open(
@@ -363,6 +387,7 @@ public class Workbook : IDisposable
             if (filePath is null)
             {
                 Document.Save();
+                saveStream = true;
                 return;
             }
 
@@ -387,10 +412,14 @@ public class Workbook : IDisposable
             if (!disposedValue)
             {
                 Document.Close();
-                if (ownsStream)
+                // ZIPへの反映が完了してから、明示的なSaveの結果だけを元のStreamへ戻します。
+                if (saveStream && saveDestinationStream is not null)
                 {
-                    stream.Dispose();
+                    workingStream.Position = 0;
+                    saveDestinationStream.Position = 0;
+                    workingStream.CopyTo(saveDestinationStream);
                 }
+                workingStream.Dispose();
                 fileLock?.Dispose();
                 disposedValue = true;
             }

@@ -64,6 +64,20 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void Openは再圧縮でサイズが増えるブックも固定容量のMemoryStreamで開いて閉じられます()
+    {
+        using var stream = new MemoryStream(
+            File.ReadAllBytes(@"TestData\再圧縮でサイズが増えるブック.xlsx"));
+
+        var tested = () =>
+        {
+            using var book = Workbook.Open(stream);
+        };
+
+        tested.Should().NotThrow();
+    }
+
+    [Fact]
     public void OpenはFileStream上のブックを開きます()
     {
         using var stream = File.Open(
