@@ -189,6 +189,32 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void 生成されたBook型は構造の検証でOpenに失敗するとファイルを解放します()
+    {
+        using var temporaryFiles = new TemporaryExcelFiles();
+        var excelFilePath = temporaryFiles.Copy(DefinedNamesExcelFilePath);
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(DefinedNamesWithSheetScopeExcelFilePath))
+            .GeneratedType("定義名Book");
+
+        var openBook = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>("Open", excelFilePath);
+        };
+
+        openBook.Should().Throw<TargetInvocationException>()
+            .WithInnerException<InvalidDataException>();
+
+        var tested = () =>
+        {
+            using var stream = File.Open(excelFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+        };
+
+        tested.Should().NotThrow();
+    }
+
+    [Fact]
     public void 生成されたBook型は必要なシートがないStreamをOpenすると失敗します()
     {
         var generatedType = GeneratedCodeInspection
