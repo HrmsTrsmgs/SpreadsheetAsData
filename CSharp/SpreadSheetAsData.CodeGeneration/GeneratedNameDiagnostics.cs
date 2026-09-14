@@ -16,7 +16,7 @@ static class GeneratedNameDiagnostics
         CodeGenerationOptions options) =>
         [
             .. InvalidBookSheetPropertyNameDiagnostics(book, options),
-            .. SheetTypeNameDiagnostics(book, options),
+            .. TypeNameDiagnostics(book, options),
             .. BookPropertyNameDiagnostics(filePath, book, options),
             .. BookDefinedNameDiagnostics(book, options),
             .. SheetDefinedNameDiagnostics(book, options),
@@ -29,15 +29,21 @@ static class GeneratedNameDiagnostics
         ];
 
     /// <summary>
-    /// 異なるワークシートから同じSheet型名が生成される場合を検出します。
+    /// ワークシート・テーブルから生成する型名同士の衝突を検出します。
     /// </summary>
-    static IEnumerable<CodeGenerationDiagnostic> SheetTypeNameDiagnostics(
+    static IEnumerable<CodeGenerationDiagnostic> TypeNameDiagnostics(
         Workbook book,
         CodeGenerationOptions options) =>
         NameCollisionDiagnostics(
             GroupMemberNames(
-                from sheet in book.Sheets.Values
-                select (sheet.Name, $"{options.GeneratedName(sheet.Name)}Sheet")),
+                [
+                    .. from sheet in book.Sheets.Values
+                       select (sheet.Name, $"{options.GeneratedName(sheet.Name)}Sheet"),
+                    .. from table in book.Tables
+                       let name = options.GeneratedName(table.Name)
+                       from typeName in new[] { $"{name}Table", name }
+                       select (table.Name, typeName)
+                ]),
             []);
 
     /// <summary>

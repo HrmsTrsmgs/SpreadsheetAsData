@@ -269,7 +269,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, "SalesDataSheet", ["sales_data", "product_master"]));
     }
 
-    [Fact(Skip = "同一名前空間に出力する型名の衝突診断を、Table型と行データ型に適用する段階で解除する。")]
+    [Fact]
     public void 異なるテーブルから同じTable型名と行データ型名を生成する場合に両方を診断します()
     {
         var tested = GeneratedCodeInspection.GenerateDiagnostics(
