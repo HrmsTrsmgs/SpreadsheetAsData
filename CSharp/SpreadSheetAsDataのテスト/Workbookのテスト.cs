@@ -250,16 +250,18 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
-    public void Openは検証する場合不正なOOXMLで失敗します()
+    public void Openは不正なOOXMLの検証で失敗するとファイルの束縛を解除します()
     {
+        var filePath = temporaryFiles.Copy("不正なOOXML.xlsx");
         var action = () =>
         {
             using var book = Workbook.Open(
-                temporaryFiles.Copy("不正なOOXML.xlsx"),
+                filePath,
                 validate: true);
         };
 
         action.Should().Throw<InvalidDataException>();
+        FluentActions.Invoking(() => File.Delete(filePath)).Should().NotThrow();
     }
 
     [Fact]
