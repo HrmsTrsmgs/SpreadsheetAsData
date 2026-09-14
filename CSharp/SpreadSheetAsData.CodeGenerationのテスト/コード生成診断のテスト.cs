@@ -299,7 +299,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, generatedName, ["sales_detail", otherSourceName]));
     }
 
-    [Theory(Skip = "文字列の一致ではなくCSharp識別子としての同一性で衝突を診断する段階で解除する。")]
+    [Theory]
     [InlineData("Shared\u200CValue")]
     [InlineData("@SharedValue")]
     public void 書式文字やエスケープ表記だけが異なるプロパティ名も同じ識別子として診断します(string equivalentName)

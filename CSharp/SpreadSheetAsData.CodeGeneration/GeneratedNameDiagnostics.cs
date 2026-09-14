@@ -1,4 +1,5 @@
 using Marimo.SpreadSheetAsData;
+using System.Globalization;
 
 namespace Marimo.SpreadSheetAsData.CodeGeneration;
 
@@ -206,12 +207,16 @@ static class GeneratedNameDiagnostics
         ];
 
     /// <summary>
-    /// 同じ生成名を持つメンバーを、入力順を保ってまとめます。
+    /// 先頭のエスケープ表記と書式文字を除いて同じ識別子になるメンバーを、入力順を保ってまとめます。
     /// </summary>
     static IEnumerable<(string Name, string[] SourceNames)> GroupMemberNames(
         IEnumerable<(string SourceName, string Name)> members) =>
         from member in members
-        group member.SourceName by member.Name into names
+        let identifier = string.Concat(
+            from character in member.Name.TrimStart('@')
+            where char.GetUnicodeCategory(character) != UnicodeCategory.Format
+            select character)
+        group member.SourceName by identifier into names
         select (names.Key, names.ToArray());
 
     /// <summary>
