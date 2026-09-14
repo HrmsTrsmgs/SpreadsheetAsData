@@ -282,7 +282,7 @@ public sealed class コード生成診断のテスト
             new CodeGenerationDiagnostic(true, "SalesDetail", ["sales_detail", "product_list"]));
     }
 
-    [Theory(Skip = "生成型同士の衝突診断と、ブック由来のSourceNamesをファイル名で示す案をレビュー後に解除する。")]
+    [Theory]
     [InlineData("定義名Book", "定義名.xlsx")]
     [InlineData("定義名Data", "定義名.xlsx")]
     [InlineData("SalesDataSheet", "sales_data")]
