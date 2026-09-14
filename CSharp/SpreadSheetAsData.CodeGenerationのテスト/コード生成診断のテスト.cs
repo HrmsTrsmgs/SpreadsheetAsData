@@ -82,7 +82,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, generatedName, [sourceName]));
     }
 
-    [Fact(Skip = "Worksheetの継承API名の予約範囲を確認し、テーブル由来のプロパティにも適用する段階で解除する。")]
+    [Fact]
     public void テーブルの生成プロパティにもWorksheetのBookプロパティ名との衝突診断を適用します()
     {
         GeneratedCodeInspection
