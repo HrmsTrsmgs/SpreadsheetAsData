@@ -235,6 +235,26 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void 生成されたBook型は構造の検証でOpenに失敗しても呼び出し側のStreamを閉じません()
+    {
+        using var stream = new MemoryStream(File.ReadAllBytes(DefinedNamesExcelFilePath));
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(DefinedNamesWithSheetScopeExcelFilePath))
+            .GeneratedType("定義名Book");
+
+        var openBook = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>("Open", stream);
+        };
+
+        openBook.Should().Throw<TargetInvocationException>()
+            .WithInnerException<InvalidDataException>();
+
+        stream.CanRead.Should().BeTrue();
+    }
+
+    [Fact]
     public void 生成されたBook型はStreamから開けます()
     {
         using var stream = new MemoryStream(
