@@ -285,7 +285,7 @@ public sealed class コード生成アクセスのテスト
         tested.Should().NotThrow();
     }
 
-    [Theory(Skip = "範囲プロパティで1セルも扱う方針をレビューし、単一セルから範囲への変更とは別に確認する段階で解除する。")]
+    [Theory]
     [InlineData(@"TestData\コード生成\単一セル定義名の範囲化\定義名.xlsx", DefinedNamesExcelFilePath)]
     [InlineData(@"TestData\コード生成\シートローカル単一セル定義名の範囲化\定義名.xlsx", DefinedNamesWithSheetScopeExcelFilePath)]
     public void 生成されたBook型は複数セルの定義名が単一セルに変わってもOpenできます(
