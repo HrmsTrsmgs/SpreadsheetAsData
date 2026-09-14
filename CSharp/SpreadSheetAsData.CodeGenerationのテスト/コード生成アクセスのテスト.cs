@@ -374,7 +374,7 @@ public sealed class コード生成アクセスのテスト
             .WithInnerException<InvalidDataException>();
     }
 
-    [Fact(Skip = "名前で対応付ける列の順序変更を許容する仕様をレビューした段階で解除する。")]
+    [Fact]
     public void 生成されたBook型はテーブルの列順だけが変わってもOpenできます()
     {
         var generatedType = GeneratedCodeInspection
