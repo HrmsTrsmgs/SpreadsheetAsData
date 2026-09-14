@@ -13,7 +13,7 @@ public sealed class コード生成診断のテスト
     const string InvalidNameExcelFilePath = @"TestData\コード生成\無効名.xlsx";
     const string DefinedNamesWithoutCollisionsExcelFilePath = @"TestData\コード生成\衝突なし\定義名.xlsx";
 
-    [Theory(Skip = "継承API名を含む予約範囲をレビューし、既存メンバー名との衝突診断をまとめて確認する段階で解除する。")]
+    [Theory]
     [InlineData("SalesData", "Read")]
     [InlineData("sales_detail", "Read")]
     [InlineData("SalesData", "Open")]

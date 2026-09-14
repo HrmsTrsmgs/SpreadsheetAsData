@@ -73,7 +73,7 @@ public static class WorkbookWrapperGenerator
 
     /// <summary>
     /// Book型の中で、ワークシートとExcelテーブルの生成プロパティ名同士、
-    /// およびBook型名とRead・Open・Replace・ValidateStructureメソッド名との衝突を検出します。
+    /// およびBook型名、Read・Open・Replace・ValidateStructureメソッド名、Cell・Rangeプロパティ名との衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> BookPropertyNameDiagnostics(
         string filePath,
@@ -89,6 +89,7 @@ public static class WorkbookWrapperGenerator
             || sourceNamesByPropertyName.Key == $"{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}Book"
             || sourceNamesByPropertyName.Key is nameof(Workbook.Read) or nameof(Workbook.Open)
                 or nameof(Workbook.Replace) or "ValidateStructure"
+                or nameof(Workbook.Cell) or nameof(Workbook.Range)
         select new CodeGenerationDiagnostic(
             true,
             sourceNamesByPropertyName.Key,
