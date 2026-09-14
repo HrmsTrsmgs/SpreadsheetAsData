@@ -56,15 +56,14 @@ static class GeneratedNameDiagnostics
             BookReservedNames(filePath));
 
     /// <summary>
-    /// Book型名と生成メソッド名、継承した構造プロパティ・読み取り・保存・終了API名との定義名の衝突を検出します。
+    /// Bookの定義名同士、および型名・生成メソッド名・継承したAPI名との衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> BookDefinedNameDiagnostics(
         string filePath,
         Workbook book,
         CodeGenerationOptions options) =>
         NameCollisionDiagnostics(
-            from member in BookDefinedNames(book, options)
-            select (member.Name, new[] { member.SourceName }),
+            GroupMemberNames(BookDefinedNames(book, options)),
             [
                 .. BookReservedNames(filePath),
                 nameof(Workbook.Tables), nameof(Workbook.DefinedNames), nameof(Workbook.Sheets),
@@ -83,16 +82,17 @@ static class GeneratedNameDiagnostics
             BookPropertyNames(book, options));
 
     /// <summary>
-    /// Sheet型名、継承した構造プロパティ名・ToStringとのシートローカル定義名の衝突を検出します。
+    /// 同じSheetの定義名同士、および型名・継承した構造プロパティ名・ToStringとの衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> SheetDefinedNameDiagnostics(
         Workbook book,
         CodeGenerationOptions options) =>
-        from definedName in book.DefinedNames
-        let sheet = definedName.Worksheet
-        where sheet is not null
+        from sheet in book.Sheets.Values
         from diagnostic in NameCollisionDiagnostics(
-            [(options.SheetDefinedName(sheet, definedName), new[] { definedName.Name })],
+            GroupMemberNames(
+                from definedName in book.DefinedNames
+                where definedName.Worksheet?.Name == sheet.Name
+                select (definedName.Name, options.SheetDefinedName(sheet, definedName))),
             [
                 $"{options.GeneratedName(sheet.Name)}Sheet", nameof(Worksheet.Cell), nameof(Worksheet.Range),
                 nameof(Worksheet.Book), nameof(Worksheet.Name), nameof(Worksheet.Cells), nameof(Worksheet.ToString)

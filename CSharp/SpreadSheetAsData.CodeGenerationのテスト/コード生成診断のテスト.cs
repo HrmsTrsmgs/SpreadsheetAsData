@@ -196,7 +196,7 @@ public sealed class コード生成診断のテスト
                     ["local_cell", "sales_detail"]));
     }
 
-    [Theory(Skip = "定義名同士の衝突を、Book・Sheetそれぞれの生成先で診断する段階で解除する。")]
+    [Theory]
     [InlineData("book.main_cell", "book.main_range", "main_cell", "main_range")]
     [InlineData("sales_data.local_cell", "sales_data.local_range", "local_cell", "local_range")]
     public void 同じ生成型の単一セルと範囲の定義名が同じプロパティ名になる場合に診断します(
