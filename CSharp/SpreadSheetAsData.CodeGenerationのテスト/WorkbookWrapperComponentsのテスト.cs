@@ -14,6 +14,31 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
     readonly Workbook basicBook;
     readonly Workbook definedNamesBook;
 
+    [Theory]
+    [InlineData("Workbook", "public partial class BasicStructureBook : global::Marimo.SpreadSheetAsData.Workbook")]
+    [InlineData("Worksheet", "public partial class SalesDataSheet : global::Marimo.SpreadSheetAsData.Worksheet")]
+    [InlineData("Table", "public TableTable(global::Marimo.SpreadSheetAsData.Table source)")]
+    [InlineData("System", "Open(global::System.IO.Stream stream)")]
+    public void SourceFileは同名の生成型に隠される参照を完全修飾します(string generatedName, string expected)
+    {
+        SourceFile(
+            BasicStructureExcelFilePath,
+            new() { NameMappings = new() { ["sales_detail"] = generatedName } },
+            basicBook)
+            .Should().Contain(expected);
+    }
+
+    [Theory]
+    [InlineData("public partial class BasicStructureBook : Workbook")]
+    [InlineData("public partial class SalesDataSheet : Worksheet")]
+    [InlineData("public SalesDetailTable(Table source)")]
+    [InlineData("Open(System.IO.Stream stream)")]
+    public void SourceFileは同名の生成型がない参照を短い表記にします(string expected)
+    {
+        SourceFile(BasicStructureExcelFilePath, options, basicBook)
+            .Should().Contain(expected);
+    }
+
     public WorkbookWrapperComponentsのテスト()
     {
         basicBook = Workbook.Open(BasicStructureExcelFilePath);

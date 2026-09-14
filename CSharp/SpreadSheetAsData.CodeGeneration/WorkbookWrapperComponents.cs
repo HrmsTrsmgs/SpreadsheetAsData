@@ -50,7 +50,7 @@ static class WorkbookWrapperComponents
         /// <summary>
         /// Excelブック「{{bookFileName}}」を型付きで表します。
         /// </summary>
-        public partial class {{bookFileIdentifier}}Book : Workbook
+        public partial class {{bookFileIdentifier}}Book : {{ReferencedTypeName("Workbook", book, options)}}
         {
             public {{bookFileIdentifier}}Book() : this({{StringLiteral(filePath)}})
             {
@@ -63,19 +63,19 @@ static class WorkbookWrapperComponents
             /// <summary>
             /// 生成元のシート、テーブルとその列、両スコープの定義名を確認して、Excelブックを開きます。
             /// </summary>
-            /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、テーブルの所属シートが異なるか、単一セルの定義名が複数セルを参照しています。</exception>
+            /// <exception cref="{{ReferencedTypeName("System.IO.InvalidDataException", book, options)}}">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、テーブルの所属シートが異なるか、単一セルの定義名が複数セルを参照しています。</exception>
             public static new {{bookFileIdentifier}}Book Open(string filePath) =>
                 ValidateStructure(new(filePath));
 
-            {{bookFileIdentifier}}Book(System.IO.Stream stream) : base(stream)
+            {{bookFileIdentifier}}Book({{ReferencedTypeName("System.IO.Stream", book, options)}} stream) : base(stream)
             {
             }
 
             /// <summary>
             /// 生成元のシート、テーブルとその列、両スコープの定義名を確認して、Stream上のExcelブックを開きます。
             /// </summary>
-            /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、テーブルの所属シートが異なるか、単一セルの定義名が複数セルを参照しています。</exception>
-            public static new {{bookFileIdentifier}}Book Open(System.IO.Stream stream) =>
+            /// <exception cref="{{ReferencedTypeName("System.IO.InvalidDataException", book, options)}}">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、テーブルの所属シートが異なるか、単一セルの定義名が複数セルを参照しています。</exception>
+            public static new {{bookFileIdentifier}}Book Open({{ReferencedTypeName("System.IO.Stream", book, options)}} stream) =>
                 ValidateStructure(new(stream));
 
             /// <summary>
@@ -119,7 +119,7 @@ static class WorkbookWrapperComponents
                                     || definedName.Range.TopLeftCell == definedName.Range.BottomRightCell))))
                 {
                     book.Dispose();
-                    throw new System.IO.InvalidDataException();
+                    throw new {{ReferencedTypeName("System.IO.InvalidDataException", book, options)}}();
                 }
 
                 return book;
@@ -313,9 +313,9 @@ static class WorkbookWrapperComponents
         /// <summary>
         /// ワークシート「{{sheet.Name}}」を型付きで表します。
         /// </summary>
-        public partial class {{options.GeneratedName(sheet.Name)}}Sheet : Worksheet
+        public partial class {{options.GeneratedName(sheet.Name)}}Sheet : {{ReferencedTypeName("Worksheet", sheet.Book, options)}}
         {
-            public {{options.GeneratedName(sheet.Name)}}Sheet(Workbook book) : base(book, {{StringLiteral(sheet.Name)}})
+            public {{options.GeneratedName(sheet.Name)}}Sheet({{ReferencedTypeName("Workbook", sheet.Book, options)}} book) : base(book, {{StringLiteral(sheet.Name)}})
             {
             }
         {{ForEach([
@@ -348,7 +348,7 @@ static class WorkbookWrapperComponents
         /// </summary>
         public partial class {{tableIdentifier}}Table : Table<{{tableIdentifier}}>
         {
-            public {{tableIdentifier}}Table(Table source) : base(source)
+            public {{tableIdentifier}}Table({{ReferencedTypeName("Table", table.Worksheet.Book, options)}} source) : base(source)
             {
             }
         }
@@ -592,6 +592,17 @@ static class WorkbookWrapperComponents
             /// </summary>
             public {{options.GeneratedName(table.Name)}}Table {{options.GeneratedName(table.Name)}} => new(Book.Tables[{{StringLiteral(table.Name)}}]);
         """;
+
+    /// <summary>
+    /// 行データ型が参照名の先頭を隠す場合だけ、ルートからの完全修飾名を返します。
+    /// その他の生成型には接尾辞が付くため、ここで扱う既存型名とは衝突しません。
+    /// </summary>
+    static string ReferencedTypeName(string typeName, Workbook book, CodeGenerationOptions options) =>
+        !book.Tables.Any(table => options.GeneratedName(table.Name) == typeName.Split('.')[0])
+            ? typeName
+        : typeName.Contains('.')
+            ? $"global::{typeName}"
+        : $"global::Marimo.SpreadSheetAsData.{typeName}";
 
     /// <summary>
     /// 複数のテンプレート部品を、生成ソース上の行単位で連結します。

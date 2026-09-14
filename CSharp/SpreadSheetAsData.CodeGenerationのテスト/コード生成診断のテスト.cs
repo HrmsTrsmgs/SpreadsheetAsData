@@ -299,21 +299,6 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, generatedName, ["sales_detail", otherSourceName]));
     }
 
-    [Theory(Skip = "既存型名を予約して診断する案。完全修飾で衝突を回避する案との比較・仕様レビュー後に解除または変更する。")]
-    [InlineData("Workbook")]
-    [InlineData("Worksheet")]
-    [InlineData("Table")]
-    [InlineData("System")]
-    public void 生成コードの参照先を隠す型名を生成する場合に診断します(string generatedName)
-    {
-        GeneratedCodeInspection
-            .GenerateDiagnostics(
-                BasicStructureExcelFilePath,
-                options => options.NameMappings = new() { ["sales_detail"] = generatedName })
-            .Should().ContainEquivalentOf(
-                new CodeGenerationDiagnostic(true, generatedName, ["sales_detail"]));
-    }
-
     [Theory(Skip = "文字列の一致ではなくCSharp識別子としての同一性で衝突を診断する段階で解除する。")]
     [InlineData("Shared\u200CValue")]
     [InlineData("@SharedValue")]

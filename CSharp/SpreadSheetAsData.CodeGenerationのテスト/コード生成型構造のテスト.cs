@@ -10,6 +10,22 @@ public sealed class コード生成型構造のテスト
     const string IntegratedExcelFilePath = @"TestData\コード生成\統合.xlsx";
 
     [Theory]
+    [InlineData("Workbook")]
+    [InlineData("Worksheet")]
+    [InlineData("Table")]
+    [InlineData("System")]
+    public void 既存の型や名前空間と同名の行データ型もコンパイルできます(string generatedName)
+    {
+        GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath,
+                    options => options.NameMappings = new() { ["sales_detail"] = generatedName }))
+            .DefinedTypes.Select(it => it.Name)
+            .Should().Contain(generatedName);
+    }
+
+    [Theory]
     [InlineData(BasicStructureExcelFilePath, "BasicStructureBook")]
     [InlineData(IntegratedExcelFilePath, "統合Book")]
     public void 生成されたBook型はExcelファイル名に対応する型名で生成します(
