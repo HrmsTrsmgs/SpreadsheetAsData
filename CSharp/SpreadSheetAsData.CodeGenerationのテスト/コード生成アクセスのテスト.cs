@@ -304,7 +304,7 @@ public sealed class コード生成アクセスのテスト
         tested.Should().NotThrow();
     }
 
-    [Fact(Skip = "名前と単一セル・範囲の区別を保った参照位置の変更を許容する仕様をレビューした段階で解除する。")]
+    [Fact]
     public void 生成されたBook型は定義名の参照位置だけが変わってもOpenできます()
     {
         var generatedType = GeneratedCodeInspection
