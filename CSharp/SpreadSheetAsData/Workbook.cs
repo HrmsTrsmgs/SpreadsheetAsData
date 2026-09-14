@@ -306,6 +306,7 @@ public class Workbook : IDisposable
     /// </summary>
     /// <param name="filePath">保存先のファイルパス。</param>
     /// <remarks>Streamから開いた場合も利用できます。元Streamの内容は変更しません。</remarks>
+    /// <exception cref="ObjectDisposedException">ブックは既に閉じられています。</exception>
     public void SaveAs(string filePath) =>
         documentSession.SaveAs(filePath);
 
@@ -414,6 +415,7 @@ public class Workbook : IDisposable
 
         internal void SaveAs(string filePath)
         {
+            ObjectDisposedException.ThrowIf(disposedValue, this);
             using var document = Document.Clone(filePath);
         }
 

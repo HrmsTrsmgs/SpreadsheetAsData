@@ -590,6 +590,21 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void SaveAsはDispose後に呼び出すと保存先を変更せずに失敗します()
+    {
+        var sourcePath = temporaryFiles.Copy("Book1.xlsx");
+        var savedPath = temporaryFiles.Copy("Book1.xlsx");
+        var originalBytes = File.ReadAllBytes(savedPath);
+        using var book = Workbook.Open(sourcePath);
+        book.Dispose();
+
+        var tested = () => book.SaveAs(savedPath);
+
+        tested.Should().Throw<ObjectDisposedException>();
+        File.ReadAllBytes(savedPath).Should().Equal(originalBytes);
+    }
+
+    [Fact]
     public void SaveAsは変更したセル値を別ファイルへ保存します()
     {
         var sourcePath = temporaryFiles.Copy("Book1.xlsx");
