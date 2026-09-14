@@ -117,23 +117,24 @@ static class GeneratedNameDiagnostics
         select diagnostic;
 
     /// <summary>
-    /// Dataへ平坦化する定義名・テーブルのプロパティと、Data型名との衝突を検出します。
+    /// Dataへ平坦化する定義名・テーブルのプロパティ同士、およびData型名との衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> DataPropertyNameDiagnostics(
         string filePath,
         Workbook book,
         CodeGenerationOptions options) =>
         NameCollisionDiagnostics(
-            [
-                .. from definedName in book.DefinedNames
-                   let sheet = definedName.Worksheet
-                   let propertyName = sheet is null
-                       ? options.BookDefinedName(definedName)
-                       : options.SheetDefinedName(sheet, definedName)
-                   select (propertyName, new[] { definedName.Name }),
-                .. from table in book.Tables
-                   select (options.GeneratedName(table.Name), new[] { table.Name })
-            ],
+            GroupMemberNames(
+                [
+                    .. from definedName in book.DefinedNames
+                       let sheet = definedName.Worksheet
+                       let propertyName = sheet is null
+                           ? options.BookDefinedName(definedName)
+                           : options.SheetDefinedName(sheet, definedName)
+                       select (definedName.Name, propertyName),
+                    .. from table in book.Tables
+                       select (table.Name, options.GeneratedName(table.Name))
+                ]),
             [$"{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}Data"]);
 
     /// <summary>

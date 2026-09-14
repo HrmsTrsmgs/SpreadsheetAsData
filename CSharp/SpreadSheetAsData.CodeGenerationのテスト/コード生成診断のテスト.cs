@@ -232,7 +232,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, "SalesDetail", ["main_cell", "sales_data", "sales_detail"]));
     }
 
-    [Fact(Skip = "BookとSheetでは別の名前でも、Dataへ平坦化すると衝突する場合の診断を実装する段階で解除する。")]
+    [Fact]
     public void ブックとシートの定義名がDataへ平坦化されて同じプロパティ名になる場合に診断します()
     {
         GeneratedCodeInspection
