@@ -63,7 +63,7 @@ static class WorkbookWrapperComponents
             /// <summary>
             /// 生成元のシート、テーブルとその列、両スコープの定義名を確認して、Excelブックを開きます。
             /// </summary>
-            /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しません。</exception>
+            /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、単一セルのブック定義名が複数セルを参照しています。</exception>
             public static new {{bookFileIdentifier}}Book Open(string filePath) =>
                 ValidateStructure(new(filePath));
 
@@ -74,7 +74,7 @@ static class WorkbookWrapperComponents
             /// <summary>
             /// 生成元のシート、テーブルとその列、両スコープの定義名を確認して、Stream上のExcelブックを開きます。
             /// </summary>
-            /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しません。</exception>
+            /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、単一セルのブック定義名が複数セルを参照しています。</exception>
             public static new {{bookFileIdentifier}}Book Open(System.IO.Stream stream) =>
                 ValidateStructure(new(stream));
 
@@ -99,12 +99,14 @@ static class WorkbookWrapperComponents
                         from column in table.Columns
                         select $"({StringLiteral(table.Name)}, {StringLiteral(column.Name)})")}} }
                         .Any(column => !book.Tables[column.TableName].Columns.Contains(column.ColumnName))
-                    || new string[] { {{string.Join(
+                    || new (string Name, bool RequiresSingleCell)[] { {{string.Join(
                         ", ",
                         from definedName in BookScopedDefinedNames(book)
-                        select StringLiteral(definedName.Name))}} }
+                        select $"({StringLiteral(definedName.Name)}, {(IsSingleCellDefinedName(definedName) ? "true" : "false")})")}} }
                         .Any(name => !book.DefinedNames.Any(
-                            definedName => definedName.Worksheet is null && definedName.Name == name))
+                            definedName => definedName.Worksheet is null && definedName.Name == name.Name
+                                && (!name.RequiresSingleCell
+                                    || definedName.Range.TopLeftCell == definedName.Range.BottomRightCell)))
                     || new (string SheetName, string Name)[] { {{string.Join(
                         ", ",
                         from sheet in book.Sheets.Values

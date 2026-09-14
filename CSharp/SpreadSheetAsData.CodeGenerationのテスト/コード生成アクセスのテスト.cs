@@ -167,6 +167,25 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void 生成されたBook型は単一セルのブック定義名が複数セルに変わったファイルをOpenすると失敗します()
+    {
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(DefinedNamesExcelFilePath))
+            .GeneratedType("定義名Book");
+
+        // main_cellの参照先だけがE1からE1:F1へ広がり、他の構造と値は同じです。
+        var tested = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>(
+                "Open", @"TestData\コード生成\単一セル定義名の範囲化\定義名.xlsx");
+        };
+
+        tested.Should().Throw<TargetInvocationException>()
+            .WithInnerException<InvalidDataException>();
+    }
+
+    [Fact]
     public void 生成されたBook型は必要なシートローカルの定義名がないファイルをOpenすると失敗します()
     {
         var generatedType = GeneratedCodeInspection
