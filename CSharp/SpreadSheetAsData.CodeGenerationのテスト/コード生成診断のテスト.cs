@@ -247,7 +247,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, "SharedValue", ["main_cell", "local_cell"]));
     }
 
-    [Fact(Skip = "別シートのテーブルもDataでは同じ型に集まるため、平坦化後の衝突診断を実装する段階で解除する。")]
+    [Fact]
     public void シートローカルの定義名が別シートのテーブルとData内で同じプロパティ名になる場合に診断します()
     {
         GeneratedCodeInspection
@@ -258,7 +258,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, "ProductList", ["local_cell", "product_list"]));
     }
 
-    [Fact(Skip = "同一名前空間に出力する型名の衝突を診断する段階で解除する。プロパティ名の診断とは別に確認する。")]
+    [Fact]
     public void 異なるシートから同じSheet型名を生成する場合に診断します()
     {
         GeneratedCodeInspection

@@ -16,6 +16,7 @@ static class GeneratedNameDiagnostics
         CodeGenerationOptions options) =>
         [
             .. InvalidBookSheetPropertyNameDiagnostics(book, options),
+            .. SheetTypeNameDiagnostics(book, options),
             .. BookPropertyNameDiagnostics(filePath, book, options),
             .. BookDefinedNameDiagnostics(book, options),
             .. SheetDefinedNameDiagnostics(book, options),
@@ -26,6 +27,18 @@ static class GeneratedNameDiagnostics
                from diagnostic in ColumnPropertyNameDiagnostics(table, options)
                select diagnostic
         ];
+
+    /// <summary>
+    /// 異なるワークシートから同じSheet型名が生成される場合を検出します。
+    /// </summary>
+    static IEnumerable<CodeGenerationDiagnostic> SheetTypeNameDiagnostics(
+        Workbook book,
+        CodeGenerationOptions options) =>
+        NameCollisionDiagnostics(
+            GroupMemberNames(
+                from sheet in book.Sheets.Values
+                select (sheet.Name, $"{options.GeneratedName(sheet.Name)}Sheet")),
+            []);
 
     /// <summary>
     /// Book型のプロパティ名を生成できないワークシート名を検出します。
