@@ -478,6 +478,7 @@ static class WorkbookWrapperComponents
         {
             string => "string",
             double => "double",
+            bool => "bool",
             _ => "dynamic"
         };
 

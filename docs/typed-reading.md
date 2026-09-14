@@ -221,6 +221,11 @@ var sources = WorkbookWrapperGenerator.GenerateSources(
 そのため、生成行型の値変換は手書きPOCOと同じ `Table<T>` のマッピング規則を使用します。
 生成Bookの `Read()` と `Replace(Data)` でData内のテーブルを扱う場合も、同じ規則を使用します。
 
+### 単一セル定義名の型推論
+
+生成Dataの単一セル定義名プロパティは、現在値が文字列なら `string`、数値なら `double`、真偽値なら `bool` になります。空白なら `dynamic` です。
+Book／Sheet上の直接読み書き用プロパティは、これとは別に `dynamic` のままです。
+
 ### テーブル列の型推論
 
 行データ型のプロパティ型は、生成時のExcelテーブルの列値から判定します。

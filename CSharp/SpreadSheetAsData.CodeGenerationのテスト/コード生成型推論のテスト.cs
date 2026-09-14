@@ -32,6 +32,26 @@ public sealed class コード生成型推論のテスト
     }
 
     [Fact]
+    public void 真偽値の単一セル定義名をbool型のDataプロパティとして生成します()
+    {
+        using var temporaryFiles = new TemporaryExcelFiles();
+        var excelFilePath = temporaryFiles.Copy(DefinedNamesExcelFilePath);
+        using (var book = Workbook.Open(excelFilePath))
+        {
+            book.Cell["main_cell"].Value = true;
+            book.Save();
+        }
+
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(excelFilePath))
+            .GeneratedType($"{Path.GetFileNameWithoutExtension(excelFilePath).ToCSharpIdentifier()}Data")
+            .GetProperty("MainCell");
+
+        tested.Should().NotBeNull();
+        tested.PropertyType.Should().Be(typeof(bool));
+    }
+
+    [Fact]
     public void ブックスコープの複数セル定義名を二次元の値列挙となるDataプロパティとして生成します()
     {
         var tested = GeneratedCodeInspection
