@@ -356,7 +356,7 @@ public sealed class コード生成アクセスのテスト
             .WithInnerException<InvalidDataException>();
     }
 
-    [Fact(Skip = "列不足の検証でテーブルごとの所属も区別する観点をレビューした段階で解除する。")]
+    [Fact]
     public void 生成されたBook型は別テーブルの同名列を必要な列の代わりにしません()
     {
         var generatedType = GeneratedCodeInspection
