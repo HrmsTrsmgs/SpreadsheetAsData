@@ -264,7 +264,7 @@ public sealed class コード生成アクセスのテスト
             .WithInnerException<InvalidDataException>();
     }
 
-    [Theory(Skip = "余剰要素を許容する仕様をレビューし、Openの必須構造検証と区別して確認する段階で解除する。")]
+    [Theory]
     [InlineData(WithoutTablesExcelFilePath, "テーブルなしBook", BasicStructureExcelFilePath)]
     [InlineData(@"TestData\コード生成\列不足.xlsx", "列不足Book", BasicStructureExcelFilePath)]
     [InlineData(DefinedNamesExcelFilePath, "定義名Book", DefinedNamesWithSheetScopeExcelFilePath)]
