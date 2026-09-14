@@ -77,9 +77,10 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
-    public void Save失敗後も他からの書き込みを禁止し原因を除けば再保存できます()
+    public void Save失敗時は元ファイルと書き込み禁止を維持し原因を除けば再保存できます()
     {
         var filePath = temporaryFiles.Copy("Book1.xlsx");
+        var originalBytes = File.ReadAllBytes(filePath);
         using var book = Workbook.Open(filePath);
         book.Sheets["いろいろなデータ"].Cell["A1"].Value = 9.9;
 
@@ -88,6 +89,8 @@ public class Workbookのテスト : IDisposable
             var save = () => book.Save();
             save.Should().Throw<IOException>();
         }
+
+        File.ReadAllBytes(filePath).Should().Equal(originalBytes);
 
         var write = () =>
         {
