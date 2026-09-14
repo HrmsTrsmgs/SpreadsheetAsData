@@ -115,15 +115,16 @@ static class GeneratedNameDiagnostics
         select diagnostic;
 
     /// <summary>
-    /// Sheetのテーブル由来プロパティと、継承したBookプロパティ名との衝突を検出します。
+    /// Sheetのテーブル由来プロパティと、所属するSheet型名・継承したBookプロパティ名との衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> SheetTableNameDiagnostics(
         Workbook book,
         CodeGenerationOptions options) =>
-        NameCollisionDiagnostics(
-            from table in book.Tables
-            select (options.GeneratedName(table.Name), new[] { table.Name }),
-            [nameof(Worksheet.Book)]);
+        from table in book.Tables
+        from diagnostic in NameCollisionDiagnostics(
+            [(options.GeneratedName(table.Name), new[] { table.Name })],
+            [$"{options.GeneratedName(table.Worksheet.Name)}Sheet", nameof(Worksheet.Book)])
+        select diagnostic;
 
     /// <summary>
     /// 列プロパティ同士の名前衝突と、行データ型名との衝突を検出します。

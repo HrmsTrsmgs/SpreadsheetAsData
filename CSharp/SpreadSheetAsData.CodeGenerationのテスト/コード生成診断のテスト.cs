@@ -93,7 +93,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, "Book", ["sales_detail"]));
     }
 
-    [Theory(Skip = "所属する型名との衝突診断を、Sheetのテーブルプロパティも含めて確認する段階で解除する。")]
+    [Theory]
     [InlineData("SalesData", "BasicStructureBook", "SalesData")]
     [InlineData("sales_detail", "BasicStructureBook", "sales_detail")]
     [InlineData("sales_detail", "SalesDataSheet", "sales_detail")]
