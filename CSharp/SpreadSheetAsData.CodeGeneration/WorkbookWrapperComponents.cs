@@ -63,7 +63,7 @@ static class WorkbookWrapperComponents
             /// <summary>
             /// 生成元のシート、テーブルとその列、両スコープの定義名を確認して、Excelブックを開きます。
             /// </summary>
-            /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、単一セルの定義名が複数セルを参照しています。</exception>
+            /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、テーブルの所属シートが異なるか、単一セルの定義名が複数セルを参照しています。</exception>
             public static new {{bookFileIdentifier}}Book Open(string filePath) =>
                 ValidateStructure(new(filePath));
 
@@ -74,12 +74,12 @@ static class WorkbookWrapperComponents
             /// <summary>
             /// 生成元のシート、テーブルとその列、両スコープの定義名を確認して、Stream上のExcelブックを開きます。
             /// </summary>
-            /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、単一セルの定義名が複数セルを参照しています。</exception>
+            /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、テーブルの所属シートが異なるか、単一セルの定義名が複数セルを参照しています。</exception>
             public static new {{bookFileIdentifier}}Book Open(System.IO.Stream stream) =>
                 ValidateStructure(new(stream));
 
             /// <summary>
-            /// 生成元に対応するシート、テーブルとその列、両スコープの定義名を確認し、不足時は開いたブックを破棄します。
+            /// 生成元に対応するシート、テーブルとその列、両スコープの定義名を確認し、不一致時は開いたブックを破棄します。
             /// </summary>
             static {{bookFileIdentifier}}Book ValidateStructure({{bookFileIdentifier}}Book book)
             {
@@ -88,11 +88,12 @@ static class WorkbookWrapperComponents
                     from sheet in book.Sheets.Values
                     select StringLiteral(sheet.Name))}} }
                     .Any(sheetName => !book.Sheets.ContainsKey(sheetName))
-                    || new string[] { {{string.Join(
+                    || new (string SheetName, string TableName)[] { {{string.Join(
                         ", ",
                         from table in book.Tables
-                        select StringLiteral(table.Name))}} }
-                        .Any(tableName => !book.Tables.Any(table => table.Name == tableName))
+                        select $"({StringLiteral(table.Worksheet.Name)}, {StringLiteral(table.Name)})")}} }
+                        .Any(name => !book.Tables.Any(
+                            table => table.Name == name.TableName && table.Worksheet.Name == name.SheetName))
                     || new (string TableName, string ColumnName)[] { {{string.Join(
                         ", ",
                         from table in book.Tables

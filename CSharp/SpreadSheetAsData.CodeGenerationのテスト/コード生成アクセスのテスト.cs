@@ -338,7 +338,7 @@ public sealed class コード生成アクセスのテスト
         tested.Should().NotThrow();
     }
 
-    [Fact(Skip = "生成Sheetが公開するテーブルの所属もOpenの検証対象にする仕様をレビューした段階で解除する。")]
+    [Fact]
     public void 生成されたBook型は必要なテーブルが別シートへ移動したファイルをOpenすると失敗します()
     {
         var generatedType = GeneratedCodeInspection
