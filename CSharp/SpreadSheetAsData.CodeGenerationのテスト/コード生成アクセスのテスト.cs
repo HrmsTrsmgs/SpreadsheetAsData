@@ -189,6 +189,25 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void 生成されたBook型は別シートの同名定義名を必要なシートローカル定義名の代わりにしません()
+    {
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(DefinedNamesWithSheetScopeExcelFilePath))
+            .GeneratedType("定義名Book");
+
+        // local_cellの参照先は同じsales_data!A2ですが、所属はproduct_masterです。
+        var tested = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>(
+                "Open", @"TestData\コード生成\別シートローカル定義名\定義名.xlsx");
+        };
+
+        tested.Should().Throw<TargetInvocationException>()
+            .WithInnerException<InvalidDataException>();
+    }
+
+    [Fact]
     public void 生成されたBook型は構造の検証でOpenに失敗するとファイルを解放します()
     {
         using var temporaryFiles = new TemporaryExcelFiles();
