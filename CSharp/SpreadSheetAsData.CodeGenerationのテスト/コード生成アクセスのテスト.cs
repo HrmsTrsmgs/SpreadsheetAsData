@@ -321,28 +321,14 @@ public sealed class コード生成アクセスのテスト
         tested.Should().NotThrow();
     }
 
-    [Theory(Skip = "列定義を維持したデータ行数の変更を許容する仕様をレビューした段階で解除する。")]
-    [InlineData(1)]
-    [InlineData(2)]
-    public void 生成されたBook型はテーブルのデータ行が減っても空になってもOpenできます(int clearedRowCount)
+    [Theory]
+    [InlineData(@"TestData\コード生成\データ行減少.xlsx")]
+    [InlineData(@"TestData\コード生成\データ行なし.xlsx")]
+    public void 生成されたBook型はテーブルのデータ行が減っても空になってもOpenできます(string excelFilePath)
     {
         var generatedType = GeneratedCodeInspection
             .AssemblyFrom(GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
             .GeneratedType("BasicStructureBook");
-        using var temporaryFiles = new TemporaryExcelFiles();
-        var excelFilePath = temporaryFiles.Copy(BasicStructureExcelFilePath);
-        using (var book = Workbook.Open(excelFilePath))
-        {
-            foreach (var cell in
-                from row in book.Tables["sales_detail"].Rows.Take(clearedRowCount)
-                from column in book.Tables["sales_detail"].Columns
-                select row[column])
-            {
-                cell.Value = null;
-            }
-
-            book.Save();
-        }
 
         var tested = () =>
         {
