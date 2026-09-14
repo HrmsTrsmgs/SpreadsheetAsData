@@ -46,6 +46,7 @@ var byColumn = firstRow[table.Columns["ProductName"]];
 列や行の構造を確認したい場合は、`Table.Columns`、`Table.Range`、`Table.Worksheet` を使用します。
 取得したセルの `Value` へ値を設定し、ファイルパスから開いた場合は `Workbook.Save()`、別ファイルへ出力する場合は `SaveAs(path)` で保存できます。
 `Save()` は正常終了時点で元ファイルへの保存を完了します。Streamから開いた場合の `Save()` は `NotSupportedException` になります。
+ファイル版は読み取り共有で元ファイルを保持し、Open中、Save後、Save失敗後の他からの書き込みを禁止します。Save中は保持を一時解除して保存し、再取得します。この区間を含む同時更新の競合検出や、保存全体の原子性は保証しません。
 Close/Disposeは保存を行いません。Streamだけで編集結果の出力まで完結するAPIは、現時点では提供していません。
 
 ## 2. 利用者定義型へ対応付けて読み書きする

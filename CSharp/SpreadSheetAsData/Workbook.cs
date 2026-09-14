@@ -27,6 +27,10 @@ public class Workbook : IDisposable
     /// </summary>
     /// <param name="filePath">開く Spreadsheet ファイルのパス。</param>
     /// <returns>開いたブック。</returns>
+    /// <remarks>
+    /// 読み取り共有で元ファイルを保持し、他からの書き込みを禁止します。
+    /// Save中は保存のため一時的にファイルの保持を解除します。
+    /// </remarks>
     public static Workbook Open(string filePath) =>
         new(DocumentSession.Open(filePath));
 
@@ -387,7 +391,7 @@ public class Workbook : IDisposable
                 filePath,
                 FileMode.Open,
                 FileAccess.Read,
-                FileShare.ReadWrite);
+                FileShare.Read);
 
         internal void Save()
         {

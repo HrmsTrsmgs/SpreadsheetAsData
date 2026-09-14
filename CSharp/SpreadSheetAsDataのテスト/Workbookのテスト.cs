@@ -47,6 +47,60 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void Open中は元ファイルへの他からの書き込みを禁止します()
+    {
+        var filePath = temporaryFiles.Copy("Book1.xlsx");
+        using var book = Workbook.Open(filePath);
+
+        var tested = () =>
+        {
+            using var stream = File.Open(filePath, FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
+        };
+
+        tested.Should().Throw<IOException>();
+    }
+
+    [Fact]
+    public void Save後も元ファイルへの他からの書き込みを禁止します()
+    {
+        var filePath = temporaryFiles.Copy("Book1.xlsx");
+        using var book = Workbook.Open(filePath);
+        book.Sheets["いろいろなデータ"].Cell["A1"].Value = 9.9;
+        book.Save();
+
+        var tested = () =>
+        {
+            using var stream = File.Open(filePath, FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
+        };
+
+        tested.Should().Throw<IOException>();
+    }
+
+    [Fact]
+    public void Save失敗後も他からの書き込みを禁止し原因を除けば再保存できます()
+    {
+        var filePath = temporaryFiles.Copy("Book1.xlsx");
+        using var book = Workbook.Open(filePath);
+        book.Sheets["いろいろなデータ"].Cell["A1"].Value = 9.9;
+
+        using (var reader = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+        {
+            var save = () => book.Save();
+            save.Should().Throw<IOException>();
+        }
+
+        var write = () =>
+        {
+            using var stream = File.Open(filePath, FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
+        };
+        write.Should().Throw<IOException>();
+
+        book.Save();
+        using var tested = Workbook.Open(filePath);
+        (tested.Sheets["いろいろなデータ"].Cell["A1"].Value as object).Should().Be(9.9);
+    }
+
+    [Fact]
     public void OpenはMemoryStream上のブックを開きます()
     {
         using var stream = new MemoryStream(
