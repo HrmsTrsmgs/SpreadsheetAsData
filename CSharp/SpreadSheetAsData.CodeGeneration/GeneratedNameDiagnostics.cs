@@ -81,7 +81,7 @@ static class GeneratedNameDiagnostics
             BookPropertyNames(book, options));
 
     /// <summary>
-    /// Sheet型名、継承したCell・Rangeプロパティ名とのシートローカル定義名の衝突を検出します。
+    /// Sheet型名、継承した構造プロパティ名・ToStringとのシートローカル定義名の衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> SheetDefinedNameDiagnostics(
         Workbook book,
@@ -91,7 +91,10 @@ static class GeneratedNameDiagnostics
         where sheet is not null
         from diagnostic in NameCollisionDiagnostics(
             [(options.SheetDefinedName(sheet, definedName), new[] { definedName.Name })],
-            [$"{options.GeneratedName(sheet.Name)}Sheet", nameof(Worksheet.Cell), nameof(Worksheet.Range)])
+            [
+                $"{options.GeneratedName(sheet.Name)}Sheet", nameof(Worksheet.Cell), nameof(Worksheet.Range),
+                nameof(Worksheet.Book), nameof(Worksheet.Name), nameof(Worksheet.Cells), nameof(Worksheet.ToString)
+            ])
         select diagnostic;
 
     /// <summary>

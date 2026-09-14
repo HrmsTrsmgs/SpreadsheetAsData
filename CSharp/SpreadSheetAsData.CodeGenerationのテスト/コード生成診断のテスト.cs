@@ -63,7 +63,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, generatedName, [sourceName]));
     }
 
-    [Theory(Skip = "継承API名の予約範囲をレビューし、既存メンバー名との衝突診断をまとめて確認する段階で解除する。")]
+    [Theory]
     [InlineData("local_cell", "Cell")]
     [InlineData("local_range", "Range")]
     [InlineData("local_cell", "Book")]
