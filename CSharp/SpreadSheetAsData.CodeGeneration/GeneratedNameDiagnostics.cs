@@ -17,8 +17,7 @@ static class GeneratedNameDiagnostics
         [
             .. InvalidBookSheetPropertyNameDiagnostics(book, options),
             .. BookPropertyNameDiagnostics(filePath, book, options),
-            .. BookDefinedNameDiagnostics(filePath, book, options),
-            .. BookDefinedNamePropertyDiagnostics(book, options),
+            .. BookDefinedNameDiagnostics(book, options),
             .. SheetDefinedNameDiagnostics(book, options),
             .. SheetDefinedNameTableDiagnostics(book, options),
             .. SheetTableNameDiagnostics(book, options),
@@ -44,7 +43,7 @@ static class GeneratedNameDiagnostics
             sheet.Name);
 
     /// <summary>
-    /// Book型の中で、ワークシートとExcelテーブルの生成プロパティ名同士、
+    /// Book型の中で、定義名・ワークシート・Excelテーブルの生成プロパティ名同士、
     /// およびBook型名、Read・Open・Replace・ValidateStructureメソッド名、Cell・Rangeプロパティ名との衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> BookPropertyNameDiagnostics(
@@ -52,34 +51,24 @@ static class GeneratedNameDiagnostics
         Workbook book,
         CodeGenerationOptions options) =>
         NameCollisionDiagnostics(
-            GroupMemberNames(BookPropertyNames(book, options)),
+            GroupMemberNames(
+                Enumerable.Concat(BookDefinedNames(book, options), BookPropertyNames(book, options))),
             BookReservedNames(filePath));
 
     /// <summary>
-    /// Bookの定義名同士、および型名・生成メソッド名・継承したAPI名との衝突を検出します。
+    /// 定義名由来のプロパティについて、追加で予約している継承API名との衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> BookDefinedNameDiagnostics(
-        string filePath,
         Workbook book,
         CodeGenerationOptions options) =>
         NameCollisionDiagnostics(
-            GroupMemberNames(BookDefinedNames(book, options)),
+            from member in BookDefinedNames(book, options)
+            select (member.Name, new[] { member.SourceName }),
             [
-                .. BookReservedNames(filePath),
                 nameof(Workbook.Tables), nameof(Workbook.DefinedNames), nameof(Workbook.Sheets),
                 nameof(Workbook.Save), nameof(Workbook.SaveAs), nameof(Workbook.Close),
                 nameof(Workbook.Dispose), nameof(Workbook.ReadTable)
             ]);
-
-    /// <summary>
-    /// Book型の定義名とシート・テーブルから生成するプロパティ名の衝突を検出します。
-    /// </summary>
-    static IEnumerable<CodeGenerationDiagnostic> BookDefinedNamePropertyDiagnostics(
-        Workbook book,
-        CodeGenerationOptions options) =>
-        MemberNameCollisionDiagnostics(
-            BookDefinedNames(book, options),
-            BookPropertyNames(book, options));
 
     /// <summary>
     /// 同じSheetの定義名同士、および型名・継承した構造プロパティ名・ToStringとの衝突を検出します。

@@ -217,7 +217,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, "SharedValue", [cellName, rangeName]));
     }
 
-    [Fact(Skip = "衝突診断を生成先ごとの集約へ整理する段階で解除し、二者ずつではなく全生成元を報告することを確認する。")]
+    [Fact]
     public void 同じBook型で三つ以上の生成プロパティ名が衝突した場合にすべての生成元を診断に含めます()
     {
         GeneratedCodeInspection
