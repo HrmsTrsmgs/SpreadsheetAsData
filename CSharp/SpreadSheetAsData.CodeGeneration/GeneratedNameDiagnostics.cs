@@ -22,6 +22,7 @@ static class GeneratedNameDiagnostics
             .. SheetDefinedNameDiagnostics(book, options),
             .. SheetDefinedNameTableDiagnostics(book, options),
             .. SheetTableNameDiagnostics(book, options),
+            .. DataPropertyNameDiagnostics(filePath, book, options),
             .. from table in book.Tables
                from diagnostic in ColumnPropertyNameDiagnostics(table, options)
                select diagnostic
@@ -125,6 +126,26 @@ static class GeneratedNameDiagnostics
             [(options.GeneratedName(table.Name), new[] { table.Name })],
             [$"{options.GeneratedName(table.Worksheet.Name)}Sheet", nameof(Worksheet.Book)])
         select diagnostic;
+
+    /// <summary>
+    /// Dataへ平坦化する定義名・テーブルのプロパティと、Data型名との衝突を検出します。
+    /// </summary>
+    static IEnumerable<CodeGenerationDiagnostic> DataPropertyNameDiagnostics(
+        string filePath,
+        Workbook book,
+        CodeGenerationOptions options) =>
+        NameCollisionDiagnostics(
+            [
+                .. from definedName in book.DefinedNames
+                   let sheet = definedName.Worksheet
+                   let propertyName = sheet is null
+                       ? options.BookDefinedName(definedName)
+                       : options.SheetDefinedName(sheet, definedName)
+                   select (propertyName, new[] { definedName.Name }),
+                .. from table in book.Tables
+                   select (options.GeneratedName(table.Name), new[] { table.Name })
+            ],
+            [$"{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}Data"]);
 
     /// <summary>
     /// 列プロパティ同士の名前衝突と、行データ型名との衝突を検出します。

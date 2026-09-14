@@ -111,7 +111,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, generatedName, [sourceName]));
     }
 
-    [Theory(Skip = "所属する型名との衝突診断を、Dataへ取り込むプロパティも含めて確認する段階で解除する。")]
+    [Theory]
     [InlineData("book.main_cell", "定義名Book", "main_cell")]
     [InlineData("sales_data.local_cell", "SalesDataSheet", "local_cell")]
     [InlineData("book.main_cell", "定義名Data", "main_cell")]
