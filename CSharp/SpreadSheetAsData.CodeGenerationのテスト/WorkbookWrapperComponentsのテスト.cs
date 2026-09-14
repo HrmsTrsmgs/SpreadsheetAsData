@@ -68,7 +68,7 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     /// <summary>
                     /// 生成元のシート、テーブルとその列、両スコープの定義名を確認して、Excelブックを開きます。
                     /// </summary>
-                    /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、単一セルのブック定義名が複数セルを参照しています。</exception>
+                    /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、単一セルの定義名が複数セルを参照しています。</exception>
                     public static new BasicStructureBook Open(string filePath) =>
                         ValidateStructure(new(filePath));
 
@@ -79,7 +79,7 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     /// <summary>
                     /// 生成元のシート、テーブルとその列、両スコープの定義名を確認して、Stream上のExcelブックを開きます。
                     /// </summary>
-                    /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、単一セルのブック定義名が複数セルを参照しています。</exception>
+                    /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、単一セルの定義名が複数セルを参照しています。</exception>
                     public static new BasicStructureBook Open(System.IO.Stream stream) =>
                         ValidateStructure(new(stream));
 
@@ -99,9 +99,11 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                                     definedName => definedName.Worksheet is null && definedName.Name == name.Name
                                         && (!name.RequiresSingleCell
                                             || definedName.Range.TopLeftCell == definedName.Range.BottomRightCell)))
-                            || new (string SheetName, string Name)[] {  }
+                            || new (string SheetName, string Name, bool RequiresSingleCell)[] {  }
                                 .Any(name => !book.DefinedNames.Any(
-                                    definedName => definedName.Worksheet?.Name == name.SheetName && definedName.Name == name.Name)))
+                                    definedName => definedName.Worksheet?.Name == name.SheetName && definedName.Name == name.Name
+                                        && (!name.RequiresSingleCell
+                                            || definedName.Range.TopLeftCell == definedName.Range.BottomRightCell))))
                         {
                             book.Dispose();
                             throw new System.IO.InvalidDataException();

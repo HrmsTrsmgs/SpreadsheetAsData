@@ -205,6 +205,25 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void 生成されたBook型は単一セルのシートローカル定義名が複数セルに変わったファイルをOpenすると失敗します()
+    {
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(DefinedNamesWithSheetScopeExcelFilePath))
+            .GeneratedType("定義名Book");
+
+        // sales_dataのlocal_cellだけがA2からA2:B2へ広がり、他の構造と値は同じです。
+        var tested = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>(
+                "Open", @"TestData\コード生成\シートローカル単一セル定義名の範囲化\定義名.xlsx");
+        };
+
+        tested.Should().Throw<TargetInvocationException>()
+            .WithInnerException<InvalidDataException>();
+    }
+
+    [Fact]
     public void 生成されたBook型は同名のブック定義名があっても必要なシートローカル定義名がなければOpenに失敗します()
     {
         var generatedType = GeneratedCodeInspection
@@ -243,6 +262,146 @@ public sealed class コード生成アクセスのテスト
 
         tested.Should().Throw<TargetInvocationException>()
             .WithInnerException<InvalidDataException>();
+    }
+
+    [Theory(Skip = "余剰要素を許容する仕様をレビューし、Openの必須構造検証と区別して確認する段階で解除する。")]
+    [InlineData(WithoutTablesExcelFilePath, "テーブルなしBook", BasicStructureExcelFilePath)]
+    [InlineData(@"TestData\コード生成\列不足.xlsx", "列不足Book", BasicStructureExcelFilePath)]
+    [InlineData(DefinedNamesExcelFilePath, "定義名Book", DefinedNamesWithSheetScopeExcelFilePath)]
+    public void 生成されたBook型は生成元になかったテーブルや列や定義名が追加されてもOpenできます(
+        string sourceExcelFilePath,
+        string bookTypeName,
+        string openedExcelFilePath)
+    {
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(sourceExcelFilePath))
+            .GeneratedType(bookTypeName);
+
+        var tested = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>("Open", openedExcelFilePath);
+        };
+
+        tested.Should().NotThrow();
+    }
+
+    [Theory(Skip = "範囲プロパティで1セルも扱う方針をレビューし、単一セルから範囲への変更とは別に確認する段階で解除する。")]
+    [InlineData(@"TestData\コード生成\単一セル定義名の範囲化\定義名.xlsx", DefinedNamesExcelFilePath)]
+    [InlineData(@"TestData\コード生成\シートローカル単一セル定義名の範囲化\定義名.xlsx", DefinedNamesWithSheetScopeExcelFilePath)]
+    public void 生成されたBook型は複数セルの定義名が単一セルに変わってもOpenできます(
+        string sourceExcelFilePath,
+        string openedExcelFilePath)
+    {
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(sourceExcelFilePath))
+            .GeneratedType("定義名Book");
+
+        var tested = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>("Open", openedExcelFilePath);
+        };
+
+        tested.Should().NotThrow();
+    }
+
+    [Fact(Skip = "名前と単一セル・範囲の区別を保った参照位置の変更を許容する仕様をレビューした段階で解除する。")]
+    public void 生成されたBook型は定義名の参照位置だけが変わってもOpenできます()
+    {
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(DefinedNamesWithoutCollisionsExcelFilePath))
+            .GeneratedType("定義名Book");
+
+        // main_cellはE1からF1へ、local_cellはA2からB2へ移動しています。
+        var tested = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>(
+                "Open", @"TestData\コード生成\定義名参照位置変更\定義名.xlsx");
+        };
+
+        tested.Should().NotThrow();
+    }
+
+    [Theory(Skip = "列定義を維持したデータ行数の変更を許容する仕様をレビューした段階で解除する。")]
+    [InlineData(1)]
+    [InlineData(2)]
+    public void 生成されたBook型はテーブルのデータ行が減っても空になってもOpenできます(int clearedRowCount)
+    {
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
+            .GeneratedType("BasicStructureBook");
+        using var temporaryFiles = new TemporaryExcelFiles();
+        var excelFilePath = temporaryFiles.Copy(BasicStructureExcelFilePath);
+        using (var book = Workbook.Open(excelFilePath))
+        {
+            foreach (var cell in
+                from row in book.Tables["sales_detail"].Rows.Take(clearedRowCount)
+                from column in book.Tables["sales_detail"].Columns
+                select row[column])
+            {
+                cell.Value = null;
+            }
+
+            book.Save();
+        }
+
+        var tested = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>("Open", excelFilePath);
+        };
+
+        tested.Should().NotThrow();
+    }
+
+    [Fact(Skip = "生成Sheetが公開するテーブルの所属もOpenの検証対象にする仕様をレビューした段階で解除する。")]
+    public void 生成されたBook型は必要なテーブルが別シートへ移動したファイルをOpenすると失敗します()
+    {
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
+            .GeneratedType("BasicStructureBook");
+
+        // シート名とテーブル名は揃っていますが、二つのテーブルの所属シートが逆です。
+        var tested = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>(
+                "Open", @"TestData\コード生成\テーブル所属シート変更.xlsx");
+        };
+
+        tested.Should().Throw<TargetInvocationException>()
+            .WithInnerException<InvalidDataException>();
+    }
+
+    [Fact(Skip = "列不足の検証でテーブルごとの所属も区別する観点をレビューした段階で解除する。")]
+    public void 生成されたBook型は別テーブルの同名列を必要な列の代わりにしません()
+    {
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
+            .GeneratedType("BasicStructureBook");
+
+        // DescriptionはProductListにだけあり、sales_detailにはありません。
+        var tested = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>(
+                "Open", @"TestData\コード生成\別テーブルに同名列.xlsx");
+        };
+
+        tested.Should().Throw<TargetInvocationException>()
+            .WithInnerException<InvalidDataException>();
+    }
+
+    [Fact(Skip = "名前で対応付ける列の順序変更を許容する仕様をレビューした段階で解除する。")]
+    public void 生成されたBook型はテーブルの列順だけが変わってもOpenできます()
+    {
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
+            .GeneratedType("BasicStructureBook");
+
+        var tested = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>(
+                "Open", @"TestData\コード生成\列順変更.xlsx");
+        };
+
+        tested.Should().NotThrow();
     }
 
     [Fact]

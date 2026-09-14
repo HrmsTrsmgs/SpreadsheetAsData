@@ -7,14 +7,14 @@
 
 ## データの所在
 
-リポジトリ直下の`TestData`に、次の29ファイルをまとめる。
+リポジトリ直下の`TestData`に、次の34ファイルをまとめる。
 各節に記載するファイル名は、それぞれの格納先からの相対パスである。
 共有データとコード生成用データにある同名の`定義名.xlsx`は別のファイルである。
 
 | 区分 | 格納先（このREADMEからの相対パス） | ファイル数 |
 | --- | --- | --- |
 | [共有データ](#共有データ) | [このフォルダー](.) | 9 |
-| [コード生成用データ](#コード生成用データ) | [コード生成](コード生成/) | 19 |
+| [コード生成用データ](#コード生成用データ) | [コード生成](コード生成/) | 24 |
 | [空白数値なしのテーブル](#空白数値なしのテーブル) | [空白数値なし](空白数値なし/) | 1 |
 
 C#の各テストプロジェクトはここから必要なファイルをリンクし、出力先の`TestData`へコピーして使用する。
@@ -30,7 +30,7 @@ Rubyもこのフォルダーを参照する。内容が同じファイルを言�
 * 数値セルの整数値は、Excelの独立した整数型を意味しない。整数部分だけの数値か、小数部分を持つ数値かが型変換・型推論の前提になる。
 * 数値セルには、`t`属性を省略したものと`t="n"`を指定したものがある。表中の数値は読み取る値を示し、XML内の小数表記の桁数まで同じという意味ではない。
 * 見た目が同じ文字列でも、共有文字列（`t="s"`）と直接文字列（`t="str"`）は別の入力条件である。Excelで保存し直して格納形式を変えない。
-* 現在の29ファイルの原本には、数式セル、エラーセル（`t="e"`）、インライン文字列（`t="inlineStr"`）はない。直接文字列（`t="str"`）とインライン文字列を同じ格納形式として扱わない。
+* 現在の34ファイルの原本には、数式セル、エラーセル（`t="e"`）、インライン文字列（`t="inlineStr"`）はない。直接文字列（`t="str"`）とインライン文字列を同じ格納形式として扱わない。
 * テスト本文が一時コピーやStream上の内容を変更する場合、その変更後の状態が入力になる。この文書は保存されている原本の状態を示す。
 * ファイルがSDKで開けることと、OOXMLスキーマ検証に合格することは別である。特に`不正なOOXML.xlsx`は意図的に後者を満たさない。
 
@@ -234,14 +234,14 @@ Open XML SDK 2.11.3で開くと`OpenXmlPackageException`になることを確認
 
 ## コード生成用データ
 
-上記の「コード生成」フォルダーにある19ファイルを対象とする。
+上記の「コード生成」フォルダーにある24ファイルを対象とする。
 生成される型・プロパティ、値の読み書き、名前変換、診断を区別するためのデータである。
-この19ファイルの文字列セルは、見出しを含めて直接文字列（`t="str"`）であり、数値セルは`t="n"`である。
+この24ファイルの文字列セルは、見出しを含めて直接文字列（`t="str"`）であり、数値セルは`t="n"`である。
 共有文字列を含む入力が必要な場合は、共有データの`Book1.xlsx`や`テーブル.xlsx`などを参照する。コード生成用フォルダーのデータだけで両形式を確認できるわけではない。
 
 ### テストデータの仕様
 
-この区分の19ファイルは、Open XML SDKで正常に開け、対象のシート・テーブル・定義名を読み取れることが前提となる。
+この区分の24ファイルは、Open XML SDKで正常に開け、対象のシート・テーブル・定義名を読み取れることが前提となる。
 名前衝突や必要項目の不足による失敗を、ファイル破損による失敗で代用しない。
 このREADMEに記載する名前、所属、順序、範囲、代表値、項目の有無を、各テストデータが満たす仕様とする。
 これはテストデータの仕様であり、ライブラリが一般の利用者に同じ名前や値を要求するという意味ではない。
@@ -259,7 +259,12 @@ Open XML SDK 2.11.3で開くと`OpenXmlPackageException`になることを確認
 | --- | --- |
 | `BasicStructure.xlsx` | `SalesData` → `sales_detail(customer_id, Amount, Description)`。次に`ProductMaster` → `ProductList(Id, Name)`。 |
 | `列不足.xlsx` | `SalesData` → `sales_detail(customer_id, Amount)`。次に`ProductMaster` → `ProductList(Id, Name)`。 |
+| `テーブル所属シート変更.xlsx` | `ProductMaster` → `sales_detail(customer_id, Amount, Description)`。次に`SalesData` → `ProductList(Id, Name)`。 |
+| `列順変更.xlsx` | `SalesData` → `sales_detail(customer_id, Description, Amount)`。次に`ProductMaster` → `ProductList(Id, Name)`。 |
+| `別テーブルに同名列.xlsx` | `SalesData` → `sales_detail(customer_id, Amount)`。次に`ProductMaster` → `ProductList(Id, Name, Description)`。 |
+| `定義名参照位置変更/定義名.xlsx` | `sales_data` → `sales_detail(customer_id, amount, description)`。次に`product_master` → `product_list(id, name)`。 |
 | `単一セル定義名の範囲化/定義名.xlsx` | `sales_data` → `sales_detail(customer_id, amount, description)`。次に`product_master` → `product_list(id, name)`。 |
+| `シートローカル単一セル定義名の範囲化/定義名.xlsx` | `sales_data` → `sales_detail(customer_id, amount, description)`。次に`product_master` → `product_list(id, name)`。 |
 | `FormattingCharacter.xlsx` | `Sheet1`のみ。テーブルなし。ブックスコープの定義名`Customer\u200CName`が`Sheet1!$A$1`を参照する。`\u200C`は実際のU+200Cを表す。 |
 | `salesReport.xlsx` | `salesData` → `salesDetail(customerId, amountValue, descriptionText)`。 |
 | `テーブルなし.xlsx` | `SalesData`, `ProductMaster`の順。両シートともテーブルなし。 |
@@ -287,7 +292,12 @@ Open XML SDK 2.11.3で開くと`OpenXmlPackageException`になることを確認
 | `salesReport.xlsx` | ファイル名・シート名・テーブル名・列名のそれぞれがcamelCaseで、変換の適用有無を見分けられること。対象の名前が互いに偶然一致せず、どの生成箇所を確認しているか区別できること。 |
 | `テーブルなし.xlsx` | `BasicStructure.xlsx`の生成型が要求するシートがすべて存在すること。その生成型が要求するExcelテーブルは存在しないこと。空のテーブルを置くのではなく、テーブル定義自体がないこと。 |
 | `列不足.xlsx` | `BasicStructure.xlsx`からsales_detailのDescription列とそのセルだけを削除する。他のシート・テーブル・列・値は維持し、列不足だけでOpenが失敗することを確認できること。 |
+| `テーブル所属シート変更.xlsx` | BasicStructure版と同じシート名・テーブル名を持ち、テーブルの所属だけが逆であること。列とデータは各テーブルに付随して維持する。 |
+| `列順変更.xlsx` | BasicStructure版のsales_detailでAmountとDescriptionの列定義とセルを一緒に入れ替える。列名と値の対応は変えない。 |
+| `別テーブルに同名列.xlsx` | sales_detailのDescriptionは不足しているが、ProductListには同名列が存在すること。他の必須列は維持する。 |
+| `定義名参照位置変更/定義名.xlsx` | 衝突なし版からmain_cellとlocal_cellの参照位置だけを変える。名前、スコープ、単一セルかどうか、他の構造と値は維持する。 |
 | `単一セル定義名の範囲化/定義名.xlsx` | ブックスコープ版からmain_cellの参照先だけをE1:F1へ広げる。他の構造とセル値は維持し、名前の不足ではなく単一セルから複数セルへの変更を区別できること。 |
+| `シートローカル単一セル定義名の範囲化/定義名.xlsx` | シートローカル単一セル版からlocal_cellの参照先だけをA2:B2へ広げる。所属シート、他の構造、セル値は維持し、シートローカル定義名の単一セルから複数セルへの変更を区別できること。 |
 | `ブックスコープ/定義名.xlsx` | ブックスコープに文字列の単一セル、数値の単一セル、複数セル範囲が存在すること。範囲内の位置や値の違いを読み書きで区別できること。シートローカル定義名を含めず、ブックスコープの処理を独立して確認できること。 |
 | `シートローカル単一セル/定義名.xlsx` | ブックスコープ版のシート・テーブル・定義名・値を維持し、シートローカルの単一セルを追加していること。追加の定義名が既存の定義名と衝突せず、ローカル単一セルの読み書きを確認できること。 |
 | `別シートローカル定義名/定義名.xlsx` | シートローカル単一セル版からlocal_cellの所属だけをproduct_masterへ変更する。参照先sales_data!A2と他の構造・値は維持し、定義名の所属と参照先シートを区別する。 |
@@ -313,7 +323,12 @@ Open XML SDK 2.11.3で開くと`OpenXmlPackageException`になることを確認
 | --- | --- | --- |
 | `BasicStructure.xlsx` | なし | なし |
 | `列不足.xlsx` | なし | なし |
+| `テーブル所属シート変更.xlsx` | なし | なし |
+| `列順変更.xlsx` | なし | なし |
+| `別テーブルに同名列.xlsx` | なし | なし |
+| `定義名参照位置変更/定義名.xlsx` | `main_cell`, `main_range`, `total` | `sales_data`: `sheet_total`, `local_cell`, `local_range` |
 | `単一セル定義名の範囲化/定義名.xlsx` | `main_cell`, `main_range`, `total` | なし |
+| `シートローカル単一セル定義名の範囲化/定義名.xlsx` | `main_cell`, `main_range`, `total` | `sales_data`: `local_cell` |
 | `salesReport.xlsx` | なし | なし |
 | `テーブルなし.xlsx` | なし | なし |
 | `ブックスコープ/定義名.xlsx` | `main_cell`, `main_range`, `total` | なし |
@@ -354,6 +369,12 @@ Open XML SDK 2.11.3で開くと`OpenXmlPackageException`になることを確認
 シート、テーブル、列、セル値はブックスコープ版と同じで、`main_cell`は文字列`"main"`と`"range"`の2セルを参照する。
 定義名の単一セル・複数セルの区別だけを変更したデータであり、値の変更や名前の欠落とは独立して扱う。
 
+#### シートローカル単一セル定義名の範囲化/定義名.xlsx
+
+`シートローカル単一セル/定義名.xlsx`から、`sales_data`所属の`local_cell`の参照先だけを`sales_data!$A$2:$B$2`へ変更したブック。
+参照先は数値`1`と`10.5`の2セル。所属シート、シート・テーブル・列の構造、セル値は変更しない。
+ブックスコープの定義名も、`main_cell`（`sales_data!$E$1`）、`main_range`（`sales_data!$E$1:$F$2`）、`total`（`sales_data!$B$3`）のまま維持する。
+
 #### 列不足.xlsx
 
 `BasicStructure.xlsx`と同じシート・テーブルを持ち、`sales_detail`の`Description`列だけがない。
@@ -365,6 +386,27 @@ Open XML SDK 2.11.3で開くと`OpenXmlPackageException`になることを確認
 
 * 定義名はない。
 * `SalesData`の`C1:C3`にはセルがなく、列定義数とテーブル範囲も2列に合わせている。壊れたExcelではなく、生成後に列を削除したテンプレートを表す。
+
+#### テーブル所属シート変更.xlsx、列順変更.xlsx、別テーブルに同名列.xlsx
+
+定義名はない。以下以外の構造・値は`BasicStructure.xlsx`と同じ。
+
+* `テーブル所属シート変更.xlsx`: シート名を入れ替え、`sales_detail`（`A1:C3`）は`ProductMaster`、`ProductList`（`A1:B2`）は`SalesData`に所属する。各テーブルの列順・データ行は維持する。
+* `列順変更.xlsx`: `sales_detail`（`A1:C3`）は列順`customer_id, Description, Amount`、行`(1, "a", 10.5)`, `(2, "b", 20.5)`。`ProductList`は変更しない。
+* `別テーブルに同名列.xlsx`: `sales_detail`（`A1:B3`）は列`customer_id, Amount`、行`(1, 10.5)`, `(2, 20.5)`。`ProductList`（`A1:C2`）は列`Id, Name, Description`、行`(1, "product-a", "product description")`。
+
+#### 定義名参照位置変更/定義名.xlsx
+
+`衝突なし/定義名.xlsx`と同じシート、テーブル、列、セル値を持つ。定義名は次の構成で、単一セルの参照先2か所だけが異なる。
+
+| 定義名 | スコープ | 参照先 |
+| --- | --- | --- |
+| `main_cell` | ブック | `sales_data!$F$1`（文字列`"range"`） |
+| `main_range` | ブック | `sales_data!$E$1:$F$2` |
+| `total` | ブック | `sales_data!$B$3` |
+| `sheet_total` | `sales_data` | `sales_data!$B$4` |
+| `local_cell` | `sales_data` | `sales_data!$B$2`（数値`10.5`） |
+| `local_range` | `sales_data` | `sales_data!$A$2:$B$3` |
 
 #### salesReport.xlsx
 
