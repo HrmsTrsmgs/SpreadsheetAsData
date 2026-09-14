@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using FluentAssertions;
 using Marimo.SpreadSheetAsData;
 using Marimo.SpreadSheetAsData.CodeGeneration.Test.テスト補助;
@@ -175,6 +176,26 @@ public sealed class コード生成型推論のテスト
 
         tested.Should().NotBeNull();
         tested.PropertyType.Should().Be(typeof(string));
+    }
+
+    [Fact]
+    public void 数値と文字列が混在する列をdynamicプロパティとして生成します()
+    {
+        using var temporaryFiles = new TemporaryExcelFiles();
+        var excelFilePath = temporaryFiles.Copy(BasicStructureExcelFilePath);
+        using (var book = Workbook.Open(excelFilePath))
+        {
+            book.Tables["sales_detail"].Rows.First()["Description"].Value = 1.0;
+            book.Save();
+        }
+
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(excelFilePath))
+            .GeneratedType("SalesDetail")
+            .GetProperty("Description");
+
+        tested.Should().NotBeNull();
+        tested.GetCustomAttribute<DynamicAttribute>().Should().NotBeNull();
     }
 
     [Fact]

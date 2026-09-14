@@ -232,6 +232,7 @@ var sources = WorkbookWrapperGenerator.GenerateSources(
 | 小数値を含む数値 | `double` | `double?` |
 | 真偽値 | `bool` | `bool?` |
 | 文字列 | `string` | `string` |
+| 数値と文字列など、単一の型にまとめられない混在値 | `dynamic` | `dynamic` |
 
 空白を含む文字列列も `string` として生成し、読み取り時は空白を空文字列へ変換します。
 データ行があり、空白だけを持つ列は `string` のプロパティとして生成します。

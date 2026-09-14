@@ -61,9 +61,9 @@ static class WorkbookWrapperComponents
             }
 
             /// <summary>
-            /// 生成元のシート、テーブル、両スコープの定義名を確認して、Excelブックを開きます。
+            /// 生成元のシート、テーブルとその列、両スコープの定義名を確認して、Excelブックを開きます。
             /// </summary>
-            /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブル、両スコープの定義名のいずれかが存在しません。</exception>
+            /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しません。</exception>
             public static new {{bookFileIdentifier}}Book Open(string filePath) =>
                 ValidateStructure(new(filePath));
 
@@ -72,14 +72,14 @@ static class WorkbookWrapperComponents
             }
 
             /// <summary>
-            /// 生成元のシート、テーブル、両スコープの定義名を確認して、Stream上のExcelブックを開きます。
+            /// 生成元のシート、テーブルとその列、両スコープの定義名を確認して、Stream上のExcelブックを開きます。
             /// </summary>
-            /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブル、両スコープの定義名のいずれかが存在しません。</exception>
+            /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しません。</exception>
             public static new {{bookFileIdentifier}}Book Open(System.IO.Stream stream) =>
                 ValidateStructure(new(stream));
 
             /// <summary>
-            /// 生成元に対応するシート、テーブル、両スコープの定義名を確認し、不足時は開いたブックを破棄します。
+            /// 生成元に対応するシート、テーブルとその列、両スコープの定義名を確認し、不足時は開いたブックを破棄します。
             /// </summary>
             static {{bookFileIdentifier}}Book ValidateStructure({{bookFileIdentifier}}Book book)
             {
@@ -93,6 +93,12 @@ static class WorkbookWrapperComponents
                         from table in book.Tables
                         select StringLiteral(table.Name))}} }
                         .Any(tableName => !book.Tables.Any(table => table.Name == tableName))
+                    || new (string TableName, string ColumnName)[] { {{string.Join(
+                        ", ",
+                        from table in book.Tables
+                        from column in table.Columns
+                        select $"({StringLiteral(table.Name)}, {StringLiteral(column.Name)})")}} }
+                        .Any(column => !book.Tables[column.TableName].Columns.Contains(column.ColumnName))
                     || new string[] { {{string.Join(
                         ", ",
                         from definedName in BookScopedDefinedNames(book)
@@ -443,7 +449,7 @@ static class WorkbookWrapperComponents
             return "string";
         }
 
-        return "object?";
+        return "dynamic";
 
         // セル値がintの範囲に収まる整数値かどうかを判定します。
         static bool CanConvertToInt32(object value) =>

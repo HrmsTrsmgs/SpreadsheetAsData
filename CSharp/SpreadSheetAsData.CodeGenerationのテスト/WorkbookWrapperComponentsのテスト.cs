@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Marimo.SpreadSheetAsData;
 using static Marimo.SpreadSheetAsData.CodeGeneration.WorkbookWrapperComponents;
 using Xunit;
@@ -66,9 +66,9 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     }
 
                     /// <summary>
-                    /// 生成元のシート、テーブル、両スコープの定義名を確認して、Excelブックを開きます。
+                    /// 生成元のシート、テーブルとその列、両スコープの定義名を確認して、Excelブックを開きます。
                     /// </summary>
-                    /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブル、両スコープの定義名のいずれかが存在しません。</exception>
+                    /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しません。</exception>
                     public static new BasicStructureBook Open(string filePath) =>
                         ValidateStructure(new(filePath));
 
@@ -77,14 +77,14 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     }
 
                     /// <summary>
-                    /// 生成元のシート、テーブル、両スコープの定義名を確認して、Stream上のExcelブックを開きます。
+                    /// 生成元のシート、テーブルとその列、両スコープの定義名を確認して、Stream上のExcelブックを開きます。
                     /// </summary>
-                    /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブル、両スコープの定義名のいずれかが存在しません。</exception>
+                    /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しません。</exception>
                     public static new BasicStructureBook Open(System.IO.Stream stream) =>
                         ValidateStructure(new(stream));
 
                     /// <summary>
-                    /// 生成元に対応するシート、テーブル、両スコープの定義名を確認し、不足時は開いたブックを破棄します。
+                    /// 生成元に対応するシート、テーブルとその列、両スコープの定義名を確認し、不足時は開いたブックを破棄します。
                     /// </summary>
                     static BasicStructureBook ValidateStructure(BasicStructureBook book)
                     {
@@ -92,6 +92,8 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                             .Any(sheetName => !book.Sheets.ContainsKey(sheetName))
                             || new string[] { "sales_detail", "ProductList" }
                                 .Any(tableName => !book.Tables.Any(table => table.Name == tableName))
+                            || new (string TableName, string ColumnName)[] { ("sales_detail", "customer_id"), ("sales_detail", "Amount"), ("sales_detail", "Description"), ("ProductList", "Id"), ("ProductList", "Name") }
+                                .Any(column => !book.Tables[column.TableName].Columns.Contains(column.ColumnName))
                             || new string[] {  }
                                 .Any(name => !book.DefinedNames.Any(
                                     definedName => definedName.Worksheet is null && definedName.Name == name))

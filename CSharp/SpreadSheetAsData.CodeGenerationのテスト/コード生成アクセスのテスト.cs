@@ -129,6 +129,25 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void 生成されたBook型は必要なテーブル列がないファイルをOpenすると失敗します()
+    {
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
+            .GeneratedType("BasicStructureBook");
+
+        // シートとテーブルは同じですが、sales_detailのDescription列がありません。
+        var tested = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>(
+                "Open", @"TestData\コード生成\列不足.xlsx");
+        };
+
+        tested.Should().Throw<TargetInvocationException>()
+            .WithInnerException<InvalidDataException>();
+    }
+
+    [Fact]
     public void 生成されたBook型は必要なブックスコープの定義名がないファイルをOpenすると失敗します()
     {
         var generatedType = GeneratedCodeInspection
