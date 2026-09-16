@@ -6,6 +6,65 @@ namespace Marimo.SpreadSheetAsData.CodeGeneration.Test;
 
 public sealed class MSBuild連携タスクのテスト
 {
+    [Fact]
+    public void Excel項目ごとの名前空間で同名の生成型を併用できます()
+    {
+        using var project = MSBuild連携テストプロジェクト.Create();
+        var orders = project.AddBasicStructureExcel(@"Orders\Master.xlsx");
+        var archive = project.AddBasicStructureExcel(@"Archive\Master.xlsx");
+
+        var tested = project.Generate([(orders, "OrdersModel"), (archive, "ArchiveModel")]);
+
+        tested.Succeeded.Should().BeTrue();
+        var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(
+            tested.GeneratedFilePaths.Select(File.ReadAllText));
+        generatedAssembly.GetType("OrdersModel.MasterBook").Should().NotBeNull();
+        generatedAssembly.GetType("ArchiveModel.MasterBook").Should().NotBeNull();
+    }
+
+    [Fact]
+    public void Excel項目の名前空間を変更または解除すると生成結果を更新します()
+    {
+        using var project = MSBuild連携テストプロジェクト.Create();
+        var excelFilePath = project.AddBasicStructureExcel("BasicStructure.xlsx");
+        project.Generate(excelFilePath).Succeeded.Should().BeTrue();
+
+        var tested = project.Generate([(excelFilePath, "UpdatedModel")]);
+
+        tested.Succeeded.Should().BeTrue();
+        tested.SingleGeneratedSource.Should().Contain("namespace UpdatedModel;");
+        project.Generate(excelFilePath).SingleGeneratedSource.Should().Contain("namespace Generated;");
+    }
+
+    [Fact]
+    public void パッケージ参照でブックごとに名前空間を分けてコンパイルし利用できます()
+    {
+        using var project = MSBuild連携テストプロジェクト.Create();
+        project.AddBasicStructureExcel("BasicStructure.xlsx");
+        project.AddBasicStructureExcel(@"Archive\BasicStructure.xlsx");
+        var scriptFilePath = project.AddPowerShellPackageReferenceSample(
+            "Marimo.SpreadSheetAsData",
+            """
+            Invoke-MSBuild /t:Build
+            Invoke-Dotnet run --project ./Consumer.csproj --no-build --no-restore
+            """,
+            workbookItems: """
+            <SpreadsheetAsData Include="BasicStructure.xlsx" Namespace="ConsumerModel.Current" />
+            <SpreadsheetAsData Include="Archive\BasicStructure.xlsx" Namespace="ConsumerModel.Archive" />
+            """,
+            programSource: """
+            using var current = ConsumerModel.Current.BasicStructureBook.Open("BasicStructure.xlsx");
+            using var archive = ConsumerModel.Archive.BasicStructureBook.Open("Archive/BasicStructure.xlsx");
+            System.Console.WriteLine($"current:{current.SalesData.Name}");
+            System.Console.WriteLine($"archive:{archive.SalesData.Name}");
+            """);
+
+        var tested = PowerShell実行結果.Run(scriptFilePath, project.DirectoryPath);
+
+        tested.ExitCode.Should().Be(0, tested.Output);
+        tested.Output.Should().Contain("current:SalesData").And.Contain("archive:SalesData");
+    }
+
     [Theory]
     [InlineData("Marimo.SpreadSheetAsData")]
     [InlineData("Marimo.SpreadSheetAsData.Build")]

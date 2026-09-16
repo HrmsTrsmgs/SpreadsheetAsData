@@ -13,6 +13,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
 {
     /// <summary>
     /// コード生成対象のExcelファイルを取得または設定します。
+    /// 各項目のNamespaceメタデータで、RootNamespaceとは異なる生成先を指定できます。
     /// </summary>
     [Required]
     public ITaskItem[] ExcelFiles { get; set; } = [];
@@ -69,7 +70,8 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
         try
         {
             var dictionaryFilePath = DictionaryFilePath(excelFilePath);
-            var fingerprint = Fingerprint(excelFilePath, dictionaryFilePath);
+            var generatedNamespace = GeneratedNamespace(excelFile);
+            var fingerprint = Fingerprint(excelFilePath, dictionaryFilePath, generatedNamespace);
 
             var stampFilePath = StampFilePath(excelFilePath);
 
@@ -88,7 +90,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
             foreach (var diagnostic in
                 WorkbookWrapperGenerator.GenerateDiagnostics(
                     excelFilePath,
-                    options => ConfigureOptions(options, nameMappings)))
+                    options => ConfigureOptions(options, nameMappings, generatedNamespace)))
             {
                 LogDiagnostic(excelFilePath, diagnostic);
             }
@@ -100,7 +102,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
 
             var sources = WorkbookWrapperGenerator.GenerateSources(
                 excelFilePath,
-                options => ConfigureOptions(options, nameMappings));
+                options => ConfigureOptions(options, nameMappings, generatedNamespace));
 
             Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath)!);
             Directory.CreateDirectory(Path.GetDirectoryName(stampFilePath)!);
@@ -122,14 +124,26 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
         }
     }
 
-    void ConfigureOptions(
+    static void ConfigureOptions(
         CodeGenerationOptions options,
-        Dictionary<string, string> nameMappings)
+        Dictionary<string, string> nameMappings,
+        string generatedNamespace)
     {
-        options.Namespace = string.IsNullOrEmpty(RootNamespace)
-            ? "Generated"
-            : RootNamespace;
+        options.Namespace = generatedNamespace;
         options.NameMappings = nameMappings;
+    }
+
+    /// <summary>
+    /// 項目ごとの指定を優先し、未指定ならプロジェクトの既定名前空間を使用します。
+    /// </summary>
+    string GeneratedNamespace(ITaskItem excelFile)
+    {
+        var itemNamespace = excelFile.GetMetadata("Namespace");
+        return !string.IsNullOrEmpty(itemNamespace)
+            ? itemNamespace
+        : !string.IsNullOrEmpty(RootNamespace)
+            ? RootNamespace
+        : "Generated";
     }
 
     Dictionary<string, string> LoadNameMappings(
@@ -225,14 +239,15 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
             : null;
     }
 
-    string Fingerprint(
+    static string Fingerprint(
         string excelFilePath,
-        string? dictionaryFilePath) =>
+        string? dictionaryFilePath,
+        string generatedNamespace) =>
         string.Join(
             Environment.NewLine,
             [
                 typeof(WorkbookWrapperGenerator).Assembly.GetName().Version?.ToString() ?? "",
-                RootNamespace,
+                generatedNamespace,
                 excelFilePath,
                 FileFingerprint(excelFilePath),
                 dictionaryFilePath ?? "",

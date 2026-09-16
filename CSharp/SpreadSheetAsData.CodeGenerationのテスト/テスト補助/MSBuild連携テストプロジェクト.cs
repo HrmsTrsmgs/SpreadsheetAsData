@@ -102,13 +102,29 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
     /// </summary>
     /// <param name="excelFilePaths">生成対象Excelファイルの絶対パス。</param>
     /// <returns>タスクの実行結果。</returns>
-    internal MSBuild連携タスク実行結果 Generate(params string[] excelFilePaths)
+    internal MSBuild連携タスク実行結果 Generate(params string[] excelFilePaths) =>
+        Generate(excelFilePaths.Select(it => (it, "")));
+
+    /// <summary>
+    /// Excel項目ごとのNamespaceメタデータを指定してMSBuildタスクを実行します。
+    /// </summary>
+    /// <param name="excelFiles">Excelファイルの絶対パスと生成先名前空間。</param>
+    /// <returns>タスクの実行結果。</returns>
+    internal MSBuild連携タスク実行結果 Generate(
+        IEnumerable<(string FilePath, string Namespace)> excelFiles)
     {
         var buildEngine = new RecordingBuildEngine();
         var task = new GenerateSpreadsheetAsData
         {
             BuildEngine = buildEngine,
-            ExcelFiles = [.. excelFilePaths.Select(it => new TaskItem(it))],
+            ExcelFiles =
+            [
+                .. from file in excelFiles
+                   select new TaskItem(file.FilePath, new Dictionary<string, string>
+                   {
+                       ["Namespace"] = file.Namespace
+                   })
+            ],
             ProjectDirectory = DirectoryPath,
             RootNamespace = "Generated",
             IntermediateOutputPath = Path.Combine("obj", Configuration, TargetFramework)
@@ -329,8 +345,14 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
     /// </summary>
     /// <param name="packageId">全部入りまたはBuild単体のパッケージID。</param>
     /// <param name="commands">復元後に実行するPowerShellコマンド。</param>
+    /// <param name="workbookItems">省略時の基本ブックに代えて登録するSpreadsheetAsData項目のXML。</param>
+    /// <param name="programSource">省略時の読み書き例に代えて実行するProgram.cs。</param>
     /// <returns>pack、restore、検証の順で実行するスクリプトのパス。</returns>
-    internal string AddPowerShellPackageReferenceSample(string packageId, string commands)
+    internal string AddPowerShellPackageReferenceSample(
+        string packageId,
+        string commands,
+        string? workbookItems = null,
+        string? programSource = null)
     {
         Directory.CreateDirectory(DirectoryPath);
         using var assets = JsonDocument.Parse(File.ReadAllText(
@@ -368,7 +390,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
               </PropertyGroup>
               <ItemGroup>
                 <PackageReference Include="{{packageId}}" Version="{{version}}" />
-                <SpreadsheetAsData Include="BasicStructure.xlsx" Condition="'$(IncludeWorkbook)' == 'true'" />
+                {{workbookItems ?? """<SpreadsheetAsData Include="BasicStructure.xlsx" Condition="'$(IncludeWorkbook)' == 'true'" />"""}}
               </ItemGroup>
               <Target Name="InspectProject" DependsOnTargets="ResolveReferences">
                 <WriteLinesToFile File="Compile.txt" Lines="@(Compile->'%(Filename)%(Extension)|%(DependentUpon)')" Overwrite="true" />
@@ -381,7 +403,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
             """);
         File.WriteAllText(
             Path.Combine(DirectoryPath, "Program.cs"),
-            """
+            programSource ?? """
             using ConsumerModel;
 
             using (var book = BasicStructureBook.Open("BasicStructure.xlsx"))

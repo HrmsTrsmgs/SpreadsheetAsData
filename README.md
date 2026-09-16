@@ -188,6 +188,21 @@ Visual Studio以外で明示的に設定する場合は、プロジェクトフ�
 </ItemGroup>
 ```
 
+生成先の名前空間は、既定ではプロジェクトの `RootNamespace` です。
+同名のシートやテーブルを持つ複数のExcelファイルを併用するときは、各項目の `Namespace` で生成型を分離できます。
+フォルダを分けるだけではC#の型名衝突は解消しません。
+
+```xml
+<ItemGroup>
+  <SpreadsheetAsData Include="Orders\Master.xlsx" Namespace="MyApp.Orders" />
+  <SpreadsheetAsData Include="Archive\Master.xlsx" Namespace="MyApp.Archive" />
+</ItemGroup>
+```
+
+この場合は `MyApp.Orders.MasterBook` と `MyApp.Archive.MasterBook` を使用します。
+`Namespace` の変更・解除でも生成し直します。空または未指定なら `RootNamespace` を使い、それも空なら `Generated` になります。
+同じ名前空間内に生成型名の重複が残る場合は、C#のコンパイルエラーになります。必要に応じて名前空間を分けるか、以下の辞書で生成名を変更してください。
+
 識別子名を調整したい場合は、Excelファイルごとに任意のJSON辞書を置けます。
 辞書ファイル名は、Excelファイルの拡張子を除いた名前に `.spreadsheetasdata.json` を付けます。
 
