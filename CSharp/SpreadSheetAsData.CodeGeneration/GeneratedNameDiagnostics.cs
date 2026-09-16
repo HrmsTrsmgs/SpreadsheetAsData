@@ -18,7 +18,6 @@ static class GeneratedNameDiagnostics
             .. InvalidBookSheetPropertyNameDiagnostics(book, options),
             .. TypeNameDiagnostics(filePath, book, options),
             .. BookPropertyNameDiagnostics(filePath, book, options),
-            .. BookDefinedNameDiagnostics(book, options),
             .. SheetDefinedNameDiagnostics(book, options),
             .. SheetDefinedNameTableDiagnostics(book, options),
             .. SheetTableNameDiagnostics(book, options),
@@ -68,7 +67,7 @@ static class GeneratedNameDiagnostics
 
     /// <summary>
     /// Book型の中で、定義名・ワークシート・Excelテーブルの生成プロパティ名同士、
-    /// およびBook型名、Read・Open・Replace・ValidateStructureメソッド名、Cell・Rangeプロパティ名との衝突を検出します。
+    /// およびBook型名、生成・継承するAPIの予約名との衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> BookPropertyNameDiagnostics(
         string filePath,
@@ -78,21 +77,6 @@ static class GeneratedNameDiagnostics
             GroupMemberNames(
                 Enumerable.Concat(BookDefinedNames(book, options), BookPropertyNames(book, options))),
             BookReservedNames(filePath));
-
-    /// <summary>
-    /// 定義名由来のプロパティについて、追加で予約している継承API名との衝突を検出します。
-    /// </summary>
-    static IEnumerable<CodeGenerationDiagnostic> BookDefinedNameDiagnostics(
-        Workbook book,
-        CodeGenerationOptions options) =>
-        NameCollisionDiagnostics(
-            from member in BookDefinedNames(book, options)
-            select (member.Name, new[] { member.SourceName }),
-            [
-                nameof(Workbook.Tables), nameof(Workbook.DefinedNames), nameof(Workbook.Sheets),
-                nameof(Workbook.Save), nameof(Workbook.SaveAs), nameof(Workbook.Close),
-                nameof(Workbook.Dispose), nameof(Workbook.ReadTable)
-            ]);
 
     /// <summary>
     /// 同じSheetの定義名同士、および型名・継承した構造プロパティ名・ToStringとの衝突を検出します。
@@ -202,7 +186,10 @@ static class GeneratedNameDiagnostics
         [
             $"{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}Book",
             nameof(Workbook.Read), nameof(Workbook.Open), nameof(Workbook.Replace), "ValidateStructure",
-            nameof(Workbook.Cell), nameof(Workbook.Range)
+            nameof(Workbook.Cell), nameof(Workbook.Range),
+            nameof(Workbook.Tables), nameof(Workbook.DefinedNames), nameof(Workbook.Sheets),
+            nameof(Workbook.Save), nameof(Workbook.SaveAs), nameof(Workbook.Close),
+            nameof(Workbook.Dispose), nameof(Workbook.ReadTable)
         ];
 
     /// <summary>

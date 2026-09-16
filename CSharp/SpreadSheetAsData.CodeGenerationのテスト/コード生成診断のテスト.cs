@@ -82,7 +82,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, generatedName, [sourceName]));
     }
 
-    [Theory(Skip = "定義名以外のBookプロパティにも、既存の予約名を共通して適用する段階で解除する。")]
+    [Theory]
     [InlineData("sales_detail", "Tables")]
     [InlineData("sales_detail", "DefinedNames")]
     [InlineData("sales_detail", "Sheets")]
