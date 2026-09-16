@@ -8,6 +8,7 @@ public sealed class コード生成型構造のテスト
 {
     const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
     const string IntegratedExcelFilePath = @"TestData\コード生成\統合.xlsx";
+    const string DefinedNamesExcelFilePath = @"TestData\コード生成\衝突なし\定義名.xlsx";
 
     [Theory]
     [InlineData("@Workbook", "Workbook")]
@@ -33,6 +34,22 @@ public sealed class コード生成型構造のテスト
                 GeneratedCodeInspection.GenerateSources(
                     BasicStructureExcelFilePath,
                     options => options.NameMappings = new() { ["sales_detail"] = "SpreadSheetNameAttribute" }))
+            .DefinedTypes.Select(it => it.Name)
+            .Should().Contain("SpreadSheetNameAttribute");
+    }
+
+    [Fact]
+    public void 定義名の属性も属性クラスと同名の行データ型があってもコンパイルできます()
+    {
+        GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesExcelFilePath,
+                    options => options.NameMappings = new()
+                    {
+                        ["sales_detail"] = "SpreadSheetNameAttribute",
+                        ["book.main_cell"] = "Title"
+                    }))
             .DefinedTypes.Select(it => it.Name)
             .Should().Contain("SpreadSheetNameAttribute");
     }

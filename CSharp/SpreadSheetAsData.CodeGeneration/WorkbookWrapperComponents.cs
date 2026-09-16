@@ -234,7 +234,8 @@ static class WorkbookWrapperComponents
             : options.SheetDefinedName(worksheet, definedName);
         var attributeDeclaration = BookDataDefinedNameAttribute(
             definedName,
-            propertyName);
+            propertyName,
+            options);
         var scopeDescription = worksheet is null
             ? ""
             : $"ワークシート「{worksheet.Name}」の";
@@ -258,7 +259,8 @@ static class WorkbookWrapperComponents
     /// </summary>
     static string BookDataDefinedNameAttribute(
         DefinedName definedName,
-        string propertyName)
+        string propertyName,
+        CodeGenerationOptions options)
     {
         // コンパイル後の識別子では書式文字が無視されるため、属性で元の定義名を保持します。
         if (propertyName == definedName.Name.ToCSharpIdentifier()
@@ -271,7 +273,7 @@ static class WorkbookWrapperComponents
             ? ""
             : $", WorksheetName = {StringLiteral(definedName.Worksheet.Name)}";
 
-        return $"[SpreadSheetName({StringLiteral(definedName.Name)}{worksheetArgument})]{Environment.NewLine}    ";
+        return $"[{ReferencedAttributeName(definedName.Range.TopLeftCell.Book, options)}({StringLiteral(definedName.Name)}{worksheetArgument})]{Environment.NewLine}    ";
     }
 
     /// <summary>
