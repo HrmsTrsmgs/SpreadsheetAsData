@@ -90,10 +90,7 @@ static class GeneratedNameDiagnostics
                 from definedName in book.DefinedNames
                 where definedName.Worksheet?.Name == sheet.Name
                 select (definedName.Name, options.SheetDefinedName(sheet, definedName))),
-            [
-                $"{options.GeneratedName(sheet.Name)}Sheet", nameof(Worksheet.Cell), nameof(Worksheet.Range),
-                nameof(Worksheet.Book), nameof(Worksheet.Name), nameof(Worksheet.Cells), nameof(Worksheet.ToString)
-            ])
+            SheetReservedNames(sheet, options))
         select diagnostic;
 
     /// <summary>
@@ -113,7 +110,7 @@ static class GeneratedNameDiagnostics
         select diagnostic;
 
     /// <summary>
-    /// Sheetのテーブル由来プロパティと、所属するSheet型名・継承したBookプロパティ名との衝突を検出します。
+    /// Sheetのテーブル由来プロパティと、所属するSheet型名・継承APIの予約名との衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> SheetTableNameDiagnostics(
         Workbook book,
@@ -121,7 +118,7 @@ static class GeneratedNameDiagnostics
         from table in book.Tables
         from diagnostic in NameCollisionDiagnostics(
             [(options.GeneratedName(table.Name), new[] { table.Name })],
-            [$"{options.GeneratedName(table.Worksheet.Name)}Sheet", nameof(Worksheet.Book)])
+            SheetReservedNames(table.Worksheet, options))
         select diagnostic;
 
     /// <summary>
@@ -190,6 +187,15 @@ static class GeneratedNameDiagnostics
             nameof(Workbook.Tables), nameof(Workbook.DefinedNames), nameof(Workbook.Sheets),
             nameof(Workbook.Save), nameof(Workbook.SaveAs), nameof(Workbook.Close),
             nameof(Workbook.Dispose), nameof(Workbook.ReadTable)
+        ];
+
+    /// <summary>
+    /// Sheetのプロパティの生成元によらず共通して予約する、所属型名と継承API名です。
+    /// </summary>
+    static string[] SheetReservedNames(Worksheet sheet, CodeGenerationOptions options) =>
+        [
+            $"{options.GeneratedName(sheet.Name)}Sheet", nameof(Worksheet.Cell), nameof(Worksheet.Range),
+            nameof(Worksheet.Book), nameof(Worksheet.Name), nameof(Worksheet.Cells), nameof(Worksheet.ToString)
         ];
 
     /// <summary>

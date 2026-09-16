@@ -104,7 +104,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, generatedName, [sourceName]));
     }
 
-    [Theory(Skip = "Sheetのテーブルプロパティにも、定義名と同じ既存メンバー名の予約を適用する段階で解除する。")]
+    [Theory]
     [InlineData("Name")]
     [InlineData("Cells")]
     [InlineData("ToString")]
