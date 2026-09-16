@@ -109,16 +109,8 @@ public class Worksheet
     /// </summary>
     /// <param name="name">解決する定義名。</param>
     /// <returns>定義名が表すセル範囲。</returns>
-    internal CellRange ResolveNamedRange(string name)
-    {
-        var localSheetId = (uint)(
-            from index in Enumerable.Range(0, Book.Sheets.Count)
-            where Book.Sheets[index].Name == Name
-            select index
-        ).Single();
-
-        return Book.ResolveNamedRange(name, localSheetId);
-    }
+    internal CellRange ResolveNamedRange(string name) =>
+        Book.ResolveNamedRange(name, LocalSheetId);
 
     /// <summary>
     /// ワークシートスコープの定義名をセル範囲として解決できるか確認します。
@@ -126,16 +118,18 @@ public class Worksheet
     /// <param name="name">解決する定義名。</param>
     /// <param name="range">定義名が見つかった場合のセル範囲。</param>
     /// <returns>定義名を解決できた場合は true。</returns>
-    internal bool TryResolveNamedRange(string name, out CellRange range)
-    {
-        var localSheetId = (uint)(
+    internal bool TryResolveNamedRange(string name, out CellRange range) =>
+        Book.TryResolveNamedRange(name, LocalSheetId, out range);
+
+    /// <summary>
+    /// ローカル定義名のスコープに使う、ブック内のシートの位置を取得します。
+    /// </summary>
+    uint LocalSheetId =>
+        (uint)(
             from index in Enumerable.Range(0, Book.Sheets.Count)
             where Book.Sheets[index].Name == Name
             select index
         ).Single();
-
-        return Book.TryResolveNamedRange(name, localSheetId, out range);
-    }
 
     /// <summary>
     /// ワークシート名を返します。
