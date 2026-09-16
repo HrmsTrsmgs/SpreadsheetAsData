@@ -82,6 +82,74 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, generatedName, [sourceName]));
     }
 
+    [Theory(Skip = "定義名以外のBookプロパティにも、既存の予約名を共通して適用する段階で解除する。")]
+    [InlineData("sales_detail", "Tables")]
+    [InlineData("sales_detail", "DefinedNames")]
+    [InlineData("sales_detail", "Sheets")]
+    [InlineData("sales_detail", "Save")]
+    [InlineData("sales_detail", "SaveAs")]
+    [InlineData("sales_detail", "Close")]
+    [InlineData("sales_detail", "Dispose")]
+    [InlineData("sales_detail", "ReadTable")]
+    [InlineData("SalesData", "Tables")]
+    public void シートやテーブルのBookプロパティにも定義名と同じ既存メンバー名の衝突診断を適用します(
+        string sourceName,
+        string generatedName)
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                BasicStructureExcelFilePath,
+                options => options.NameMappings = new() { [sourceName] = generatedName })
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(true, generatedName, [sourceName]));
+    }
+
+    [Theory(Skip = "Sheetのテーブルプロパティにも、定義名と同じ既存メンバー名の予約を適用する段階で解除する。")]
+    [InlineData("Name")]
+    [InlineData("Cells")]
+    [InlineData("ToString")]
+    public void テーブルのSheetプロパティにも定義名と同じ既存メンバー名の衝突診断を適用します(string generatedName)
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                BasicStructureExcelFilePath,
+                options => options.NameMappings = new() { ["sales_detail"] = generatedName })
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(true, generatedName, ["sales_detail"]));
+    }
+
+    [Theory(Skip = "集約を経由しない予約名の比較にもCSharp識別子としての同一性を適用する段階で解除する。")]
+    [InlineData("book.main_cell", "@Save", "Save", "main_cell")]
+    [InlineData("sales_detail", "@Book", "Book", "sales_detail")]
+    public void 定義名とテーブルの予約名診断はエスケープ表記が異なっても衝突を検出します(
+        string mappingKey,
+        string generatedName,
+        string identifier,
+        string sourceName)
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                DefinedNamesWithoutCollisionsExcelFilePath,
+                options => options.NameMappings = new() { [mappingKey] = generatedName })
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(true, identifier, [sourceName]));
+    }
+
+    [Fact(Skip = "所属型名との衝突判定で、プロパティ名だけでなく型名もCSharp識別子として比較する段階で解除する。")]
+    public void 行データ型名にエスケープ表記があっても同じ識別子の列プロパティを診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                BasicStructureExcelFilePath,
+                options => options.NameMappings = new()
+                {
+                    ["sales_detail"] = "@SalesDetail",
+                    ["sales_detail.customer_id"] = "SalesDetail"
+                })
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(true, "SalesDetail", ["customer_id"]));
+    }
+
     [Fact]
     public void テーブルの生成プロパティにもWorksheetのBookプロパティ名との衝突診断を適用します()
     {

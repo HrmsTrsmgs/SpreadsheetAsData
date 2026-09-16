@@ -1,5 +1,4 @@
 using Marimo.SpreadSheetAsData;
-using System.Globalization;
 
 namespace Marimo.SpreadSheetAsData.CodeGeneration;
 
@@ -212,11 +211,7 @@ static class GeneratedNameDiagnostics
     static IEnumerable<(string Name, string[] SourceNames)> GroupMemberNames(
         IEnumerable<(string SourceName, string Name)> members) =>
         from member in members
-        let identifier = string.Concat(
-            from character in member.Name.TrimStart('@')
-            where char.GetUnicodeCategory(character) != UnicodeCategory.Format
-            select character)
-        group member.SourceName by identifier into names
+        group member.SourceName by member.Name.IdentifierValue() into names
         select (names.Key, names.ToArray());
 
     /// <summary>

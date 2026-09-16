@@ -10,6 +10,34 @@ public sealed class コード生成型構造のテスト
     const string IntegratedExcelFilePath = @"TestData\コード生成\統合.xlsx";
 
     [Theory]
+    [InlineData("@Workbook", "Workbook")]
+    [InlineData("Sys\u200Ctem", "System")]
+    public void エスケープ表記や書式文字を含む行データ型が既存の参照先と同名でもコンパイルできます(
+        string generatedName,
+        string identifier)
+    {
+        GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath,
+                    options => options.NameMappings = new() { ["sales_detail"] = generatedName }))
+            .DefinedTypes.Select(it => it.Name)
+            .Should().Contain(identifier);
+    }
+
+    [Fact(Skip = "生成コードの属性参照にも必要に応じた完全修飾を適用する段階で解除する。")]
+    public void 属性クラスと同名の行データ型もコンパイルできます()
+    {
+        GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath,
+                    options => options.NameMappings = new() { ["sales_detail"] = "SpreadSheetNameAttribute" }))
+            .DefinedTypes.Select(it => it.Name)
+            .Should().Contain("SpreadSheetNameAttribute");
+    }
+
+    [Theory]
     [InlineData("Workbook")]
     [InlineData("Worksheet")]
     [InlineData("Table")]
