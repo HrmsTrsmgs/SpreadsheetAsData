@@ -72,6 +72,18 @@ public sealed class コード生成型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void 生成されたTableは改行を含む列名からも値を読み込みます()
+    {
+        const string excelFilePath = @"TestData\コード生成\改行列名.xlsx";
+        using var sourceBook = Workbook.Open(excelFilePath, validate: true);
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(excelFilePath))
+            .GeneratedInstance<IEnumerable<object>>("SalesDetailTable", sourceBook.Tables["sales_detail"]);
+
+        tested.Select(it => PropertyValue(it, "Customer_id")).Should().Equal(1, 2);
+    }
+
+    [Fact]
     public void 生成されたTable型からTableの構造情報を使用できます()
     {
         using var book = GeneratedCodeInspection

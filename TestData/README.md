@@ -278,6 +278,7 @@ Open XML SDK 2.11.3で開くと`OpenXmlPackageException`になることを確認
 | `統合.xlsx` | `sales_data` → `sales_detail(customer_id, amount, description)`。次に`product_master` → `product_list(id, name)`。最後に`商品_明細`（テーブルなし）。 |
 | `簡易名前置換.xlsx` | `data` → `sales_detail(cust_id, sales_detail)`。 |
 | `文脈付き名前置換.xlsx` | `customers` → `customers(id, name)`。次に`products` → `products(id, name)`。最後に`sales_data`（テーブルなし）。 |
+| `改行列名.xlsx` | `SalesData` → `sales_detail(customer\nid, Amount, Description)`。次に`ProductMaster` → `ProductList(Id, Name)`。`\n`は実際のLF。 |
 | `列名衝突.xlsx` | `sales_data` → `collision_columns(customer_id, customer-id)`。 |
 | `Bookメンバー名衝突.xlsx` | `sales_data`, `sales-data`の順。両シートともテーブルなし。 |
 | `無効名.xlsx` | `---`だけを持ち、テーブルなし。 |
@@ -492,6 +493,10 @@ Open XML SDK 2.11.3で開くと`OpenXmlPackageException`になることを確認
 * `main_range`と`total`はない。`ブックスコープ/定義名.xlsx`から生成したBookで開くとき、シート・テーブルは揃っていても定義名が不足する比較に使う。
 
 ### 名前の設定と診断
+
+`改行列名.xlsx`は`BasicStructure.xlsx`のテーブル列定義`customer_id`を`customer`と`id`の間にLFを含む名前へ変更したもの。
+他の列定義とデータ行は同じで、対象列の値は`1`, `2`。セルA1の表示文字列は`customer_id`のままであり、列の識別にはテーブル列定義の名前を使う。
+文字列リテラルとXMLコメントに改行が含まれても生成ソースをコンパイルでき、元の列名を使って値を取得できることを確認する。
 
 | ファイル | 重要な構造 | 確認する違い・意図 |
 | --- | --- | --- |

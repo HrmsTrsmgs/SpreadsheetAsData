@@ -403,7 +403,7 @@ static class WorkbookWrapperComponents
             $$"""
 
                 /// <summary>
-                /// Excel列「{{column.Name}}」の値を取得または設定します。
+                /// Excel列「{{column.Name.ReplaceLineEndings(" ")}}」の値を取得または設定します。
                 /// </summary>
             {{ColumnAttributeDeclaration(column, propertyName, options)}}    public {{propertyTypeName}} {{propertyName}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
             """;
@@ -638,5 +638,9 @@ static class WorkbookWrapperComponents
     /// 生成コード内へ埋め込む文字列リテラルを作ります。
     /// </summary>
     internal static string StringLiteral(string value) =>
-        "\"" + value.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+        "\"" + value
+            .Replace("\\", "\\\\")
+            .Replace("\"", "\\\"")
+            .Replace("\r", "\\r")
+            .Replace("\n", "\\n") + "\"";
 }

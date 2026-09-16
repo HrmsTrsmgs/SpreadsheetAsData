@@ -553,4 +553,13 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                 "C:\\temp\\\"book.xlsx"
                 """"");
     }
+
+    [Theory]
+    [InlineData("first\nsecond", "\"first\\nsecond\"")]
+    [InlineData("first\rsecond", "\"first\\rsecond\"")]
+    [InlineData("first\r\nsecond", "\"first\\r\\nsecond\"")]
+    public void StringLiteralは改行をエスケープします(string value, string expected)
+    {
+        StringLiteral(value).Should().Be(expected);
+    }
 }
