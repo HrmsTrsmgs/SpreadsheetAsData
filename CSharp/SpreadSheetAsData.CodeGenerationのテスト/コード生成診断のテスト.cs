@@ -316,7 +316,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, "SharedValue", ["main_cell", "main_range"]));
     }
 
-    [Theory(Skip = "CSharp識別子としての同一性による診断を、Sheet・行データ・Dataの各生成先へ適用する段階で解除する。")]
+    [Theory]
     [InlineData("sales_data.local_cell", "sales_data.local_range", "local_cell", "local_range")]
     [InlineData("sales_detail.customer_id", "sales_detail.amount", "customer_id", "amount")]
     [InlineData("book.main_cell", "sales_data.local_cell", "main_cell", "local_cell")]
@@ -338,7 +338,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, "SharedValue", [firstSourceName, secondSourceName]));
     }
 
-    [Theory(Skip = "継承API名・生成メソッド名との衝突でもCSharp識別子としての同一性を使用する段階で解除する。")]
+    [Theory]
     [InlineData("@Cell", "Cell")]
     [InlineData("Re\u200Cad", "Read")]
     public void 表記が異なっても既存メンバーと同じ識別子になる場合に診断します(
@@ -353,7 +353,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, identifier, ["main_cell"]));
     }
 
-    [Fact(Skip = "型名の衝突診断にもCSharp識別子としての同一性を適用する段階で解除する。")]
+    [Fact]
     public void 書式文字を除くと同じになる生成型名も衝突として診断します()
     {
         GeneratedCodeInspection
@@ -364,7 +364,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, "SalesDetail", ["sales_detail", "product_list"]));
     }
 
-    [Fact(Skip = "CSharp識別子としての同一性による衝突診断を実装する際、大文字小文字を区別することを確認して解除する。")]
+    [Fact]
     public void 大文字小文字だけが異なる生成プロパティ名は衝突にはなりません()
     {
         GeneratedCodeInspection
@@ -378,7 +378,7 @@ public sealed class コード生成診断のテスト
             .Should().BeEmpty();
     }
 
-    [Fact(Skip = "名前の集約を共通化する際、別の行データ型のプロパティまで衝突扱いしないことを確認して解除する。")]
+    [Fact]
     public void 別の行データ型の列プロパティ名が同じでも衝突にはなりません()
     {
         GeneratedCodeInspection
@@ -402,7 +402,7 @@ public sealed class コード生成診断のテスト
             .Should().BeEmpty();
     }
 
-    [Fact(Skip = "Dataへの平坦化の衝突診断を実装する際、文脈付き名前設定による解消も確認して解除する。")]
+    [Fact]
     public void 文脈付きNameMappingsでDataへ平坦化する同名定義名の衝突を解消できます()
     {
         GeneratedCodeInspection
