@@ -264,6 +264,7 @@ public class Workbook : IDisposable
     /// <param name="data">ブックへ書き込むデータ。</param>
     /// <remarks>
     /// 読み取りと同じ名前対応を使用します。例えば属性のないCellNameは、cell_nameという定義名へ書き込みます。
+    /// getterを持たない書き込み専用プロパティは無視します。
     /// シートローカル定義名を明示する場合は、属性のWorksheetNameも指定してください。
     /// </remarks>
     public void Replace<T>(T data) =>

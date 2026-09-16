@@ -898,7 +898,7 @@ public class Workbookのテスト : IDisposable
         (tested.Cell["CustomerName"].Value as object).Should().Be("山田太郎");
     }
 
-    [Fact(Skip = "Replaceで書き込み専用プロパティを除外する仕様を確認する段階で解除する。")]
+    [Fact]
     public void Replaceは書き込み専用プロパティを無視して読み取り可能なプロパティを書き込みます()
     {
         using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));
