@@ -406,7 +406,8 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
     {
         ColumnAttributeDeclaration(
                 basicBook.Tables["sales_detail"].Columns["customer_id"],
-                "CustomerId")
+                "CustomerId",
+                new())
             .Should().Be(
                 """
                     [SpreadSheetName("customer_id")]
@@ -419,7 +420,8 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
     {
         ColumnAttributeDeclaration(
                 basicBook.Tables["sales_detail"].Columns["Amount"],
-                "Amount")
+                "Amount",
+                new())
             .Should().Be("");
     }
 

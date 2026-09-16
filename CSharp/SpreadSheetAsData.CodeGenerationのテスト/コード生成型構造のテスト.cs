@@ -25,7 +25,7 @@ public sealed class コード生成型構造のテスト
             .Should().Contain(identifier);
     }
 
-    [Fact(Skip = "生成コードの属性参照にも必要に応じた完全修飾を適用する段階で解除する。")]
+    [Fact]
     public void 属性クラスと同名の行データ型もコンパイルできます()
     {
         GeneratedCodeInspection

@@ -206,7 +206,7 @@ static class WorkbookWrapperComponents
         var propertyName = options.GeneratedName(table.Name);
         var attributeDeclaration = table.Name.ToCSharpIdentifier() == propertyName
             ? ""
-            : $"    [SpreadSheetName({StringLiteral(table.Name)})]{Environment.NewLine}";
+            : $"    [{ReferencedAttributeName(table.Worksheet.Book, options)}({StringLiteral(table.Name)})]{Environment.NewLine}";
 
         return $$"""
 
@@ -392,17 +392,20 @@ static class WorkbookWrapperComponents
                 /// <summary>
                 /// Excel列「{{column.Name}}」の値を取得または設定します。
                 /// </summary>
-            {{ColumnAttributeDeclaration(column, propertyName)}}    public {{propertyTypeName}} {{propertyName}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
+            {{ColumnAttributeDeclaration(column, propertyName, options)}}    public {{propertyTypeName}} {{propertyName}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
             """;
     }
 
     /// <summary>
     /// 生成プロパティ名とExcel列名が一致しない場合に、既存の型付きTableマッピングへ列名を伝える属性を生成します。
     /// </summary>
-    internal static string ColumnAttributeDeclaration(TableColumn column, string propertyName) =>
+    internal static string ColumnAttributeDeclaration(
+        TableColumn column,
+        string propertyName,
+        CodeGenerationOptions options) =>
         column.Name == propertyName
             ? ""
-            : $"    [SpreadSheetName({StringLiteral(column.Name)})]{Environment.NewLine}";
+            : $"    [{ReferencedAttributeName(column.Table.Worksheet.Book, options)}({StringLiteral(column.Name)})]{Environment.NewLine}";
 
     /// <summary>
     /// 既存の型付きTableマッピングで読み込めるプロパティ型名を、列の値から決定します。
@@ -603,6 +606,15 @@ static class WorkbookWrapperComponents
         : typeName.Contains('.')
             ? $"global::{typeName}"
         : $"global::Marimo.SpreadSheetAsData.{typeName}";
+
+    /// <summary>
+    /// 行データ型が属性クラス名を隠す場合だけ完全修飾し、それ以外は属性の短縮表記を使います。
+    /// </summary>
+    static string ReferencedAttributeName(Workbook book, CodeGenerationOptions options)
+    {
+        var typeName = ReferencedTypeName(nameof(SpreadSheetNameAttribute), book, options);
+        return typeName == nameof(SpreadSheetNameAttribute) ? "SpreadSheetName" : typeName;
+    }
 
     /// <summary>
     /// 複数のテンプレート部品を、生成ソース上の行単位で連結します。
