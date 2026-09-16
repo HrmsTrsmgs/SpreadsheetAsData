@@ -419,7 +419,7 @@ static class WorkbookWrapperComponents
             select row[column].Value
         ).ToArray();
 
-        if (values.All(it => it is string) || values.All(it => it is BlankValue))
+        if (values.All(it => it is string or BlankValue))
         {
             return "string";
         }
@@ -452,11 +452,6 @@ static class WorkbookWrapperComponents
         if (values.All(it => it is bool or BlankValue))
         {
             return "bool?";
-        }
-
-        if (values.All(it => it is string or BlankValue))
-        {
-            return "string";
         }
 
         return "dynamic";
