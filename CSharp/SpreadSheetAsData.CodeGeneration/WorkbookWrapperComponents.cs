@@ -511,12 +511,21 @@ static class WorkbookWrapperComponents
     internal static string BookCellDefinedNamePropertyDeclaration(
         DefinedName definedName,
         CodeGenerationOptions options) =>
+        CellDefinedNamePropertyDeclaration(definedName, options.BookDefinedName(definedName), "");
+
+    /// <summary>
+    /// スコープごとに決めた名前と説明を使い、単一セル値への読み書きを生成します。
+    /// </summary>
+    static string CellDefinedNamePropertyDeclaration(
+        DefinedName definedName,
+        string propertyName,
+        string scopeDescription) =>
         $$"""
 
             /// <summary>
-            /// 定義名「{{definedName.Name}}」が表すセルの値を取得または設定します。
+            /// {{scopeDescription}}定義名「{{definedName.Name}}」が表すセルの値を取得または設定します。
             /// </summary>
-            public dynamic {{options.BookDefinedName(definedName)}}
+            public dynamic {{propertyName}}
             {
                 get => Cell[{{StringLiteral(definedName.Name)}}].Value;
                 set => Cell[{{StringLiteral(definedName.Name)}}].Value = value;
@@ -529,12 +538,21 @@ static class WorkbookWrapperComponents
     internal static string BookCellRangeDefinedNamePropertyDeclaration(
         DefinedName definedName,
         CodeGenerationOptions options) =>
+        CellRangeDefinedNamePropertyDeclaration(definedName, options.BookDefinedName(definedName), "");
+
+    /// <summary>
+    /// スコープごとに決めた名前と説明を使い、セル範囲の値への読み書きを生成します。
+    /// </summary>
+    static string CellRangeDefinedNamePropertyDeclaration(
+        DefinedName definedName,
+        string propertyName,
+        string scopeDescription) =>
         $$"""
 
             /// <summary>
-            /// 定義名「{{definedName.Name}}」が表すセル範囲の値を取得または設定します。
+            /// {{scopeDescription}}定義名「{{definedName.Name}}」が表すセル範囲の値を取得または設定します。
             /// </summary>
-            public IEnumerable<IEnumerable<object?>> {{options.BookDefinedName(definedName)}}
+            public IEnumerable<IEnumerable<object?>> {{propertyName}}
             {
                 get => Range[{{StringLiteral(definedName.Name)}}].Values;
                 set => Range[{{StringLiteral(definedName.Name)}}].Values = value;
@@ -548,17 +566,10 @@ static class WorkbookWrapperComponents
         Worksheet sheet,
         DefinedName definedName,
         CodeGenerationOptions options) =>
-        $$"""
-
-            /// <summary>
-            /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセルの値を取得または設定します。
-            /// </summary>
-            public dynamic {{options.SheetDefinedName(sheet, definedName)}}
-            {
-                get => Cell[{{StringLiteral(definedName.Name)}}].Value;
-                set => Cell[{{StringLiteral(definedName.Name)}}].Value = value;
-            }
-        """;
+        CellDefinedNamePropertyDeclaration(
+            definedName,
+            options.SheetDefinedName(sheet, definedName),
+            $"ワークシート「{sheet.Name}」の");
 
     /// <summary>
     /// ワークシートスコープのセル範囲定義名が表す値を読み書きするプロパティ宣言を生成します。
@@ -567,17 +578,10 @@ static class WorkbookWrapperComponents
         Worksheet sheet,
         DefinedName definedName,
         CodeGenerationOptions options) =>
-        $$"""
-
-            /// <summary>
-            /// ワークシート「{{sheet.Name}}」の定義名「{{definedName.Name}}」が表すセル範囲の値を取得または設定します。
-            /// </summary>
-            public IEnumerable<IEnumerable<object?>> {{options.SheetDefinedName(sheet, definedName)}}
-            {
-                get => Range[{{StringLiteral(definedName.Name)}}].Values;
-                set => Range[{{StringLiteral(definedName.Name)}}].Values = value;
-            }
-        """;
+        CellRangeDefinedNamePropertyDeclaration(
+            definedName,
+            options.SheetDefinedName(sheet, definedName),
+            $"ワークシート「{sheet.Name}」の");
 
     /// <summary>
     /// Sheet型から指定Excelテーブル型を取得するプロパティ宣言を生成します。
