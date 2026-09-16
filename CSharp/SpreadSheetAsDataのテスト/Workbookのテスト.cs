@@ -703,7 +703,7 @@ public class Workbookのテスト : IDisposable
         }
     }
 
-    [Fact(Skip = "単一セルから代入できないプロパティ型の拒否を確認する段階で解除する。例外型は未確定。")]
+    [Fact]
     public void Readは文字列セルをUri型のプロパティへ読み込めません()
     {
         using var book = Workbook.Open(@"TestData\定義名.xlsx");
