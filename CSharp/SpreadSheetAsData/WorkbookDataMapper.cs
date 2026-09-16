@@ -54,13 +54,19 @@ sealed class WorkbookDataMapper(Workbook book)
             where property.CanRead
             select property)
         {
+            ReplacePropertyValue(property);
+        }
+
+        // 一つのプロパティを、対応するテーブル、単一セル、範囲へ書き込みます。
+        void ReplacePropertyValue(PropertyInfo property)
+        {
             if (TryGetTable(property, out var table))
             {
                 ReplaceTableRows(
                     table,
                     TableRowType(property),
                     property.GetValue(data));
-                continue;
+                return;
             }
 
             var range = DefinedNameRange(property);
@@ -68,7 +74,7 @@ sealed class WorkbookDataMapper(Workbook book)
             if (range.TopLeftCell == range.BottomRightCell)
             {
                 range.TopLeftCell.Value = property.GetValue(data);
-                continue;
+                return;
             }
 
             range.Values =
