@@ -305,6 +305,40 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void 生成されたBookは単一セルへ縮小した定義名もDataの範囲として読み込みます()
+    {
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(
+                @"TestData\コード生成\単一セル定義名の範囲化\定義名.xlsx"))
+            .GeneratedType("定義名Book")
+            .InvokeStaticMethod<Workbook>("Open", DefinedNamesExcelFilePath);
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        IEnumerable<IEnumerable<object?>> tested = dataAccessor.MainCell;
+
+        tested.Should().ContainSingle().Which.Should().Equal("main");
+    }
+
+    [Fact]
+    public void 生成されたBookはDataの範囲から単一セルへ縮小した定義名を置換します()
+    {
+        using var temporaryFiles = new TemporaryExcelFiles();
+        using var book = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(
+                @"TestData\コード生成\単一セル定義名の範囲化\定義名.xlsx"))
+            .GeneratedType("定義名Book")
+            .InvokeStaticMethod<Workbook>("Open", temporaryFiles.Copy(DefinedNamesExcelFilePath));
+        dynamic bookAccessor = book;
+        dynamic dataAccessor = bookAccessor.Read();
+        IEnumerable<IEnumerable<object?>> replacement = [["changed"]];
+        dataAccessor.MainCell = replacement;
+
+        bookAccessor.Replace(dataAccessor);
+
+        (book.Cell["main_cell"].Value as object).Should().Be("changed");
+    }
+
+    [Fact]
     public void 生成されたBook型は定義名の参照位置だけが変わってもOpenできます()
     {
         var generatedType = GeneratedCodeInspection

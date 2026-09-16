@@ -30,7 +30,8 @@ sealed class WorkbookDataMapper(Workbook book)
 
             var range = DefinedNameRange(property);
 
-            if (range.TopLeftCell == range.BottomRightCell)
+            if (range.TopLeftCell == range.BottomRightCell
+                && property.PropertyType != typeof(IEnumerable<IEnumerable<object?>>))
             {
                 return ConvertValue(range.TopLeftCell.Value, property.PropertyType);
             }
@@ -71,7 +72,8 @@ sealed class WorkbookDataMapper(Workbook book)
 
             var range = DefinedNameRange(property);
 
-            if (range.TopLeftCell == range.BottomRightCell)
+            if (range.TopLeftCell == range.BottomRightCell
+                && property.PropertyType != typeof(IEnumerable<IEnumerable<object?>>))
             {
                 range.TopLeftCell.Value = property.GetValue(data);
                 return;
