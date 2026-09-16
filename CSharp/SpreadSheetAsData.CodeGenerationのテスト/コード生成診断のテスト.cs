@@ -118,7 +118,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, generatedName, ["sales_detail"]));
     }
 
-    [Theory(Skip = "集約を経由しない予約名の比較にもCSharp識別子としての同一性を適用する段階で解除する。")]
+    [Theory]
     [InlineData("book.main_cell", "@Save", "Save", "main_cell")]
     [InlineData("sales_detail", "@Book", "Book", "sales_detail")]
     public void 定義名とテーブルの予約名診断はエスケープ表記が異なっても衝突を検出します(

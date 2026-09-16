@@ -215,15 +215,16 @@ static class GeneratedNameDiagnostics
         select (names.Key, names.ToArray());
 
     /// <summary>
-    /// 生成名の重複、または予約名との衝突を一つの診断として返します。
+    /// 生成名を識別子名へ揃え、重複または予約名との衝突を一つの診断として返します。
     /// 定義名同士の重複を検証していない経路では、元名を一件ずつ渡します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> NameCollisionDiagnostics(
         IEnumerable<(string Name, string[] SourceNames)> names,
         IEnumerable<string> reservedNames) =>
         from name in names
-        where name.SourceNames.Length > 1 || reservedNames.Contains(name.Name)
-        select new CodeGenerationDiagnostic(true, name.Name, name.SourceNames);
+        let identifier = name.Name.IdentifierValue()
+        where name.SourceNames.Length > 1 || reservedNames.Contains(identifier)
+        select new CodeGenerationDiagnostic(true, identifier, name.SourceNames);
 
     /// <summary>
     /// 異なる生成元の間で同名になる組を、従来どおり元名の二者ごとに報告します。
