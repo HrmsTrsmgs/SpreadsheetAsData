@@ -598,7 +598,7 @@ static class WorkbookWrapperComponents
     /// その他の生成型には接尾辞が付くため、ここで扱う既存型名とは衝突しません。
     /// </summary>
     static string ReferencedTypeName(string typeName, Workbook book, CodeGenerationOptions options) =>
-        !book.Tables.Any(table => options.GeneratedName(table.Name).IdentifierValue() == typeName.Split('.')[0])
+        !book.Tables.Any(table => options.GeneratedName(table.Name).IdentifierValue == typeName.Split('.')[0])
             ? typeName
         : typeName.Contains('.')
             ? $"global::{typeName}"

@@ -12,7 +12,7 @@ static class CSharpIdentifierNames
         /// <summary>
         /// 先頭のエスケープ表記と書式文字を除き、コンパイル後の識別子名を返します。
         /// </summary>
-        internal string IdentifierValue() =>
+        internal string IdentifierValue =>
             string.Concat(
                 from character in self.TrimStart('@')
                 where char.GetUnicodeCategory(character) != UnicodeCategory.Format

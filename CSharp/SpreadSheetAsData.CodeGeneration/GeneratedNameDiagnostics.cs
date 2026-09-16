@@ -211,19 +211,20 @@ static class GeneratedNameDiagnostics
     static IEnumerable<(string Name, string[] SourceNames)> GroupMemberNames(
         IEnumerable<(string SourceName, string Name)> members) =>
         from member in members
-        group member.SourceName by member.Name.IdentifierValue() into names
+        group member.SourceName by member.Name.IdentifierValue into names
         select (names.Key, names.ToArray());
 
     /// <summary>
-    /// 生成名を識別子名へ揃え、重複または予約名との衝突を一つの診断として返します。
+    /// 生成名と予約名を識別子名へ揃え、重複または予約名との衝突を一つの診断として返します。
     /// 定義名同士の重複を検証していない経路では、元名を一件ずつ渡します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> NameCollisionDiagnostics(
         IEnumerable<(string Name, string[] SourceNames)> names,
         IEnumerable<string> reservedNames) =>
         from name in names
-        let identifier = name.Name.IdentifierValue()
-        where name.SourceNames.Length > 1 || reservedNames.Contains(identifier)
+        let identifier = name.Name.IdentifierValue
+        where name.SourceNames.Length > 1
+            || reservedNames.Select(it => it.IdentifierValue).Contains(identifier)
         select new CodeGenerationDiagnostic(true, identifier, name.SourceNames);
 
     /// <summary>

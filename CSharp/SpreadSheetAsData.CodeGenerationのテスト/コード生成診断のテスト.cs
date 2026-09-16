@@ -135,7 +135,7 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(true, identifier, [sourceName]));
     }
 
-    [Fact(Skip = "所属型名との衝突判定で、プロパティ名だけでなく型名もCSharp識別子として比較する段階で解除する。")]
+    [Fact]
     public void 行データ型名にエスケープ表記があっても同じ識別子の列プロパティを診断します()
     {
         GeneratedCodeInspection
