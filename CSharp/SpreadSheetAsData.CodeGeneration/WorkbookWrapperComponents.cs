@@ -77,6 +77,43 @@ static class WorkbookWrapperComponents
             /// <exception cref="{{ReferencedTypeName("System.IO.InvalidDataException", book, options)}}">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、テーブルの所属シートが異なるか、単一セルの定義名が複数セルを参照しています。</exception>
             public static new {{bookFileIdentifier}}Book Open({{ReferencedTypeName("System.IO.Stream", book, options)}} stream) =>
                 ValidateStructure(new(stream));
+        {{BookStructureValidationDeclaration(bookFileIdentifier, book, options)}}
+
+            /// <summary>
+            /// Excelブック全体のデータを読み込みます。
+            /// </summary>
+            public {{bookFileIdentifier}}Data Read() =>
+                base.Read<{{bookFileIdentifier}}Data>();
+
+            /// <summary>
+            /// Excelブック全体のデータを置換します。
+            /// </summary>
+            public void Replace({{bookFileIdentifier}}Data data) =>
+                base.Replace(data);
+        {{ForEach([
+            .. from definedName in BookScopedDefinedNames(book)
+               where IsSingleCellDefinedName(definedName)
+               select BookCellDefinedNamePropertyDeclaration(definedName, options),
+            .. from definedName in BookScopedDefinedNames(book)
+               where !IsSingleCellDefinedName(definedName)
+               select BookCellRangeDefinedNamePropertyDeclaration(definedName, options),
+            .. from sheet in book.Sheets.Values
+               select SheetPropertyDeclaration(sheet, options),
+            .. from table in book.Tables
+               select BookTablePropertyDeclaration(table, options)
+        ])}}
+        }
+        """;
+    }
+
+    /// <summary>
+    /// Bookの宣言から独立して、生成元との構造照合と不一致時の解放処理を生成します。
+    /// </summary>
+    static string BookStructureValidationDeclaration(
+        string bookFileIdentifier,
+        Workbook book,
+        CodeGenerationOptions options) =>
+        $$"""
 
             /// <summary>
             /// 生成元に対応するシート、テーブルとその列、両スコープの定義名を確認し、不一致時は開いたブックを破棄します。
@@ -124,33 +161,7 @@ static class WorkbookWrapperComponents
 
                 return book;
             }
-
-            /// <summary>
-            /// Excelブック全体のデータを読み込みます。
-            /// </summary>
-            public {{bookFileIdentifier}}Data Read() =>
-                base.Read<{{bookFileIdentifier}}Data>();
-
-            /// <summary>
-            /// Excelブック全体のデータを置換します。
-            /// </summary>
-            public void Replace({{bookFileIdentifier}}Data data) =>
-                base.Replace(data);
-        {{ForEach([
-            .. from definedName in BookScopedDefinedNames(book)
-               where IsSingleCellDefinedName(definedName)
-               select BookCellDefinedNamePropertyDeclaration(definedName, options),
-            .. from definedName in BookScopedDefinedNames(book)
-               where !IsSingleCellDefinedName(definedName)
-               select BookCellRangeDefinedNamePropertyDeclaration(definedName, options),
-            .. from sheet in book.Sheets.Values
-               select SheetPropertyDeclaration(sheet, options),
-            .. from table in book.Tables
-               select BookTablePropertyDeclaration(table, options)
-        ])}}
-        }
         """;
-    }
 
     /// <summary>
     /// Excelブック全体のデータを表す型の宣言を生成します。
