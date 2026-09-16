@@ -232,10 +232,10 @@ public class Table<T> : Table, IEnumerable<T>
             || HasPublicGetter(property) && HasPublicSetter(property);
 
     /// <summary>
-    /// マッピング対象になる公開プロパティを取得します。
+    /// 行のインスタンスに属する公開プロパティからマッピング対象を取得します。
     /// </summary>
     static IEnumerable<PropertyInfo> MappedProperties =>
-        from property in typeof(T).GetProperties()
+        from property in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
         where IsMappedProperty(property)
         select property;
 

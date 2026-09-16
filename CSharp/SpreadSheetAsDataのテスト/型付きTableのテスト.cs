@@ -64,6 +64,31 @@ public sealed class 型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void 型付きTableは列挙してもstaticプロパティを書き換えません()
+    {
+        RowWithStaticProperty.文字列 = "shared";
+
+        _ = book.ReadTable<RowWithStaticProperty>(MappingTableName).ToArray();
+
+        RowWithStaticProperty.文字列.Should().Be("shared");
+    }
+
+    [Fact]
+    public void Replaceはstaticプロパティを列へ書き込みません()
+    {
+        using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
+        RowWithStaticProperty.文字列 = "shared";
+
+        book.ReadTable<RowWithStaticProperty>(MappingTableName)
+            .Replace([new RowWithStaticProperty { IntegerValue = 10 }]);
+
+        (book.Tables[MappingTableName].Rows.First()["文字列"].Value as object)
+            .Should().Be("さしすせそ");
+        (book.Tables[MappingTableName].Rows.First()["数値2"].Value as object)
+            .Should().Be(10d);
+    }
+
+    [Fact]
     public void 型付きTableは数値をnullableなdoubleプロパティへ読み込みます()
     {
         book.ReadTable<NullableDoubleRow>(MappingTableName)
@@ -755,6 +780,14 @@ public sealed class 型付きTableのテスト : IDisposable
     {
         [SpreadSheetName("文字列")]
         public string TextValue { get; set; } = "";
+    }
+
+    public sealed class RowWithStaticProperty
+    {
+        [SpreadSheetName("数値2")]
+        public int IntegerValue { get; set; }
+
+        public static string 文字列 { get; set; } = "";
     }
 
     public sealed class NullableDoubleRow
