@@ -257,7 +257,7 @@ public class Workbook : IDisposable
         dataMapper.Read<T>();
 
     /// <summary>
-    /// オブジェクトのプロパティを、同じC#識別子となるブック内の定義名またはExcelテーブルへ書き込みます。
+    /// オブジェクトのpublicなインスタンスプロパティを、同じC#識別子となるブック内の定義名またはExcelテーブルへ書き込みます。
     /// <see cref="SpreadSheetNameAttribute"/> による明示的な対応付けを優先します。
     /// </summary>
     /// <typeparam name="T">ブックへ書き込むデータの型。</typeparam>

@@ -888,7 +888,7 @@ public class Workbookのテスト : IDisposable
         (tested.Cell["CustomerName"].Value as object).Should().Be("佐藤花子");
     }
 
-    [Fact(Skip = "Replaceの対象をインスタンスプロパティに限定する段階で解除する。")]
+    [Fact]
     public void Replaceはstaticプロパティをセルへ書き込みません()
     {
         using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));

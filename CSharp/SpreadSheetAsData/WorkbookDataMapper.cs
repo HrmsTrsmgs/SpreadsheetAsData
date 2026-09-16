@@ -49,7 +49,7 @@ sealed class WorkbookDataMapper(Workbook book)
 
     internal void Replace<T>(T data)
     {
-        foreach (var property in typeof(T).GetProperties())
+        foreach (var property in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
             if (TryGetTable(property, out var table))
             {
