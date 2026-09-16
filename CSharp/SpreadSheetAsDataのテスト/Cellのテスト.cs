@@ -214,6 +214,25 @@ public class Cellのテスト : IDisposable
         b1.Reference.Should().Be("B1");
     }
 
+    [Theory]
+    [InlineData("B1")]
+    [InlineData("B2")]
+    [InlineData("D4")]
+    public void Valueプロパティは未格納のセルへの書き込みも保存します(string cellReference)
+    {
+        var filePath = temporaryFiles.Copy("Book1.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            book.Sheets["Sheet1"].Cells[cellReference].Value = 42d;
+            book.Save();
+        }
+
+        using var tested = Workbook.Open(filePath, validate: true);
+
+        (tested.Sheets["Sheet1"].Cells[cellReference].Value as object).Should().Be(42d);
+    }
+
     [Fact]
     public void ToStringはA1形式のセル参照を返します()
     {

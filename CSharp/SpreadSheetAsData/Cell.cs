@@ -28,7 +28,7 @@ public class Cell
     internal Cell(Worksheet sheet, string cellReference) :
         this(
             sheet,
-            new Spreadsheet.Cell(new Value { })
+            new Spreadsheet.Cell
             {
                 CellReference = new StringValue(cellReference)
             })
@@ -74,6 +74,8 @@ public class Cell
 
         set
         {
+            AttachToWorksheet();
+
             if (value is null)
             {
                 Xml.DataType = null;
@@ -98,6 +100,30 @@ public class Cell
             Xml.DataType = CellValues.Number;
             Xml.CellValue = new(((double)value).ToString(CultureInfo.InvariantCulture));
         }
+    }
+
+    /// <summary>
+    /// 未格納のセルを初回書き込み時にXMLへ接続し、行と列の昇順を維持します。
+    /// </summary>
+    void AttachToWorksheet()
+    {
+        if (Xml.Parent is not null)
+        {
+            return;
+        }
+
+        var cellName = CellName.Parse(Reference);
+        var sheetData = Sheet.WorksheetPart.Worksheet.GetFirstChild<SheetData>()
+            ?? throw new InvalidOperationException();
+        var row = sheetData.Elements<Row>().SingleOrDefault(it => it.RowIndex == cellName.RowIndex)
+            ?? sheetData.InsertBefore(
+                new Row { RowIndex = cellName.RowIndex },
+                sheetData.Elements<Row>().FirstOrDefault(it => it.RowIndex > cellName.RowIndex));
+
+        row.InsertBefore(
+            Xml,
+            row.Elements<Spreadsheet.Cell>().FirstOrDefault(
+                it => CellName.Parse(it.CellReference.Value).ColumnIndex > cellName.ColumnIndex));
     }
 
     /// <summary>
