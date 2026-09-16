@@ -114,7 +114,7 @@ public class Workbookのテスト : IDisposable
             .Should().Equal("Sheet1", "Sheet2", "いろいろなデータ");
     }
 
-    [Fact(Skip = "パス版の空ファイル拒否と失敗後の解放を確認する段階で解除する。")]
+    [Fact]
     public void Openは空ファイルを拒否し失敗後にファイルを解放します()
     {
         var filePath = temporaryFiles.Copy("空ファイル.xlsx");
