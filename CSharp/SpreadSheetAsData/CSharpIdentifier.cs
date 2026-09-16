@@ -65,18 +65,13 @@ public static class CSharpIdentifier
     /// C#識別子の2文字目以降で使用できるUnicodeカテゴリかどうかを判定します。
     /// </summary>
     static bool IsIdentifierPartCharacter(char character) =>
-        char.GetUnicodeCategory(character) is
-            UnicodeCategory.UppercaseLetter
-            or UnicodeCategory.LowercaseLetter
-            or UnicodeCategory.TitlecaseLetter
-            or UnicodeCategory.ModifierLetter
-            or UnicodeCategory.OtherLetter
-            or UnicodeCategory.LetterNumber
-            or UnicodeCategory.DecimalDigitNumber
-            or UnicodeCategory.ConnectorPunctuation
-            or UnicodeCategory.NonSpacingMark
-            or UnicodeCategory.SpacingCombiningMark
-            or UnicodeCategory.Format;
+        IsIdentifierStartCharacter(character)
+            || char.GetUnicodeCategory(character) is
+                UnicodeCategory.DecimalDigitNumber
+                or UnicodeCategory.ConnectorPunctuation
+                or UnicodeCategory.NonSpacingMark
+                or UnicodeCategory.SpacingCombiningMark
+                or UnicodeCategory.Format;
 
     /// <summary>
     /// ASCII以外の文字を含むかどうかを判定します。
