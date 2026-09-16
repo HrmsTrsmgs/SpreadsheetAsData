@@ -314,6 +314,7 @@ public class Table<T> : Table, IEnumerable<T>
 
         object? conversion = (propertyType, sourceValue) switch
         {
+            ({ } type, _) when type == typeof(object) => sourceValue,
             ({ } type, double number) when (type == typeof(int) || type == typeof(int?))
                 && double.IsInteger(number)
                 && number is >= int.MinValue and <= int.MaxValue => (int)number,

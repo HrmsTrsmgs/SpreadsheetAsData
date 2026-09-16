@@ -112,7 +112,7 @@ public sealed class Order
 
 ### テーブル行の値変換
 
-現在対応しているプロパティ型は、`int`、`double`、`bool`、`string` と、`int?`、`double?`、`bool?` です。
+現在対応しているプロパティ型は、`int`、`double`、`bool`、`string` と、`int?`、`double?`、`bool?`、`object`／`dynamic` です。
 
 | プロパティ型 | 読み込めるセル値 | 空白セルを読み込んだ値 |
 | --- | --- | --- |
@@ -123,6 +123,7 @@ public sealed class Order
 | `int?` | 整数値の `double` | `null` |
 | `double?` | `double` | `null` |
 | `bool?` | `bool` | `null` |
+| `object`／`dynamic` | 元のセル値を変換せず取得 | `BlankValue` |
 
 小数値を `int` または `int?` へ変換しようとした場合はエラーになります。
 `string?` の注釈によって変換規則を切り替えることはなく、文字列プロパティへ空白を読み込むと空文字列になります。

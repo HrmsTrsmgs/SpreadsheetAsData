@@ -54,6 +54,24 @@ public sealed class コード生成型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void 生成されたTableは混在列の値を元の型のまま読み込みます()
+    {
+        var excelFilePath = temporaryFiles.Copy(BasicStructureExcelFilePath);
+        using (var book = Workbook.Open(excelFilePath))
+        {
+            book.Tables["sales_detail"].Rows.First()["Description"].Value = 1d;
+            book.Save();
+        }
+
+        using var sourceBook = Workbook.Open(excelFilePath);
+        var tested = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(excelFilePath))
+            .GeneratedInstance<IEnumerable<object>>("SalesDetailTable", sourceBook.Tables["sales_detail"]);
+
+        tested.Select(it => PropertyValue(it, "Description")).Should().Equal(1d, "b");
+    }
+
+    [Fact]
     public void 生成されたTable型からTableの構造情報を使用できます()
     {
         using var book = GeneratedCodeInspection
