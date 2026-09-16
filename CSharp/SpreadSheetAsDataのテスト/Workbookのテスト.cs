@@ -114,6 +114,20 @@ public class Workbookのテスト : IDisposable
             .Should().Equal("Sheet1", "Sheet2", "いろいろなデータ");
     }
 
+    [Fact(Skip = "パス版の空ファイル拒否と失敗後の解放を確認する段階で解除する。")]
+    public void Openは空ファイルを拒否し失敗後にファイルを解放します()
+    {
+        var filePath = temporaryFiles.Copy("空ファイル.xlsx");
+        var tested = () =>
+        {
+            using var book = Workbook.Open(filePath);
+        };
+
+        tested.Should().Throw<Exception>();
+        using var stream = File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+        stream.Length.Should().Be(0);
+    }
+
     [Fact]
     public void Openは読み取り専用のStream上のブックを開きます()
     {
@@ -664,6 +678,40 @@ public class Workbookのテスト : IDisposable
         tested.Read<WorkbookData>().CustomerName.Should().BeEmpty();
     }
 
+    [Fact(Skip = "構造体へのReadで値を保持する仕様を確認する段階で解除する。")]
+    public void Readは構造体のプロパティへ読み込んだ値を保持します()
+    {
+        using var tested = Workbook.Open(@"TestData\定義名.xlsx");
+
+        tested.Read<StructWorkbookData>().CustomerName.Should().Be("山田太郎");
+    }
+
+    [Fact(Skip = "Readの対象をインスタンスプロパティに限定する段階で解除する。")]
+    public void Readはstaticプロパティを書き換えません()
+    {
+        using var tested = Workbook.Open(@"TestData\定義名.xlsx");
+        var original = StaticWorkbookData.CustomerName;
+        try
+        {
+            tested.Read<StaticWorkbookData>();
+
+            StaticWorkbookData.CustomerName.Should().Be(original);
+        }
+        finally
+        {
+            StaticWorkbookData.CustomerName = original;
+        }
+    }
+
+    [Fact(Skip = "単一セルから代入できないプロパティ型の拒否を確認する段階で解除する。例外型は未確定。")]
+    public void Readは文字列セルをUri型のプロパティへ読み込めません()
+    {
+        using var book = Workbook.Open(@"TestData\定義名.xlsx");
+        var tested = () => book.Read<UriWorkbookData>();
+
+        tested.Should().Throw<Exception>();
+    }
+
     [Fact]
     public void ReadはSpreadSheetName属性で指定した定義名からオブジェクトを読み込みます()
     {
@@ -840,6 +888,26 @@ public class Workbookのテスト : IDisposable
         (tested.Cell["CustomerName"].Value as object).Should().Be("佐藤花子");
     }
 
+    [Fact(Skip = "Replaceの対象をインスタンスプロパティに限定する段階で解除する。")]
+    public void Replaceはstaticプロパティをセルへ書き込みません()
+    {
+        using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));
+
+        tested.Replace(new StaticWorkbookData());
+
+        (tested.Cell["CustomerName"].Value as object).Should().Be("山田太郎");
+    }
+
+    [Fact(Skip = "Replaceで書き込み専用プロパティを除外する仕様を確認する段階で解除する。")]
+    public void Replaceは書き込み専用プロパティを無視して読み取り可能なプロパティを書き込みます()
+    {
+        using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));
+
+        tested.Replace(new WriteOnlyWorkbookData { Name = "佐藤花子" });
+
+        (tested.Cell["CustomerName"].Value as object).Should().Be("佐藤花子");
+    }
+
     [Fact]
     public void ReplaceはSpreadSheetName属性で指定したシートローカルの単一セル定義名へオブジェクトを書き込みます()
     {
@@ -951,6 +1019,29 @@ public class Workbookのテスト : IDisposable
 
     public sealed class AttributedWorkbookData
     {
+        [SpreadSheetName("CustomerName")]
+        public string Name { get; set; } = "";
+    }
+
+    public struct StructWorkbookData
+    {
+        public string CustomerName { get; set; }
+    }
+
+    public sealed class StaticWorkbookData
+    {
+        public static string CustomerName { get; set; } = "静的な値";
+    }
+
+    public sealed class UriWorkbookData
+    {
+        public Uri? CustomerName { get; set; }
+    }
+
+    public sealed class WriteOnlyWorkbookData
+    {
+        public string CustomerName { set => throw new InvalidOperationException(); }
+
         [SpreadSheetName("CustomerName")]
         public string Name { get; set; } = "";
     }
