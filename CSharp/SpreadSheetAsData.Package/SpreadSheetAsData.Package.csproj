@@ -22,8 +22,8 @@
 
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
-    <None Include="buildTransitive\Marimo.SpreadSheetAsData.props" Pack="true" PackagePath="buildTransitive\Marimo.SpreadSheetAsData.props" Visible="false" />
-    <None Include="buildTransitive\Marimo.SpreadSheetAsData.targets" Pack="true" PackagePath="buildTransitive\Marimo.SpreadSheetAsData.targets" Visible="false" />
+    <None Include="..\SpreadSheetAsData.Build\buildTransitive\Marimo.SpreadSheetAsData.Build.props" Pack="true" PackagePath="buildTransitive\Marimo.SpreadSheetAsData.props" Visible="false" />
+    <None Include="..\SpreadSheetAsData.Build\buildTransitive\Marimo.SpreadSheetAsData.Build.targets" Pack="true" PackagePath="buildTransitive\Marimo.SpreadSheetAsData.targets" Visible="false" />
     <None Include="PackagePlaceholder\_._" Pack="true" PackagePath="lib\net10.0\_._" Visible="false" />
   </ItemGroup>
 
