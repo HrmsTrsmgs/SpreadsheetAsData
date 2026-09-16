@@ -6,6 +6,19 @@ namespace Marimo.SpreadSheetAsData.Test;
 
 public class CellRangeReferenceのテスト
 {
+    [Theory]
+    [InlineData("'Order Details'!$A$1", "Order Details")]
+    [InlineData("'O''Brien'!$A$1", "O'Brien")]
+    [InlineData("'Order!Details'!$A$1", "Order!Details")]
+    public void TryParseは引用されたシート名を元の名前へ戻します(string reference, string sheetName)
+    {
+        CellRangeReference.TryParse(reference, out var tested).Should().BeTrue();
+
+        tested.SheetName.Should().Be(sheetName);
+        tested.TopLeft.Should().Be(CellName.Parse("A1"));
+        tested.BottomRight.Should().Be(CellName.Parse("A1"));
+    }
+
     [Fact]
     public void TryParseはA1形式の範囲参照を変換します()
     {

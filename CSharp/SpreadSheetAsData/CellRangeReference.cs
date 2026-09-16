@@ -112,7 +112,10 @@ readonly partial struct CellRangeReference
         /// <summary>
         /// シート名を取得します。
         /// </summary>
-        public string? SheetName => OptionalGroupValue("sheet");
+        public string? SheetName =>
+            match.Groups["quotedSheet"].Success
+                ? GroupValue("quotedSheet").Replace("''", "'")
+                : OptionalGroupValue("sheet");
 
         /// <summary>
         /// 始点セルの参照文字列を取得します。
@@ -157,7 +160,7 @@ readonly partial struct CellRangeReference
         }
 
         [GeneratedRegex(
-@"^(?:(?<sheet>[^!]*)!)?(?<startCell>[^!:]*)(?::(?<endCell>[^!:]*))?$")]
+@"^(?:(?:'(?<quotedSheet>(?:[^']|'')*)'|(?<sheet>[^!']*))!)?(?<startCell>[^!:]*)(?::(?<endCell>[^!:]*))?$")]
         private static partial Regex CellRangeReferencePattern();
     }
 }
