@@ -12,7 +12,7 @@ sealed class WorkbookDataMapper(Workbook book)
         // 値型でも各SetValueが同じインスタンスを更新するよう、一度だけボックス化します。
         object? data = Activator.CreateInstance<T>();
 
-        foreach (var property in typeof(T).GetProperties())
+        foreach (var property in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
             property.SetValue(data, ReadPropertyValue(property));
         }

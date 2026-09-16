@@ -686,7 +686,7 @@ public class Workbookのテスト : IDisposable
         tested.Read<StructWorkbookData>().CustomerName.Should().Be("山田太郎");
     }
 
-    [Fact(Skip = "Readの対象をインスタンスプロパティに限定する段階で解除する。")]
+    [Fact]
     public void Readはstaticプロパティを書き換えません()
     {
         using var tested = Workbook.Open(@"TestData\定義名.xlsx");
