@@ -496,7 +496,7 @@ public sealed class 型付きTableのテスト : IDisposable
     {
         var action = () =>
         {
-            book.ReadTable<MissingColumnRow>(MappingTableName)
+            _ = book.ReadTable<MissingColumnRow>(MappingTableName)
                 .ToArray();
         };
 
@@ -517,7 +517,7 @@ public sealed class 型付きTableのテスト : IDisposable
     {
         var action = () =>
         {
-            book.ReadTable<StringAsIntegerRow>(MappingTableName)
+            _ = book.ReadTable<StringAsIntegerRow>(MappingTableName)
                 .ToArray();
         };
 
@@ -538,7 +538,7 @@ public sealed class 型付きTableのテスト : IDisposable
     {
         var action = () =>
         {
-            book.ReadTable<FloatingPointAsIntegerRow>(MappingTableName)
+            _ = book.ReadTable<FloatingPointAsIntegerRow>(MappingTableName)
                 .ToArray();
         };
 
@@ -561,7 +561,7 @@ public sealed class 型付きTableのテスト : IDisposable
     {
         var action = () =>
         {
-            book.ReadTable<NullableIntegerWithBlankRow>(MappingTableName)
+            _ = book.ReadTable<NullableIntegerWithBlankRow>(MappingTableName)
                 .ToArray();
         };
 
@@ -602,7 +602,7 @@ public sealed class 型付きTableのテスト : IDisposable
     {
         var action = () =>
         {
-            book.ReadTable<DuplicateColumnRow>(MappingTableName)
+            _ = book.ReadTable<DuplicateColumnRow>(MappingTableName)
                 .ToArray();
         };
 
@@ -621,7 +621,7 @@ public sealed class 型付きTableのテスト : IDisposable
     {
         var action = () =>
         {
-            book.ReadTable<AttributedPropertyWithoutPublicSetterRow>(MappingTableName)
+            _ = book.ReadTable<AttributedPropertyWithoutPublicSetterRow>(MappingTableName)
                 .ToArray();
         };
 
@@ -661,7 +661,7 @@ public sealed class 型付きTableのテスト : IDisposable
     {
         var action = () =>
         {
-            book.ReadTable<RowWithoutPublicParameterlessConstructor>(MappingTableName)
+            _ = book.ReadTable<RowWithoutPublicParameterlessConstructor>(MappingTableName)
                 .ToArray();
         };
 

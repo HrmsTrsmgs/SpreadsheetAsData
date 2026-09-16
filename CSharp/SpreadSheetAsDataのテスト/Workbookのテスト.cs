@@ -534,7 +534,7 @@ public class Workbookのテスト : IDisposable
 
         var action = () =>
         {
-            tested.ReadTable<TestMappedRow>("missing")
+            _ = tested.ReadTable<TestMappedRow>("missing")
                 .ToArray();
         };
 
