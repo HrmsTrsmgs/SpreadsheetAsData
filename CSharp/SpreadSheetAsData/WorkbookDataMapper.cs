@@ -9,14 +9,16 @@ sealed class WorkbookDataMapper(Workbook book)
 {
     internal T Read<T>()
     {
-        var data = Activator.CreateInstance<T>();
+        // 値型でも各SetValueが同じインスタンスを更新するよう、一度だけボックス化します。
+        object? data = Activator.CreateInstance<T>();
 
         foreach (var property in typeof(T).GetProperties())
         {
             property.SetValue(data, ReadPropertyValue(property));
         }
 
-        return data;
+        // Tとして作った値を戻します。nullの場合も元のTが許すnullのまま返します。
+        return (T)data!;
 
         // プロパティに対応するテーブル、単一セル、範囲から設定する値を読み取ります。
         object? ReadPropertyValue(PropertyInfo property)

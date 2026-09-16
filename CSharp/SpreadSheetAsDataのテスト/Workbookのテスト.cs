@@ -678,7 +678,7 @@ public class Workbookのテスト : IDisposable
         tested.Read<WorkbookData>().CustomerName.Should().BeEmpty();
     }
 
-    [Fact(Skip = "構造体へのReadで値を保持する仕様を確認する段階で解除する。")]
+    [Fact]
     public void Readは構造体のプロパティへ読み込んだ値を保持します()
     {
         using var tested = Workbook.Open(@"TestData\定義名.xlsx");
