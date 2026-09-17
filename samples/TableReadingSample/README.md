@@ -37,7 +37,8 @@ NuGet.orgへ公開する前は、リポジトリ内で生成したローカル�
 
 ```powershell
 dotnet pack .\CSharp\SpreadSheetAsData.slnx -c Release -o .\artifacts\nupkg
-dotnet restore .\samples\TableReadingSample\TableReadingSample.slnx --source .\artifacts\nupkg --source "https://api.nuget.org/v3/index.json"
+$localFeed = (Resolve-Path .\artifacts\nupkg).Path
+dotnet restore .\samples\TableReadingSample\TableReadingSample\TableReadingSample.csproj --source $localFeed --source "https://api.nuget.org/v3/index.json"
 dotnet run --no-restore --project .\samples\TableReadingSample\TableReadingSample\TableReadingSample.csproj
 ```
 

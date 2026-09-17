@@ -2,8 +2,8 @@
 
 SpreadsheetAsDataは、Excelをインストールしていない環境でもExcelファイルを扱えるようにするライブラリです。
 
-現在はC#版を再整備中です。
-Open XML SDKを内部実装として使いながら、利用側コードからはワークブック、ワークシート、セルをコレクション操作に近い感覚で扱えるAPIを目指しています。
+C#版では、Excelから生成した型付きAPIでデータを読み書きできます。
+Open XML SDKを内部実装として使いながら、ワークブック、ワークシート、セルを直接扱うAPIも提供します。
 
 ## デモ動画
 
@@ -166,7 +166,7 @@ using var book = Workbook.Open("customers.xlsx");
 var customers = book.ReadTable<CustomerRow>("Customers");
 ```
 
-型付きテーブルでは、現在 `int`、`double`、`string` への基本的な変換を扱います。
+型付きテーブルでは、`int`、`double`、`bool`、`string` と、数値・真偽値のnullable型を扱います。`object` / `dynamic` は元のセル値を保持します。
 対応する列がない場合、変換できない値がある場合、同じ列へ複数のプロパティを対応付けた場合は `TableMappingException` で失敗します。
 
 ### コード生成の詳しい設定
@@ -341,7 +341,7 @@ Console.WriteLine(cell.ColumnIndex);
 * 空白セル: `BlankValue`
 * 数値セル: `double`
 * 真偽値セル: `bool`
-* 共有文字列セル: `string`
+* 共有文字列・直接文字列セル: `string`
 
 型付きテーブルでは、空白を `string` には空文字列、`int`・`double` には0、`bool` にはfalseとして読み込みます。
 `int?`・`double?`・`bool?` では空白をnullとして保持します。
@@ -458,6 +458,20 @@ dotnet format .\CSharp\SpreadSheetAsData.slnx --verify-no-changes --no-restore -
 
 ## NuGetパッケージ
 
+### 0.3.0への更新
+
+0.3.0は、0.2.xからの互換性変更を含む更新です。4パッケージのバージョンを揃え、Excelからコードを再生成してください。
+
+* セル・範囲・既存テーブル行の書き込みと、ブック全体の `Read<T>()` / `Replace<T>()` に対応しました。
+* 生成Bookには、型引数なしの `Read()` / `Replace(Data)` を用意しています。
+* 生成された名前付きセル・範囲のプロパティは、`Cell` / `CellRange` ではなく値を直接読み書きします。利用コードの `.Value` / `.Values` は取り除いてください。非生成APIは変更しません。
+* Excel名を指定する属性は `SpreadSheetName` に統一しました。旧 `SpreadsheetColumn` 属性の利用箇所は置き換えてください。
+* 生成Bookの `Open()` は、必要なシート・テーブル・列・定義名などの不足を検出します。
+* Stream入力に対応しましたが、元Streamへの `Save()` は禁止です。編集結果は `SaveAs(path)` で別ファイルへ保存します。Close/Disposeでは保存しません。
+* 複数ブックで生成型名が重なる場合は、Excel項目ごとの `Namespace` を指定できます。
+
+### パッケージの選択
+
 C#版は、NuGet.orgでパッケージとして公開しています。
 推奨パッケージIDは `Marimo.SpreadSheetAsData` です。
 この短い名前のパッケージは、実行時ライブラリ、コード生成API、Visual Studio/MSBuild連携をまとめる全部入りパッケージです。
@@ -482,7 +496,7 @@ dotnet pack .\CSharp\SpreadSheetAsData.slnx -c Release -o .\artifacts\nupkg
 NuGet.orgへ公開する前にローカルで別プロジェクトから確認する場合は、検証先プロジェクトに `PackageReference` を追加し、復元時にローカルパッケージ出力先とNuGet.orgをNuGetソースとして指定します。
 
 ```xml
-<PackageReference Include="Marimo.SpreadSheetAsData" Version="0.2.5" />
+<PackageReference Include="Marimo.SpreadSheetAsData" Version="0.3.0" />
 ```
 
 ```powershell
@@ -537,7 +551,7 @@ DocFXが生成する `docs/api/csharp/metadata/` と `docs/api/csharp/_site/` �
 * ビルド: 成功
 * テスト: 成功、本体とコード生成の全テスト
 * XMLドキュメント生成: 成功、警告なし
-* `dotnet format --verify-no-changes`: 成功
+* `dotnet format --verify-no-changes --severity info`: 既存の整形・解析指摘が残っています。成功扱いにはしていません。
 
 ## 制約
 
