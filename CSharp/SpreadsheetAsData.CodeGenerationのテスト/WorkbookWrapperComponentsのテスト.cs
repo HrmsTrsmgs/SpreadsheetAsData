@@ -18,7 +18,10 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
     [InlineData("Workbook", "public partial class BasicStructureBook : global::Marimo.SpreadsheetAsData.Workbook")]
     [InlineData("Worksheet", "public partial class SalesDataSheet : global::Marimo.SpreadsheetAsData.Worksheet")]
     [InlineData("Table", "public TableTable(global::Marimo.SpreadsheetAsData.Table source)")]
-    [InlineData("System", "Open(global::System.IO.Stream stream)")]
+    [InlineData("Stream", "Open(global::System.IO.Stream stream)")]
+    [InlineData("Path", "global::System.IO.Path.Combine(AppContext.BaseDirectory,")]
+    [InlineData("AppContext", "Path.Combine(global::System.AppContext.BaseDirectory,")]
+    [InlineData("InvalidDataException", "throw new global::System.IO.InvalidDataException();")]
     public void SourceFileは同名の生成型に隠される参照を完全修飾します(string generatedName, string expected)
     {
         SourceFile(
@@ -32,11 +35,23 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
     [InlineData("public partial class BasicStructureBook : Workbook")]
     [InlineData("public partial class SalesDataSheet : Worksheet")]
     [InlineData("public SalesDetailTable(Table source)")]
-    [InlineData("Open(System.IO.Stream stream)")]
+    [InlineData("Open(Stream stream)")]
+    [InlineData("Path.Combine(AppContext.BaseDirectory,")]
+    [InlineData("throw new InvalidDataException();")]
     public void SourceFileは同名の生成型がない参照を短い表記にします(string expected)
     {
         SourceFile(BasicStructureExcelFilePath, options, basicBook)
             .Should().Contain(expected);
+    }
+
+    [Fact]
+    public void SourceFileはSystemと同名の生成型があってもStream型は短い表記にします()
+    {
+        SourceFile(
+            BasicStructureExcelFilePath,
+            new() { NameMappings = new() { ["sales_detail"] = "System" } },
+            basicBook)
+            .Should().Contain("Open(Stream stream)");
     }
 
     public WorkbookWrapperComponentsのテスト()
@@ -71,7 +86,9 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
         SourceFile(BasicStructureExcelFilePath, options, basicBook)
             .Should().Be(
                 """
+                using System;
                 using System.Collections.Generic;
+                using System.IO;
                 using System.Linq;
                 using Marimo.SpreadsheetAsData;
 
@@ -82,7 +99,7 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                 /// </summary>
                 public partial class BasicStructureBook : Workbook
                 {
-                    public BasicStructureBook() : this(System.IO.Path.Combine(System.AppContext.BaseDirectory, "TestData\\コード生成\\BasicStructure.xlsx"))
+                    public BasicStructureBook() : this(Path.Combine(AppContext.BaseDirectory, "TestData\\コード生成\\BasicStructure.xlsx"))
                     {
                     }
 
@@ -93,19 +110,19 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     /// <summary>
                     /// 生成元のシート、テーブルとその列、両スコープの定義名を確認して、Excelブックを開きます。
                     /// </summary>
-                    /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、テーブルの所属シートが異なるか、単一セルの定義名が複数セルを参照しています。</exception>
+                    /// <exception cref="InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、テーブルの所属シートが異なるか、単一セルの定義名が複数セルを参照しています。</exception>
                     public static new BasicStructureBook Open(string filePath) =>
                         ValidateStructure(new(filePath));
 
-                    BasicStructureBook(System.IO.Stream stream) : base(stream)
+                    BasicStructureBook(Stream stream) : base(stream)
                     {
                     }
 
                     /// <summary>
                     /// 生成元のシート、テーブルとその列、両スコープの定義名を確認して、Stream上のExcelブックを開きます。
                     /// </summary>
-                    /// <exception cref="System.IO.InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、テーブルの所属シートが異なるか、単一セルの定義名が複数セルを参照しています。</exception>
-                    public static new BasicStructureBook Open(System.IO.Stream stream) =>
+                    /// <exception cref="InvalidDataException">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、テーブルの所属シートが異なるか、単一セルの定義名が複数セルを参照しています。</exception>
+                    public static new BasicStructureBook Open(Stream stream) =>
                         ValidateStructure(new(stream));
 
                     /// <summary>
@@ -132,7 +149,7 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                                             || definedName.Range.TopLeftCell == definedName.Range.BottomRightCell))))
                         {
                             book.Dispose();
-                            throw new System.IO.InvalidDataException();
+                            throw new InvalidDataException();
                         }
 
                         return book;

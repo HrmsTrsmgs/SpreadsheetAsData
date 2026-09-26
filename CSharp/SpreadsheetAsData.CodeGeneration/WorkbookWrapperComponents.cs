@@ -15,7 +15,9 @@ static class WorkbookWrapperComponents
         CodeGenerationOptions options,
         Workbook book) =>
         $$"""
+        using System;
         using System.Collections.Generic;
+        using System.IO;
         using System.Linq;
         using Marimo.SpreadsheetAsData;
 
@@ -52,7 +54,7 @@ static class WorkbookWrapperComponents
         /// </summary>
         public partial class {{bookFileIdentifier}}Book : {{ReferencedTypeName("Workbook", book, options)}}
         {
-            public {{bookFileIdentifier}}Book() : this({{ReferencedTypeName("System.IO.Path", book, options)}}.Combine({{ReferencedTypeName("System.AppContext", book, options)}}.BaseDirectory, {{StringLiteral(options.RuntimeWorkbookPath ?? filePath)}}))
+            public {{bookFileIdentifier}}Book() : this({{ReferencedTypeName("System.IO.Path", book, options, usedAsExpression: true)}}.Combine({{ReferencedTypeName("System.AppContext", book, options, usedAsExpression: true)}}.BaseDirectory, {{StringLiteral(options.RuntimeWorkbookPath ?? filePath)}}))
             {
             }
 
@@ -609,15 +611,27 @@ static class WorkbookWrapperComponents
         """;
 
     /// <summary>
-    /// 行データ型が参照名の先頭を隠す場合だけ、ルートからの完全修飾名を返します。
+    /// 行データ型が参照先の型名を隠す場合だけ完全修飾し、それ以外は短い型名を返します。
+    /// 式中ではBookのプロパティも型名を隠すため、シート名と定義名を確認します。
     /// その他の生成型には接尾辞が付くため、ここで扱う既存型名とは衝突しません。
     /// </summary>
-    static string ReferencedTypeName(string typeName, Workbook book, CodeGenerationOptions options) =>
-        !book.Tables.Any(table => options.GeneratedName(table.Name).IdentifierValue == typeName.Split('.')[0])
-            ? typeName
+    static string ReferencedTypeName(
+        string typeName,
+        Workbook book,
+        CodeGenerationOptions options,
+        bool usedAsExpression = false)
+    {
+        var shortName = typeName.Split('.')[^1];
+        var isHidden = book.Tables.Any(table => options.GeneratedName(table.Name).IdentifierValue == shortName)
+            || usedAsExpression && (
+                book.Sheets.Values.Any(sheet => options.GeneratedName(sheet.Name).IdentifierValue == shortName)
+                || BookScopedDefinedNames(book).Any(name => options.BookDefinedName(name).IdentifierValue == shortName));
+        return !isHidden
+            ? shortName
         : typeName.Contains('.')
             ? $"global::{typeName}"
         : $"global::Marimo.SpreadsheetAsData.{typeName}";
+    }
 
     /// <summary>
     /// 行データ型が属性クラス名を隠す場合だけ完全修飾し、それ以外は属性の短縮表記を使います。

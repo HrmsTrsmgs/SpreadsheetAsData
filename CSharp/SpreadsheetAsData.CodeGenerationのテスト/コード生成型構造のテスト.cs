@@ -59,6 +59,10 @@ public sealed class コード生成型構造のテスト
     [InlineData("Worksheet")]
     [InlineData("Table")]
     [InlineData("System")]
+    [InlineData("Stream")]
+    [InlineData("Path")]
+    [InlineData("AppContext")]
+    [InlineData("InvalidDataException")]
     public void 既存の型や名前空間と同名の行データ型もコンパイルできます(string generatedName)
     {
         GeneratedCodeInspection
@@ -68,6 +72,34 @@ public sealed class コード生成型構造のテスト
                     options => options.NameMappings = new() { ["sales_detail"] = generatedName }))
             .DefinedTypes.Select(it => it.Name)
             .Should().Contain(generatedName);
+    }
+
+    [Theory]
+    [InlineData("Path")]
+    [InlineData("AppContext")]
+    public void 既存の型と同名のシートプロパティもコンパイルできます(string generatedName)
+    {
+        GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    BasicStructureExcelFilePath,
+                    options => options.NameMappings = new() { ["SalesData"] = generatedName }))
+            .GeneratedType("BasicStructureBook")
+            .GetProperty(generatedName).Should().NotBeNull();
+    }
+
+    [Theory]
+    [InlineData("Path")]
+    [InlineData("AppContext")]
+    public void 既存の型と同名の定義名プロパティもコンパイルできます(string generatedName)
+    {
+        GeneratedCodeInspection
+            .AssemblyFrom(
+                GeneratedCodeInspection.GenerateSources(
+                    DefinedNamesExcelFilePath,
+                    options => options.NameMappings = new() { ["book.main_cell"] = generatedName }))
+            .GeneratedType("定義名Book")
+            .GetProperty(generatedName).Should().NotBeNull();
     }
 
     [Theory]
