@@ -65,6 +65,46 @@ public sealed class MSBuild連携タスクのテスト
         tested.Output.Should().Contain("current:SalesData").And.Contain("archive:SalesData");
     }
 
+    [Fact]
+    public void 引数なしの生成Bookは出力先のExcelを開きSaveもそのコピーだけを変更します()
+    {
+        using var project = MSBuild連携テストプロジェクト.Create();
+        var sourcePath = project.AddBasicStructureExcel(@"Schemas\BasicStructure.xlsx");
+        var original = File.ReadAllBytes(sourcePath);
+        var scriptFilePath = project.AddPowerShellPackageReferenceSample(
+            "Marimo.SpreadSheetAsData",
+            """
+            Invoke-MSBuild /t:Build
+            Invoke-Dotnet run --project ./Consumer.csproj --no-build --no-restore
+            """,
+            workbookItems: """
+            <SpreadsheetAsData Include="Schemas\BasicStructure.xlsx" />
+            """,
+            programSource: """
+            using System;
+            using System.IO;
+            using ConsumerModel;
+
+            Environment.CurrentDirectory = Path.GetTempPath();
+            using (var book = new BasicStructureBook())
+            {
+                book.SalesData.Cells["A1"].Value = "Updated";
+                book.Save();
+            }
+
+            using var saved = BasicStructureBook.Open(
+                Path.Combine(AppContext.BaseDirectory, "Schemas", "BasicStructure.xlsx"));
+            string value = saved.SalesData.Cells["A1"].Value;
+            Console.WriteLine($"saved:{value}");
+            """);
+
+        var tested = PowerShell実行結果.Run(scriptFilePath, project.DirectoryPath);
+
+        tested.ExitCode.Should().Be(0, tested.Output);
+        tested.Output.Should().Contain("saved:Updated");
+        File.ReadAllBytes(sourcePath).Should().Equal(original);
+    }
+
     [Theory]
     [InlineData("Marimo.SpreadSheetAsData")]
     [InlineData("Marimo.SpreadSheetAsData.Build")]

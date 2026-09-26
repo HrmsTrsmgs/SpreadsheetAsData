@@ -82,7 +82,7 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                 /// </summary>
                 public partial class BasicStructureBook : Workbook
                 {
-                    public BasicStructureBook() : this("TestData\\コード生成\\BasicStructure.xlsx")
+                    public BasicStructureBook() : this(System.IO.Path.Combine(System.AppContext.BaseDirectory, "TestData\\コード生成\\BasicStructure.xlsx"))
                     {
                     }
 

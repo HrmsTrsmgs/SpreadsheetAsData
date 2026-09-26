@@ -121,7 +121,7 @@ book.Orders.Replace(orders);
 book.Save();
 ```
 
-現行実装では、生成されたBook型の引数なしコンストラクターに生成元Excelファイルのパスを埋め込みます。
+MSBuild連携では、生成されたBook型の引数なしコンストラクターは実行先へコピーされたExcelファイルを開きます。`Save()` はそのコピーへ保存します。
 通常の利用では、実行時API、コード生成API、Visual StudioとMSBuildの連携をまとめた `Marimo.SpreadSheetAsData` パッケージを使用します。
 
 ## 公開版の確認条件

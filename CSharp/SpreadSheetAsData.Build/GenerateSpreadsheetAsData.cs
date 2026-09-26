@@ -63,6 +63,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
         ICollection<ITaskItem> generatedFiles)
     {
         var excelFilePath = FullPath(excelFile);
+        var runtimeWorkbookPath = Path.GetRelativePath(ProjectDirectory, excelFilePath);
         var outputFilePath = OutputFilePath(excelFilePath);
 
         generatedFiles.Add(GeneratedFileItem(excelFilePath, outputFilePath));
@@ -90,7 +91,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
             foreach (var diagnostic in
                 WorkbookWrapperGenerator.GenerateDiagnostics(
                     excelFilePath,
-                    options => ConfigureOptions(options, nameMappings, generatedNamespace)))
+                    options => ConfigureOptions(options, nameMappings, generatedNamespace, runtimeWorkbookPath)))
             {
                 LogDiagnostic(excelFilePath, diagnostic);
             }
@@ -102,7 +103,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
 
             var sources = WorkbookWrapperGenerator.GenerateSources(
                 excelFilePath,
-                options => ConfigureOptions(options, nameMappings, generatedNamespace));
+                options => ConfigureOptions(options, nameMappings, generatedNamespace, runtimeWorkbookPath));
 
             Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath)!);
             Directory.CreateDirectory(Path.GetDirectoryName(stampFilePath)!);
@@ -127,10 +128,12 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
     static void ConfigureOptions(
         CodeGenerationOptions options,
         Dictionary<string, string> nameMappings,
-        string generatedNamespace)
+        string generatedNamespace,
+        string runtimeWorkbookPath)
     {
         options.Namespace = generatedNamespace;
         options.NameMappings = nameMappings;
+        options.RuntimeWorkbookPath = runtimeWorkbookPath;
     }
 
     /// <summary>

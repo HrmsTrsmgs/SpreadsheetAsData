@@ -58,6 +58,9 @@ foreach (var sale in book.SalesDetail)
 `SalesReportBook`、`SalesDetail`、`ProductName` などは、`sales_report.xlsx` のファイル名、Excelテーブル名、列名から生成されます。
 生成された `.g.cs` は `sales_report.xlsx` の隣へ出力され、同じビルドの `Compile` に自動で追加されます。
 このファイルは生成物なので編集せず、通常はGit管理にも含めません。
+Excelファイルはビルド時にプロジェクト内の相対パスを保って実行先へコピーされます。
+この例では、引数なしの `SalesReportBook` は実行先の `SampleData/sales_report.xlsx` を開きます。
+`Save()` もそのコピーへ保存し、プロジェクト内の生成元ファイルは変更しません。
 
 ### CLIから同じことを行う
 
@@ -242,7 +245,8 @@ SampleProject/
 このAPIはC#ソース文字列の配列を返します。
 MSBuild連携も同じ生成処理と診断処理を使用します。
 
-現在の生成コードは、生成元ExcelファイルのパスをBook型の引数なしコンストラクターに埋め込みます。
+MSBuild連携では、生成Book型の引数なしコンストラクターは `AppContext.BaseDirectory` からプロジェクト相対パスのExcelファイルを開きます。
+生成Book型を別プロジェクトから使う場合は、利用側アプリの実行先に同じ相対パスでExcelファイルを配置するか、`Open(path)` で明示的に開いてください。
 生成前に検出できる名前衝突や無効名は `WorkbookWrapperGenerator.GenerateDiagnostics` で確認できます。
 詳しい規則は [型付き読み書き](docs/typed-reading.md) を参照してください。
 

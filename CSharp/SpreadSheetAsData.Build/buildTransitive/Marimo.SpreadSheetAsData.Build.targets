@@ -11,6 +11,7 @@
     Condition="'$(_SpreadsheetAsDataSupportsNetTaskHost)' == 'true'" />
 
   <ItemGroup Condition="'@(SpreadsheetAsData)' != ''">
+    <Content Include="@(SpreadsheetAsData)" CopyToOutputDirectory="PreserveNewest" Visible="false" />
     <SpreadsheetAsData Update="@(SpreadsheetAsData)">
       <SpreadsheetAsDataDependentUpon>%(Filename)%(Extension)</SpreadsheetAsDataDependentUpon>
       <LastGenOutput>%(Filename).SpreadsheetAsData.g.cs</LastGenOutput>

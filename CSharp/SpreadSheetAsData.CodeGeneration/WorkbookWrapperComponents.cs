@@ -52,7 +52,7 @@ static class WorkbookWrapperComponents
         /// </summary>
         public partial class {{bookFileIdentifier}}Book : {{ReferencedTypeName("Workbook", book, options)}}
         {
-            public {{bookFileIdentifier}}Book() : this({{StringLiteral(filePath)}})
+            public {{bookFileIdentifier}}Book() : this({{ReferencedTypeName("System.IO.Path", book, options)}}.Combine({{ReferencedTypeName("System.AppContext", book, options)}}.BaseDirectory, {{StringLiteral(options.RuntimeWorkbookPath ?? filePath)}}))
             {
             }
 
