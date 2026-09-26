@@ -265,7 +265,7 @@ public class Cellのテスト : IDisposable
         tested.FullCalculationOnLoad?.Value.Should().BeTrue();
     }
 
-    [Fact(Skip = "数式の読み取り仕様をレビュー後、保存済みの計算結果を返すことを確認する")]
+    [Fact]
     public void Valueプロパティは数式セルの保存済みの計算結果を返します()
     {
         using var book = Workbook.Open(@"TestData\数式セル.xlsx");
@@ -273,7 +273,7 @@ public class Cellのテスト : IDisposable
         (book.Sheets["Sheet1"].Cells["A1"].Value as object).Should().Be(3d);
     }
 
-    [Fact(Skip = "再計算要求の仕様をレビュー後、別セルの数式を保持しライブラリ内では再計算しないことを確認する")]
+    [Fact]
     public void Valueで参照元を変更しても別セルの数式と保存済みの計算結果を保持します()
     {
         var filePath = temporaryFiles.Copy("参照元を持つ数式.xlsx");
@@ -299,7 +299,7 @@ public class Cellのテスト : IDisposable
         tested.CellValue.Text.Should().Be("20");
     }
 
-    [Fact(Skip = "再計算要求の仕様をレビュー後、読み取りだけでは要求を追加しないことを確認する")]
+    [Fact]
     public void Valueを読み取るだけではExcelでの再計算を要求しません()
     {
         var filePath = temporaryFiles.Copy("参照元を持つ数式.xlsx");
@@ -318,7 +318,7 @@ public class Cellのテスト : IDisposable
         tested.CalculationProperties?.FullCalculationOnLoad?.Value.Should().NotBe(true);
     }
 
-    [Fact(Skip = "再計算要求の仕様をレビュー後、既存の計算設定を置き換えず要求を設定することを確認する")]
+    [Fact]
     public void Valueの変更は既存の計算設定を保持して再計算を要求します()
     {
         var filePath = temporaryFiles.Copy("Book1.xlsx");
