@@ -52,6 +52,7 @@ public class Cell
     /// 空白セルは <see cref="BlankValue"/>、真偽値セルは <see cref="bool"/>、共有文字列セルと文字列セルは
     /// <see cref="string"/>、その他の数値セルは <see cref="double"/> として返します。
     /// 値を設定すると、対象セルの既存の数式を削除します。
+    /// また、Excelでブックを開く際に数式を再計算するよう要求します。ここでは計算結果を更新しません。
     /// </remarks>
     [System.Diagnostics.CodeAnalysis.AllowNull]
     public dynamic Value
@@ -71,6 +72,7 @@ public class Cell
         {
             AttachToWorksheet();
             Xml.CellFormula = null;
+            (Book.WorkbookXml.CalculationProperties ??= new()).FullCalculationOnLoad = true;
 
             if (value is null)
             {

@@ -244,6 +244,102 @@ public class Cellのテスト : IDisposable
         b1.Reference.Should().Be("B1");
     }
 
+    [Fact]
+    public void Valueの変更はExcelで開く際に数式を再計算するよう要求します()
+    {
+        var filePath = temporaryFiles.Copy("参照元を持つ数式.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            book.Sheets["Sheet1"].Cells["A1"].Value = 30d;
+            book.Save();
+        }
+
+        using var document = Packaging.SpreadsheetDocument.Open(filePath, false);
+        document.WorkbookPart.Should().NotBeNull();
+        var workbook = document.WorkbookPart.Workbook;
+        workbook.Should().NotBeNull();
+        var tested = workbook.CalculationProperties;
+
+        tested.Should().NotBeNull();
+        tested.FullCalculationOnLoad?.Value.Should().BeTrue();
+    }
+
+    [Fact(Skip = "数式の読み取り仕様をレビュー後、保存済みの計算結果を返すことを確認する")]
+    public void Valueプロパティは数式セルの保存済みの計算結果を返します()
+    {
+        using var book = Workbook.Open(@"TestData\数式セル.xlsx");
+
+        (book.Sheets["Sheet1"].Cells["A1"].Value as object).Should().Be(3d);
+    }
+
+    [Fact(Skip = "再計算要求の仕様をレビュー後、別セルの数式を保持しライブラリ内では再計算しないことを確認する")]
+    public void Valueで参照元を変更しても別セルの数式と保存済みの計算結果を保持します()
+    {
+        var filePath = temporaryFiles.Copy("参照元を持つ数式.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            book.Sheets["Sheet1"].Cells["A1"].Value = 30d;
+
+            (book.Sheets["Sheet1"].Cells["B1"].Value as object).Should().Be(20d);
+            book.Save();
+        }
+
+        using var document = Packaging.SpreadsheetDocument.Open(filePath, false);
+        document.WorkbookPart.Should().NotBeNull();
+        var worksheet = document.WorkbookPart.WorksheetParts.Single().Worksheet;
+        worksheet.Should().NotBeNull();
+        var tested = worksheet.Descendants<Spreadsheet.Cell>()
+            .Single(it => it.CellReference?.Value == "B1");
+
+        tested.CellFormula.Should().NotBeNull();
+        tested.CellFormula.Text.Should().Be("A1*2");
+        tested.CellValue.Should().NotBeNull();
+        tested.CellValue.Text.Should().Be("20");
+    }
+
+    [Fact(Skip = "再計算要求の仕様をレビュー後、読み取りだけでは要求を追加しないことを確認する")]
+    public void Valueを読み取るだけではExcelでの再計算を要求しません()
+    {
+        var filePath = temporaryFiles.Copy("参照元を持つ数式.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            _ = book.Sheets["Sheet1"].Cells["B1"].Value;
+            book.Save();
+        }
+
+        using var document = Packaging.SpreadsheetDocument.Open(filePath, false);
+        document.WorkbookPart.Should().NotBeNull();
+        var tested = document.WorkbookPart.Workbook;
+
+        tested.Should().NotBeNull();
+        tested.CalculationProperties?.FullCalculationOnLoad?.Value.Should().NotBe(true);
+    }
+
+    [Fact(Skip = "再計算要求の仕様をレビュー後、既存の計算設定を置き換えず要求を設定することを確認する")]
+    public void Valueの変更は既存の計算設定を保持して再計算を要求します()
+    {
+        var filePath = temporaryFiles.Copy("Book1.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            book.Sheets["いろいろなデータ"].Cells["A1"].Value = 30d;
+            book.Save();
+        }
+
+        using var document = Packaging.SpreadsheetDocument.Open(filePath, false);
+        document.WorkbookPart.Should().NotBeNull();
+        var workbook = document.WorkbookPart.Workbook;
+        workbook.Should().NotBeNull();
+        var tested = workbook.CalculationProperties;
+
+        tested.Should().NotBeNull();
+        tested.CalculationId?.Value.Should().Be(125725U);
+        tested.FullCalculationOnLoad?.Value.Should().BeTrue();
+    }
+
     [Theory]
     [InlineData("B1")]
     [InlineData("B2")]
