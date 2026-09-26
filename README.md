@@ -410,7 +410,7 @@ output.Position = 0;
 using var saved = Workbook.Open(output);
 ```
 
-現在確認済みの出力先は`MemoryStream`です。現在位置によらず先頭から保存し、既存内容を置き換えて古い末尾を残しません。保存後の`Position`は保証しないため、読み直す側で先頭へ戻してください。入力と同じStreamインスタンスへの保存は、書き込み前に`NotSupportedException`で拒否します。別Streamへの出力途中で失敗した場合の扱いは仕様検討中です。
+現在確認済みの出力先は`MemoryStream`です。現在位置によらず先頭から保存し、既存内容を置き換えて古い末尾を残しません。保存後の`Position`は保証しないため、読み直す側で先頭へ戻してください。入力と同じStreamインスタンスへの保存は、書き込み前に`NotSupportedException`で拒否します。出力途中の失敗は例外として通知し、元ファイル・元Streamは変更せず、出力Streamも閉じません。出力先には途中までの内容が残り得るため、巻き戻しは保証しません。
 別Streamへの保存は元ファイル・元Streamを変更せず、各出力は保存時点の内容を保持します。出力Streamは呼び出し側で破棄してください。書き込み不可の出力先は、内容を変更する前に`NotSupportedException`で拒否します。
 Stream入力からファイルへ保存する例は、[サンプルの説明](samples/TableReadingSample/README.md#streamから開いて編集する場合)を参照してください。
 

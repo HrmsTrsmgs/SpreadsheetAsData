@@ -326,8 +326,11 @@ public class Workbook : IDisposable
     /// 元ファイル・元Streamは変更せず、出力先のStreamも閉じません。
     /// 出力先の現在位置によらず先頭から保存し、古い末尾は残しません。
     /// 保存後のPositionは保証しません。読み直す場合は呼び出し側で先頭へ戻してください。
+    /// 出力途中で失敗しても元データは変更せず、出力先も閉じません。
+    /// 出力先には途中までの内容が残り得ます。巻き戻しは保証しません。
     /// </remarks>
     /// <exception cref="NotSupportedException">入力と同じStreamを指定した場合、または出力先のStreamに書き込めない場合。</exception>
+    /// <exception cref="IOException">出力先への書き込み中にI/Oエラーが発生した場合。</exception>
     /// <exception cref="ObjectDisposedException">ブックを既に閉じている場合。</exception>
     public void SaveAs(Stream destination) =>
         documentSession.SaveAs(destination);

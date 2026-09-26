@@ -808,6 +808,52 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void SaveAsはStreamへの出力途中の失敗を通知し元ファイルを変更せず出力Streamを閉じません()
+    {
+        var sourcePath = temporaryFiles.Copy("文字列セル.xlsx");
+        var original = File.ReadAllBytes(sourcePath);
+        using var destination = new FailingWriteStream(bytesBeforeFailure: 128);
+
+        using (var book = Workbook.Open(sourcePath))
+        {
+            book.Sheets["Sheet1"].Cell["A1"].Value = "保存できない文字列";
+
+            var tested = () => book.SaveAs(destination);
+
+            tested.Should().Throw<IOException>();
+            destination.WrittenByteCount.Should().Be(128);
+            destination.CanWrite.Should().BeTrue();
+            File.ReadAllBytes(sourcePath).Should().Equal(original);
+        }
+
+        destination.CanWrite.Should().BeTrue();
+        File.ReadAllBytes(sourcePath).Should().Equal(original);
+    }
+
+    [Fact]
+    public void SaveAsはStreamへの出力途中の失敗を通知し元Streamを変更せず出力Streamを閉じません()
+    {
+        var original = File.ReadAllBytes(@"TestData\文字列セル.xlsx");
+        using var source = new MemoryStream([.. original]);
+        using var destination = new FailingWriteStream(bytesBeforeFailure: 128);
+
+        using (var book = Workbook.Open(source))
+        {
+            book.Sheets["Sheet1"].Cell["A1"].Value = "保存できない文字列";
+
+            var tested = () => book.SaveAs(destination);
+
+            tested.Should().Throw<IOException>();
+            destination.WrittenByteCount.Should().Be(128);
+            destination.CanWrite.Should().BeTrue();
+            source.ToArray().Should().Equal(original);
+        }
+
+        destination.CanWrite.Should().BeTrue();
+        source.ToArray().Should().Equal(original);
+    }
+
+    [Fact]
     public void SaveAsは入力と同じStreamへの保存を元の内容を変更せずに拒否します()
     {
         var original = File.ReadAllBytes(@"TestData\文字列セル.xlsx");
