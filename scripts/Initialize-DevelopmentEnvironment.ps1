@@ -4,7 +4,7 @@ param()
 $ErrorActionPreference = "Stop"
 
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
-$solutionPath = Join-Path $repositoryRoot "CSharp\SpreadSheetAsData.slnx"
+$solutionPath = Join-Path $repositoryRoot "CSharp\SpreadsheetAsData.slnx"
 
 function Invoke-Dotnet {
     dotnet @args

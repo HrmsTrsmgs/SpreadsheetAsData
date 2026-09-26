@@ -1,4 +1,4 @@
-﻿using Marimo.SpreadSheetAsData;
+﻿using Marimo.SpreadsheetAsData;
 
 var workbookPath = Path.Combine(
     AppContext.BaseDirectory,
@@ -32,13 +32,13 @@ foreach (var row in table.Rows)
 
 public sealed class OrderRow
 {
-    [SpreadSheetName("商品名")]
+    [SpreadsheetName("商品名")]
     public string ProductName { get; set; } = "";
 
-    [SpreadSheetName("数量")]
+    [SpreadsheetName("数量")]
     public int Quantity { get; set; }
 
-    [SpreadSheetName("単価")]
+    [SpreadsheetName("単価")]
     public double UnitPrice { get; set; }
 
     public double TotalPrice => Quantity * UnitPrice;

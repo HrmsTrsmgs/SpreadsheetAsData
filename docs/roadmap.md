@@ -125,8 +125,8 @@ IEnumerable<Order> orders = book.ReadTable<Order>("Orders");
 
 - [ ] 後日のバージョンアップで、使用しない項目を明示する無視属性を検討する。マッピング対象と `Open` 時の不足検証との関係を含めて設計し、現時点では欠落を暗黙に許容しない。
 
-コード生成APIは `Marimo.SpreadSheetAsData.CodeGeneration`、Visual StudioとMSBuildの連携は `Marimo.SpreadSheetAsData.Build` で提供します。
-通常の利用では、実行時APIとコード生成機能をまとめた `Marimo.SpreadSheetAsData` を使用します。
+コード生成APIは `Marimo.SpreadsheetAsData.CodeGeneration`、Visual StudioとMSBuildの連携は `Marimo.SpreadsheetAsData.Build` で提供します。
+通常の利用では、実行時APIとコード生成機能をまとめた `Marimo.SpreadsheetAsData` を使用します。
 対応型と空白の変換規則は、[型付き読み書き](typed-reading.md)を参照してください。
 
 ## フェーズ7: 初回公開準備

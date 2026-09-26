@@ -2,6 +2,8 @@
 
 SpreadsheetAsDataは、Excelをインストールしていない環境でもExcelファイルを扱えるようにするライブラリです。
 
+> このブランチでは次回公開に向けて、C#の名前を`Spreadsheet`表記へ統一しています。以下のコード例は変更後の名前です。公開済み0.3.0では名前空間が`Marimo.SpreadSheetAsData`、属性が`SpreadSheetName`です。次回公開まではローカルで生成したパッケージを使用してください。
+
 C#版では、Excelから生成した型付きAPIでデータを読み書きできます。
 Open XML SDKを内部実装として使いながら、ワークブック、ワークシート、セルを直接扱うAPIも提供します。
 
@@ -34,7 +36,7 @@ SpreadsheetAsDataは、Excelファイルを低水準のOpen XML要素として�
 ### Visual Studioから使う
 
 1. Visual Studioでコンソールアプリの新規プロジェクトを作成する
-2. ［NuGet パッケージの管理］から `Marimo.SpreadSheetAsData` をインストールする
+2. ［NuGet パッケージの管理］から `Marimo.SpreadsheetAsData` をインストールする
 3. ソリューション エクスプローラーで、プロジェクトへ `SampleData/sales_report.xlsx` を追加する
 4. 追加した `sales_report.xlsx` を選択してプロパティを開く
 5. ［ビルド アクション］を `SpreadsheetAsData` へ変更する
@@ -69,7 +71,7 @@ Visual Studioを使わない場合は、同じ設定をプロジェクトファ�
 ```powershell
 dotnet new console -n SpreadsheetTutorial
 cd .\SpreadsheetTutorial
-dotnet add package Marimo.SpreadSheetAsData
+dotnet add package Marimo.SpreadsheetAsData
 mkdir SampleData
 $repository = "C:\path\to\SpreadsheetAsData"
 Copy-Item "$repository\SampleData\sales_report.xlsx" .\SampleData\sales_report.xlsx
@@ -126,20 +128,20 @@ foreach (var order in book.Orders)
 ### 型付きテーブルとして読む
 
 Excelテーブルの列名とC#のプロパティを対応付けると、各データ行を利用者定義型として列挙できます。
-列名とプロパティ名が異なる場合は、`SpreadSheetName` 属性でExcelテーブル列名を指定します。
+列名とプロパティ名が異なる場合は、`SpreadsheetName` 属性でExcelテーブル列名を指定します。
 
 ```csharp
-using Marimo.SpreadSheetAsData;
+using Marimo.SpreadsheetAsData;
 
 public sealed class OrderRow
 {
-    [SpreadSheetName("商品名")]
+    [SpreadsheetName("商品名")]
     public string ProductName { get; set; } = "";
 
-    [SpreadSheetName("数量")]
+    [SpreadsheetName("数量")]
     public int Quantity { get; set; }
 
-    [SpreadSheetName("単価")]
+    [SpreadsheetName("単価")]
     public double UnitPrice { get; set; }
 }
 
@@ -155,7 +157,7 @@ foreach (var order in book.ReadTable<OrderRow>("注文一覧"))
 列名とプロパティ名が同じ場合は、属性を書かずに読み取れます。
 
 ```csharp
-using Marimo.SpreadSheetAsData;
+using Marimo.SpreadsheetAsData;
 
 public sealed class CustomerRow
 {
@@ -241,7 +243,7 @@ SampleProject/
 文脈付きキーを使うと、同じ元名でもテーブルやシートごとに別の生成名を指定できます。
 異なるディレクトリに同名Excelファイルがあり、別々の辞書が必要な場合は、それぞれのExcelファイルの隣へ辞書を置いてください。
 
-コードから直接生成する場合は、`Marimo.SpreadSheetAsData.CodeGeneration` の `WorkbookWrapperGenerator.GenerateSources` を使用します。
+コードから直接生成する場合は、`Marimo.SpreadsheetAsData.CodeGeneration` の `WorkbookWrapperGenerator.GenerateSources` を使用します。
 このAPIはC#ソース文字列の配列を返します。
 MSBuild連携も同じ生成処理と診断処理を使用します。
 
@@ -256,7 +258,7 @@ MSBuild連携では、生成Book型の引数なしコンストラクターは `A
 列、データ行、セルの位置情報が必要な場合はこちらを使います。
 
 ```csharp
-using Marimo.SpreadSheetAsData;
+using Marimo.SpreadsheetAsData;
 
 using var book = Workbook.Open("orders.xlsx");
 
@@ -297,7 +299,7 @@ var byColumn = firstRow[table.Columns["商品名"]];
 名前付き範囲として取得した場合、`CellRange.Name` と `ToString()` はその名前を返します。
 
 ```csharp
-using Marimo.SpreadSheetAsData;
+using Marimo.SpreadsheetAsData;
 
 using var book = Workbook.Open("report.xlsx");
 
@@ -325,7 +327,7 @@ var total = book.Cell["総合計"].Value;
 より低水準の操作として、ワークシートやセルを直接取得できます。
 
 ```csharp
-using Marimo.SpreadSheetAsData;
+using Marimo.SpreadsheetAsData;
 
 using var book = Workbook.Open("Book1.xlsx");
 
@@ -371,7 +373,7 @@ book.Save();
 `Workbook.Read<T>()` でブック全体をデータオブジェクトへ読み込み、変更後に `Workbook.Replace<T>()` で定義名とExcelテーブルへ書き戻すこともできます。
 手書きのデータクラスでも、Excelの定義名・テーブル名をC#識別子へ自動変換してプロパティ名と照合します。
 例えば、定義名 `customer_name` は `CustomerName`、テーブル名 `sales_detail` は `SalesDetail` へ、属性なしで対応します。
-別の名前のプロパティを使う場合は `SpreadSheetName` 属性で元のExcel名を指定でき、属性の指定が自動対応より優先されます。
+別の名前のプロパティを使う場合は `SpreadsheetName` 属性で元のExcel名を指定でき、属性の指定が自動対応より優先されます。
 詳しい例とシートローカル定義名の扱いは、[ブック全体のデータ対応](docs/typed-reading.md#3-ブック全体をデータオブジェクトへ対応付ける)を参照してください。
 
 生成されたBook型では、型引数を指定せずに `Read()` と `Replace()` を呼び出せます。
@@ -379,7 +381,7 @@ book.Save();
 セルとセル範囲は、非型付きAPIから直接書き換えられます。
 
 ```csharp
-using Marimo.SpreadSheetAsData;
+using Marimo.SpreadsheetAsData;
 
 using var book = Workbook.Open("orders.xlsx");
 
@@ -426,7 +428,7 @@ Stream入力からファイルへ保存する例は、[サンプルの説明](sa
 
 ## ビルドとテスト
 
-C#版は `CSharp/SpreadSheetAsData.slnx` に含まれています。
+C#版は `CSharp/SpreadsheetAsData.slnx` に含まれています。
 ライブラリ本体とテストプロジェクトは `net10.0` を対象にしています。
 現在のコードはC# 14の構文を使用します。
 
@@ -450,17 +452,25 @@ PowerShell 7、.NET 10 SDK、Gitなどの導入自体は行いません。
 .NET 10 SDKが入っている環境では、次のコマンドでビルドとテストを実行できます。
 
 ```powershell
-dotnet build .\CSharp\SpreadSheetAsData.slnx
-dotnet test .\CSharp\SpreadSheetAsData.slnx
+dotnet build .\CSharp\SpreadsheetAsData.slnx
+dotnet test .\CSharp\SpreadsheetAsData.slnx
 ```
 
 整形と基本的なスタイルチェックは `.editorconfig` に定義しています。
 
 ```powershell
-dotnet format .\CSharp\SpreadSheetAsData.slnx --verify-no-changes --no-restore --severity warn
+dotnet format .\CSharp\SpreadsheetAsData.slnx --verify-no-changes --no-restore --severity warn
 ```
 
 ## NuGetパッケージ
+
+### 次回更新での名称統一
+
+* 名前空間を`Marimo.SpreadSheetAsData`から`Marimo.SpreadsheetAsData`へ変更します。利用側の`using`や完全修飾名を更新してください。
+* `SpreadSheetName`属性を`SpreadsheetName`へ変更します。
+* アセンブリ名、プロジェクト名、NuGetパッケージIDの表記も`SpreadsheetAsData`へ統一します。
+* 生成コードは再生成してください。ビルドアクション`SpreadsheetAsData`と生成ファイルの拡張子`.SpreadsheetAsData.g.cs`は変更しません。
+* 旧名の互換APIは追加しません。公開済み0.3.0の内容は変更しません。
 
 ### 0.3.0への更新
 
@@ -469,7 +479,7 @@ dotnet format .\CSharp\SpreadSheetAsData.slnx --verify-no-changes --no-restore -
 * セル・範囲・既存テーブル行の書き込みと、ブック全体の `Read<T>()` / `Replace<T>()` に対応しました。
 * 生成Bookには、型引数なしの `Read()` / `Replace(Data)` を用意しています。
 * 生成された名前付きセル・範囲のプロパティは、`Cell` / `CellRange` ではなく値を直接読み書きします。利用コードの `.Value` / `.Values` は取り除いてください。非生成APIは変更しません。
-* Excel名を指定する属性は `SpreadSheetName` に統一しました。旧 `SpreadsheetColumn` 属性の利用箇所は置き換えてください。
+* Excel名を指定する属性は `SpreadSheetName` に統一しました。旧 `SpreadsheetColumn` 属性の利用箇所は置き換えてください（次回更新では上記のとおり`SpreadsheetName`へ改名します）。
 * 生成Bookの `Open()` は、必要なシート・テーブル・列・定義名などの不足を検出します。
 * Stream入力に対応しましたが、元Streamへの `Save()` は禁止です。編集結果は `SaveAs(path)` で別ファイルへ保存します。Close/Disposeでは保存しません。
 * 複数ブックで生成型名が重なる場合は、Excel項目ごとの `Namespace` を指定できます。
@@ -477,30 +487,30 @@ dotnet format .\CSharp\SpreadSheetAsData.slnx --verify-no-changes --no-restore -
 ### パッケージの選択
 
 C#版は、NuGet.orgでパッケージとして公開しています。
-推奨パッケージIDは `Marimo.SpreadSheetAsData` です。
+推奨パッケージIDは `Marimo.SpreadsheetAsData` です。
 この短い名前のパッケージは、実行時ライブラリ、コード生成API、Visual Studio/MSBuild連携をまとめる全部入りパッケージです。
 
 内部の責務は、次のパッケージに分けています。
 
-* `Marimo.SpreadSheetAsData.Core`: `Workbook`、`Worksheet`、`Table` などの実行時ライブラリ
-* `Marimo.SpreadSheetAsData.CodeGeneration`: `.xlsx` から型付き読み書きコードを生成するAPI
-* `Marimo.SpreadSheetAsData.Build`: Visual StudioとMSBuildからコード生成を起動するビルドタスク
+* `Marimo.SpreadsheetAsData.Core`: `Workbook`、`Worksheet`、`Table` などの実行時ライブラリ
+* `Marimo.SpreadsheetAsData.CodeGeneration`: `.xlsx` から型付き読み書きコードを生成するAPI
+* `Marimo.SpreadsheetAsData.Build`: Visual StudioとMSBuildからコード生成を起動するビルドタスク
 
-通常の利用者は `Marimo.SpreadSheetAsData` を参照してください。
+通常の利用者は `Marimo.SpreadsheetAsData` を参照してください。
 依存を絞りたい場合だけ、用途に応じて個別パッケージを参照します。
 コード生成タスクは .NET 10 / MSBuild 18 以降の .NET TaskHost を前提にしています。
 
 ローカルでパッケージを生成する場合は、次のコマンドを実行します。
 
 ```powershell
-dotnet pack .\CSharp\SpreadSheetAsData.slnx -c Release -o .\artifacts\nupkg
+dotnet pack .\CSharp\SpreadsheetAsData.slnx -c Release -o .\artifacts\nupkg
 ```
 
 生成されたパッケージは `artifacts\nupkg\` に出力されます。
 NuGet.orgへ公開する前にローカルで別プロジェクトから確認する場合は、検証先プロジェクトに `PackageReference` を追加し、復元時にローカルパッケージ出力先とNuGet.orgをNuGetソースとして指定します。
 
 ```xml
-<PackageReference Include="Marimo.SpreadSheetAsData" Version="0.3.0" />
+<PackageReference Include="Marimo.SpreadsheetAsData" Version="0.3.0" />
 ```
 
 ```powershell
@@ -510,14 +520,14 @@ dotnet restore .\YourProject.csproj --source .\artifacts\nupkg --source "https:/
 NuGet.orgへ公開した後は、通常のNuGetソースから次のように追加できます。
 
 ```powershell
-dotnet add package Marimo.SpreadSheetAsData
+dotnet add package Marimo.SpreadsheetAsData
 ```
 
 ## サンプル
 
 NuGetパッケージとして参照する利用者向けサンプルは、`samples/TableReadingSample/` にあります。
 
-このサンプルは、リポジトリ内のプロダクトコードを `ProjectReference` では参照せず、外部利用者と同じように `PackageReference` で `Marimo.SpreadSheetAsData` を参照します。
+このサンプルは、リポジトリ内のプロダクトコードを `ProjectReference` では参照せず、外部利用者と同じように `PackageReference` で `Marimo.SpreadsheetAsData` を参照します。
 
 NuGet.orgへ公開する前に動かす場合は、先にローカルパッケージを生成し、サンプルの復元時にその生成先をNuGetソースとして指定します。
 詳しい手順は [samples/TableReadingSample/README.md](samples/TableReadingSample/README.md) を参照してください。

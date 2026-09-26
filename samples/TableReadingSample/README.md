@@ -1,9 +1,11 @@
 # TableReadingSample
 
-`Marimo.SpreadSheetAsData` をNuGetパッケージとして参照する、利用者向けの最小サンプルです。
+`Marimo.SpreadsheetAsData` をNuGetパッケージとして参照する、利用者向けの最小サンプルです。
+
+現在のコードは次回公開用の`Spreadsheet`表記です。公開済み0.3.0とは名前空間・属性名が異なるため、次回公開までは以下のローカルパッケージを使う手順で実行してください。
 
 このサンプルは、リポジトリ内のプロダクトコードを `ProjectReference` では参照しません。
-外部利用者と同じように、`PackageReference` で `Marimo.SpreadSheetAsData` を参照します。
+外部利用者と同じように、`PackageReference` で `Marimo.SpreadsheetAsData` を参照します。
 
 ## 実行内容
 
@@ -36,9 +38,9 @@ Streamから開いた場合、`Save()`は元Streamの内容を変更する前に
 NuGet.orgへ公開する前は、リポジトリ内で生成したローカルパッケージをNuGetソースとして指定します。
 
 ```powershell
-dotnet pack .\CSharp\SpreadSheetAsData.slnx -c Release -o .\artifacts\nupkg
+dotnet pack .\CSharp\SpreadsheetAsData.slnx -c Release -o .\artifacts\nupkg
 $localFeed = (Resolve-Path .\artifacts\nupkg).Path
-dotnet restore .\samples\TableReadingSample\TableReadingSample\TableReadingSample.csproj --source $localFeed --source "https://api.nuget.org/v3/index.json"
+dotnet restore .\samples\TableReadingSample\TableReadingSample\TableReadingSample.csproj --packages .\artifacts\sample-packages --source $localFeed --source "https://api.nuget.org/v3/index.json"
 dotnet run --no-restore --project .\samples\TableReadingSample\TableReadingSample\TableReadingSample.csproj
 ```
 

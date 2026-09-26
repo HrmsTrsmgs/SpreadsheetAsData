@@ -6,7 +6,7 @@
         {
           "src": "../../../",
           "files": [
-            "CSharp/SpreadSheetAsData/SpreadSheetAsData.csproj"
+            "CSharp/SpreadsheetAsData/SpreadsheetAsData.csproj"
           ]
         }
       ],

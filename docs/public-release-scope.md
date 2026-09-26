@@ -97,7 +97,7 @@ book.Save();
 
 現行版では、プロパティ名と列名の一致を基本規則とします。
 
-列名とプロパティ名が異なる場合は、`SpreadSheetNameAttribute` で列名を指定します。
+列名とプロパティ名が異なる場合は、`SpreadsheetNameAttribute` で列名を指定します。
 
 ### 型付き読み書きコードの生成
 
@@ -122,7 +122,7 @@ book.Save();
 ```
 
 MSBuild連携では、生成されたBook型の引数なしコンストラクターは実行先へコピーされたExcelファイルを開きます。`Save()` はそのコピーへ保存します。
-通常の利用では、実行時API、コード生成API、Visual StudioとMSBuildの連携をまとめた `Marimo.SpreadSheetAsData` パッケージを使用します。
+通常の利用では、実行時API、コード生成API、Visual StudioとMSBuildの連携をまとめた `Marimo.SpreadsheetAsData` パッケージを使用します。
 
 ## 公開版の確認条件
 

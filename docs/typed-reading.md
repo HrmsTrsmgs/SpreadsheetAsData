@@ -18,7 +18,7 @@ SpreadsheetAsDataでは、Excelテーブルを単なるセル範囲ではなく�
 `Workbook.Tables` からExcelテーブルを取得し、`Table.Rows` でデータ行を列挙します。
 
 ```csharp
-using Marimo.SpreadSheetAsData;
+using Marimo.SpreadsheetAsData;
 
 using var book = Workbook.Open("orders.xlsx");
 
@@ -57,7 +57,7 @@ Close/Disposeは保存を行いません。Streamだけで編集結果の出力�
 取得した `Table<T>` の `Replace()` へ型付き行を渡すと、既存のExcelテーブル行をワークシート上の順序で置き換えます。
 
 ```csharp
-using Marimo.SpreadSheetAsData;
+using Marimo.SpreadsheetAsData;
 
 public sealed class Order
 {
@@ -86,12 +86,12 @@ table.Replace(orders);
 book.Save();
 ```
 
-プロパティ名とExcel列名が異なる場合は、`SpreadSheetNameAttribute` で列名を指定します。
+プロパティ名とExcel列名が異なる場合は、`SpreadsheetNameAttribute` で列名を指定します。
 
 ```csharp
 public sealed class Order
 {
-    [SpreadSheetName("商品名")]
+    [SpreadsheetName("商品名")]
     public string ProductName { get; set; } = "";
 }
 ```
@@ -100,7 +100,7 @@ public sealed class Order
 
 * publicな引数なしコンストラクターが必要
 * public setterを持つプロパティを列へ対応付ける
-* `SpreadSheetNameAttribute` がある場合は、属性の列名を使用する
+* `SpreadsheetNameAttribute` がある場合は、属性の列名を使用する
 * 属性がない場合は、プロパティ名を列名として使用する
 * 属性がない読み取り専用プロパティは無視する
 * 属性がある読み取り専用プロパティはエラーにする
@@ -175,34 +175,34 @@ book.Save();
 ```csharp
 public sealed class OrderBookData
 {
-    [SpreadSheetName("orders")]
+    [SpreadsheetName("orders")]
     public IEnumerable<Order> OrderLines { get; set; } = [];
 
-    [SpreadSheetName("report_title")]
+    [SpreadsheetName("report_title")]
     public string Title { get; set; } = "";
 }
 ```
 
 定義名の自動対応では、ブックスコープとシートローカルの両方を検索します。
 例えば、シートローカルの `cell_name` も、変換後の名前に一致する定義名がブック全体で一つなら `CellName` へ対応します。
-同じ名前へ変換される定義名が複数ある場合は一意に決まらないため失敗します。シートローカル定義名を明示する場合は、`[SpreadSheetName("cell_name", WorksheetName = "Sheet2")]` のように指定します。
+同じ名前へ変換される定義名が複数ある場合は一意に決まらないため失敗します。シートローカル定義名を明示する場合は、`[SpreadsheetName("cell_name", WorksheetName = "Sheet2")]` のように指定します。
 
-`SpreadSheetNameAttribute` は、Excelテーブル名、列名、定義名の明示的な対応付けに共通して使用します。
+`SpreadsheetNameAttribute` は、Excelテーブル名、列名、定義名の明示的な対応付けに共通して使用します。
 ここで説明した自動変換は、ブックのデータオブジェクトと定義名・テーブル名の対応規則です。行データ型 `Order` の列プロパティは、前節の列名規則に従います。
 複数セル定義名に対応するプロパティの型は `IEnumerable<IEnumerable<object?>>` です。
 
 ## 4. `.xlsx` から型付き読み書きコードを生成する
 
-`Marimo.SpreadSheetAsData.CodeGeneration` では、Excelブックから型付きラッパーのC#ソースコードを生成します。
+`Marimo.SpreadsheetAsData.CodeGeneration` では、Excelブックから型付きラッパーのC#ソースコードを生成します。
 
 ```csharp
-using Marimo.SpreadSheetAsData.CodeGeneration;
+using Marimo.SpreadsheetAsData.CodeGeneration;
 
 var sources = WorkbookWrapperGenerator.GenerateSources(
     "orders.xlsx",
     options =>
     {
-        options.Namespace = "MyApp.SpreadSheets";
+        options.Namespace = "MyApp.Spreadsheets";
         options.NameMappings = new()
         {
             ["注文一覧"] = "Orders",

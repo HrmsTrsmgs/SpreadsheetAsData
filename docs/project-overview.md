@@ -63,7 +63,7 @@ book.Save();
 ```
 
 現行のコード生成は、読み取りと書き戻しに使用するC#ソース文字列を生成するAPIとして実装しています。
-Visual StudioとMSBuildからの生成には `Marimo.SpreadSheetAsData`、生成APIを直接使う場合は `Marimo.SpreadSheetAsData.CodeGeneration` を利用します。
+Visual StudioとMSBuildからの生成には `Marimo.SpreadsheetAsData`、生成APIを直接使う場合は `Marimo.SpreadsheetAsData.CodeGeneration` を利用します。
 
 ## プロジェクトの経緯
 

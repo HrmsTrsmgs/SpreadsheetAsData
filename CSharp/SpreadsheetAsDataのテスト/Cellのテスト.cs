@@ -1,0 +1,412 @@
+﻿using FluentAssertions;
+using Marimo.SpreadsheetAsData;
+using Marimo.SpreadsheetAsData.Test.テスト補助;
+using System.Globalization;
+using Packaging = DocumentFormat.OpenXml.Packaging;
+using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
+using Xunit;
+
+namespace Marimo.SpreadsheetAsData.Test;
+
+public class Cellのテスト : IDisposable
+{
+    readonly Worksheet いろいろなデータ;
+    readonly Cell a1;
+    readonly Cell b1;
+    readonly Cell a2;
+    readonly Cell b2;
+    readonly Cell a3;
+    readonly Cell b3;
+    readonly TemporaryExcelFiles temporaryFiles = new();
+    public Cellのテスト()
+    {
+        var book = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));
+
+        いろいろなデータ = book.Sheets["いろいろなデータ"];
+
+        a1 = いろいろなデータ.Cells["A1"];
+        b1 = いろいろなデータ.Cells["B1"];
+        a2 = いろいろなデータ.Cells["A2"];
+        b2 = いろいろなデータ.Cells["B2"];
+        a3 = いろいろなデータ.Cells["A3"];
+        b3 = いろいろなデータ.Cells["B3"];
+
+    }
+    public void Dispose()
+    {
+        いろいろなデータ.Book.Close();
+        temporaryFiles.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    [Fact]
+    public void Bookプロパティはブックを取得できます()
+    {
+        a1.Book.Should().BeSameAs(いろいろなデータ.Book);
+    }
+
+    [Fact]
+    public void Sheetプロパティはシートを取得できます()
+    {
+        a1.Sheet.Should().BeSameAs(いろいろなデータ);
+    }
+
+    [Fact]
+    public void Valueプロパティは数字の値を取得できます()
+    {
+        var a1Value = a1.Value as object;
+        var b1Value = b1.Value as object;
+
+        a1Value.Should().BeOfType<double>().Which.Should().Be(1.1);
+        b1Value.Should().BeOfType<double>().Which.Should().Be(2.2);
+    }
+
+    [Fact]
+    public void Valueプロパティは現在カルチャーに依存せず数値を読み込めます()
+    {
+        var originalCulture = CultureInfo.CurrentCulture;
+
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("de-DE");
+
+            (a1.Value as object).Should().Be(1.1);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
+    }
+
+    [Fact]
+    public void Valueプロパティはboolの値を取得できます()
+    {
+        var a2Value = a2.Value as object;
+        var b2Value = b2.Value as object;
+
+        a2Value.Should().BeOfType<bool>().Which.Should().BeTrue();
+        b2Value.Should().BeOfType<bool>().Which.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Valueプロパティは共有文字列セルの値を取得できます()
+    {
+        var a3Value = a3.Value as object;
+        var b3Value = b3.Value as object;
+
+        a3Value.Should().BeOfType<string>().Which.Should().Be("あいうえお");
+        b3Value.Should().BeOfType<string>().Which.Should().Be("かきくけこ");
+    }
+
+    [Fact]
+    public void Valueプロパティは文字列セルの値を取得できます()
+    {
+        using var book = Workbook.Open(@"TestData\文字列セル.xlsx");
+        var tested = book.Sheets["Sheet1"].Cells["A1"].Value as object;
+
+        tested.Should().Be("直接文字列");
+    }
+
+    [Fact]
+    public void Valueプロパティは数値を設定すると同じセルから取得できます()
+    {
+        using var book = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));
+        var tested = book.Sheets["いろいろなデータ"].Cells["A1"];
+
+        tested.Value = 12.34;
+
+        (tested.Value as object).Should().Be(12.34);
+    }
+
+    [Fact]
+    public void Valueプロパティは整数を設定すると同じセルから数値として取得できます()
+    {
+        using var book = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));
+        var tested = book.Sheets["いろいろなデータ"].Cells["A1"];
+
+        tested.Value = 123;
+
+        (tested.Value as object).Should().Be(123d);
+    }
+
+    [Theory]
+    [InlineData("Book1.xlsx", "いろいろなデータ", "A3")]
+    [InlineData("文字列セル.xlsx", "Sheet1", "A1")]
+    [InlineData("Book1.xlsx", "いろいろなデータ", "A2")]
+    public void Valueプロパティは文字列や真偽値のセルを数値で上書きできます(
+        string excelFileName,
+        string sheetName,
+        string cellReference)
+    {
+        using var book = Workbook.Open(temporaryFiles.Copy(excelFileName));
+        var tested = book.Sheets[sheetName].Cells[cellReference];
+
+        tested.Value = 12.34;
+
+        (tested.Value as object).Should().Be(12.34);
+    }
+
+    [Fact]
+    public void Valueプロパティは現在カルチャーに依存せず数値を書き込めます()
+    {
+        var originalCulture = CultureInfo.CurrentCulture;
+
+        try
+        {
+            using var book = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));
+            var tested = book.Sheets["いろいろなデータ"].Cells["A1"];
+
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("de-DE");
+
+            tested.Value = 12.34;
+
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+
+            (tested.Value as object).Should().Be(12.34);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
+    }
+
+    [Fact]
+    public void Valueプロパティは文字列を書き込めます()
+    {
+        using var book = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));
+        var tested = book.Sheets["いろいろなデータ"].Cells["A3"];
+
+        tested.Value = "書き込み";
+
+        (tested.Value as object).Should().Be("書き込み");
+    }
+
+    [Fact]
+    public void Valueプロパティは真偽値を書き込めます()
+    {
+        using var book = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));
+        var tested = book.Sheets["いろいろなデータ"].Cells["A2"];
+
+        tested.Value = false;
+
+        (tested.Value as object).Should().Be(false);
+    }
+
+    [Fact]
+    public void Valueプロパティにnullを指定すると空白セルとして保存します()
+    {
+        var filePath = temporaryFiles.Copy("Book1.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            book.Sheets["いろいろなデータ"].Cells["A1"].Value = null;
+            book.Save();
+        }
+
+        using var tested = Workbook.Open(filePath);
+
+        (tested.Sheets["いろいろなデータ"].Cells["A1"].Value as object)
+            .Should().BeOfType<BlankValue>();
+    }
+
+    [Theory]
+    [InlineData(42d)]
+    [InlineData("固定値")]
+    [InlineData(false)]
+    [InlineData(null)]
+    public void Valueプロパティへの代入は数式を削除して指定した値を保存します(object? value)
+    {
+        var filePath = temporaryFiles.Copy("数式セル.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            book.Sheets["Sheet1"].Cells["A1"].Value = value;
+            book.Save();
+        }
+
+        using var document = Packaging.SpreadsheetDocument.Open(filePath, false);
+        document.WorkbookPart.Should().NotBeNull();
+        var worksheet = document.WorkbookPart.WorksheetParts.Single().Worksheet;
+        worksheet.Should().NotBeNull();
+        var tested = worksheet.Descendants<Spreadsheet.Cell>().Single();
+
+        tested.CellFormula.Should().BeNull();
+
+        using var saved = Workbook.Open(filePath);
+        (saved.Sheets["Sheet1"].Cells["A1"].Value as object)
+            .Should().Be(value ?? new BlankValue());
+    }
+
+    [Fact]
+    public void Referenceプロパティがセル参照の名称を取得できます()
+    {
+        a1.Reference.Should().Be("A1");
+        b1.Reference.Should().Be("B1");
+    }
+
+    [Fact]
+    public void Valueの変更はExcelで開く際に数式を再計算するよう要求します()
+    {
+        var filePath = temporaryFiles.Copy("参照元を持つ数式.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            book.Sheets["Sheet1"].Cells["A1"].Value = 30d;
+            book.Save();
+        }
+
+        using var document = Packaging.SpreadsheetDocument.Open(filePath, false);
+        document.WorkbookPart.Should().NotBeNull();
+        var workbook = document.WorkbookPart.Workbook;
+        workbook.Should().NotBeNull();
+        var tested = workbook.CalculationProperties;
+
+        tested.Should().NotBeNull();
+        tested.FullCalculationOnLoad?.Value.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Valueプロパティは数式セルの保存済みの計算結果を返します()
+    {
+        using var book = Workbook.Open(@"TestData\数式セル.xlsx");
+
+        (book.Sheets["Sheet1"].Cells["A1"].Value as object).Should().Be(3d);
+    }
+
+    [Fact]
+    public void Valueで参照元を変更しても別セルの数式と保存済みの計算結果を保持します()
+    {
+        var filePath = temporaryFiles.Copy("参照元を持つ数式.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            book.Sheets["Sheet1"].Cells["A1"].Value = 30d;
+
+            (book.Sheets["Sheet1"].Cells["B1"].Value as object).Should().Be(20d);
+            book.Save();
+        }
+
+        using var document = Packaging.SpreadsheetDocument.Open(filePath, false);
+        document.WorkbookPart.Should().NotBeNull();
+        var worksheet = document.WorkbookPart.WorksheetParts.Single().Worksheet;
+        worksheet.Should().NotBeNull();
+        var tested = worksheet.Descendants<Spreadsheet.Cell>()
+            .Single(it => it.CellReference?.Value == "B1");
+
+        tested.CellFormula.Should().NotBeNull();
+        tested.CellFormula.Text.Should().Be("A1*2");
+        tested.CellValue.Should().NotBeNull();
+        tested.CellValue.Text.Should().Be("20");
+    }
+
+    [Fact]
+    public void Valueを読み取るだけではExcelでの再計算を要求しません()
+    {
+        var filePath = temporaryFiles.Copy("参照元を持つ数式.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            _ = book.Sheets["Sheet1"].Cells["B1"].Value;
+            book.Save();
+        }
+
+        using var document = Packaging.SpreadsheetDocument.Open(filePath, false);
+        document.WorkbookPart.Should().NotBeNull();
+        var tested = document.WorkbookPart.Workbook;
+
+        tested.Should().NotBeNull();
+        tested.CalculationProperties?.FullCalculationOnLoad?.Value.Should().NotBe(true);
+    }
+
+    [Fact]
+    public void Valueの変更は既存の計算設定を保持して再計算を要求します()
+    {
+        var filePath = temporaryFiles.Copy("Book1.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            book.Sheets["いろいろなデータ"].Cells["A1"].Value = 30d;
+            book.Save();
+        }
+
+        using var document = Packaging.SpreadsheetDocument.Open(filePath, false);
+        document.WorkbookPart.Should().NotBeNull();
+        var workbook = document.WorkbookPart.Workbook;
+        workbook.Should().NotBeNull();
+        var tested = workbook.CalculationProperties;
+
+        tested.Should().NotBeNull();
+        tested.CalculationId?.Value.Should().Be(125725U);
+        tested.FullCalculationOnLoad?.Value.Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData("B1")]
+    [InlineData("B2")]
+    [InlineData("D4")]
+    public void Valueプロパティは未格納のセルへの書き込みも保存します(string cellReference)
+    {
+        var filePath = temporaryFiles.Copy("Book1.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            book.Sheets["Sheet1"].Cells[cellReference].Value = 42d;
+            book.Save();
+        }
+
+        using var tested = Workbook.Open(filePath, validate: true);
+
+        (tested.Sheets["Sheet1"].Cells[cellReference].Value as object).Should().Be(42d);
+    }
+
+    [Fact]
+    public void ToStringはA1形式のセル参照を返します()
+    {
+        a1.ToString().Should().Be("A1");
+        b1.ToString().Should().Be("B1");
+    }
+
+    [Fact]
+    public void RowIndexプロパティが行番号を取得できます()
+    {
+        a1.RowIndex.Should().Be(1U);
+        a2.RowIndex.Should().Be(2U);
+    }
+
+    [Fact]
+    public void RowIndexは行番号属性がなくてもセル参照から行番号を取得します()
+    {
+        using var book = Workbook.Open(@"TestData\行番号属性省略.xlsx");
+
+        book.Sheets["Sheet1"].Cells["A1"].RowIndex.Should().Be(1U);
+    }
+
+    [Fact]
+    public void Valueは行番号属性のない行に新しいセルを追加します()
+    {
+        var filePath = temporaryFiles.Copy("行番号属性省略.xlsx");
+        using (var book = Workbook.Open(filePath))
+        {
+            book.Sheets["Sheet1"].Cells["B1"].Value = 42d;
+            book.Save();
+        }
+
+        using var document = Packaging.SpreadsheetDocument.Open(filePath, false);
+        document.WorkbookPart.Should().NotBeNull();
+        var worksheet = document.WorkbookPart.WorksheetParts
+            .Single(it => it.Uri.ToString().EndsWith("/sheet1.xml"))
+            .Worksheet;
+        worksheet.Should().NotBeNull();
+        var row = worksheet.Descendants<Spreadsheet.Row>().First();
+
+        row.Elements<Spreadsheet.Cell>().Select(it => it.CellReference?.Value)
+            .Should().Equal("A1", "B1", "C1");
+    }
+
+    [Fact]
+    public void ColumnIndexプロパティが列番号を取得できます()
+    {
+        a1.ColumnIndex.Should().Be(1U);
+        b1.ColumnIndex.Should().Be(2U);
+    }
+}
