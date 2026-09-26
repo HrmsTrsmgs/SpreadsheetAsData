@@ -321,7 +321,12 @@ public class Workbook : IDisposable
     /// ブックへの変更を、指定した出力Streamへ保存します。
     /// </summary>
     /// <param name="destination">保存先のStream。</param>
-    /// <remarks>正常終了時点で出力を完了します。ブックを閉じる必要はありません。</remarks>
+    /// <remarks>
+    /// 正常終了時点で出力を完了します。ブックを閉じる必要はありません。
+    /// 元ファイル・元Streamは変更せず、出力先のStreamも閉じません。
+    /// </remarks>
+    /// <exception cref="NotSupportedException">出力先のStreamに書き込めない場合。</exception>
+    /// <exception cref="ObjectDisposedException">ブックを既に閉じている場合。</exception>
     public void SaveAs(Stream destination) =>
         documentSession.SaveAs(destination);
 

@@ -127,6 +127,11 @@ sealed class DocumentSession : IDisposable
     /// </summary>
     internal void SaveAs(Stream destination)
     {
+        if (!destination.CanWrite)
+        {
+            throw new NotSupportedException();
+        }
+
         using var document = Document.Clone(destination);
     }
 

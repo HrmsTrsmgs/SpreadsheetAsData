@@ -680,7 +680,7 @@ public class Workbookのテスト : IDisposable
         (tested.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
     }
 
-    [Fact(Skip = "SaveAs(Stream)の基本保存を実装後、元ファイルを変更しないことを確認する")]
+    [Fact]
     public void SaveAsで別Streamへ保存しても元ファイルは変更しません()
     {
         var sourcePath = temporaryFiles.Copy("文字列セル.xlsx");
@@ -698,7 +698,7 @@ public class Workbookのテスト : IDisposable
         File.ReadAllBytes(sourcePath).Should().Equal(original);
     }
 
-    [Fact(Skip = "SaveAs(Stream)の基本保存を実装後、元Streamを変更しないことを確認する")]
+    [Fact]
     public void SaveAsで別Streamへ保存しても元Streamは変更しません()
     {
         var original = File.ReadAllBytes(@"TestData\文字列セル.xlsx");
@@ -716,7 +716,7 @@ public class Workbookのテスト : IDisposable
         source.ToArray().Should().Equal(original);
     }
 
-    [Fact(Skip = "SaveAs(Stream)の基本保存を実装後、出力先の所有権が呼び出し側に残ることを確認する")]
+    [Fact]
     public void SaveAsとWorkbookのDisposeは出力Streamを閉じません()
     {
         using var destination = new MemoryStream();
@@ -733,7 +733,7 @@ public class Workbookのテスト : IDisposable
         destination.CanWrite.Should().BeTrue();
     }
 
-    [Fact(Skip = "SaveAs(Stream)の基本保存を実装後、各出力が保存時点の内容を保持することを確認する")]
+    [Fact]
     public void SaveAsで異なるStreamへ保存すると各保存時点の内容を別々に保持します()
     {
         using var firstStream = new MemoryStream();
@@ -757,7 +757,7 @@ public class Workbookのテスト : IDisposable
         (second.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("二回目");
     }
 
-    [Fact(Skip = "SaveAs(Stream)の例外仕様をレビュー後、ファイル版と同じくDispose後は出力前に拒否する")]
+    [Fact]
     public void SaveAsはDispose後に呼び出すと出力Streamを変更せずに失敗します()
     {
         byte[] original = [1, 2, 3, 4];
@@ -771,7 +771,7 @@ public class Workbookのテスト : IDisposable
         destination.ToArray().Should().Equal(original);
     }
 
-    [Fact(Skip = "SaveAs(Stream)の例外仕様をレビュー後、書き込み不可の出力先をNotSupportedExceptionで拒否する案を確認する")]
+    [Fact]
     public void SaveAsは書き込み不可の出力Streamを変更せずに拒否します()
     {
         byte[] original = [1, 2, 3, 4];
