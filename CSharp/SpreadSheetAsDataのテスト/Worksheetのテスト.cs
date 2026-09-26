@@ -56,6 +56,24 @@ public class Worksheetのテスト : IDisposable
     }
 
     [Fact]
+    public void Cellsはワークシート要素がない場合InvalidDataExceptionを投げます()
+    {
+        using var book = Workbook.Open(@"TestData\ワークシート要素省略.xlsx");
+
+        FluentActions.Invoking(() => book.Sheets["Sheet1"].Cells["A1"])
+            .Should().Throw<InvalidDataException>();
+    }
+
+    [Fact]
+    public void Cellsはセル参照属性のないセルを空白と扱わず拒否します()
+    {
+        using var book = Workbook.Open(@"TestData\セル参照属性省略.xlsx");
+
+        FluentActions.Invoking(() => book.Sheets["Sheet1"].Cells["A1"])
+            .Should().Throw<NotSupportedException>();
+    }
+
+    [Fact]
     public void Cellsはセルの参照文字列に存在しないセル名を指定した時にFormatExceptionを投げます()
     {
         FluentActions.Invoking(

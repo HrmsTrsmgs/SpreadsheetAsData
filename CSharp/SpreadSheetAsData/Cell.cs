@@ -1,6 +1,6 @@
-﻿using DocumentFormat.OpenXml;
+﻿using System.Globalization;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
-using System.Globalization;
 using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Marimo.SpreadSheetAsData;
@@ -40,12 +40,6 @@ public class Cell
     internal Spreadsheet.Cell Xml { get; private set; }
 
     /// <summary>
-    /// このセルを含む Open XML の行要素を取得します。
-    /// </summary>
-    internal Spreadsheet.Row RowXml =>
-        Xml.Parent as Row ?? throw new InvalidOperationException();
-
-    /// <summary>
     /// A1 形式のセル参照を取得します。
     /// </summary>
     public string Reference =>
@@ -64,10 +58,10 @@ public class Cell
         get => (Xml.DataType?.Value, Xml.CellValue?.Text) switch
         {
             (null, null) => new BlankValue(),
-            (CellValues.Boolean, "0") => false,
-            (CellValues.Boolean, _) => true,
-            (CellValues.SharedString, _) => SharedStringValue,
-            (CellValues.String, string text) => text,
+            (var type, "0") when type == CellValues.Boolean => false,
+            (var type, _) when type == CellValues.Boolean => true,
+            (var type, _) when type == CellValues.SharedString => SharedStringValue,
+            (var type, string text) when type == CellValues.String => text,
             (_, string text) => double.Parse(text, CultureInfo.InvariantCulture),
             _ => throw new InvalidOperationException()
         };
@@ -113,17 +107,33 @@ public class Cell
         }
 
         var cellName = CellName.Parse(Reference);
-        var sheetData = Sheet.WorksheetPart.Worksheet.GetFirstChild<SheetData>()
+        var sheetData = Sheet.WorksheetXml.GetFirstChild<SheetData>()
             ?? throw new InvalidOperationException();
-        var row = sheetData.Elements<Row>().SingleOrDefault(it => it.RowIndex == cellName.RowIndex)
+        var row = sheetData.Elements<Row>().SingleOrDefault(it => RowIndexOf(it) == cellName.RowIndex)
             ?? sheetData.InsertBefore(
                 new Row { RowIndex = cellName.RowIndex },
-                sheetData.Elements<Row>().FirstOrDefault(it => it.RowIndex > cellName.RowIndex));
+                sheetData.Elements<Row>().FirstOrDefault(it => RowIndexOf(it) > cellName.RowIndex));
 
         row.InsertBefore(
             Xml,
             row.Elements<Spreadsheet.Cell>().FirstOrDefault(
-                it => CellName.Parse(it.CellReference.Value).ColumnIndex > cellName.ColumnIndex));
+                it => CellName.Parse(it.CellReference?.Value ?? throw new NotSupportedException()).ColumnIndex > cellName.ColumnIndex));
+    }
+
+    static uint RowIndexOf(Row row)
+    {
+        if (row.RowIndex?.Value is uint index)
+        {
+            return index;
+        }
+
+        var indexes = (
+            from cell in row.Elements<Spreadsheet.Cell>()
+            let reference = cell.CellReference?.Value ?? throw new NotSupportedException()
+            select CellName.Parse(reference).RowIndex
+        ).Distinct().Take(2).ToArray();
+
+        return indexes.Length == 1 ? indexes[0] : throw new NotSupportedException();
     }
 
     /// <summary>
@@ -155,7 +165,7 @@ public class Cell
     /// <summary>
     /// セルの行番号を取得します。
     /// </summary>
-    public uint RowIndex => RowXml.RowIndex;
+    public uint RowIndex => CellName.Parse(Reference).RowIndex;
 
     /// <summary>
     /// セルの列番号を取得します。

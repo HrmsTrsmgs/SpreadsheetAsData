@@ -108,6 +108,12 @@ public class Workbook : IDisposable
         Document.WorkbookPart ?? throw new InvalidOperationException();
 
     /// <summary>
+    /// Open XML のブック要素を取得します。
+    /// </summary>
+    internal Spreadsheet.Workbook WorkbookXml =>
+        WorkbookPart.Workbook ?? throw new InvalidDataException();
+
+    /// <summary>
     /// Open XML のシート一覧から遅延作成したワークシートコレクションです。
     /// </summary>
     WorksheetCollection? sheets;
@@ -117,7 +123,7 @@ public class Workbook : IDisposable
     /// </summary>
     public WorksheetCollection Sheets =>
         sheets ??= new WorksheetCollection(
-                    from sheet in (WorkbookPart.Workbook.Sheets ?? throw new InvalidOperationException()).Elements<Spreadsheet.Sheet>()
+                    from sheet in (WorkbookXml.Sheets ?? throw new InvalidOperationException()).Elements<Spreadsheet.Sheet>()
                     select new Worksheet(this, sheet.Name?.Value ?? throw new InvalidOperationException()));
 
     /// <summary>
@@ -125,7 +131,7 @@ public class Workbook : IDisposable
     /// 名前付きセルや名前付き範囲を対象とし、Excelテーブル名は含みません。
     /// </summary>
     public IEnumerable<DefinedName> DefinedNames =>
-        from definedName in WorkbookPart.Workbook.DefinedNames?.Elements<Spreadsheet.DefinedName>() ?? []
+        from definedName in WorkbookXml.DefinedNames?.Elements<Spreadsheet.DefinedName>() ?? []
         let name = definedName.Name?.Value ?? throw new InvalidOperationException()
         let worksheet = DefinedNameWorksheet(definedName.LocalSheetId?.Value)
         select new DefinedName(
@@ -201,7 +207,7 @@ public class Workbook : IDisposable
 
     Spreadsheet.DefinedName? FindDefinedName(string name, uint? localSheetId)
     {
-        var definedNames = WorkbookPart.Workbook.DefinedNames?.Elements<Spreadsheet.DefinedName>();
+        var definedNames = WorkbookXml.DefinedNames?.Elements<Spreadsheet.DefinedName>();
 
         return definedNames == null
             ? null

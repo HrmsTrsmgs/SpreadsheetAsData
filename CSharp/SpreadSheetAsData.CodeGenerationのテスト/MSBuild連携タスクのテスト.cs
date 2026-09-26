@@ -88,6 +88,31 @@ public sealed class MSBuild連携タスクのテスト
     }
 
     [Theory]
+    [InlineData("DocumentFormat.OpenXml", "3.5.1")]
+    [InlineData("Marimo.DocumentAsData", "0.3.0")]
+    public void OpenXml3を利用するパッケージと併用して生成型からExcelを読み書きできます(
+        string packageId,
+        string version)
+    {
+        using var project = MSBuild連携テストプロジェクト.Create();
+        project.AddBasicStructureExcel("BasicStructure.xlsx");
+        var scriptFilePath = project.AddPowerShellPackageReferenceSample(
+            "Marimo.SpreadSheetAsData",
+            """
+            Invoke-MSBuild /t:Build
+            Invoke-Dotnet run --project ./Consumer.csproj --no-build --no-restore
+            """,
+            packageReferences: $$"""
+            <PackageReference Include="{{packageId}}" Version="{{version}}" />
+            """);
+
+        var tested = PowerShell実行結果.Run(scriptFilePath, project.DirectoryPath);
+
+        tested.ExitCode.Should().Be(0, tested.Output);
+        tested.Output.Should().Contain("SalesData").And.Contain("saved:Updated");
+    }
+
+    [Theory]
     [InlineData("Marimo.SpreadSheetAsData")]
     [InlineData("Marimo.SpreadSheetAsData.Build")]
     public void パッケージ参照のデザイン時ビルドは再生成せずExcelと生成コードを紐づけます(string packageId)

@@ -14,6 +14,12 @@ public class Table
     internal Packaging.TableDefinitionPart TableDefinitionPart { get; }
 
     /// <summary>
+    /// Open XML のテーブル要素を取得します。
+    /// </summary>
+    internal Spreadsheet.Table TableXml =>
+        TableDefinitionPart.Table ?? throw new InvalidDataException();
+
+    /// <summary>
     /// この Excel テーブルが属するワークシートです。
     /// </summary>
     readonly Worksheet worksheet;
@@ -54,7 +60,8 @@ public class Table
     {
         TableDefinitionPart = tableDefinitionPart;
         this.worksheet = worksheet;
-        rangeReference = CellRangeReference.Parse(tableDefinitionPart.Table.Reference.ToString());
+        rangeReference = CellRangeReference.Parse(
+            TableXml.Reference?.Value ?? throw new InvalidDataException());
         columns = new(this);
         rows = [
             .. from dataRow in DataRowIndexes.WithIndex()
@@ -64,8 +71,8 @@ public class Table
 
     IEnumerable<uint> DataRowIndexes =>
         (
-            from cell in worksheet.WorksheetPart.Worksheet.Descendants<Spreadsheet.Cell>()
-            let cellName = CellName.Parse(cell.CellReference?.Value ?? throw new InvalidOperationException())
+            from cell in worksheet.WorksheetXml.Descendants<Spreadsheet.Cell>()
+            let cellName = CellName.Parse(cell.CellReference?.Value ?? throw new NotSupportedException())
             where IsDataCell(cellName)
             orderby cellName.RowIndex
             select cellName.RowIndex
@@ -79,7 +86,9 @@ public class Table
     /// Excel テーブル名を取得します。
     /// </summary>
     public string Name =>
-        TableDefinitionPart.Table.Name.ToString();
+        TableXml.Name?.Value
+            ?? TableXml.DisplayName?.Value
+            ?? throw new InvalidDataException();
 
     /// <summary>
     /// この Excel テーブルが属するワークシートを取得します。

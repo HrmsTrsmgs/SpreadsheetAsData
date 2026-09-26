@@ -347,12 +347,14 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
     /// <param name="commands">復元後に実行するPowerShellコマンド。</param>
     /// <param name="workbookItems">省略時の基本ブックに代えて登録するSpreadsheetAsData項目のXML。</param>
     /// <param name="programSource">省略時の読み書き例に代えて実行するProgram.cs。</param>
+    /// <param name="packageReferences">利用側で併用するPackageReference項目のXML。</param>
     /// <returns>pack、restore、検証の順で実行するスクリプトのパス。</returns>
     internal string AddPowerShellPackageReferenceSample(
         string packageId,
         string commands,
         string? workbookItems = null,
-        string? programSource = null)
+        string? programSource = null,
+        string? packageReferences = null)
     {
         Directory.CreateDirectory(DirectoryPath);
         using var assets = JsonDocument.Parse(File.ReadAllText(
@@ -390,6 +392,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
               </PropertyGroup>
               <ItemGroup>
                 <PackageReference Include="{{packageId}}" Version="{{version}}" />
+                {{packageReferences}}
                 {{workbookItems ?? """<SpreadsheetAsData Include="BasicStructure.xlsx" Condition="'$(IncludeWorkbook)' == 'true'" />"""}}
               </ItemGroup>
               <Target Name="InspectProject" DependsOnTargets="ResolveReferences">
@@ -469,6 +472,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
                 or "SpreadSheetAsData.CodeGeneration.dll"
                 or "SpreadSheetAsData.dll"
                 or "DocumentFormat.OpenXml.dll"
+                or "DocumentFormat.OpenXml.Framework.dll"
                 or "System.Interactive.dll"
                 or "System.IO.Packaging.dll")
             {

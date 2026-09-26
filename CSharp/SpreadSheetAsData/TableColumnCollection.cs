@@ -20,7 +20,7 @@ public class TableColumnCollection : IReadOnlyList<TableColumn>
     {
         items = [
             .. from column in
-                table.TableDefinitionPart.Table.TableColumns
+                (table.TableXml.TableColumns ?? throw new InvalidDataException())
                     .Elements<Spreadsheet.TableColumn>()
                     .WithIndex()
                select new TableColumn(table, column.Value, column.Index)

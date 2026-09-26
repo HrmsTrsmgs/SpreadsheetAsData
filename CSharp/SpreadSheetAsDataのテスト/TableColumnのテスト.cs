@@ -32,6 +32,16 @@ public class TableColumnのテスト : IDisposable
     }
 
     [Fact]
+    public void Nameは列名属性がない場合InvalidDataExceptionを投げます()
+    {
+        using var book = Workbook.Open(@"TestData\テーブル列名属性省略.xlsx");
+        var tested = book.Tables["型付き行マッピング"].Columns[0];
+        var action = () => { _ = tested.Name; };
+
+        action.Should().Throw<InvalidDataException>();
+    }
+
+    [Fact]
     public void ToStringはExcelテーブルの列名を返します()
     {
         column.ToString().Should().Be("数値2");

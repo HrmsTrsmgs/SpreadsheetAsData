@@ -1,3 +1,4 @@
+﻿using DocumentFormat.OpenXml.Packaging;
 using Packaging = DocumentFormat.OpenXml.Packaging;
 
 namespace Marimo.SpreadSheetAsData;
@@ -45,10 +46,7 @@ sealed class DocumentSession : IDisposable
                 filePath,
                 fileLock,
                 stream,
-                Packaging.SpreadsheetDocument.Open(
-                    stream,
-                    isEditable: true,
-                    new Packaging.OpenSettings { AutoSave = false }));
+                OpenDocument(stream));
         }
         catch
         {
@@ -67,16 +65,29 @@ sealed class DocumentSession : IDisposable
                 filePath: null,
                 fileLock: null,
                 documentStream,
-                Packaging.SpreadsheetDocument.Open(
-                    documentStream,
-                    isEditable: true,
-                    new Packaging.OpenSettings { AutoSave = false }));
+                OpenDocument(documentStream));
         }
         catch
         {
             documentStream.Dispose();
             throw;
         }
+    }
+
+    /// <summary>
+    /// 空の入力を拒否し、明示的な保存だけを行うSDKドキュメントを開きます。
+    /// </summary>
+    static Packaging.SpreadsheetDocument OpenDocument(CopyOnWriteStream stream)
+    {
+        if (stream.Length == 0)
+        {
+            throw new InvalidDataException();
+        }
+
+        return Packaging.SpreadsheetDocument.Open(
+            stream,
+            isEditable: true,
+            new Packaging.OpenSettings { AutoSave = false });
     }
 
     static FileStream Lock(string filePath) =>
@@ -115,7 +126,7 @@ sealed class DocumentSession : IDisposable
     {
         if (!disposedValue)
         {
-            Document.Close();
+            Document.Dispose();
             stream.Dispose();
             fileLock?.Dispose();
             disposedValue = true;

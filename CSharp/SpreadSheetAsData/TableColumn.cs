@@ -39,7 +39,7 @@ public class TableColumn
     /// Excel テーブル内の列名を取得します。
     /// </summary>
     public string Name =>
-        xml.Name.ToString();
+        xml.Name?.Value ?? throw new InvalidDataException();
 
     /// <summary>
     /// Excel テーブル内での 0 始まりの列位置を取得します。

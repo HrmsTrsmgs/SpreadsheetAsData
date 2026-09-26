@@ -66,7 +66,7 @@ public class Worksheet
     /// </summary>
     internal Spreadsheet.Sheet SheetTag =>
         (
-            from sheet in Book.WorkbookPart.Workbook.Descendants<Spreadsheet.Sheet>()
+            from sheet in Book.WorkbookXml.Descendants<Spreadsheet.Sheet>()
             where sheet.Name == Name
             select sheet
         ).Single();
@@ -77,6 +77,12 @@ public class Worksheet
     internal Packaging.WorksheetPart WorksheetPart =>
         Book.WorkbookPart.GetPartById(SheetTag.Id?.Value ?? throw new InvalidOperationException()) as Packaging.WorksheetPart
             ?? throw new InvalidOperationException();
+
+    /// <summary>
+    /// Open XML のワークシート要素を取得します。
+    /// </summary>
+    internal Spreadsheet.Worksheet WorksheetXml =>
+        WorksheetPart.Worksheet ?? throw new InvalidDataException();
 
     /// <summary>
     /// 取得経路によらず、同じセル参照に対して同じインスタンスを返します。
@@ -95,8 +101,9 @@ public class Worksheet
     {
         var cellReference = cellName.ToString();
         var cellXml =
-            from xml in WorksheetPart.Worksheet.Descendants<Spreadsheet.Cell>()
-            where xml.CellReference == cellReference
+            from xml in WorksheetXml.Descendants<Spreadsheet.Cell>()
+            let reference = xml.CellReference?.Value ?? throw new NotSupportedException()
+            where reference == cellReference
             select xml;
 
         return cellXml.IsEmpty()

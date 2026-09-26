@@ -2,6 +2,8 @@
 using Marimo.SpreadSheetAsData;
 using Marimo.SpreadSheetAsData.Test.テスト補助;
 using System.Globalization;
+using Packaging = DocumentFormat.OpenXml.Packaging;
+using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
 using Xunit;
 
 namespace Marimo.SpreadSheetAsData.Test;
@@ -245,6 +247,36 @@ public class Cellのテスト : IDisposable
     {
         a1.RowIndex.Should().Be(1U);
         a2.RowIndex.Should().Be(2U);
+    }
+
+    [Fact]
+    public void RowIndexは行番号属性がなくてもセル参照から行番号を取得します()
+    {
+        using var book = Workbook.Open(@"TestData\行番号属性省略.xlsx");
+
+        book.Sheets["Sheet1"].Cells["A1"].RowIndex.Should().Be(1U);
+    }
+
+    [Fact]
+    public void Valueは行番号属性のない行に新しいセルを追加します()
+    {
+        var filePath = temporaryFiles.Copy("行番号属性省略.xlsx");
+        using (var book = Workbook.Open(filePath))
+        {
+            book.Sheets["Sheet1"].Cells["B1"].Value = 42d;
+            book.Save();
+        }
+
+        using var document = Packaging.SpreadsheetDocument.Open(filePath, false);
+        document.WorkbookPart.Should().NotBeNull();
+        var worksheet = document.WorkbookPart.WorksheetParts
+            .Single(it => it.Uri.ToString().EndsWith("/sheet1.xml"))
+            .Worksheet;
+        worksheet.Should().NotBeNull();
+        var row = worksheet.Descendants<Spreadsheet.Row>().First();
+
+        row.Elements<Spreadsheet.Cell>().Select(it => it.CellReference?.Value)
+            .Should().Equal("A1", "B1", "C1");
     }
 
     [Fact]

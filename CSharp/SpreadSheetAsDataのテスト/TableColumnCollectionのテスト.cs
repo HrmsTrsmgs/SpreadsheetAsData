@@ -70,6 +70,15 @@ public class TableColumnCollectionのテスト : IDisposable
     }
 
     [Fact]
+    public void 列定義のないExcelテーブルはInvalidDataExceptionで拒否します()
+    {
+        using var book = Workbook.Open(@"TestData\テーブル列定義省略.xlsx");
+
+        FluentActions.Invoking(() => book.Tables["型付き行マッピング"])
+            .Should().Throw<InvalidDataException>();
+    }
+
+    [Fact]
     public void Columnsは範囲外の位置を指定した場合に失敗します()
     {
         var action = () => _ = columns[4];

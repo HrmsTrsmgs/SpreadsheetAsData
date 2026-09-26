@@ -32,6 +32,24 @@ public class Tableのテスト : IDisposable
     }
 
     [Fact]
+    public void Nameはname属性がない場合displayNameを返します()
+    {
+        using var book = Workbook.Open(@"TestData\テーブル名属性省略.xlsx");
+
+        book.Tables["型付き行マッピング"].Name.Should().Be("型付き行マッピング");
+    }
+
+    [Fact]
+    public void Nameは両方の名前属性がない場合InvalidDataExceptionを投げます()
+    {
+        using var book = Workbook.Open(@"TestData\テーブル名属性全省略.xlsx");
+        var tested = book.Tables.Single(it => it.Range.ToString() == "B6:E9");
+        var action = () => { _ = tested.Name; };
+
+        action.Should().Throw<InvalidDataException>();
+    }
+
+    [Fact]
     public void ToStringはExcelテーブル名を返します()
     {
         table.ToString().Should().Be("型付き行マッピング");
@@ -49,6 +67,24 @@ public class Tableのテスト : IDisposable
     public void RangeはExcelテーブル全体の対象範囲を返します()
     {
         table.Range.ToString().Should().Be("B6:E9");
+    }
+
+    [Fact]
+    public void 範囲属性のないExcelテーブルはInvalidDataExceptionで拒否します()
+    {
+        using var book = Workbook.Open(@"TestData\テーブル範囲属性省略.xlsx");
+
+        FluentActions.Invoking(() => book.Tables["型付き行マッピング"])
+            .Should().Throw<InvalidDataException>();
+    }
+
+    [Fact]
+    public void テーブル要素がない場合InvalidDataExceptionで拒否します()
+    {
+        using var book = Workbook.Open(@"TestData\テーブル要素省略.xlsx");
+
+        FluentActions.Invoking(() => book.Tables["型付き行マッピング"])
+            .Should().Throw<InvalidDataException>();
     }
 
     [Fact]
@@ -74,6 +110,15 @@ public class Tableのテスト : IDisposable
     public void Rowsはすべてのデータ行を列挙します()
     {
         table.Rows.Should().HaveCount(3);
+    }
+
+    [Fact]
+    public void セル参照属性のないセルを含むExcelテーブルは拒否します()
+    {
+        using var book = Workbook.Open(@"TestData\テーブル内セル参照属性省略.xlsx");
+
+        FluentActions.Invoking(() => book.Tables["型付き行マッピング"])
+            .Should().Throw<NotSupportedException>();
     }
 
     [Fact]

@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Marimo.SpreadSheetAsData;
 using Marimo.SpreadSheetAsData.Test.テスト補助;
+using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
 namespace Marimo.SpreadSheetAsData.Test;
@@ -310,7 +311,7 @@ public class Workbookのテスト : IDisposable
     public void Stream版のSaveAsは元のStreamを変更せず別ファイルへ保存します()
     {
         var original = File.ReadAllBytes(@"TestData\定義名.xlsx");
-        using var stream = new MemoryStream(original.ToArray());
+        using var stream = new MemoryStream([.. original]);
         var savedPath = temporaryFiles.NewFilePath();
 
         using (var book = Workbook.Open(stream))
@@ -337,7 +338,7 @@ public class Workbookのテスト : IDisposable
     public void SaveAsは書き込み不可のStreamからも元データを変更せず編集結果を保存します(bool seekable)
     {
         var original = File.ReadAllBytes(@"TestData\文字列セル.xlsx");
-        using var source = new MemoryStream(original.ToArray(), writable: false);
+        using var source = new MemoryStream([.. original], writable: false);
         using Stream stream = seekable ? source : new NonSeekableReadStream(source);
         var savedPath = temporaryFiles.NewFilePath();
 
@@ -361,7 +362,7 @@ public class Workbookのテスト : IDisposable
     {
         byte[] prefix = [1, 2, 3, 4];
         byte[] original = [.. prefix, .. File.ReadAllBytes(@"TestData\文字列セル.xlsx")];
-        using var stream = new MemoryStream(original.ToArray());
+        using var stream = new MemoryStream([.. original]);
         stream.Position = prefix.Length;
         var savedPath = temporaryFiles.NewFilePath();
 
@@ -384,7 +385,7 @@ public class Workbookのテスト : IDisposable
     public void SaveAs後に編集して再びSaveAsすると各保存時点の内容を別々に保持します()
     {
         var original = File.ReadAllBytes(@"TestData\文字列セル.xlsx");
-        using var stream = new MemoryStream(original.ToArray());
+        using var stream = new MemoryStream([.. original]);
         var firstPath = temporaryFiles.NewFilePath();
         var secondPath = temporaryFiles.NewFilePath();
 
@@ -409,7 +410,7 @@ public class Workbookのテスト : IDisposable
     public void SaveAsが保存先を開けず失敗しても元Streamと編集内容を保持して再保存できます()
     {
         var original = File.ReadAllBytes(@"TestData\文字列セル.xlsx");
-        using var stream = new MemoryStream(original.ToArray());
+        using var stream = new MemoryStream([.. original]);
         var blockedPath = temporaryFiles.NewFilePath();
         var savedPath = temporaryFiles.NewFilePath();
 
@@ -441,7 +442,7 @@ public class Workbookのテスト : IDisposable
     public void DisposeはSaveしていない変更を元のStreamへ書き込みません()
     {
         var original = File.ReadAllBytes(@"TestData\定義名.xlsx");
-        using var stream = new MemoryStream(original.ToArray());
+        using var stream = new MemoryStream([.. original]);
 
         using (var book = Workbook.Open(stream))
         {
@@ -501,6 +502,15 @@ public class Workbookのテスト : IDisposable
     public void Sheetsでシートが取得できます()
     {
         book1.Sheets.Count.Should().Be(3);
+    }
+
+    [Fact]
+    public void Sheetsはブック要素がない場合InvalidDataExceptionを投げます()
+    {
+        using var book = Workbook.Open(@"TestData\ブック要素省略.xlsx");
+
+        FluentActions.Invoking(() => book.Sheets["Sheet1"])
+            .Should().Throw<InvalidDataException>();
     }
 
     [Fact]
@@ -1040,6 +1050,7 @@ public class Workbookのテスト : IDisposable
 
     public sealed class WriteOnlyWorkbookData
     {
+        [SuppressMessage("Performance", "CA1822", Justification = "インスタンスの書き込み専用プロパティを検証するため。")]
         public string CustomerName { set => throw new InvalidOperationException(); }
 
         [SpreadSheetName("CustomerName")]
