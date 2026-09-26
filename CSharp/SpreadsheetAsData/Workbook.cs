@@ -318,6 +318,15 @@ public class Workbook : IDisposable
         documentSession.SaveAs(filePath);
 
     /// <summary>
+    /// ブックへの変更を、指定した出力Streamへ保存します。
+    /// </summary>
+    /// <param name="destination">保存先のStream。</param>
+    /// <remarks>仕様レビュー用の未実装APIです。</remarks>
+    /// <exception cref="NotImplementedException">Streamへの保存はまだ実装されていません。</exception>
+    public void SaveAs(Stream destination) =>
+        throw new NotImplementedException();
+
+    /// <summary>
     /// ブックが使用しているリソースを解放します。
     /// </summary>
     /// <param name="disposing">マネージドリソースを解放する場合は true。</param>

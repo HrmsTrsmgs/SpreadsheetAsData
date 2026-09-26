@@ -666,6 +666,124 @@ public class Workbookのテスト : IDisposable
             .Should().Be(1.1);
     }
 
+    [Fact(Skip = "SaveAs(Stream)の仕様レビュー後、Workbookを閉じる前に出力が完了することから実装する")]
+    public void SaveAsはWorkbookを閉じる前に変更したセル値を出力Streamへ保存します()
+    {
+        using var book = Workbook.Open(@"TestData\文字列セル.xlsx");
+        using var destination = new MemoryStream();
+        book.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
+
+        book.SaveAs(destination);
+        destination.Position = 0;
+        using var tested = Workbook.Open(destination);
+
+        (tested.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
+    }
+
+    [Fact(Skip = "SaveAs(Stream)の基本保存を実装後、元ファイルを変更しないことを確認する")]
+    public void SaveAsで別Streamへ保存しても元ファイルは変更しません()
+    {
+        var sourcePath = temporaryFiles.Copy("文字列セル.xlsx");
+        var original = File.ReadAllBytes(sourcePath);
+        using var destination = new MemoryStream();
+
+        using (var book = Workbook.Open(sourcePath))
+        {
+            book.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
+            book.SaveAs(destination);
+
+            File.ReadAllBytes(sourcePath).Should().Equal(original);
+        }
+
+        File.ReadAllBytes(sourcePath).Should().Equal(original);
+    }
+
+    [Fact(Skip = "SaveAs(Stream)の基本保存を実装後、元Streamを変更しないことを確認する")]
+    public void SaveAsで別Streamへ保存しても元Streamは変更しません()
+    {
+        var original = File.ReadAllBytes(@"TestData\文字列セル.xlsx");
+        using var source = new MemoryStream([.. original]);
+        using var destination = new MemoryStream();
+
+        using (var book = Workbook.Open(source))
+        {
+            book.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
+            book.SaveAs(destination);
+
+            source.ToArray().Should().Equal(original);
+        }
+
+        source.ToArray().Should().Equal(original);
+    }
+
+    [Fact(Skip = "SaveAs(Stream)の基本保存を実装後、出力先の所有権が呼び出し側に残ることを確認する")]
+    public void SaveAsとWorkbookのDisposeは出力Streamを閉じません()
+    {
+        using var destination = new MemoryStream();
+
+        using (var book = Workbook.Open(@"TestData\文字列セル.xlsx"))
+        {
+            book.SaveAs(destination);
+
+            destination.CanRead.Should().BeTrue();
+            destination.CanWrite.Should().BeTrue();
+        }
+
+        destination.CanRead.Should().BeTrue();
+        destination.CanWrite.Should().BeTrue();
+    }
+
+    [Fact(Skip = "SaveAs(Stream)の基本保存を実装後、各出力が保存時点の内容を保持することを確認する")]
+    public void SaveAsで異なるStreamへ保存すると各保存時点の内容を別々に保持します()
+    {
+        using var firstStream = new MemoryStream();
+        using var secondStream = new MemoryStream();
+
+        using (var book = Workbook.Open(@"TestData\文字列セル.xlsx"))
+        {
+            book.Sheets["Sheet1"].Cell["A1"].Value = "一回目";
+            book.SaveAs(firstStream);
+            book.Sheets["Sheet1"].Cell["A1"].Value = "二回目";
+            book.SaveAs(secondStream);
+            book.Sheets["Sheet1"].Cell["A1"].Value = "保存しない変更";
+        }
+
+        firstStream.Position = 0;
+        secondStream.Position = 0;
+        using var first = Workbook.Open(firstStream);
+        using var second = Workbook.Open(secondStream);
+
+        (first.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("一回目");
+        (second.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("二回目");
+    }
+
+    [Fact(Skip = "SaveAs(Stream)の例外仕様をレビュー後、ファイル版と同じくDispose後は出力前に拒否する")]
+    public void SaveAsはDispose後に呼び出すと出力Streamを変更せずに失敗します()
+    {
+        byte[] original = [1, 2, 3, 4];
+        using var destination = new MemoryStream([.. original]);
+        using var book = Workbook.Open(@"TestData\文字列セル.xlsx");
+        book.Dispose();
+
+        var tested = () => book.SaveAs(destination);
+
+        tested.Should().Throw<ObjectDisposedException>();
+        destination.ToArray().Should().Equal(original);
+    }
+
+    [Fact(Skip = "SaveAs(Stream)の例外仕様をレビュー後、書き込み不可の出力先をNotSupportedExceptionで拒否する案を確認する")]
+    public void SaveAsは書き込み不可の出力Streamを変更せずに拒否します()
+    {
+        byte[] original = [1, 2, 3, 4];
+        using var destination = new MemoryStream([.. original], writable: false);
+        using var book = Workbook.Open(@"TestData\文字列セル.xlsx");
+
+        var tested = () => book.SaveAs(destination);
+
+        tested.Should().Throw<NotSupportedException>();
+        destination.ToArray().Should().Equal(original);
+    }
+
     [Fact]
     public void Readはプロパティ名と同じブックスコープの単一セル定義名からオブジェクトを読み込みます()
     {
