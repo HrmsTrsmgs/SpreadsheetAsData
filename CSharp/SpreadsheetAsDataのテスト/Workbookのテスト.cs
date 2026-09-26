@@ -680,6 +680,42 @@ public class Workbookのテスト : IDisposable
         (tested.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
     }
 
+    [Fact(Skip = "出力Stream全体を保存先とする仕様に合意済み。現在位置によらず先頭から保存するRedから進める")]
+    public void SaveAsは出力Streamの現在位置によらず先頭から文書を保存します()
+    {
+        using var book = Workbook.Open(@"TestData\文字列セル.xlsx");
+        using var destination = new MemoryStream();
+        destination.Write([1, 2, 3, 4]);
+        book.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
+
+        book.SaveAs(destination);
+
+        // xlsxのZIPヘッダーが、既存の4バイトより後ではなく先頭にあることを確認します。
+        destination.ToArray().Take(4).Should().Equal([0x50, 0x4b, 0x03, 0x04]);
+        destination.Position = 0;
+        using var tested = Workbook.Open(destination);
+        (tested.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
+    }
+
+    [Fact(Skip = "出力Stream全体を置き換える仕様に合意済み。先頭からの保存を確認後、古い末尾を残さないRedから進める")]
+    public void SaveAsは保存結果より長い出力Streamの古い末尾を残さず読み直せます()
+    {
+        using var book = Workbook.Open(@"TestData\文字列セル.xlsx");
+        using var destination = new MemoryStream();
+        book.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
+        book.SaveAs(destination);
+        var savedLength = destination.Length;
+        destination.SetLength(savedLength + 1024);
+        destination.Position = 0;
+
+        book.SaveAs(destination);
+
+        destination.Length.Should().Be(savedLength);
+        destination.Position = 0;
+        using var tested = Workbook.Open(destination);
+        (tested.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
+    }
+
     [Fact]
     public void SaveAsで別Streamへ保存しても元ファイルは変更しません()
     {
