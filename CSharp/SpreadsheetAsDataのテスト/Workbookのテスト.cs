@@ -666,7 +666,7 @@ public class Workbookのテスト : IDisposable
             .Should().Be(1.1);
     }
 
-    [Fact(Skip = "SaveAs(Stream)の仕様レビュー後、Workbookを閉じる前に出力が完了することから実装する")]
+    [Fact]
     public void SaveAsはWorkbookを閉じる前に変更したセル値を出力Streamへ保存します()
     {
         using var book = Workbook.Open(@"TestData\文字列セル.xlsx");

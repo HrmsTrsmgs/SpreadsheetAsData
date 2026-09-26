@@ -22,7 +22,7 @@ Excelの全機能への対応ではなく、通常の業務データを格納し
 
 Streamから開いた場合の `Save()` は、元Streamの内容を変更する前に `NotSupportedException` を投げます。
 `Close()` / `Dispose()` は保存を行わず、呼び出し側から渡されたStreamも閉じません。
-Stream版でも `SaveAs(path)` は利用できますが、Streamだけで編集結果の出力まで完結するAPIは提供していません。
+Stream版でも `SaveAs(path)` は利用できます。次回公開に向けて `SaveAs(Stream)` を追加し、空の `MemoryStream` への出力を確認しています。出力位置、入力と同じStreamへの保存、途中失敗時の扱いは仕様検討中です。
 
 ### 定義名
 

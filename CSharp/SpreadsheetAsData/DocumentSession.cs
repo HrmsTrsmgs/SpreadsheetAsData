@@ -122,6 +122,14 @@ sealed class DocumentSession : IDisposable
         using var document = Document.Clone(filePath);
     }
 
+    /// <summary>
+    /// 編集中の文書を出力先へ複製し、複製側を閉じて出力を完了します。
+    /// </summary>
+    internal void SaveAs(Stream destination)
+    {
+        using var document = Document.Clone(destination);
+    }
+
     public void Dispose()
     {
         if (!disposedValue)

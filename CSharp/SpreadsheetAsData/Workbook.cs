@@ -50,7 +50,7 @@ public class Workbook : IDisposable
     /// <returns>開いたブック。</returns>
     /// <remarks>
     /// 元Streamの内容は変更せず、CloseまたはDisposeでも元Stream自体は閉じません。
-    /// Saveは使用できません。編集結果を出力する場合はSaveAsでファイルへ保存してください。
+    /// Saveは使用できません。編集結果を出力する場合はSaveAsを使用してください。
     /// </remarks>
     public static Workbook Open(Stream stream) =>
         new(DocumentSession.Open(stream));
@@ -301,7 +301,7 @@ public class Workbook : IDisposable
     /// </summary>
     /// <remarks>
     /// 正常終了時点で保存を完了します。CloseまたはDisposeを待つ必要はありません。
-    /// Streamから開いた場合は元Streamを変更する前に拒否します。SaveAsで別ファイルへ保存してください。
+    /// Streamから開いた場合は元Streamを変更する前に拒否します。編集結果の出力にはSaveAsを使用してください。
     /// </remarks>
     /// <exception cref="NotSupportedException">Streamから開いたブックの場合。</exception>
     /// <exception cref="ObjectDisposedException">ファイルから開いたブックを既に閉じている場合。</exception>
@@ -321,10 +321,9 @@ public class Workbook : IDisposable
     /// ブックへの変更を、指定した出力Streamへ保存します。
     /// </summary>
     /// <param name="destination">保存先のStream。</param>
-    /// <remarks>仕様レビュー用の未実装APIです。</remarks>
-    /// <exception cref="NotImplementedException">Streamへの保存はまだ実装されていません。</exception>
+    /// <remarks>正常終了時点で出力を完了します。ブックを閉じる必要はありません。</remarks>
     public void SaveAs(Stream destination) =>
-        throw new NotImplementedException();
+        documentSession.SaveAs(destination);
 
     /// <summary>
     /// ブックが使用しているリソースを解放します。

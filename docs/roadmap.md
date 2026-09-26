@@ -153,7 +153,7 @@ IEnumerable<Order> orders = book.ReadTable<Order>("Orders");
 - [x] 別ファイルへ保存する
 
 Stream版の `Save()` は元Streamを変更する前に拒否し、Close/Disposeでも保存しない。
-Stream入力の編集結果は `SaveAs(path)` で出力できるが、Streamだけで出力まで完結するAPIは現行範囲に含めない。
+Stream入力の編集結果は `SaveAs(path)` で出力できる。`SaveAs(Stream)`も追加し、空の`MemoryStream`へ編集結果を保存できることを確認した。元データの保持・出力先の所有権・例外の予定テストを順に確認する。出力位置、入力と同じStreamへの保存、途中失敗時の扱いは仕様検討中とする。
 
 ファイル版は読み取り共有で保持し、Open中・Save後・Save失敗後の他からの書き込みを禁止します。
 Save中には保持を一時解除するため、その区間の競合対策と保存の原子性は別途検討が必要です。

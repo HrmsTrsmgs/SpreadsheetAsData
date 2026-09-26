@@ -401,7 +401,16 @@ Streamから開いた場合の `Save()` は、拡張可能かどうかにかか�
 どちらの開き方でも、`Close()` / `Dispose()` は保存を行わず、リソースを解放するだけです。呼び出し側から渡されたStream自体は閉じません。
 
 `SaveAs(path)` はどちらの開き方でも利用でき、別ファイルへ保存します。
-**Streamだけで編集結果の出力まで完結するAPIは、現時点では提供していません。** ブラウザ内でのダウンロードなど、ファイルパスを使えない環境での編集結果の出力には対応していません。
+次回公開に向けて、`SaveAs(Stream)`を追加しました。空の`MemoryStream`へ編集結果を保存でき、正常終了時点で読み直せます。ダウンロードやHTTPレスポンスへの転送は呼び出し側で行います。
+
+```csharp
+using var output = new MemoryStream();
+book.SaveAs(output);
+output.Position = 0;
+using var saved = Workbook.Open(output);
+```
+
+現在確認済みの出力先は空の`MemoryStream`です。出力位置、入力と同じStreamへの保存、途中失敗時の扱いは仕様検討中です。
 Stream入力からファイルへ保存する例は、[サンプルの説明](samples/TableReadingSample/README.md#streamから開いて編集する場合)を参照してください。
 
 `CellRange.Values` へ設定する値は、対象範囲と同じ行数・列数である必要があります。

@@ -30,7 +30,7 @@ book.SaveAs("updated-orders.xlsx");
 
 Streamから開いた場合、`Save()`は元Streamの内容を変更する前に`NotSupportedException`を投げます。
 `Close()` / `Dispose()`も保存せず、渡したStream自体は閉じません。
-**Streamだけで編集結果の出力まで完結するAPIは、現時点では提供していません。** 出力には`SaveAs(path)`でファイルパスを指定します。
+次回公開に向けて`SaveAs(Stream)`を追加し、空の`MemoryStream`への出力を確認しています。上の例は従来どおり`SaveAs(path)`でファイルへ保存します。Stream出力の例と検討中の制約は[README](../../README.md)を参照してください。
 ファイルパスから開いた場合の`Save()`は、正常終了時点で元ファイルへの保存を完了します。
 
 ## NuGet公開前に実行する
