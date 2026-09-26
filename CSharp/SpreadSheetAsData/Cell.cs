@@ -46,11 +46,12 @@ public class Cell
         Xml.CellReference?.Value ?? throw new InvalidOperationException();
 
     /// <summary>
-    /// セルの値を取得します。
+    /// セルの値を取得または設定します。
     /// </summary>
     /// <remarks>
     /// 空白セルは <see cref="BlankValue"/>、真偽値セルは <see cref="bool"/>、共有文字列セルと文字列セルは
     /// <see cref="string"/>、その他の数値セルは <see cref="double"/> として返します。
+    /// 値を設定すると、対象セルの既存の数式を削除します。
     /// </remarks>
     [System.Diagnostics.CodeAnalysis.AllowNull]
     public dynamic Value
@@ -69,6 +70,7 @@ public class Cell
         set
         {
             AttachToWorksheet();
+            Xml.CellFormula = null;
 
             if (value is null)
             {

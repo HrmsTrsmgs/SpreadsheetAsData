@@ -209,6 +209,34 @@ public class Cellのテスト : IDisposable
             .Should().BeOfType<BlankValue>();
     }
 
+    [Theory]
+    [InlineData(42d)]
+    [InlineData("固定値")]
+    [InlineData(false)]
+    [InlineData(null)]
+    public void Valueプロパティへの代入は数式を削除して指定した値を保存します(object? value)
+    {
+        var filePath = temporaryFiles.Copy("数式セル.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            book.Sheets["Sheet1"].Cells["A1"].Value = value;
+            book.Save();
+        }
+
+        using var document = Packaging.SpreadsheetDocument.Open(filePath, false);
+        document.WorkbookPart.Should().NotBeNull();
+        var worksheet = document.WorkbookPart.WorksheetParts.Single().Worksheet;
+        worksheet.Should().NotBeNull();
+        var tested = worksheet.Descendants<Spreadsheet.Cell>().Single();
+
+        tested.CellFormula.Should().BeNull();
+
+        using var saved = Workbook.Open(filePath);
+        (saved.Sheets["Sheet1"].Cells["A1"].Value as object)
+            .Should().Be(value ?? new BlankValue());
+    }
+
     [Fact]
     public void Referenceプロパティがセル参照の名称を取得できます()
     {
