@@ -324,6 +324,8 @@ public class Workbook : IDisposable
     /// <remarks>
     /// 正常終了時点で出力を完了します。ブックを閉じる必要はありません。
     /// 元ファイル・元Streamは変更せず、出力先のStreamも閉じません。
+    /// 出力先の現在位置によらず先頭から保存し、古い末尾は残しません。
+    /// 保存後のPositionは保証しません。読み直す場合は呼び出し側で先頭へ戻してください。
     /// </remarks>
     /// <exception cref="NotSupportedException">出力先のStreamに書き込めない場合。</exception>
     /// <exception cref="ObjectDisposedException">ブックを既に閉じている場合。</exception>
