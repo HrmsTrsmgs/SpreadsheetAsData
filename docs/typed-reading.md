@@ -49,7 +49,7 @@ var byColumn = firstRow[table.Columns["ProductName"]];
 セル値を変更すると、Excelで開く際の再計算要求（`fullCalcOnLoad`）を設定します。ライブラリ自身は数式を計算しないため、参照元だけを変更しても、再計算されるまでは数式セルから保存済みの計算結果を読み取ります。
 `Save()` は正常終了時点で元ファイルへの保存を完了します。Streamから開いた場合の `Save()` は `NotSupportedException` になります。
 ファイル版は読み取り共有で元ファイルを保持し、Open中、Save後、Save失敗後の他からの書き込みを禁止します。Save中は保持を一時解除して保存し、再取得します。この区間を含む同時更新の競合検出や、保存全体の原子性は保証しません。
-Close/Disposeは保存を行いません。`SaveAs(Stream)`は`MemoryStream`へ編集結果を出力でき、Workbookを閉じる前に出力を読み直せます。現在位置によらず先頭から既存内容を置き換え、古い末尾を残しません。保存後の`Position`は保証しません。入力と同じStreamへの保存、途中失敗時の扱いは仕様検討中です。
+Close/Disposeは保存を行いません。`SaveAs(Stream)`は`MemoryStream`へ編集結果を出力でき、Workbookを閉じる前に出力を読み直せます。現在位置によらず先頭から既存内容を置き換え、古い末尾を残しません。保存後の`Position`は保証しません。入力と同じStreamインスタンスへの保存は、書き込み前に`NotSupportedException`で拒否します。別Streamへの出力途中で失敗した場合の扱いは仕様検討中です。
 
 ## 2. 利用者定義型へ対応付けて読み書きする
 

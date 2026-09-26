@@ -30,6 +30,11 @@ sealed class CopyOnWriteStream : Stream
 
     Stream Current => workingCopy ?? source;
 
+    /// <summary>
+    /// 保存先が入力元そのものかを判定するための、呼び出し側から借りたStreamです。
+    /// </summary>
+    internal Stream Source => source;
+
     public override bool CanRead => Current.CanRead;
     public override bool CanSeek => Current.CanSeek;
     public override bool CanWrite => workingCopy?.CanWrite ?? true;

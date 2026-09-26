@@ -127,7 +127,7 @@ sealed class DocumentSession : IDisposable
     /// </summary>
     internal void SaveAs(Stream destination)
     {
-        if (!destination.CanWrite)
+        if (ReferenceEquals(destination, stream.Source) || !destination.CanWrite)
         {
             throw new NotSupportedException();
         }

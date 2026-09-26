@@ -808,6 +808,27 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void SaveAsは入力と同じStreamへの保存を元の内容を変更せずに拒否します()
+    {
+        var original = File.ReadAllBytes(@"TestData\文字列セル.xlsx");
+        using var source = new MemoryStream();
+        source.Write(original);
+        source.Position = 0;
+
+        using (var book = Workbook.Open(source))
+        {
+            book.Sheets["Sheet1"].Cell["A1"].Value = "保存しない文字列";
+
+            var tested = () => book.SaveAs(source);
+
+            tested.Should().Throw<NotSupportedException>();
+            source.ToArray().Should().Equal(original);
+        }
+
+        source.ToArray().Should().Equal(original);
+    }
+
+    [Fact]
     public void SaveAsは書き込み不可の出力Streamを変更せずに拒否します()
     {
         byte[] original = [1, 2, 3, 4];
