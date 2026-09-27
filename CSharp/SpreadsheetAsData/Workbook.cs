@@ -301,6 +301,7 @@ public class Workbook : IDisposable
     /// </summary>
     /// <remarks>
     /// 正常終了時点で保存を完了します。CloseまたはDisposeを待つ必要はありません。
+    /// 元ファイルの置換時には保持を一時解除します。その間の他からの書き込み禁止と変更の検出は保証しません。
     /// Streamから開いた場合は元Streamを変更する前に拒否します。編集結果の出力にはSaveAsを使用してください。
     /// </remarks>
     /// <exception cref="NotSupportedException">Streamから開いたブックの場合。</exception>
