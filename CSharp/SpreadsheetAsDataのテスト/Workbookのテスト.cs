@@ -490,6 +490,20 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void SaveAsは書き出し中に失敗しても新しい保存先を残しません()
+    {
+        var sourcePath = temporaryFiles.Copy("Book1.xlsx");
+        var savedPath = temporaryFiles.NewFilePath();
+        using var book = Workbook.Open(sourcePath);
+        book.Sheets["いろいろなデータ"].Cell["A1"].Value = "invalid\u0001text";
+
+        var save = () => book.SaveAs(savedPath);
+
+        save.Should().Throw<Exception>();
+        File.Exists(savedPath).Should().BeFalse();
+    }
+
+    [Fact]
     public void DisposeはSaveしていない変更を元のStreamへ書き込みません()
     {
         var original = File.ReadAllBytes(@"TestData\定義名.xlsx");
