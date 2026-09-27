@@ -2,7 +2,7 @@
 
 SpreadsheetAsDataは、Excelをインストールしていない環境でもExcelファイルを扱えるようにするライブラリです。
 
-> このブランチでは次回公開に向けて、C#の名前を`Spreadsheet`表記へ統一しています。以下のコード例は変更後の名前です。公開済み0.3.0では名前空間が`Marimo.SpreadSheetAsData`、属性が`SpreadSheetName`です。次回公開まではローカルで生成したパッケージを使用してください。
+> 以下のコード例は0.4.0向けです。0.3.0から更新する場合は、名前空間と属性名の変更を含む[移行案内](#040への更新)を確認してください。
 
 C#版では、Excelから生成した型付きAPIでデータを読み書きできます。
 Open XML SDKを内部実装として使いながら、ワークブック、ワークシート、セルを直接扱うAPIも提供します。
@@ -402,7 +402,7 @@ Streamから開いた場合の `Save()` は、拡張可能かどうかにかか�
 どちらの開き方でも、`Close()` / `Dispose()` は保存を行わず、リソースを解放するだけです。呼び出し側から渡されたStream自体は閉じません。
 
 `SaveAs(path)` はどちらの開き方でも利用でき、別ファイルへ保存します。
-次回公開に向けて、`SaveAs(Stream)`を追加しました。空の`MemoryStream`へ編集結果を保存でき、正常終了時点で読み直せます。ダウンロードやHTTPレスポンスへの転送は呼び出し側で行います。
+0.4.0で`SaveAs(Stream)`を追加しました。空の`MemoryStream`へ編集結果を保存でき、正常終了時点で読み直せます。ダウンロードやHTTPレスポンスへの転送は呼び出し側で行います。
 
 ```csharp
 using var output = new MemoryStream();
@@ -475,13 +475,23 @@ dotnet format .\CSharp\SpreadsheetAsData.slnx --verify-no-changes --no-restore -
 
 ## NuGetパッケージ
 
-### 次回更新での名称統一
+### 0.4.0への更新
+
+0.4.0は、0.3.0からの名前変更を含む更新です。参照している各パッケージを0.4.0へ揃え、次の変更を反映してください。
 
 * 名前空間を`Marimo.SpreadSheetAsData`から`Marimo.SpreadsheetAsData`へ変更します。利用側の`using`や完全修飾名を更新してください。
 * `SpreadSheetName`属性を`SpreadsheetName`へ変更します。
 * アセンブリ名、プロジェクト名、NuGetパッケージIDの表記も`SpreadsheetAsData`へ統一します。
 * 生成コードは再生成してください。ビルドアクション`SpreadsheetAsData`と生成ファイルの拡張子`.SpreadsheetAsData.g.cs`は変更しません。
 * 旧名の互換APIは追加しません。公開済み0.3.0の内容は変更しません。
+
+そのほか、次の変更があります。
+
+* MSBuild連携はExcelファイルを実行先へコピーします。生成Bookの引数なしコンストラクターは、生成元ではなく実行先のコピーを開きます。別の場所のファイルを開く場合は`Open(path)`を使用してください。
+* `SaveAs(Stream)`で別の出力Streamへ保存できます。入力と同じStreamへの保存と、Stream入力の`Save()`は禁止したままです。出力先は呼び出し側が管理し、ライブラリは閉じません。
+* ファイルへの`Save()`と`SaveAs(path)`は、一時ファイルへの出力完了後に保存先へ反映します。排他制御の制約は[保存の説明](#書き込みと保存)を参照してください。
+* セルに値を代入すると、そのセルの既存数式を削除し、ブックに再計算を要求します。ライブラリ自身は数式を計算しません。
+* Open XML SDKを3.5.1へ更新し、欠落属性の検証と列名解析の桁あふれ対策を追加しました。
 
 ### 0.3.0への更新
 
@@ -490,7 +500,7 @@ dotnet format .\CSharp\SpreadsheetAsData.slnx --verify-no-changes --no-restore -
 * セル・範囲・既存テーブル行の書き込みと、ブック全体の `Read<T>()` / `Replace<T>()` に対応しました。
 * 生成Bookには、型引数なしの `Read()` / `Replace(Data)` を用意しています。
 * 生成された名前付きセル・範囲のプロパティは、`Cell` / `CellRange` ではなく値を直接読み書きします。利用コードの `.Value` / `.Values` は取り除いてください。非生成APIは変更しません。
-* Excel名を指定する属性は `SpreadSheetName` に統一しました。旧 `SpreadsheetColumn` 属性の利用箇所は置き換えてください（次回更新では上記のとおり`SpreadsheetName`へ改名します）。
+* Excel名を指定する属性は `SpreadSheetName` に統一しました。旧 `SpreadsheetColumn` 属性の利用箇所は置き換えてください（0.4.0では上記のとおり`SpreadsheetName`へ改名しています）。
 * 生成Bookの `Open()` は、必要なシート・テーブル・列・定義名などの不足を検出します。
 * Stream入力に対応しましたが、元Streamへの `Save()` は禁止です。編集結果は `SaveAs(path)` で別ファイルへ保存します。Close/Disposeでは保存しません。
 * 複数ブックで生成型名が重なる場合は、Excel項目ごとの `Namespace` を指定できます。
@@ -518,14 +528,15 @@ dotnet pack .\CSharp\SpreadsheetAsData.slnx -c Release -o .\artifacts\nupkg
 ```
 
 生成されたパッケージは `artifacts\nupkg\` に出力されます。
-NuGet.orgへ公開する前にローカルで別プロジェクトから確認する場合は、検証先プロジェクトに `PackageReference` を追加し、復元時にローカルパッケージ出力先とNuGet.orgをNuGetソースとして指定します。
+NuGet.orgへ公開する前にローカルで別プロジェクトから確認する場合は、検証先プロジェクトに `PackageReference` を追加します。NuGet.orgが有効な通常のNuGet設定に、ローカルパッケージ出力先を追加して復元します。
 
 ```xml
-<PackageReference Include="Marimo.SpreadsheetAsData" Version="0.3.0" />
+<PackageReference Include="Marimo.SpreadsheetAsData" Version="0.4.0" />
 ```
 
 ```powershell
-dotnet restore .\YourProject.csproj --source .\artifacts\nupkg --source "https://api.nuget.org/v3/index.json"
+$localFeed = (Resolve-Path .\artifacts\nupkg).Path
+dotnet restore .\YourProject.csproj "-p:RestoreAdditionalProjectSources=$localFeed"
 ```
 
 NuGet.orgへ公開した後は、通常のNuGetソースから次のように追加できます。

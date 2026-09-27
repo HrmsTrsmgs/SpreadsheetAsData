@@ -2,7 +2,7 @@
 
 `Marimo.SpreadsheetAsData` をNuGetパッケージとして参照する、利用者向けの最小サンプルです。
 
-現在のコードは次回公開用の`Spreadsheet`表記です。公開済み0.3.0とは名前空間・属性名が異なるため、次回公開までは以下のローカルパッケージを使う手順で実行してください。
+このサンプルは0.4.0向けです。0.3.0とは名前空間・属性名が異なります。変更点は[移行案内](../../README.md#040への更新)を参照してください。
 
 このサンプルは、リポジトリ内のプロダクトコードを `ProjectReference` では参照しません。
 外部利用者と同じように、`PackageReference` で `Marimo.SpreadsheetAsData` を参照します。
@@ -30,17 +30,17 @@ book.SaveAs("updated-orders.xlsx");
 
 Streamから開いた場合、`Save()`は元Streamの内容を変更する前に`NotSupportedException`を投げます。
 `Close()` / `Dispose()`も保存せず、渡したStream自体は閉じません。
-次回公開に向けて`SaveAs(Stream)`を追加し、空の`MemoryStream`への出力を確認しています。上の例は従来どおり`SaveAs(path)`でファイルへ保存します。Stream出力の例と検討中の制約は[README](../../README.md)を参照してください。
+0.4.0では`SaveAs(Stream)`で空の`MemoryStream`へも出力できます。上の例は従来どおり`SaveAs(path)`でファイルへ保存します。Stream出力の例と制約は[README](../../README.md)を参照してください。
 ファイルパスから開いた場合の`Save()`は、正常終了時点で元ファイルへの保存を完了します。
 
 ## NuGet公開前に実行する
 
-NuGet.orgへ公開する前は、リポジトリ内で生成したローカルパッケージをNuGetソースとして指定します。
+NuGet.orgへ公開する前は、リポジトリ内で生成したローカルパッケージをNuGetソースへ追加します。通常のNuGet設定でNuGet.orgが有効になっていることを前提とします。
 
 ```powershell
 dotnet pack .\CSharp\SpreadsheetAsData.slnx -c Release -o .\artifacts\nupkg
 $localFeed = (Resolve-Path .\artifacts\nupkg).Path
-dotnet restore .\samples\TableReadingSample\TableReadingSample\TableReadingSample.csproj --packages .\artifacts\sample-packages --source $localFeed --source "https://api.nuget.org/v3/index.json"
+dotnet restore .\samples\TableReadingSample\TableReadingSample\TableReadingSample.csproj --packages .\artifacts\sample-packages "-p:RestoreAdditionalProjectSources=$localFeed"
 dotnet run --no-restore --project .\samples\TableReadingSample\TableReadingSample\TableReadingSample.csproj
 ```
 
