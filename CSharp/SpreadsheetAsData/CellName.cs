@@ -149,7 +149,9 @@ public partial struct CellName : IEquatable<CellName>
     static uint GetColumnIndex(IEnumerable<char> columnNameChars) =>
         columnNameChars.Aggregate(
             0U,
-            (columnIndex, character) => columnIndex * alphabetCount + (uint)(character - 'A') + 1);
+            (columnIndex, character) => columnIndex > MaxColumnIndex
+                ? columnIndex
+                : columnIndex * alphabetCount + (uint)(character - 'A') + 1);
 
     /// <summary>
     /// 1 始まりの列番号を Excel の列名へ再帰的に変換します。
