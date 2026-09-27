@@ -78,6 +78,33 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void 同じファイルを二つのWorkbookで開いている間は保存できず片方を閉じれば保存できます()
+    {
+        var filePath = temporaryFiles.Copy("Book1.xlsx");
+        var originalBytes = File.ReadAllBytes(filePath);
+        using var tested = Workbook.Open(filePath);
+        tested.Sheets["いろいろなデータ"].Cell["A1"].Value = 9.9;
+
+        using (var other = Workbook.Open(filePath))
+        {
+            var save = () => tested.Save();
+
+            save.Should().Throw<IOException>();
+            File.ReadAllBytes(filePath).Should().Equal(originalBytes);
+        }
+
+        tested.Save();
+        using var saved = Workbook.Open(filePath);
+        (saved.Sheets["いろいろなデータ"].Cell["A1"].Value as object).Should().Be(9.9);
+    }
+
+    [Fact(Skip = "置換中からロック再取得までに他の書き込みを同期させる方法を用意し、排他仕様を確認してからRedを実行します。")]
+    public void Saveは元ファイルの置換中も他からの書き込みを禁止し保存後もロックを維持します()
+    {
+        throw new NotImplementedException("置換時点に書き込みを同期させるテスト手段が必要です。");
+    }
+
+    [Fact]
     public void Saveは既存の読み取りハンドルを変更せず元ファイルを切り替えます()
     {
         var filePath = temporaryFiles.Copy("Book1.xlsx");
@@ -456,6 +483,12 @@ public class Workbookのテスト : IDisposable
         stream.CanRead.Should().BeTrue();
     }
 
+    [Fact(Skip = "保存先への書き出し開始後の失敗を再現する方法と、既存ファイルを守る仕様を確認してからRedを実行します。")]
+    public void SaveAsは書き出し途中に失敗しても既存の保存先を変更しません()
+    {
+        throw new NotImplementedException("書き出し途中の失敗を確実に起こすテスト手段が必要です。");
+    }
+
     [Fact]
     public void DisposeはSaveしていない変更を元のStreamへ書き込みません()
     {
@@ -664,6 +697,26 @@ public class Workbookのテスト : IDisposable
 
         (tested.Sheets["いろいろなデータ"].Cells["A1"].Value as object)
             .Should().Be(9.9);
+    }
+
+    [Fact]
+    public void SaveAsは既存の読み取りハンドルを変更せず保存先を切り替えます()
+    {
+        var sourcePath = temporaryFiles.Copy("Book1.xlsx");
+        var savedPath = temporaryFiles.Copy("Book1.xlsx");
+        var originalBytes = File.ReadAllBytes(savedPath);
+        using var reader = File.Open(savedPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        using var book = Workbook.Open(sourcePath);
+        book.Sheets["いろいろなデータ"].Cell["A1"].Value = 9.9;
+
+        book.SaveAs(savedPath);
+
+        reader.Position = 0;
+        using var savedBefore = new MemoryStream();
+        reader.CopyTo(savedBefore);
+        savedBefore.ToArray().Should().Equal(originalBytes);
+        using var tested = Workbook.Open(savedPath);
+        (tested.Sheets["いろいろなデータ"].Cell["A1"].Value as object).Should().Be(9.9);
     }
 
     [Fact]

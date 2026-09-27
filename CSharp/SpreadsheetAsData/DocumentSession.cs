@@ -108,7 +108,7 @@ sealed class DocumentSession : IDisposable
         var temporaryPath = filePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
         {
-            SaveAs(temporaryPath);
+            using (var document = Document.Clone(temporaryPath)) { }
             fileLock?.Dispose();
             fileLock = null;
             File.Replace(temporaryPath, filePath, null);
@@ -129,7 +129,23 @@ sealed class DocumentSession : IDisposable
     internal void SaveAs(string filePath)
     {
         ObjectDisposedException.ThrowIf(disposedValue, this);
-        using var document = Document.Clone(filePath);
+        var temporaryPath = filePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        try
+        {
+            using (var document = Document.Clone(temporaryPath)) { }
+            if (File.Exists(filePath))
+            {
+                File.Replace(temporaryPath, filePath, null);
+            }
+            else
+            {
+                File.Move(temporaryPath, filePath);
+            }
+        }
+        finally
+        {
+            File.Delete(temporaryPath);
+        }
     }
 
     /// <summary>
