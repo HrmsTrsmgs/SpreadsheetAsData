@@ -105,14 +105,24 @@ sealed class DocumentSession : IDisposable
         }
 
         ObjectDisposedException.ThrowIf(disposedValue, this);
-        fileLock?.Dispose();
+        var temporaryPath = filePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
         {
-            SaveAs(filePath);
+            SaveAs(temporaryPath);
+            fileLock?.Dispose();
+            fileLock = null;
+            File.Replace(temporaryPath, filePath, null);
         }
         finally
         {
-            fileLock = Lock(filePath);
+            try
+            {
+                File.Delete(temporaryPath);
+            }
+            finally
+            {
+                fileLock ??= Lock(filePath);
+            }
         }
     }
 

@@ -78,6 +78,24 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void Saveは既存の読み取りハンドルを変更せず元ファイルを切り替えます()
+    {
+        var filePath = temporaryFiles.Copy("Book1.xlsx");
+        using var book = Workbook.Open(filePath);
+        using var reader = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        var originalBytes = File.ReadAllBytes(filePath);
+
+        book.Sheets["いろいろなデータ"].Cell["A1"].Value = 9.9;
+        book.Save();
+
+        reader.Position = 0;
+        using var savedBefore = new MemoryStream();
+        reader.CopyTo(savedBefore);
+        savedBefore.ToArray().Should().Equal(originalBytes);
+        File.ReadAllBytes(filePath).Should().NotEqual(originalBytes);
+    }
+
+    [Fact]
     public void Save失敗時は元ファイルと書き込み禁止を維持し原因を除けば再保存できます()
     {
         var filePath = temporaryFiles.Copy("Book1.xlsx");
