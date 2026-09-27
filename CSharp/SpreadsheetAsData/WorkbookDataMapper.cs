@@ -30,8 +30,7 @@ sealed class WorkbookDataMapper(Workbook book)
 
             var range = DefinedNameRange(property);
 
-            if (range.TopLeftCell == range.BottomRightCell
-                && property.PropertyType != typeof(IEnumerable<IEnumerable<object?>>))
+            if (MapsSingleCell(property, range))
             {
                 return ConvertValue(range.TopLeftCell.Value, property.PropertyType);
             }
@@ -72,8 +71,7 @@ sealed class WorkbookDataMapper(Workbook book)
 
             var range = DefinedNameRange(property);
 
-            if (range.TopLeftCell == range.BottomRightCell
-                && property.PropertyType != typeof(IEnumerable<IEnumerable<object?>>))
+            if (MapsSingleCell(property, range))
             {
                 range.TopLeftCell.Value = property.GetValue(data);
                 return;
@@ -85,6 +83,13 @@ sealed class WorkbookDataMapper(Workbook book)
                         ?? Array.Empty<IEnumerable<object?>>());
         }
     }
+
+    /// <summary>
+    /// 二次元の値を受け取るプロパティは、範囲が一セルでも範囲として対応付けます。
+    /// </summary>
+    static bool MapsSingleCell(PropertyInfo property, CellRange range) =>
+        range.TopLeftCell == range.BottomRightCell
+            && property.PropertyType != typeof(IEnumerable<IEnumerable<object?>>);
 
     /// <summary>
     /// 属性で指定した名前を優先し、対応するExcelテーブルを検索します。

@@ -1,4 +1,4 @@
-using Marimo.SpreadsheetAsData;
+﻿using Marimo.SpreadsheetAsData;
 
 namespace Marimo.SpreadsheetAsData.CodeGeneration;
 
@@ -22,6 +22,14 @@ static class CodeGenerationOptionNames
         internal string GeneratedName(string contextName, string sourceName) =>
             self.NameMappings.GetValueOrDefault($"{contextName}.{sourceName}")
                 ?? self.GeneratedName(sourceName);
+
+        /// <summary>
+        /// Data型へ平坦化する定義名も、元のスコープに従って名前を決定します。
+        /// </summary>
+        internal string GeneratedName(DefinedName definedName) =>
+            definedName.Worksheet is { } sheet
+                ? self.SheetDefinedName(sheet, definedName)
+                : self.BookDefinedName(definedName);
 
         /// <summary>
         /// ブックスコープ定義名に対応する生成プロパティ名を決定します。

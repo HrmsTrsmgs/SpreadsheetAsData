@@ -1,4 +1,4 @@
-using Marimo.SpreadsheetAsData;
+﻿using Marimo.SpreadsheetAsData;
 
 namespace Marimo.SpreadsheetAsData.CodeGeneration;
 
@@ -132,11 +132,7 @@ static class GeneratedNameDiagnostics
             GroupMemberNames(
                 [
                     .. from definedName in book.DefinedNames
-                       let sheet = definedName.Worksheet
-                       let propertyName = sheet is null
-                           ? options.BookDefinedName(definedName)
-                           : options.SheetDefinedName(sheet, definedName)
-                       select (definedName.Name, propertyName),
+                       select (definedName.Name, options.GeneratedName(definedName)),
                     .. from table in book.Tables
                        select (table.Name, options.GeneratedName(table.Name))
                 ]),

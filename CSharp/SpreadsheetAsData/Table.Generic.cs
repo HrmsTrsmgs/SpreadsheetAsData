@@ -42,7 +42,7 @@ public class Table<T> : Table, IEnumerable<T>
     /// <param name="items">置き換え後の型付き行。</param>
     public void Replace(IEnumerable<T> items)
     {
-        ValidateAttributedPropertiesHavePublicGetters();
+        ValidateAttributedProperties(HasPublicGetter);
 
         foreach (var (row, item) in base.Rows.Zip(items))
         {
@@ -57,12 +57,13 @@ public class Table<T> : Table, IEnumerable<T>
     /// <param name="item">書き込み元の型付き行。</param>
     void Replace(TableRow row, T item)
     {
-        foreach (var property in MappedProperties)
+        foreach (var (cell, value) in
+            from property in MappedProperties
+            let sourceValue = property.GetValue(item)
+            let cell = row[GetColumnName(property)]
+            select (cell, Value: ConvertValueToCellValue(sourceValue, row, property)))
         {
-            var sourceValue = property.GetValue(item);
-
-            row[GetColumnName(property)].Value =
-                ConvertValueToCellValue(sourceValue, row, property);
+            cell.Value = value;
         }
     }
 
@@ -86,13 +87,11 @@ public class Table<T> : Table, IEnumerable<T>
     {
         var mapped = Activator.CreateInstance<T>();
 
-        foreach (var property in MappedProperties)
+        foreach (var (property, value) in
+            from property in MappedProperties
+            select (property, Value: ConvertValue(GetSourceValue(row, property), row, property)))
         {
-            var sourceValue = GetSourceValue(row, property);
-
-            property.SetValue(
-                mapped,
-                ConvertValue(sourceValue, row, property));
+            property.SetValue(mapped, value);
         }
 
         return mapped;
@@ -104,20 +103,20 @@ public class Table<T> : Table, IEnumerable<T>
     void ValidateColumns()
     {
         ValidateDuplicateColumns();
-        ValidateAttributedPropertiesHavePublicSetters();
+        ValidateAttributedProperties(HasPublicSetter);
 
-        foreach (var property in MappedProperties)
+        if ((
+            from property in MappedProperties
+            let columnName = GetColumnName(property)
+            where !Columns.Contains(columnName)
+            select (Property: property, ColumnName: columnName)
+        ).TryGetFirst(out var missingColumn))
         {
-            var columnName = GetColumnName(property);
-
-            if (!Columns.Contains(columnName))
-            {
-                throw new TableMappingException(
-                    this,
-                    typeof(T),
-                    columnName,
-                    property);
-            }
+            throw new TableMappingException(
+                this,
+                typeof(T),
+                missingColumn.ColumnName,
+                missingColumn.Property);
         }
     }
 
@@ -141,42 +140,22 @@ public class Table<T> : Table, IEnumerable<T>
     }
 
     /// <summary>
-    /// 属性で対応付けたプロパティへ値を書き込めることを検証します。
+    /// 属性で対応付けたプロパティが、読み取りまたは書き込みに必要なアクセサーを持つか検証します。
     /// </summary>
-    void ValidateAttributedPropertiesHavePublicSetters()
+    void ValidateAttributedProperties(Func<PropertyInfo, bool> hasPublicAccessor)
     {
         if ((
             from property in MappedProperties
             where HasSpreadsheetNameAttribute(property)
-                && !HasPublicSetter(property)
+                && !hasPublicAccessor(property)
             select property
-        ).TryGetFirst(out var propertyWithoutPublicSetter))
+        ).TryGetFirst(out var propertyWithoutPublicAccessor))
         {
             throw new TableMappingException(
                 this,
                 typeof(T),
-                GetColumnName(propertyWithoutPublicSetter),
-                propertyWithoutPublicSetter);
-        }
-    }
-
-    /// <summary>
-    /// 属性で対応付けたプロパティから値を読み取れることを検証します。
-    /// </summary>
-    void ValidateAttributedPropertiesHavePublicGetters()
-    {
-        if ((
-            from property in MappedProperties
-            where HasSpreadsheetNameAttribute(property)
-                && !HasPublicGetter(property)
-            select property
-        ).TryGetFirst(out var propertyWithoutPublicGetter))
-        {
-            throw new TableMappingException(
-                this,
-                typeof(T),
-                GetColumnName(propertyWithoutPublicGetter),
-                propertyWithoutPublicGetter);
+                GetColumnName(propertyWithoutPublicAccessor),
+                propertyWithoutPublicAccessor);
         }
     }
 
@@ -249,21 +228,10 @@ public class Table<T> : Table, IEnumerable<T>
     object? ConvertValue(
         object sourceValue,
         TableRow row,
-        PropertyInfo property)
-    {
-        if (TryConvertValue(sourceValue, property.PropertyType, out var converted))
-        {
-            return converted;
-        }
-
-        throw new TableMappingException(
-            this,
-            typeof(T),
-            GetColumnName(property),
-            property,
-            row,
-            sourceValue);
-    }
+        PropertyInfo property) =>
+        TryConvertValue(sourceValue, property.PropertyType, out var converted)
+            ? converted
+            : throw ValueConversionException(sourceValue, row, property);
 
     /// <summary>
     /// マッピング元のプロパティ値を、セルへ設定できる値へ変換します。
@@ -275,21 +243,22 @@ public class Table<T> : Table, IEnumerable<T>
     object? ConvertValueToCellValue(
         object? sourceValue,
         TableRow row,
-        PropertyInfo property)
-    {
-        if (TryConvertValueToCellValue(sourceValue, out var converted))
-        {
-            return converted;
-        }
+        PropertyInfo property) =>
+        TryConvertValueToCellValue(sourceValue, out var converted)
+            ? converted
+            : throw ValueConversionException(sourceValue, row, property);
 
-        throw new TableMappingException(
+    /// <summary>
+    /// 読み書きどちらの変換失敗にも、同じ列・プロパティ・行の情報を付けます。
+    /// </summary>
+    TableMappingException ValueConversionException(object? sourceValue, TableRow row, PropertyInfo property) =>
+        new(
             this,
             typeof(T),
             GetColumnName(property),
             property,
             row,
             sourceValue ?? new BlankValue());
-    }
 
     /// <summary>
     /// 元セル値を指定した型へ変換します。
@@ -312,7 +281,7 @@ public class Table<T> : Table, IEnumerable<T>
             return true;
         }
 
-        object? conversion = (propertyType, sourceValue) switch
+        converted = (propertyType, sourceValue) switch
         {
             ({ } type, _) when type == typeof(object) => sourceValue,
             ({ } type, double number) when (type == typeof(int) || type == typeof(int?))
@@ -330,9 +299,7 @@ public class Table<T> : Table, IEnumerable<T>
             _ => null
         };
 
-        converted = conversion ?? new();
-
-        return conversion != null;
+        return converted != null;
     }
 
     /// <summary>
@@ -351,7 +318,7 @@ public class Table<T> : Table, IEnumerable<T>
             return true;
         }
 
-        object? conversion = sourceValue switch
+        converted = sourceValue switch
         {
             int number => (double)number,
             double number => number,
@@ -360,8 +327,6 @@ public class Table<T> : Table, IEnumerable<T>
             _ => null
         };
 
-        converted = conversion ?? new();
-
-        return conversion != null;
+        return converted != null;
     }
 }

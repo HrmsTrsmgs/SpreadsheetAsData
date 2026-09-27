@@ -60,7 +60,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
 
     void Generate(
         ITaskItem excelFile,
-        ICollection<ITaskItem> generatedFiles)
+        List<ITaskItem> generatedFiles)
     {
         var excelFilePath = FullPath(excelFile);
         var runtimeWorkbookPath = Path.GetRelativePath(ProjectDirectory, excelFilePath);
@@ -83,6 +83,13 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
 
             var nameMappings = LoadNameMappings(dictionaryFilePath, excelFilePath);
 
+            void ConfigureOptions(CodeGenerationOptions options)
+            {
+                options.Namespace = generatedNamespace;
+                options.NameMappings = nameMappings;
+                options.RuntimeWorkbookPath = runtimeWorkbookPath;
+            }
+
             if (Log.HasLoggedErrors)
             {
                 return;
@@ -91,7 +98,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
             foreach (var diagnostic in
                 WorkbookWrapperGenerator.GenerateDiagnostics(
                     excelFilePath,
-                    options => ConfigureOptions(options, nameMappings, generatedNamespace, runtimeWorkbookPath)))
+                    ConfigureOptions))
             {
                 LogDiagnostic(excelFilePath, diagnostic);
             }
@@ -103,7 +110,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
 
             var sources = WorkbookWrapperGenerator.GenerateSources(
                 excelFilePath,
-                options => ConfigureOptions(options, nameMappings, generatedNamespace, runtimeWorkbookPath));
+                ConfigureOptions);
 
             Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath)!);
             Directory.CreateDirectory(Path.GetDirectoryName(stampFilePath)!);
@@ -112,28 +119,9 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
         }
         catch (Exception exception)
         {
-            Log.LogError(
-                subcategory: null,
-                errorCode: "SASD999",
-                helpKeyword: null,
-                file: excelFilePath,
-                lineNumber: 0,
-                columnNumber: 0,
-                endLineNumber: 0,
-                endColumnNumber: 0,
-                message: $"SpreadsheetAsData のコード生成に失敗しました。{exception.Message}");
+            LogError("SASD999", excelFilePath,
+                $"SpreadsheetAsData のコード生成に失敗しました。{exception.Message}");
         }
-    }
-
-    static void ConfigureOptions(
-        CodeGenerationOptions options,
-        Dictionary<string, string> nameMappings,
-        string generatedNamespace,
-        string runtimeWorkbookPath)
-    {
-        options.Namespace = generatedNamespace;
-        options.NameMappings = nameMappings;
-        options.RuntimeWorkbookPath = runtimeWorkbookPath;
     }
 
     /// <summary>
@@ -166,16 +154,8 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
         }
         catch (Exception exception) when (exception is JsonException or NotSupportedException)
         {
-            Log.LogError(
-                subcategory: null,
-                errorCode: "SASDJSON",
-                helpKeyword: null,
-                file: dictionaryFilePath,
-                lineNumber: 0,
-                columnNumber: 0,
-                endLineNumber: 0,
-                endColumnNumber: 0,
-                message: $"SpreadsheetAsData の識別子名変換辞書を読み込めません。対象Excel: {excelFilePath}。{exception.Message}");
+            LogError("SASDJSON", dictionaryFilePath,
+                $"SpreadsheetAsData の識別子名変換辞書を読み込めません。対象Excel: {excelFilePath}。{exception.Message}");
 
             return [];
         }
@@ -193,16 +173,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
 
         if (diagnostic.IsError)
         {
-            Log.LogError(
-                subcategory: null,
-                errorCode: "SASD001",
-                helpKeyword: null,
-                file: excelFilePath,
-                lineNumber: 0,
-                columnNumber: 0,
-                endLineNumber: 0,
-                endColumnNumber: 0,
-                message: message);
+            LogError("SASD001", excelFilePath, message);
         }
         else
         {
@@ -218,6 +189,21 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
                 message: message);
         }
     }
+
+    /// <summary>
+    /// Excelまたは辞書ファイルに対応するエラーを、ソース上の行番号を持たない診断として報告します。
+    /// </summary>
+    void LogError(string code, string filePath, string message) =>
+        Log.LogError(
+            subcategory: null,
+            errorCode: code,
+            helpKeyword: null,
+            file: filePath,
+            lineNumber: 0,
+            columnNumber: 0,
+            endLineNumber: 0,
+            endColumnNumber: 0,
+            message: message);
 
     string? DictionaryFilePath(string excelFilePath)
     {
@@ -282,16 +268,12 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
                 : fullPath);
     }
 
-    string OutputFilePath(string excelFilePath)
-    {
-        var outputDirectory = Path.GetDirectoryName(excelFilePath)!;
-
-        return Path.Combine(
-            outputDirectory,
+    static string OutputFilePath(string excelFilePath) =>
+        Path.Combine(
+            Path.GetDirectoryName(excelFilePath)!,
             $"{Path.GetFileNameWithoutExtension(excelFilePath)}.SpreadsheetAsData.g.cs");
-    }
 
-    ITaskItem GeneratedFileItem(
+    static TaskItem GeneratedFileItem(
         string excelFilePath,
         string outputFilePath)
     {

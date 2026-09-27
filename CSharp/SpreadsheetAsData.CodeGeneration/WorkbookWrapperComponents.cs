@@ -241,21 +241,11 @@ static class WorkbookWrapperComponents
         var propertyTypeName = isSingleCell
             ? CellValueTypeName(definedName.Range.TopLeftCell.Value)
             : "IEnumerable<IEnumerable<object?>>";
-        var worksheet = definedName.Worksheet;
-        var propertyName = worksheet is null
-            ? options.BookDefinedName(definedName)
-            : options.SheetDefinedName(worksheet, definedName);
-        var attributeDeclaration = BookDataDefinedNameAttribute(
-            definedName,
-            propertyName,
-            options);
-        var scopeDescription = worksheet is null
-            ? ""
-            : $"ワークシート「{worksheet.Name}」の";
-        var rangeDescription = isSingleCell ? "セル" : "セル範囲";
-        var initializer = isSingleCell
-            ? PropertyInitializer(propertyTypeName)
+        var propertyName = options.GeneratedName(definedName);
+        var scopeDescription = definedName.Worksheet is { } worksheet
+            ? $"ワークシート「{worksheet.Name}」の"
             : "";
+        var rangeDescription = isSingleCell ? "セル" : "セル範囲";
 
         return
             $$"""
@@ -263,7 +253,10 @@ static class WorkbookWrapperComponents
                 /// <summary>
                 /// {{scopeDescription}}定義名「{{definedName.Name}}」が表す{{rangeDescription}}の値を取得または設定します。
                 /// </summary>
-                {{attributeDeclaration}}public {{propertyTypeName}} {{propertyName}} { get; set; }{{initializer}}
+                {{BookDataDefinedNameAttribute(
+                    definedName,
+                    propertyName,
+                    options)}}public {{propertyTypeName}} {{propertyName}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
             """;
     }
 
@@ -437,37 +430,22 @@ static class WorkbookWrapperComponents
             return "string";
         }
 
-        if (values.All(CanConvertToInt32))
-        {
-            return "int";
-        }
+        var nonBlankValues =
+            from value in values
+            where value is not BlankValue
+            select value;
+        var typeName =
+            nonBlankValues.All(CanConvertToInt32)
+                ? "int"
+            : nonBlankValues.All(it => it is double)
+                ? "double"
+            : nonBlankValues.All(it => it is bool)
+                ? "bool"
+            : "dynamic";
 
-        if (values.All(it => it is BlankValue || CanConvertToInt32(it)))
-        {
-            return "int?";
-        }
-
-        if (values.All(it => it is double))
-        {
-            return "double";
-        }
-
-        if (values.All(it => it is double or BlankValue))
-        {
-            return "double?";
-        }
-
-        if (values.All(it => it is bool))
-        {
-            return "bool";
-        }
-
-        if (values.All(it => it is bool or BlankValue))
-        {
-            return "bool?";
-        }
-
-        return "dynamic";
+        return typeName != "dynamic" && values.Any(it => it is BlankValue)
+            ? $"{typeName}?"
+            : typeName;
 
         // セル値がintの範囲に収まる整数値かどうかを判定します。
         static bool CanConvertToInt32(object value) =>

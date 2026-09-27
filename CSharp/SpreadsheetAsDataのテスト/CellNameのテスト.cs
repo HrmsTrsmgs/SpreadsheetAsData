@@ -38,6 +38,14 @@ public class CellNameのテスト
         CellName.TryParse("XFE1", out _).Should().BeFalse();
     }
 
+    [Theory(Skip = "列番号の計算がuintで桁あふれし、例外または別のセル名になります。範囲検証を修正する際に解除します。")]
+    [InlineData("MWLQKWV1")]
+    [InlineData("MWLQKWW1")]
+    public void TryParseはuintに収まらない列番号の場合にfalseを返します(string reference)
+    {
+        CellName.TryParse(reference, out _).Should().BeFalse();
+    }
+
     [Fact]
     public void TryParseはuintに収まらない行番号の場合にfalseを返します()
     {

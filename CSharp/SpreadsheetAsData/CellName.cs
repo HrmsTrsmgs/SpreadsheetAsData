@@ -147,12 +147,9 @@ public partial struct CellName : IEquatable<CellName>
     /// <param name="columnNameChars">列名を構成する文字列。</param>
     /// <returns>1 始まりの列番号。</returns>
     static uint GetColumnIndex(IEnumerable<char> columnNameChars) =>
-        columnNameChars.Count() switch
-        {
-            1 => (uint)(columnNameChars.Single() - 'A') + 1,
-            _ => GetColumnIndex(columnNameChars.Take(columnNameChars.Count() - 1)) * alphabetCount
-                      + GetColumnIndex(columnNameChars.Skip(columnNameChars.Count() - 1))
-        };
+        columnNameChars.Aggregate(
+            0U,
+            (columnIndex, character) => columnIndex * alphabetCount + (uint)(character - 'A') + 1);
 
     /// <summary>
     /// 1 始まりの列番号を Excel の列名へ再帰的に変換します。
@@ -160,11 +157,9 @@ public partial struct CellName : IEquatable<CellName>
     /// <param name="columnIndex">1 始まりの列番号。</param>
     /// <returns>Excel の列名。</returns>
     static string GetColumnName(uint columnIndex) =>
-        (columnIndex <= alphabetCount) switch
-        {
-            true => ((char)('A' + columnIndex - 1)).ToString(),
-            false => $"{GetColumnName((columnIndex - 1) / alphabetCount)}{GetColumnName((columnIndex - 1) % alphabetCount + 1)}"
-        };
+        columnIndex <= alphabetCount
+            ? ((char)('A' + columnIndex - 1)).ToString()
+            : $"{GetColumnName((columnIndex - 1) / alphabetCount)}{GetColumnName((columnIndex - 1) % alphabetCount + 1)}";
 
     /// <summary>
     /// <see cref="GeneratedRegexAttribute"/> で A1 形式の検証用正規表現を生成します。
