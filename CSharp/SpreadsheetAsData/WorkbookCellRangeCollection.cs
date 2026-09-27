@@ -1,4 +1,4 @@
-namespace Marimo.SpreadsheetAsData;
+﻿namespace Marimo.SpreadsheetAsData;
 
 /// <summary>
 /// ブックスコープの定義名、またはシート名付きの参照からセル範囲を取得します。
@@ -41,10 +41,7 @@ public class WorkbookCellRangeCollection
                 return namedRangeCache.GetValue(reference, () => namedRange);
             }
 
-            if (!CellRangeReference.TryParse(reference, out var rangeReference))
-            {
-                throw new FormatException();
-            }
+            var rangeReference = CellRangeReference.Parse(reference);
 
             return this[
                 rangeReference.SheetName ?? throw new InvalidOperationException(),

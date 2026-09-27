@@ -20,7 +20,7 @@ static class GeneratedCodeInspection
     /// <param name="sources">観測するC#ソースコード。</param>
     /// <returns>生成コードを観測するためのテスト用オブジェクト。</returns>
     internal static GeneratedCode SyntaxFrom(IEnumerable<string> sources) =>
-        new(() => sources.ToArray());
+        new(() => [.. sources]);
 
     /// <summary>
     /// テスト内で直接用意した生成済みソースコードを構文として観測します。
@@ -133,23 +133,14 @@ sealed class GeneratedCode(Func<string[]> getSources)
     /// <summary>
     /// 観測対象のC#ソースコードを取得します。
     /// </summary>
-    internal string[] Sources
-    {
-        get
-        {
-            sources ??= getSources();
-            return sources;
-        }
-    }
+    internal string[] Sources => sources ??= getSources();
 
     /// <summary>
     /// 生成ソースに含まれる型名を取得します。
     /// </summary>
     internal string[] TypeNames =>
-        (
-            from type in Sources.TypeDeclarations()
-            select type.Identifier.ValueText
-        ).ToArray();
+        [.. from type in Sources.TypeDeclarations()
+            select type.Identifier.ValueText];
 
     /// <summary>
     /// 指定した生成型を観測します。
@@ -186,10 +177,8 @@ sealed class GeneratedType(TypeDeclarationSyntax declaration)
     /// 生成型に宣言されたプロパティ名を取得します。
     /// </summary>
     internal string[] PropertyNames =>
-        (
-            from property in declaration.Members.OfType<PropertyDeclarationSyntax>()
-            select property.Identifier.ValueText
-        ).ToArray();
+        [.. from property in declaration.Members.OfType<PropertyDeclarationSyntax>()
+            select property.Identifier.ValueText];
 
     /// <summary>
     /// 指定した名前のプロパティ宣言を取得します。
@@ -197,11 +186,7 @@ sealed class GeneratedType(TypeDeclarationSyntax declaration)
     /// <param name="name">取得するプロパティ名。</param>
     /// <returns>指定したプロパティ宣言。</returns>
     internal PropertyDeclarationSyntax Property(string name) =>
-        (
-            from property in declaration.Members.OfType<PropertyDeclarationSyntax>()
-            where property.Identifier.ValueText == name
-            select property
-        ).Single();
+        declaration.PropertyDeclaration(name);
 
     public override string ToString() =>
         $"{Name}: {NamespaceName ?? "(名前空間なし)"}";

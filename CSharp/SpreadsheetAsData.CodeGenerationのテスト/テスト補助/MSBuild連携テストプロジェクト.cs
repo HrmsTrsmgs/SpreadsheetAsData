@@ -464,9 +464,9 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
             @"SpreadsheetAsData.Build\buildTransitive\Marimo.SpreadsheetAsData.Build.targets",
             Path.Combine(buildTransitiveDirectory, "Marimo.SpreadsheetAsData.Build.targets"));
 
-        foreach (var filePath in Directory.GetFiles(AppContext.BaseDirectory))
-        {
-            if (Path.GetFileName(filePath) is
+        foreach (var filePath in
+            from path in Directory.GetFiles(AppContext.BaseDirectory)
+            where Path.GetFileName(path) is
                 "SpreadsheetAsData.Build.dll"
                 or "SpreadsheetAsData.Build.deps.json"
                 or "SpreadsheetAsData.CodeGeneration.dll"
@@ -474,13 +474,13 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
                 or "DocumentFormat.OpenXml.dll"
                 or "DocumentFormat.OpenXml.Framework.dll"
                 or "System.Interactive.dll"
-                or "System.IO.Packaging.dll")
-            {
-                File.Copy(
-                    filePath,
-                    Path.Combine(toolsDirectory, Path.GetFileName(filePath)),
-                    true);
-            }
+                or "System.IO.Packaging.dll"
+            select path)
+        {
+            File.Copy(
+                filePath,
+                Path.Combine(toolsDirectory, Path.GetFileName(filePath)),
+                true);
         }
     }
 

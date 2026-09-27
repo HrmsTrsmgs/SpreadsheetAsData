@@ -205,25 +205,17 @@ public class Workbook : IDisposable
         return true;
     }
 
-    Spreadsheet.DefinedName? FindDefinedName(string name, uint? localSheetId)
-    {
-        var definedNames = WorkbookXml.DefinedNames?.Elements<Spreadsheet.DefinedName>();
+    Spreadsheet.DefinedName? FindDefinedName(string name, uint? localSheetId) =>
+        (
+            from definedName in WorkbookXml.DefinedNames?.Elements<Spreadsheet.DefinedName>() ?? []
+            where definedName.Name == name && HasLocalSheetId(definedName, localSheetId)
+            select definedName
+        ).SingleOrDefault();
 
-        return definedNames == null
-            ? null
-            : (
-                from definedName in definedNames
-                where definedName.Name == name && HasLocalSheetId(definedName, localSheetId)
-                select definedName
-            ).SingleOrDefault();
-    }
-
-    static bool HasLocalSheetId(Spreadsheet.DefinedName definedName, uint? localSheetId)
-    {
-        return localSheetId.HasValue
+    static bool HasLocalSheetId(Spreadsheet.DefinedName definedName, uint? localSheetId) =>
+        localSheetId.HasValue
             ? definedName.LocalSheetId?.Value == localSheetId.Value
             : definedName.LocalSheetId == null;
-    }
 
     /// <summary>
     /// ブック上で有効な範囲参照を解決するコレクションを取得します。

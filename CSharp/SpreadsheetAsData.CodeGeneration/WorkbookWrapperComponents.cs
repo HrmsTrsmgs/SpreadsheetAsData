@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using Marimo.SpreadsheetAsData;
+using static Marimo.SpreadsheetAsData.CodeGeneration.GeneratedTypeNames;
 namespace Marimo.SpreadsheetAsData.CodeGeneration;
 
 /// <summary>
@@ -302,12 +303,21 @@ static class WorkbookWrapperComponents
     internal static string BookTablePropertyDeclaration(
         Table table,
         CodeGenerationOptions options) =>
+        TablePropertyDeclaration(table, options, "Tables");
+
+    /// <summary>
+    /// 所有するテーブルコレクションへのアクセス以外は、BookとSheetで同じ宣言を使用します。
+    /// </summary>
+    static string TablePropertyDeclaration(
+        Table table,
+        CodeGenerationOptions options,
+        string tableCollection) =>
         $$"""
 
             /// <summary>
             /// Excelテーブル「{{table.Name}}」を取得します。
             /// </summary>
-            public {{options.GeneratedName(table.Name)}}Table {{options.GeneratedName(table.Name)}} => new(Tables[{{StringLiteral(table.Name)}}]);
+            public {{options.GeneratedName(table.Name)}}Table {{options.GeneratedName(table.Name)}} => new({{tableCollection}}[{{StringLiteral(table.Name)}}]);
         """;
 
     /// <summary>
@@ -416,63 +426,12 @@ static class WorkbookWrapperComponents
             : $"    [{ReferencedAttributeName(column.Table.Worksheet.Book, options)}({StringLiteral(column.Name)})]{Environment.NewLine}";
 
     /// <summary>
-    /// 既存の型付きTableマッピングで読み込めるプロパティ型名を、列の値から決定します。
-    /// </summary>
-    internal static string ColumnPropertyTypeName(Table table, TableColumn column)
-    {
-        var values = (
-            from row in table.Rows
-            select row[column].Value
-        ).ToArray();
-
-        if (values.All(it => it is string or BlankValue))
-        {
-            return "string";
-        }
-
-        var nonBlankValues =
-            from value in values
-            where value is not BlankValue
-            select value;
-        var typeName =
-            nonBlankValues.All(CanConvertToInt32)
-                ? "int"
-            : nonBlankValues.All(it => it is double)
-                ? "double"
-            : nonBlankValues.All(it => it is bool)
-                ? "bool"
-            : "dynamic";
-
-        return typeName != "dynamic" && values.Any(it => it is BlankValue)
-            ? $"{typeName}?"
-            : typeName;
-
-        // セル値がintの範囲に収まる整数値かどうかを判定します。
-        static bool CanConvertToInt32(object value) =>
-            value is double number
-            && double.IsInteger(number)
-            && number is >= int.MinValue and <= int.MaxValue;
-    }
-
-    /// <summary>
     /// 生成プロパティがコンパイル時の初期化警告を出さないための初期値を返します。
     /// </summary>
     internal static string PropertyInitializer(string propertyTypeName) =>
         propertyTypeName == "string"
             ? " = \"\";"
             : "";
-
-    /// <summary>
-    /// セルの現在値を表すC#プロパティ型名を返します。
-    /// </summary>
-    internal static string CellValueTypeName(object value) =>
-        value switch
-        {
-            string => "string",
-            double => "double",
-            bool => "bool",
-            _ => "dynamic"
-        };
 
     /// <summary>
     /// ブック全体から参照できる定義名だけを選びます。
@@ -580,45 +539,7 @@ static class WorkbookWrapperComponents
     internal static string SheetTablePropertyDeclaration(
         Table table,
         CodeGenerationOptions options) =>
-        $$"""
-
-            /// <summary>
-            /// Excelテーブル「{{table.Name}}」を取得します。
-            /// </summary>
-            public {{options.GeneratedName(table.Name)}}Table {{options.GeneratedName(table.Name)}} => new(Book.Tables[{{StringLiteral(table.Name)}}]);
-        """;
-
-    /// <summary>
-    /// 行データ型が参照先の型名を隠す場合だけ完全修飾し、それ以外は短い型名を返します。
-    /// 式中ではBookのプロパティも型名を隠すため、シート名と定義名を確認します。
-    /// その他の生成型には接尾辞が付くため、ここで扱う既存型名とは衝突しません。
-    /// </summary>
-    static string ReferencedTypeName(
-        string typeName,
-        Workbook book,
-        CodeGenerationOptions options,
-        bool usedAsExpression = false)
-    {
-        var shortName = typeName.Split('.')[^1];
-        var isHidden = book.Tables.Any(table => options.GeneratedName(table.Name).IdentifierValue == shortName)
-            || usedAsExpression && (
-                book.Sheets.Values.Any(sheet => options.GeneratedName(sheet.Name).IdentifierValue == shortName)
-                || BookScopedDefinedNames(book).Any(name => options.BookDefinedName(name).IdentifierValue == shortName));
-        return !isHidden
-            ? shortName
-        : typeName.Contains('.')
-            ? $"global::{typeName}"
-        : $"global::Marimo.SpreadsheetAsData.{typeName}";
-    }
-
-    /// <summary>
-    /// 行データ型が属性クラス名を隠す場合だけ完全修飾し、それ以外は属性の短縮表記を使います。
-    /// </summary>
-    static string ReferencedAttributeName(Workbook book, CodeGenerationOptions options)
-    {
-        var typeName = ReferencedTypeName(nameof(SpreadsheetNameAttribute), book, options);
-        return typeName == nameof(SpreadsheetNameAttribute) ? "SpreadsheetName" : typeName;
-    }
+        TablePropertyDeclaration(table, options, "Book.Tables");
 
     /// <summary>
     /// 複数のテンプレート部品を、生成ソース上の行単位で連結します。

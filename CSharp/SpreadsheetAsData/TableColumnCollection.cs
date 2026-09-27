@@ -57,11 +57,7 @@ public class TableColumnCollection : IReadOnlyList<TableColumn>
     /// <param name="name">確認する列名。</param>
     /// <returns>指定した名前の列定義が存在する場合は true。</returns>
     public bool Contains(string name) =>
-        (
-            from item in items
-            where item.Name == name
-            select item
-        ).Any();
+        items.Any(it => it.Name == name);
 
     /// <summary>
     /// Excel テーブル内の列数を取得します。

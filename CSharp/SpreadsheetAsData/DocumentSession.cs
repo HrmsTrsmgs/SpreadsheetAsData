@@ -105,34 +105,26 @@ sealed class DocumentSession : IDisposable
         }
 
         ObjectDisposedException.ThrowIf(disposedValue, this);
-        var temporaryPath = filePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
         {
-            using (var document = Document.Clone(temporaryPath)) { }
-            fileLock?.Dispose();
-            fileLock = null;
-            File.Replace(temporaryPath, filePath, null);
+            SaveToFile(filePath, temporaryPath =>
+            {
+                fileLock?.Dispose();
+                fileLock = null;
+                File.Replace(temporaryPath, filePath, null);
+            });
         }
         finally
         {
-            try
-            {
-                File.Delete(temporaryPath);
-            }
-            finally
-            {
-                fileLock ??= Lock(filePath);
-            }
+            fileLock ??= Lock(filePath);
         }
     }
 
     internal void SaveAs(string filePath)
     {
         ObjectDisposedException.ThrowIf(disposedValue, this);
-        var temporaryPath = filePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
-        try
+        SaveToFile(filePath, temporaryPath =>
         {
-            using (var document = Document.Clone(temporaryPath)) { }
             if (File.Exists(filePath))
             {
                 File.Replace(temporaryPath, filePath, null);
@@ -141,11 +133,32 @@ sealed class DocumentSession : IDisposable
             {
                 File.Move(temporaryPath, filePath);
             }
+        });
+    }
+
+    /// <summary>
+    /// 同じディレクトリへ出力を完了してから保存先に反映します。失敗時も一時ファイルを削除します。
+    /// </summary>
+    void SaveToFile(string filePath, Action<string> publish)
+    {
+        var temporaryPath = filePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        try
+        {
+            WriteDocument(temporaryPath);
+            publish(temporaryPath);
         }
         finally
         {
             File.Delete(temporaryPath);
         }
+    }
+
+    /// <summary>
+    /// 複製したドキュメントを閉じ、置換に使用できるファイルとして出力を完了します。
+    /// </summary>
+    void WriteDocument(string filePath)
+    {
+        using var document = Document.Clone(filePath);
     }
 
     /// <summary>

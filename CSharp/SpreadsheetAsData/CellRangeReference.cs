@@ -81,20 +81,8 @@ readonly partial struct CellRangeReference
     {
         result = default;
 
-        if (!CellReferencePattern().IsMatch(reference))
-        {
-            return false;
-        }
-
-        try
-        {
-            result = CellName.Parse(reference.Replace("$", ""));
-            return true;
-        }
-        catch (FormatException)
-        {
-            return false;
-        }
+        return CellReferencePattern().IsMatch(reference)
+            && CellName.TryParse(reference.Replace("$", ""), out result);
     }
 
     /// <summary>

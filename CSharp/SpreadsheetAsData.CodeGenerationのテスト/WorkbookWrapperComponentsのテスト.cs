@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
 using Marimo.SpreadsheetAsData;
-using static Marimo.SpreadsheetAsData.CodeGeneration.WorkbookWrapperComponents;
 using Xunit;
+using static Marimo.SpreadsheetAsData.CodeGeneration.GeneratedTypeNames;
+using static Marimo.SpreadsheetAsData.CodeGeneration.WorkbookWrapperComponents;
 
 namespace Marimo.SpreadsheetAsData.CodeGeneration.Test;
 

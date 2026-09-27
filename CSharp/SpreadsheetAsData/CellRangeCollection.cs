@@ -68,10 +68,7 @@ public class CellRangeCollection
                 return namedRange;
             }
 
-            if (!CellRangeReference.TryParse(reference, out var rangeReference))
-            {
-                throw new FormatException();
-            }
+            var rangeReference = CellRangeReference.Parse(reference);
 
             if (rangeReference.SheetName != null)
             {
