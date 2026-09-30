@@ -2,6 +2,7 @@
 
 require_relative 'spec_helper'
 require 'package'
+require 'tmpdir'
 
 describe Package do
   subject { Package.open(TestFile.book1_path) }
@@ -12,6 +13,19 @@ describe Package do
   end
   
   describe '::open' do
+    it 'は展開先の外を指すZIPエントリを拒否し、外部へ書き込みません。', skip: 'ZIP展開先の検証を実装する際に解除する。現状はエントリ名をそのまま結合する' do
+      Dir.mktmpdir('spreadsheet-as-data-zip') do |directory|
+        archive_path = File.join(directory, 'input.xlsx')
+        outside_path = File.join(directory, 'outside.txt')
+        Zip::File.open(archive_path, Zip::File::CREATE) do |zip|
+          zip.get_output_stream('../outside.txt') { |stream| stream.write('outside') }
+        end
+
+        expect { Package.open(archive_path) { } }.to raise_error
+        expect(File.exist?(outside_path)).to be false
+      end
+    end
+
     it 'はブロック引数をとります。' do
       Package.open(TestFile.book1_path) do |package|
         package.part('xl/workbook.xml').xml_document.should_not be_nil

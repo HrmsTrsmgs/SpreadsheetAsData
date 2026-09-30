@@ -6,6 +6,55 @@ namespace Marimo.SpreadsheetAsData.CodeGeneration.Test;
 
 public sealed class テスト補助のテスト
 {
+    [Fact(Skip = "標準出力と標準エラーの同時回収へ変更する際に解除する。現状は大量の標準エラーで待ち合う可能性がある")]
+    public async Task PowerShell実行結果は大量の標準出力と標準エラーを回収して終了します()
+    {
+        using var project = MSBuild連携テストプロジェクト.Create();
+        Directory.CreateDirectory(project.DirectoryPath);
+        var processIdPath = Path.Combine(project.DirectoryPath, "pwsh.pid");
+        var scriptFilePath = Path.Combine(project.DirectoryPath, "LargeOutput.ps1");
+        File.WriteAllText(
+            scriptFilePath,
+            $$"""
+            Set-Content -LiteralPath '{{processIdPath.Replace("'", "''")}}' -Value $PID
+            [Console]::Error.Write('E' * 262144)
+            [Console]::Out.WriteLine('completed')
+            """);
+
+        var run = Task.Run(() => PowerShell実行結果.Run(scriptFilePath, project.DirectoryPath));
+        try
+        {
+            var tested = await run.WaitAsync(TimeSpan.FromSeconds(15));
+
+            tested.ExitCode.Should().Be(0);
+            tested.Output.Should().Contain("completed");
+            tested.Output.Should().Contain(new string('E', 262144));
+        }
+        finally
+        {
+            if (!run.IsCompleted && File.Exists(processIdPath))
+            {
+                try
+                {
+                    using var process = System.Diagnostics.Process.GetProcessById(
+                        int.Parse(File.ReadAllText(processIdPath)));
+                    if (!process.HasExited)
+                    {
+                        process.Kill(entireProcessTree: true);
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    // The child exited between the timeout and cleanup.
+                }
+                catch (InvalidOperationException)
+                {
+                    // The child exited while it was being stopped.
+                }
+            }
+        }
+    }
+
     [Fact]
     public void TypeNamesは生成ソースに含まれる型名を返します()
     {
