@@ -8,13 +8,13 @@
 作業開始時は、このファイルに加えて、作業内容に応じた指示を読む。
 
 * 常に適用する共通指示: `docs/ai-instructions/common.md`
-* 振る舞い追加、仕様変更、不具合修正、リファクタリング: `docs/ai-instructions/tdd.md`
+* 新しい主チャットでの振る舞い追加、仕様変更、不具合修正: `.agents/skills/spreadsheet-tdd/SKILL.md` を入口とする。起動済みの工程担当は進行役Skillを再実行せず、指定された工程文書だけを読む。
 * C#、.NET、xUnit、FluentAssertions、NuGet、MSBuildを扱う作業: `docs/ai-instructions/csharp.md`
 * SpreadsheetAsData固有の設計、README、公開準備、Ruby版同期: `docs/ai-instructions/spreadsheet-as-data.md`
 
 ## 分類方針
 
-* 他の開発にも共有できる内容は `common.md` または `tdd.md` に置く。
+* 他の開発にも共有できる内容は `common.md` または `docs/ai-instructions/tdd/` の該当工程へ置く。
 * C#/.NETに閉じる内容は `csharp.md` に置く。
 * SpreadsheetAsDataの目的、公開方針、テストデータ、Ruby版との関係など、このリポジトリ固有の内容は `spreadsheet-as-data.md` に置く。
 * 今回限りの作業メモ、試行錯誤、すぐ陳腐化する操作ログは指示化しない。
@@ -33,7 +33,7 @@
 * 新しいAPI、型、メソッド、設定項目、コマンドを追加する場合は、提案または実装変更として明示し、確認可能な差分にする。
 * 依頼範囲外の変更を混ぜない。
 * ユーザーの未コミット変更を無断で破棄、上書き、コミットしない。
-* 振る舞いを追加または変更する場合は、原則としてRed、Green、Refactorで作業だけでなく考える対象も分ける。各段階の役割と仕様変更の手順は `docs/ai-instructions/tdd.md` に従う。
+* 振る舞いを追加または変更する場合は、Red、Green、Refactorで作業とコンテキストを分ける。工程の進行は主チャットが `.agents/skills/spreadsheet-tdd/SKILL.md` に従って行う。
 * Greenでは、対象テストが要求していない仕様を先取りして実装しない。
 * コミット前に差分、対象ファイル、コミットメッセージ案を提示し、ユーザーの了承を得る。
 * pushは、ユーザーから指示された場合に行う。
