@@ -67,7 +67,7 @@ public sealed class 変更ファイル正規化スクリプトのテスト
         File.ReadAllBytes(filePath).Take(3).Should().Equal(0x74, 0x65, 0x78);
     }
 
-    [Fact(Skip = "BOM処理を修正する際に解除し、正規化を繰り返してもバイト列が変わらないことを確認する")]
+    [Fact]
     public void 正規化済みのファイルは再実行しても変わりません()
     {
         using var repository = new 一時スクリプトリポジトリ();

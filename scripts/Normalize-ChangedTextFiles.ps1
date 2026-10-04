@@ -121,7 +121,7 @@ foreach ($changedPath in $changedPaths) {
     $utf8 = [Text.UTF8Encoding]::new($false, $true)
     $text = $utf8.GetString($currentBytes)
 
-    if ([IO.Path]::GetExtension($changedPath).Equals(".md", [StringComparison]::OrdinalIgnoreCase) -and $text.StartsWith([char]0xFEFF)) {
+    if ($text.StartsWith([char]0xFEFF)) {
         $text = $text.Substring(1)
     }
 
