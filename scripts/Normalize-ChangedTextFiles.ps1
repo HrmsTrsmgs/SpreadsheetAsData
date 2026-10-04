@@ -122,7 +122,7 @@ foreach ($changedPath in $changedPaths) {
     $text = $utf8.GetString($currentBytes)
     $normalizedText = ConvertTo-NormalizedText $text
     $encoding = [Text.UTF8Encoding]::new([bool]$policy.HasBom)
-    $normalizedBytes = $encoding.GetBytes($normalizedText)
+    [byte[]]$normalizedBytes = $encoding.GetPreamble() + $encoding.GetBytes($normalizedText)
 
     if (-not [Linq.Enumerable]::SequenceEqual($currentBytes, $normalizedBytes)) {
         if ($Check) {

@@ -23,7 +23,7 @@ public sealed class GitHubPages生成スクリプトのテスト
         File.ReadAllText(markerPath).Should().Be("keep");
     }
 
-    [Fact(Skip = "出力先保護を実装する際に解除し、通常のPages生成を維持できるか確認する")]
+    [Fact]
     public void 生成物用の出力先は既存内容を置き換えて再生成できます()
     {
         using var repository = new 一時スクリプトリポジトリ();
@@ -43,7 +43,7 @@ public sealed class GitHubPages生成スクリプトのテスト
 
 public sealed class 変更ファイル正規化スクリプトのテスト
 {
-    [Fact(Skip = "BOM処理を修正する際に解除する。現在のGetBytesだけではC#にBOMを付加できない")]
+    [Fact]
     public void BOMなしのCSharpファイルにUTF8のBOMを付加します()
     {
         using var repository = new 一時スクリプトリポジトリ();
