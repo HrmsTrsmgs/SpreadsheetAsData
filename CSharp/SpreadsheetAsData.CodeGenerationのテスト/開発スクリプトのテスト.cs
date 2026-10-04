@@ -55,7 +55,7 @@ public sealed class 変更ファイル正規化スクリプトのテスト
         File.ReadAllBytes(filePath).Take(3).Should().Equal(0xEF, 0xBB, 0xBF);
     }
 
-    [Fact(Skip = "BOM処理を修正する際に解除する。現在の実装は非C#の先頭BOMを文字として保持する")]
+    [Fact]
     public void MarkdownファイルからUTF8のBOMを除きます()
     {
         using var repository = new 一時スクリプトリポジトリ();

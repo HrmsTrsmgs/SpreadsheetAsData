@@ -120,6 +120,11 @@ foreach ($changedPath in $changedPaths) {
     $currentBytes = [IO.File]::ReadAllBytes($path)
     $utf8 = [Text.UTF8Encoding]::new($false, $true)
     $text = $utf8.GetString($currentBytes)
+
+    if ([IO.Path]::GetExtension($changedPath).Equals(".md", [StringComparison]::OrdinalIgnoreCase) -and $text.StartsWith([char]0xFEFF)) {
+        $text = $text.Substring(1)
+    }
+
     $normalizedText = ConvertTo-NormalizedText $text
     $encoding = [Text.UTF8Encoding]::new([bool]$policy.HasBom)
     [byte[]]$normalizedBytes = $encoding.GetPreamble() + $encoding.GetBytes($normalizedText)
