@@ -8,7 +8,7 @@ namespace Marimo.SpreadsheetAsData.CodeGeneration.Test;
 
 public sealed class GitHubPages生成スクリプトのテスト
 {
-    [Fact(Skip = "出力先保護を実装する際に解除する。現状は指定先を再帰削除し得るため、一時リポジトリで検証する")]
+    [Fact]
     public void リポジトリルートを出力先に指定すると内容を変更せず拒否します()
     {
         using var repository = new 一時スクリプトリポジトリ();
@@ -19,6 +19,7 @@ public sealed class GitHubPages生成スクリプトのテスト
         var tested = repository.RunPages(repository.DirectoryPath);
 
         tested.ExitCode.Should().NotBe(0);
+        tested.Output.Should().Contain("repository root");
         File.ReadAllText(markerPath).Should().Be("keep");
     }
 

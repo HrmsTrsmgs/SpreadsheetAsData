@@ -15,6 +15,10 @@ else {
     $defaultOutputPath
 }
 
+if ([System.IO.Path]::GetFullPath($pagesOutputPath) -eq [System.IO.Path]::GetFullPath($repositoryRoot)) {
+    throw "The repository root cannot be used as the GitHub Pages output directory."
+}
+
 function Invoke-Dotnet {
     dotnet @args
     if ($LASTEXITCODE -ne 0) {
