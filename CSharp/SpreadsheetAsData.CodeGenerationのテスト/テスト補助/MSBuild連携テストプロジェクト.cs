@@ -564,7 +564,7 @@ sealed record PowerShell実行結果(
     /// <param name="scriptFilePath">実行するPowerShellスクリプト。</param>
     /// <param name="workingDirectory">実行時の作業ディレクトリ。</param>
     /// <returns>PowerShellの終了コードと出力。</returns>
-    internal static PowerShell実行結果 Run(
+    internal static async Task<PowerShell実行結果> RunAsync(
         string scriptFilePath,
         string workingDirectory)
     {
@@ -578,11 +578,13 @@ sealed record PowerShell実行結果(
             UseShellExecute = false
         }) ?? throw new InvalidOperationException("PowerShellを起動できませんでした。");
 
-        var output = process.StandardOutput.ReadToEnd()
-            + process.StandardError.ReadToEnd();
-        process.WaitForExit();
+        var standardOutput = process.StandardOutput.ReadToEndAsync();
+        var standardError = process.StandardError.ReadToEndAsync();
+        await process.WaitForExitAsync();
 
-        return new(process.ExitCode, output);
+        return new(
+            process.ExitCode,
+            await standardOutput + await standardError);
     }
 }
 

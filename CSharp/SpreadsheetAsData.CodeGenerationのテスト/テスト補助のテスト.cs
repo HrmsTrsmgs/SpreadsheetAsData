@@ -6,7 +6,7 @@ namespace Marimo.SpreadsheetAsData.CodeGeneration.Test;
 
 public sealed class テスト補助のテスト
 {
-    [Fact(Skip = "標準出力と標準エラーの同時回収へ変更する際に解除する。現状は大量の標準エラーで待ち合う可能性がある")]
+    [Fact]
     public async Task PowerShell実行結果は大量の標準出力と標準エラーを回収して終了します()
     {
         using var project = MSBuild連携テストプロジェクト.Create();
@@ -21,7 +21,7 @@ public sealed class テスト補助のテスト
             [Console]::Out.WriteLine('completed')
             """);
 
-        var run = Task.Run(() => PowerShell実行結果.Run(scriptFilePath, project.DirectoryPath));
+        var run = PowerShell実行結果.RunAsync(scriptFilePath, project.DirectoryPath);
         try
         {
             var tested = await run.WaitAsync(TimeSpan.FromSeconds(15));

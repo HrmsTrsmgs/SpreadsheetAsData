@@ -37,7 +37,7 @@ public sealed class MSBuild連携タスクのテスト
     }
 
     [Fact]
-    public void パッケージ参照でブックごとに名前空間を分けてコンパイルし利用できます()
+    public async Task パッケージ参照でブックごとに名前空間を分けてコンパイルし利用できます()
     {
         using var project = MSBuild連携テストプロジェクト.Create();
         project.AddBasicStructureExcel("BasicStructure.xlsx");
@@ -59,14 +59,14 @@ public sealed class MSBuild連携タスクのテスト
             System.Console.WriteLine($"archive:{archive.SalesData.Name}");
             """);
 
-        var tested = PowerShell実行結果.Run(scriptFilePath, project.DirectoryPath);
+        var tested = await PowerShell実行結果.RunAsync(scriptFilePath, project.DirectoryPath);
 
         tested.ExitCode.Should().Be(0, tested.Output);
         tested.Output.Should().Contain("current:SalesData").And.Contain("archive:SalesData");
     }
 
     [Fact]
-    public void 引数なしの生成Bookは出力先のExcelを開きSaveもそのコピーだけを変更します()
+    public async Task 引数なしの生成Bookは出力先のExcelを開きSaveもそのコピーだけを変更します()
     {
         using var project = MSBuild連携テストプロジェクト.Create();
         var sourcePath = project.AddBasicStructureExcel(@"Schemas\BasicStructure.xlsx");
@@ -98,7 +98,7 @@ public sealed class MSBuild連携タスクのテスト
             Console.WriteLine($"saved:{value}");
             """);
 
-        var tested = PowerShell実行結果.Run(scriptFilePath, project.DirectoryPath);
+        var tested = await PowerShell実行結果.RunAsync(scriptFilePath, project.DirectoryPath);
 
         tested.ExitCode.Should().Be(0, tested.Output);
         tested.Output.Should().Contain("saved:Updated");
@@ -108,7 +108,7 @@ public sealed class MSBuild連携タスクのテスト
     [Theory]
     [InlineData("Marimo.SpreadsheetAsData")]
     [InlineData("Marimo.SpreadsheetAsData.Build")]
-    public void パッケージ参照で生成した型をコンパイルしてExcelを読み書きできます(string packageId)
+    public async Task パッケージ参照で生成した型をコンパイルしてExcelを読み書きできます(string packageId)
     {
         using var project = MSBuild連携テストプロジェクト.Create();
         project.AddBasicStructureExcel("BasicStructure.xlsx");
@@ -119,7 +119,7 @@ public sealed class MSBuild連携タスクのテスト
             Invoke-MSBuild /t:InspectProject
             """);
 
-        var tested = PowerShell実行結果.Run(scriptFilePath, project.DirectoryPath);
+        var tested = await PowerShell実行結果.RunAsync(scriptFilePath, project.DirectoryPath);
 
         tested.ExitCode.Should().Be(0, tested.Output);
         tested.Output.Should().Contain("SalesData").And.Contain("saved:Updated");
@@ -130,7 +130,7 @@ public sealed class MSBuild連携タスクのテスト
     [Theory]
     [InlineData("DocumentFormat.OpenXml", "3.5.1")]
     [InlineData("Marimo.DocumentAsData", "0.3.0")]
-    public void OpenXml3を利用するパッケージと併用して生成型からExcelを読み書きできます(
+    public async Task OpenXml3を利用するパッケージと併用して生成型からExcelを読み書きできます(
         string packageId,
         string version)
     {
@@ -146,7 +146,7 @@ public sealed class MSBuild連携タスクのテスト
             <PackageReference Include="{{packageId}}" Version="{{version}}" />
             """);
 
-        var tested = PowerShell実行結果.Run(scriptFilePath, project.DirectoryPath);
+        var tested = await PowerShell実行結果.RunAsync(scriptFilePath, project.DirectoryPath);
 
         tested.ExitCode.Should().Be(0, tested.Output);
         tested.Output.Should().Contain("SalesData").And.Contain("saved:Updated");
@@ -155,7 +155,7 @@ public sealed class MSBuild連携タスクのテスト
     [Theory]
     [InlineData("Marimo.SpreadsheetAsData")]
     [InlineData("Marimo.SpreadsheetAsData.Build")]
-    public void パッケージ参照のデザイン時ビルドは再生成せずExcelと生成コードを紐づけます(string packageId)
+    public async Task パッケージ参照のデザイン時ビルドは再生成せずExcelと生成コードを紐づけます(string packageId)
     {
         using var project = MSBuild連携テストプロジェクト.Create();
         project.AddBasicStructureExcel("BasicStructure.xlsx");
@@ -168,7 +168,7 @@ public sealed class MSBuild連携タスクのテスト
             Invoke-MSBuild /t:InspectProject /p:DesignTimeBuild=true
             """);
 
-        var tested = PowerShell実行結果.Run(scriptFilePath, project.DirectoryPath);
+        var tested = await PowerShell実行結果.RunAsync(scriptFilePath, project.DirectoryPath);
 
         tested.ExitCode.Should().Be(0, tested.Output);
         File.ReadAllLines(Path.Combine(project.DirectoryPath, "Compile.txt"))
@@ -184,7 +184,7 @@ public sealed class MSBuild連携タスクのテスト
     [Theory]
     [InlineData("Marimo.SpreadsheetAsData")]
     [InlineData("Marimo.SpreadsheetAsData.Build")]
-    public void パッケージ利用プロジェクトのCleanは元Excelと手書きコードを残して生成ソースを削除します(string packageId)
+    public async Task パッケージ利用プロジェクトのCleanは元Excelと手書きコードを残して生成ソースを削除します(string packageId)
     {
         using var project = MSBuild連携テストプロジェクト.Create();
         var excelFilePath = project.AddBasicStructureExcel("BasicStructure.xlsx");
@@ -196,7 +196,7 @@ public sealed class MSBuild連携タスクのテスト
             Invoke-MSBuild /t:Clean
             """);
 
-        var tested = PowerShell実行結果.Run(scriptFilePath, project.DirectoryPath);
+        var tested = await PowerShell実行結果.RunAsync(scriptFilePath, project.DirectoryPath);
 
         tested.ExitCode.Should().Be(0, tested.Output);
         File.Exists(project.GeneratedFilePathFor("BasicStructure.xlsx")).Should().BeFalse();
@@ -207,7 +207,7 @@ public sealed class MSBuild連携タスクのテスト
     [Theory]
     [InlineData("Marimo.SpreadsheetAsData")]
     [InlineData("Marimo.SpreadsheetAsData.Build")]
-    public void パッケージ参照で生成対象から外したExcelの生成コードはCompileに含めません(string packageId)
+    public async Task パッケージ参照で生成対象から外したExcelの生成コードはCompileに含めません(string packageId)
     {
         using var project = MSBuild連携テストプロジェクト.Create();
         project.AddBasicStructureExcel("BasicStructure.xlsx");
@@ -217,7 +217,7 @@ public sealed class MSBuild連携タスクのテスト
             Invoke-MSBuild /t:InspectProject /p:IncludeWorkbook=false
             """);
 
-        var tested = PowerShell実行結果.Run(scriptFilePath, project.DirectoryPath);
+        var tested = await PowerShell実行結果.RunAsync(scriptFilePath, project.DirectoryPath);
 
         tested.ExitCode.Should().Be(0, tested.Output);
         File.Exists(project.GeneratedFilePathFor("BasicStructure.xlsx")).Should().BeTrue();
@@ -380,13 +380,13 @@ public sealed class MSBuild連携タスクのテスト
     }
 
     [Fact]
-    public void PowerShellからdotnet_msbuildでコード生成できます()
+    public async Task PowerShellからdotnet_msbuildでコード生成できます()
     {
         using var project = MSBuild連携テストプロジェクト.Create();
         project.AddBasicStructureExcel("BasicStructure.xlsx");
         var scriptFilePath = project.AddPowerShellGenerationSample();
 
-        var tested = PowerShell実行結果.Run(
+        var tested = await PowerShell実行結果.RunAsync(
             scriptFilePath,
             project.DirectoryPath);
 
@@ -396,14 +396,14 @@ public sealed class MSBuild連携タスクのテスト
     }
 
     [Fact]
-    public void PowerShellからdotnet_msbuildのDesignTimeBuildで生成コードを参照できます()
+    public async Task PowerShellからdotnet_msbuildのDesignTimeBuildで生成コードを参照できます()
     {
         using var project = MSBuild連携テストプロジェクト.Create();
         project.AddBasicStructureExcel("BasicStructure.xlsx");
         project.Generate(project.ExcelFilePathFor("BasicStructure.xlsx"));
         var scriptFilePath = project.AddPowerShellDesignTimeBuildSample();
 
-        var tested = PowerShell実行結果.Run(
+        var tested = await PowerShell実行結果.RunAsync(
             scriptFilePath,
             project.DirectoryPath);
 
@@ -411,13 +411,13 @@ public sealed class MSBuild連携タスクのテスト
     }
 
     [Fact]
-    public void SDK形式プロジェクトでは生成コードを既定Compileと重複させず元Excelファイルへ紐づけます()
+    public async Task SDK形式プロジェクトでは生成コードを既定Compileと重複させず元Excelファイルへ紐づけます()
     {
         using var project = MSBuild連携テストプロジェクト.Create();
         project.AddBasicStructureExcel("BasicStructure.xlsx");
         var scriptFilePath = project.AddPowerShellSdkProjectNestingSample();
 
-        var tested = PowerShell実行結果.Run(
+        var tested = await PowerShell実行結果.RunAsync(
             scriptFilePath,
             project.DirectoryPath);
 

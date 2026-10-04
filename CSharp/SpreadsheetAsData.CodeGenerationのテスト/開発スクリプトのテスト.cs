@@ -9,14 +9,14 @@ namespace Marimo.SpreadsheetAsData.CodeGeneration.Test;
 public sealed class GitHubPages生成スクリプトのテスト
 {
     [Fact]
-    public void リポジトリルートを出力先に指定すると内容を変更せず拒否します()
+    public async Task リポジトリルートを出力先に指定すると内容を変更せず拒否します()
     {
         using var repository = new 一時スクリプトリポジトリ();
         repository.AddPagesContent();
         var markerPath = Path.Combine(repository.DirectoryPath, "keep.txt");
         File.WriteAllText(markerPath, "keep");
 
-        var tested = repository.RunPages(repository.DirectoryPath);
+        var tested = await repository.RunPages(repository.DirectoryPath);
 
         tested.ExitCode.Should().NotBe(0);
         tested.Output.Should().Contain("repository root");
@@ -24,7 +24,7 @@ public sealed class GitHubPages生成スクリプトのテスト
     }
 
     [Fact]
-    public void 生成物用の出力先は既存内容を置き換えて再生成できます()
+    public async Task 生成物用の出力先は既存内容を置き換えて再生成できます()
     {
         using var repository = new 一時スクリプトリポジトリ();
         repository.AddPagesContent();
@@ -32,7 +32,7 @@ public sealed class GitHubPages生成スクリプトのテスト
         Directory.CreateDirectory(outputPath);
         File.WriteAllText(Path.Combine(outputPath, "stale.txt"), "old");
 
-        var tested = repository.RunPages(outputPath);
+        var tested = await repository.RunPages(outputPath);
 
         tested.ExitCode.Should().Be(0, tested.Output);
         File.ReadAllText(Path.Combine(outputPath, "api", "csharp", "index.html"))
@@ -44,39 +44,39 @@ public sealed class GitHubPages生成スクリプトのテスト
 public sealed class 変更ファイル正規化スクリプトのテスト
 {
     [Fact]
-    public void BOMなしのCSharpファイルにUTF8のBOMを付加します()
+    public async Task BOMなしのCSharpファイルにUTF8のBOMを付加します()
     {
         using var repository = new 一時スクリプトリポジトリ();
         var filePath = Path.Combine(repository.DirectoryPath, "Sample.cs");
         File.WriteAllText(filePath, "class Sample {}\n", new UTF8Encoding(false));
 
-        repository.RunNormalizer().ExitCode.Should().Be(0);
+        (await repository.RunNormalizer()).ExitCode.Should().Be(0);
 
         File.ReadAllBytes(filePath).Take(3).Should().Equal(0xEF, 0xBB, 0xBF);
     }
 
     [Fact]
-    public void MarkdownファイルからUTF8のBOMを除きます()
+    public async Task MarkdownファイルからUTF8のBOMを除きます()
     {
         using var repository = new 一時スクリプトリポジトリ();
         var filePath = Path.Combine(repository.DirectoryPath, "notes.md");
         File.WriteAllText(filePath, "text\n", new UTF8Encoding(true));
 
-        repository.RunNormalizer().ExitCode.Should().Be(0);
+        (await repository.RunNormalizer()).ExitCode.Should().Be(0);
 
         File.ReadAllBytes(filePath).Take(3).Should().Equal(0x74, 0x65, 0x78);
     }
 
     [Fact]
-    public void 正規化済みのファイルは再実行しても変わりません()
+    public async Task 正規化済みのファイルは再実行しても変わりません()
     {
         using var repository = new 一時スクリプトリポジトリ();
         var filePath = Path.Combine(repository.DirectoryPath, "Sample.cs");
         File.WriteAllText(filePath, "class Sample {}\n", new UTF8Encoding(false));
-        repository.RunNormalizer().ExitCode.Should().Be(0);
+        (await repository.RunNormalizer()).ExitCode.Should().Be(0);
         var normalized = File.ReadAllBytes(filePath);
 
-        repository.RunNormalizer().ExitCode.Should().Be(0);
+        (await repository.RunNormalizer()).ExitCode.Should().Be(0);
 
         normalized.Take(3).Should().Equal(0xEF, 0xBB, 0xBF);
         File.ReadAllBytes(filePath).Should().Equal(normalized);
@@ -100,13 +100,13 @@ sealed class 一時スクリプトリポジトリ : IDisposable
         File.WriteAllText(Path.Combine(sitePath, "index.html"), "api");
     }
 
-    internal PowerShell実行結果 RunPages(string outputPath) =>
+    internal Task<PowerShell実行結果> RunPages(string outputPath) =>
         Run(
             "build-github-pages.ps1",
             $"-OutputPath '{PowerShellLiteral(outputPath)}'",
             "function dotnet { $global:LASTEXITCODE = 0 }");
 
-    internal PowerShell実行結果 RunNormalizer()
+    internal async Task<PowerShell実行結果> RunNormalizer()
     {
         using var git = Process.Start(new ProcessStartInfo
         {
@@ -120,7 +120,7 @@ sealed class 一時スクリプトリポジトリ : IDisposable
             throw new InvalidOperationException("一時リポジトリを作成できませんでした。");
         }
 
-        return Run("Normalize-ChangedTextFiles.ps1", "-IncludeUntracked");
+        return await Run("Normalize-ChangedTextFiles.ps1", "-IncludeUntracked");
     }
 
     public void Dispose()
@@ -131,7 +131,7 @@ sealed class 一時スクリプトリポジトリ : IDisposable
         }
     }
 
-    PowerShell実行結果 Run(string fileName, string arguments, string setup = "")
+    async Task<PowerShell実行結果> Run(string fileName, string arguments, string setup = "")
     {
         var scriptPath = Path.Combine(DirectoryPath, "scripts", fileName);
         File.Copy(
@@ -143,7 +143,7 @@ sealed class 一時スクリプトリポジトリ : IDisposable
         File.WriteAllText(
             runnerPath,
             $"{setup}\n& '{PowerShellLiteral(scriptPath)}' {arguments}\n");
-        return PowerShell実行結果.Run(runnerPath, DirectoryPath);
+        return await PowerShell実行結果.RunAsync(runnerPath, DirectoryPath);
     }
 
     static string PowerShellLiteral(string path) => path.Replace("'", "''");
