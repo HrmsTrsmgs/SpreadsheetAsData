@@ -19,7 +19,7 @@ class Package
       package
     end
   end
-  
+
   # 開いたファイルのパスです。
   attr_reader :file_path, :initialized_parts
 
@@ -47,7 +47,7 @@ class Package
     FileUtils.remove_entry(unziped_dir_path) if Dir.exist?(unziped_dir_path)
     @closed = true
   end
-  
+
   def root
     part('')
   end
@@ -55,7 +55,7 @@ class Package
   def part(uri)
     @parts[uri] ||= PackagePart.new(self, uri)
   end
-  
+
   # ブック情報を記述してあるWorkBook.xmlドキュメントを取得します。
   def xml_document(part)
     #workbook.xmlのパスは変更するとExcelでも起動できなくなるため、変更には対応しません。
@@ -66,7 +66,7 @@ class Package
   def relation_tags(part)
     archive_as_document(part.rels_uri).get_elements('/Relationships/Relationship')
   end
-  
+
   private
   def archive_as_document(path)
     File.open(part_file_path(path)) {|file| REXML::Document.new(file) }
@@ -76,10 +76,15 @@ class Package
     Zip::File.open(slashed_file_path) do |zip|
       zip.each do |file|
         entry_name = file.name.force_encoding(Encoding::UTF_8)
+        directory_entry = entry_name.end_with?('/')
+        extraction_root = File.expand_path(unziped_dir_path) + File::SEPARATOR
+        ziped_file_name = File.expand_path(entry_name, extraction_root)
+        unless ziped_file_name.start_with?(extraction_root)
+          raise ArgumentError, "ZIP entry is outside the extraction directory: #{entry_name}"
+        end
         dir_name = File.dirname(entry_name)
         FileUtils.makedirs(unziped_dir_path + dir_name)
-        ziped_file_name =  unziped_dir_path + entry_name
-        unless ziped_file_name.match(/\/$/)
+        unless directory_entry
           File.open(ziped_file_name, "w+b") do |written|
             stream = file.get_input_stream
             written.write(stream.read)
@@ -89,9 +94,9 @@ class Package
       end
     end
   end
-  
+
   def zip_file
-    
+
     Zip::File.open(slashed_file_path, Zip::File::CREATE) do |zip_file|
     	Dir::glob(unziped_dir_path + "**/*", File::FNM_DOTMATCH).each do |src_path|
         next if ['.', '..'].include?(File.basename(src_path))
