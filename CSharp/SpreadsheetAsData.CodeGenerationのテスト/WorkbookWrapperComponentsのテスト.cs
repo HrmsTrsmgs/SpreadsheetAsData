@@ -127,7 +127,7 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                         ValidateStructure(new(stream));
 
                     /// <summary>
-                    /// 生成元に対応するシート、テーブルとその列、両スコープの定義名を確認し、不一致時は開いたブックを破棄します。
+                    /// 生成元に対応するシート、テーブルとその列、両スコープの定義名を確認し、検証中に例外が発生した場合は開いたブックを破棄します。
                     /// </summary>
                     static BasicStructureBook ValidateStructure(BasicStructureBook book)
                     {

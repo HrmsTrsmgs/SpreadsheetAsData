@@ -110,7 +110,7 @@ static class WorkbookWrapperComponents
     }
 
     /// <summary>
-    /// Bookの宣言から独立して、生成元との構造照合と不一致時の解放処理を生成します。
+    /// Bookの宣言から独立して、生成元との構造照合と検証失敗時の解放処理を生成します。
     /// </summary>
     static string BookStructureValidationDeclaration(
         string bookFileIdentifier,
@@ -119,7 +119,7 @@ static class WorkbookWrapperComponents
         $$"""
 
             /// <summary>
-            /// 生成元に対応するシート、テーブルとその列、両スコープの定義名を確認し、不一致時は開いたブックを破棄します。
+            /// 生成元に対応するシート、テーブルとその列、両スコープの定義名を確認し、検証中に例外が発生した場合は開いたブックを破棄します。
             /// </summary>
             static {{bookFileIdentifier}}Book ValidateStructure({{bookFileIdentifier}}Book book)
             {
