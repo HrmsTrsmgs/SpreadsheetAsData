@@ -131,29 +131,36 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     /// </summary>
                     static BasicStructureBook ValidateStructure(BasicStructureBook book)
                     {
-                        if (new string[] { "SalesData", "ProductMaster" }
-                            .Any(sheetName => !book.Sheets.ContainsKey(sheetName))
-                            || new (string SheetName, string TableName)[] { ("SalesData", "sales_detail"), ("ProductMaster", "ProductList") }
-                                .Any(name => !book.Tables.Any(
-                                    table => table.Name == name.TableName && table.Worksheet.Name == name.SheetName))
-                            || new (string TableName, string ColumnName)[] { ("sales_detail", "customer_id"), ("sales_detail", "Amount"), ("sales_detail", "Description"), ("ProductList", "Id"), ("ProductList", "Name") }
-                                .Any(column => !book.Tables[column.TableName].Columns.Contains(column.ColumnName))
-                            || new (string Name, bool RequiresSingleCell)[] {  }
-                                .Any(name => !book.DefinedNames.Any(
-                                    definedName => definedName.Worksheet is null && definedName.Name == name.Name
-                                        && (!name.RequiresSingleCell
-                                            || definedName.Range.TopLeftCell == definedName.Range.BottomRightCell)))
-                            || new (string SheetName, string Name, bool RequiresSingleCell)[] {  }
-                                .Any(name => !book.DefinedNames.Any(
-                                    definedName => definedName.Worksheet?.Name == name.SheetName && definedName.Name == name.Name
-                                        && (!name.RequiresSingleCell
-                                            || definedName.Range.TopLeftCell == definedName.Range.BottomRightCell))))
+                        try
+                        {
+                            if (new string[] { "SalesData", "ProductMaster" }
+                                .Any(sheetName => !book.Sheets.ContainsKey(sheetName))
+                                || new (string SheetName, string TableName)[] { ("SalesData", "sales_detail"), ("ProductMaster", "ProductList") }
+                                    .Any(name => !book.Tables.Any(
+                                        table => table.Name == name.TableName && table.Worksheet.Name == name.SheetName))
+                                || new (string TableName, string ColumnName)[] { ("sales_detail", "customer_id"), ("sales_detail", "Amount"), ("sales_detail", "Description"), ("ProductList", "Id"), ("ProductList", "Name") }
+                                    .Any(column => !book.Tables[column.TableName].Columns.Contains(column.ColumnName))
+                                || new (string Name, bool RequiresSingleCell)[] {  }
+                                    .Any(name => !book.DefinedNames.Any(
+                                        definedName => definedName.Worksheet is null && definedName.Name == name.Name
+                                            && (!name.RequiresSingleCell
+                                                || definedName.Range.TopLeftCell == definedName.Range.BottomRightCell)))
+                                || new (string SheetName, string Name, bool RequiresSingleCell)[] {  }
+                                    .Any(name => !book.DefinedNames.Any(
+                                        definedName => definedName.Worksheet?.Name == name.SheetName && definedName.Name == name.Name
+                                            && (!name.RequiresSingleCell
+                                                || definedName.Range.TopLeftCell == definedName.Range.BottomRightCell))))
+                            {
+                                throw new InvalidDataException();
+                            }
+
+                            return book;
+                        }
+                        catch
                         {
                             book.Dispose();
-                            throw new InvalidDataException();
+                            throw;
                         }
-
-                        return book;
                     }
 
                     /// <summary>

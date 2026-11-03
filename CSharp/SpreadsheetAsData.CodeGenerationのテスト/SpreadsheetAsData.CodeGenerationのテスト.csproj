@@ -18,6 +18,9 @@
     <Content Include="..\..\TestData\テーブル.xlsx" Link="TestData\テーブル.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\TestData\テーブル範囲属性省略.xlsx" Link="TestData\テーブル範囲属性省略.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

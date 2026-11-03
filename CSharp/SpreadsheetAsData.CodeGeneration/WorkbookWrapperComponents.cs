@@ -123,46 +123,53 @@ static class WorkbookWrapperComponents
             /// </summary>
             static {{bookFileIdentifier}}Book ValidateStructure({{bookFileIdentifier}}Book book)
             {
-                if (new string[] { {{string.Join(
-                    ", ",
-                    from sheet in book.Sheets.Values
-                    select StringLiteral(sheet.Name))}} }
-                    .Any(sheetName => !book.Sheets.ContainsKey(sheetName))
-                    || new (string SheetName, string TableName)[] { {{string.Join(
-                        ", ",
-                        from table in book.Tables
-                        select $"({StringLiteral(table.Worksheet.Name)}, {StringLiteral(table.Name)})")}} }
-                        .Any(name => !book.Tables.Any(
-                            table => table.Name == name.TableName && table.Worksheet.Name == name.SheetName))
-                    || new (string TableName, string ColumnName)[] { {{string.Join(
-                        ", ",
-                        from table in book.Tables
-                        from column in table.Columns
-                        select $"({StringLiteral(table.Name)}, {StringLiteral(column.Name)})")}} }
-                        .Any(column => !book.Tables[column.TableName].Columns.Contains(column.ColumnName))
-                    || new (string Name, bool RequiresSingleCell)[] { {{string.Join(
-                        ", ",
-                        from definedName in BookScopedDefinedNames(book)
-                        select $"({StringLiteral(definedName.Name)}, {(IsSingleCellDefinedName(definedName) ? "true" : "false")})")}} }
-                        .Any(name => !book.DefinedNames.Any(
-                            definedName => definedName.Worksheet is null && definedName.Name == name.Name
-                                && (!name.RequiresSingleCell
-                                    || definedName.Range.TopLeftCell == definedName.Range.BottomRightCell)))
-                    || new (string SheetName, string Name, bool RequiresSingleCell)[] { {{string.Join(
+                try
+                {
+                    if (new string[] { {{string.Join(
                         ", ",
                         from sheet in book.Sheets.Values
-                        from definedName in SheetScopedDefinedNames(sheet)
-                        select $"({StringLiteral(sheet.Name)}, {StringLiteral(definedName.Name)}, {(IsSingleCellDefinedName(definedName) ? "true" : "false")})")}} }
-                        .Any(name => !book.DefinedNames.Any(
-                            definedName => definedName.Worksheet?.Name == name.SheetName && definedName.Name == name.Name
-                                && (!name.RequiresSingleCell
-                                    || definedName.Range.TopLeftCell == definedName.Range.BottomRightCell))))
+                        select StringLiteral(sheet.Name))}} }
+                        .Any(sheetName => !book.Sheets.ContainsKey(sheetName))
+                        || new (string SheetName, string TableName)[] { {{string.Join(
+                            ", ",
+                            from table in book.Tables
+                            select $"({StringLiteral(table.Worksheet.Name)}, {StringLiteral(table.Name)})")}} }
+                            .Any(name => !book.Tables.Any(
+                                table => table.Name == name.TableName && table.Worksheet.Name == name.SheetName))
+                        || new (string TableName, string ColumnName)[] { {{string.Join(
+                            ", ",
+                            from table in book.Tables
+                            from column in table.Columns
+                            select $"({StringLiteral(table.Name)}, {StringLiteral(column.Name)})")}} }
+                            .Any(column => !book.Tables[column.TableName].Columns.Contains(column.ColumnName))
+                        || new (string Name, bool RequiresSingleCell)[] { {{string.Join(
+                            ", ",
+                            from definedName in BookScopedDefinedNames(book)
+                            select $"({StringLiteral(definedName.Name)}, {(IsSingleCellDefinedName(definedName) ? "true" : "false")})")}} }
+                            .Any(name => !book.DefinedNames.Any(
+                                definedName => definedName.Worksheet is null && definedName.Name == name.Name
+                                    && (!name.RequiresSingleCell
+                                        || definedName.Range.TopLeftCell == definedName.Range.BottomRightCell)))
+                        || new (string SheetName, string Name, bool RequiresSingleCell)[] { {{string.Join(
+                            ", ",
+                            from sheet in book.Sheets.Values
+                            from definedName in SheetScopedDefinedNames(sheet)
+                            select $"({StringLiteral(sheet.Name)}, {StringLiteral(definedName.Name)}, {(IsSingleCellDefinedName(definedName) ? "true" : "false")})")}} }
+                            .Any(name => !book.DefinedNames.Any(
+                                definedName => definedName.Worksheet?.Name == name.SheetName && definedName.Name == name.Name
+                                    && (!name.RequiresSingleCell
+                                        || definedName.Range.TopLeftCell == definedName.Range.BottomRightCell))))
+                    {
+                        throw new {{ReferencedTypeName("System.IO.InvalidDataException", book, options)}}();
+                    }
+
+                    return book;
+                }
+                catch
                 {
                     book.Dispose();
-                    throw new {{ReferencedTypeName("System.IO.InvalidDataException", book, options)}}();
+                    throw;
                 }
-
-                return book;
             }
         """;
 

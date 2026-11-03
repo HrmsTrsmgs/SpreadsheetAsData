@@ -474,6 +474,39 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void 生成されたBook型は構造の検証条件の評価中に例外が発生してもファイルを解放します()
+    {
+        using var temporaryFiles = new TemporaryExcelFiles();
+        var excelFilePath = temporaryFiles.Copy(@"TestData\テーブル範囲属性省略.xlsx");
+        var generatedType = GeneratedCodeInspection
+            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(@"TestData\テーブル.xlsx"))
+            .GeneratedType("テーブルBook");
+
+        var openBook = () =>
+        {
+            using var book = generatedType.InvokeStaticMethod<Workbook>("Open", excelFilePath);
+        };
+
+        openBook.Should().Throw<TargetInvocationException>()
+            .WithInnerException<InvalidDataException>();
+
+        var openFileExclusively = () =>
+        {
+            using var stream = File.Open(excelFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+        };
+
+        try
+        {
+            openFileExclusively.Should().NotThrow();
+        }
+        finally
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
+    }
+
+    [Fact]
     public void 生成されたBook型は必要なシートがないStreamをOpenすると失敗します()
     {
         var generatedType = GeneratedCodeInspection
