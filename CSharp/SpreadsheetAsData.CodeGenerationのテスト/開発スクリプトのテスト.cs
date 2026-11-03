@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Marimo.SpreadsheetAsData.CodeGeneration.Test.テスト補助;
 using Xunit;
 
@@ -8,6 +9,26 @@ namespace Marimo.SpreadsheetAsData.CodeGeneration.Test;
 
 public sealed class GitHubPages生成スクリプトのテスト
 {
+    [Fact]
+    public async Task 末尾に区切り文字を付けたリポジトリルートを出力先に指定すると内容を変更せず拒否します()
+    {
+        using var repository = new 一時スクリプトリポジトリ();
+        repository.AddPagesContent();
+        var markerPath = Path.Combine(repository.DirectoryPath, "keep.txt");
+        File.WriteAllText(markerPath, "keep");
+
+        var tested = await repository.RunPages(repository.DirectoryPath + Path.DirectorySeparatorChar);
+
+        using var scope = new AssertionScope();
+        tested.ExitCode.Should().NotBe(0);
+        tested.Output.Should().Contain("repository root");
+        File.Exists(markerPath).Should().BeTrue();
+        if (File.Exists(markerPath))
+        {
+            File.ReadAllText(markerPath).Should().Be("keep");
+        }
+    }
+
     [Fact]
     public async Task リポジトリルートを出力先に指定すると内容を変更せず拒否します()
     {

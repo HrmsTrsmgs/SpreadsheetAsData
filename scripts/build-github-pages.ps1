@@ -15,7 +15,7 @@ else {
     $defaultOutputPath
 }
 
-if ([System.IO.Path]::GetFullPath($pagesOutputPath) -eq [System.IO.Path]::GetFullPath($repositoryRoot)) {
+if ([System.IO.Path]::GetFullPath($pagesOutputPath).TrimEnd([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar) -eq [System.IO.Path]::GetFullPath($repositoryRoot).TrimEnd([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar)) {
     throw "The repository root cannot be used as the GitHub Pages output directory."
 }
 
