@@ -45,6 +45,29 @@ public sealed class コード生成アクセスのテスト
     }
 
     [Fact]
+    public void 同じSheetプロパティから取得した未格納セルへの最後の書き込みを保存します()
+    {
+        using var temporaryFiles = new TemporaryExcelFiles();
+        var filePath = temporaryFiles.Copy(BasicStructureExcelFilePath);
+
+        using (var book = GeneratedCodeInspection
+                   .AssemblyFrom(GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
+                   .GeneratedInstance<Workbook>("BasicStructureBook", filePath))
+        {
+            dynamic bookAccessor = book;
+            Cell firstCell = bookAccessor.SalesData.Cells["XFD1048576"];
+            Cell secondCell = bookAccessor.SalesData.Cells["XFD1048576"];
+
+            firstCell.Value = "first";
+            secondCell.Value = "last";
+            book.Save();
+        }
+
+        using var tested = Workbook.Open(filePath);
+        (tested.Sheets["SalesData"].Cells["XFD1048576"].Value as object).Should().Be("last");
+    }
+
+    [Fact]
     public void Bookは各Excelテーブルを型付きプロパティとして公開します()
     {
         var generatedAssembly = GeneratedCodeInspection.AssemblyFrom(

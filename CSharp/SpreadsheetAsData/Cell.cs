@@ -118,6 +118,13 @@ public class Cell
                 new Row { RowIndex = cellName.RowIndex },
                 sheetData.Elements<Row>().FirstOrDefault(it => RowIndexOf(it) > cellName.RowIndex));
 
+        var existingCell = row.Elements<Spreadsheet.Cell>().SingleOrDefault(it => it.CellReference?.Value == Reference);
+        if (existingCell is not null)
+        {
+            Xml = existingCell;
+            return;
+        }
+
         row.InsertBefore(
             Xml,
             row.Elements<Spreadsheet.Cell>().FirstOrDefault(
