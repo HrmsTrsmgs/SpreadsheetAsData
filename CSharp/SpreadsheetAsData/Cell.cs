@@ -70,6 +70,11 @@ public class Cell
 
         set
         {
+            if (value is not null and not string and not bool)
+            {
+                value = (double)value;
+            }
+
             AttachToWorksheet();
             Xml.CellFormula = null;
             (Book.WorkbookXml.CalculationProperties ??= new()).FullCalculationOnLoad = true;

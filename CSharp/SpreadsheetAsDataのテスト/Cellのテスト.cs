@@ -238,6 +238,30 @@ public class Cellのテスト : IDisposable
     }
 
     [Fact]
+    public void Valueプロパティに対応しない値を代入して例外が発生しても数式を保持します()
+    {
+        var filePath = temporaryFiles.Copy("数式セル.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            var tested = book.Sheets["Sheet1"].Cells["A1"];
+            var action = () => tested.Value = new object();
+
+            action.Should().Throw<Exception>();
+            book.Save();
+        }
+
+        using var document = Packaging.SpreadsheetDocument.Open(filePath, false);
+        document.WorkbookPart.Should().NotBeNull();
+        var worksheet = document.WorkbookPart.WorksheetParts.Single().Worksheet;
+        worksheet.Should().NotBeNull();
+        var cell = worksheet.Descendants<Spreadsheet.Cell>().Single();
+
+        cell.CellFormula.Should().NotBeNull();
+        cell.CellFormula.Text.Should().Be("1+2");
+    }
+
+    [Fact]
     public void Referenceプロパティがセル参照の名称を取得できます()
     {
         a1.Reference.Should().Be("A1");
