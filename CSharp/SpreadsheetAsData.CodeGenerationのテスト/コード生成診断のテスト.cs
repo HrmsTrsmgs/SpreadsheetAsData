@@ -561,4 +561,19 @@ public sealed class コード生成診断のテスト
                     ["customer_id"],
                     "customer_id"));
     }
+
+    [Fact(Skip = "予約語判定がclassとstructに限定されているため。別のRed・Greenでenumも変換せずエラー診断できたら解除する。")]
+    public void NameMappingsで列にenumを指定した場合も変換せずエラーを診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                DefinedNamesWithoutCollisionsExcelFilePath,
+                options => options.NameMappings["sales_detail.customer_id"] = "enum")
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "enum",
+                    ["customer_id"],
+                    "customer_id"));
+    }
 }

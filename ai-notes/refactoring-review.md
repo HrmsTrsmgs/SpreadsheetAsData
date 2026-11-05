@@ -73,7 +73,7 @@ P1はデータ・ファイルを損なう可能性があり先に扱いたいも
 
 #### F8 / P2: 不正なNameMappingsの生成名を事前診断しない
 
-* 状態: 一部対応済み。`c128b54` でハイフン、`fc583bb` で先頭数字、`db8fe01` でclassの列指定名を診断。`32b3d29` のstruct指定Skipを解除し、RedからGreenを確認した差分は未コミット。診断90件・関連19件成功。ほかの予約語を含む識別子規則全体・他経路の確認、MSBuild連携を含む全体テストの停止は未解決。
+* 状態: 一部対応済み。`c128b54` でハイフン、`fc583bb` で先頭数字、`db8fe01` でclass、`bf997cf` でstructの列指定名を診断。ほかの予約語の不足はenum指定のSkipテストとして追加済み（未コミット）。識別子規則全体・他経路の確認、MSBuild連携を含む全体テストの停止は未解決。
 
 
 * 根拠: `CSharp/SpreadsheetAsData.CodeGeneration/GeneratedNameDiagnostics.cs:17-31,60-70` と `CodeGenerationOptionNames.cs`。
