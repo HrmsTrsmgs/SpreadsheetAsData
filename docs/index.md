@@ -19,4 +19,4 @@ Ruby版のAPIリファレンスは、Ruby版の再整備後に追加する予定
 * [ロードマップ](roadmap.md)
 * [型付き読み書き](typed-reading.md)
 * [公開運用](release-operations.md)
-* [開発再開メモ](development-status.md)
+* [開発再開メモ](../ai-notes/development-status.md)
