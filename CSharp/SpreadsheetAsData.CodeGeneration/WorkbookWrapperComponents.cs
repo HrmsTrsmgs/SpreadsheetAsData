@@ -236,7 +236,7 @@ static class WorkbookWrapperComponents
             /// <summary>
             /// Excelテーブル「{{table.Name}}」の行データを取得または設定します。
             /// </summary>
-        {{attributeDeclaration}}    public IEnumerable<{{propertyName}}> {{propertyName}} { get; set; }
+        {{attributeDeclaration}}    public IEnumerable<{{propertyName}}> {{propertyName}} { get; set; } = [];
         """;
     }
 
@@ -266,7 +266,7 @@ static class WorkbookWrapperComponents
                 {{BookDataDefinedNameAttribute(
                     definedName,
                     propertyName,
-                    options)}}public {{propertyTypeName}} {{propertyName}} { get; set; }{{PropertyInitializer(propertyTypeName)}}
+                    options)}}public {{propertyTypeName}} {{propertyName}} { get; set; }{{(isSingleCell ? PropertyInitializer(propertyTypeName) : " = [];")}}
             """;
     }
 

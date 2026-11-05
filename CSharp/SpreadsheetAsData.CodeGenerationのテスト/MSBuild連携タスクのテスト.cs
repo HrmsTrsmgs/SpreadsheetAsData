@@ -7,8 +7,10 @@ namespace Marimo.SpreadsheetAsData.CodeGeneration.Test;
 
 public sealed class MSBuild連携タスクのテスト
 {
-    [Fact]
-    public void 生成されたファイルはnullable有効の利用側でCS8669をエラーとしてコンパイルできます()
+    [Theory]
+    [InlineData("CS8669")]
+    [InlineData("CS8618")]
+    public void 生成されたファイルはnullable有効の利用側で指定の警告をエラーとしてコンパイルできます(string diagnosticId)
     {
         using var project = MSBuild連携テストプロジェクト.Create();
         Directory.CreateDirectory(project.DirectoryPath);
@@ -19,7 +21,7 @@ public sealed class MSBuild連携タスクのテスト
 
         var action = () => GeneratedSourceCompiler.Compile(
             [generated.SingleGeneratedSource],
-            warningsAsErrors: ["CS8669"],
+            warningsAsErrors: [diagnosticId],
             sourceFilePath: generated.SingleGeneratedFilePath,
             nullableContextOptions: NullableContextOptions.Enable);
 
