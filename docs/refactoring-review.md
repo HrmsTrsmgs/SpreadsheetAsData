@@ -53,6 +53,8 @@ P1はデータ・ファイルを損なう可能性があり先に扱いたいも
 
 #### F6 / P2: 実際の生成ファイル名・nullable設定で警告が発生する
 
+* 2026-11-05の追加確認: 未コミットの `#nullable enable` でCS8669は解消。F6の回帰テストと同じ生成条件では `定義名Data.MainRange`、`SalesDetail`、`ProductList` にCS8618が残る。CS8669のみをエラー化したテストでは検出されない。nullable有効化は開発者合意済みだが、初期値・未設定状態の扱いは別途確認する。
+
 * 根拠: `WorkbookWrapperComponents.cs:14,260,431`、`CSharp/SpreadsheetAsData.CodeGenerationのテスト/テスト補助/GeneratedSourceCompiler.cs:23-36`。
 * 再現: 定義名用の生成ソースを `.g.cs` のファイル名とnullable有効でコンパイルすると、`object?` の箇所に `CS8669`。生成ソース内に明示的なnullableコンテキストがない。該当警告をエラー扱いする利用側でビルドできない。
 * 補足: 同じソースを通常ファイルとしてnullable有効で扱うと、範囲・テーブル・dynamicのDataプロパティに `CS8618` も出る。`.g.cs` の場合と同じ警告が出ると混同しない。

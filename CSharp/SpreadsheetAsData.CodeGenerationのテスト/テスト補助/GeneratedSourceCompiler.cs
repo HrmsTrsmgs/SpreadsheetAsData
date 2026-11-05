@@ -16,12 +16,18 @@ static class GeneratedSourceCompiler
     /// </summary>
     /// <param name="sources">コンパイルするC#ソースコード。</param>
     /// <param name="warningsAsErrors">エラーとして扱う警告ID。</param>
+    /// <param name="sourceFilePath">ソースのファイルパス。</param>
+    /// <param name="nullableContextOptions">nullableコンテキストの設定。</param>
     /// <returns>コンパイルしたアセンブリ。</returns>
-    internal static Assembly Compile(IEnumerable<string> sources, string[]? warningsAsErrors = null)
+    internal static Assembly Compile(
+        IEnumerable<string> sources,
+        string[]? warningsAsErrors = null,
+        string sourceFilePath = "",
+        NullableContextOptions nullableContextOptions = NullableContextOptions.Disable)
     {
         var syntaxTrees =
             from source in sources
-            select CSharpSyntaxTree.ParseText(source);
+            select CSharpSyntaxTree.ParseText(source, path: sourceFilePath);
 
         var compilation = CSharpCompilation.Create(
             $"SpreadsheetAsData.Generated.{Guid.NewGuid():N}",
@@ -29,6 +35,7 @@ static class GeneratedSourceCompiler
             References,
             new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary,
+                nullableContextOptions: nullableContextOptions,
                 specificDiagnosticOptions:
                     from id in warningsAsErrors ?? []
                     select new KeyValuePair<string, ReportDiagnostic>(id, ReportDiagnostic.Error)));

@@ -1,11 +1,31 @@
 ﻿using FluentAssertions;
 using Marimo.SpreadsheetAsData.CodeGeneration.Test.テスト補助;
+using Microsoft.CodeAnalysis;
 using Xunit;
 
 namespace Marimo.SpreadsheetAsData.CodeGeneration.Test;
 
 public sealed class MSBuild連携タスクのテスト
 {
+    [Fact]
+    public void 生成されたファイルはnullable有効の利用側でCS8669をエラーとしてコンパイルできます()
+    {
+        using var project = MSBuild連携テストプロジェクト.Create();
+        Directory.CreateDirectory(project.DirectoryPath);
+        var excelFilePath = Path.Combine(project.DirectoryPath, "定義名.xlsx");
+        File.Copy(@"TestData\コード生成\ブックスコープ\定義名.xlsx", excelFilePath);
+        var generated = project.Generate(excelFilePath);
+        generated.Succeeded.Should().BeTrue();
+
+        var action = () => GeneratedSourceCompiler.Compile(
+            [generated.SingleGeneratedSource],
+            warningsAsErrors: ["CS8669"],
+            sourceFilePath: generated.SingleGeneratedFilePath,
+            nullableContextOptions: NullableContextOptions.Enable);
+
+        action.Should().NotThrow();
+    }
+
     [Fact]
     public void Excel項目ごとの名前空間で同名の生成型を併用できます()
     {

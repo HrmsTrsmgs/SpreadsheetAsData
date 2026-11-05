@@ -87,6 +87,8 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
         SourceFile(BasicStructureExcelFilePath, options, basicBook)
             .Should().Be(
                 """
+                #nullable enable
+
                 using System;
                 using System.Collections.Generic;
                 using System.IO;

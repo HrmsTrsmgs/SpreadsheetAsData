@@ -16,6 +16,8 @@ static class WorkbookWrapperComponents
         CodeGenerationOptions options,
         Workbook book) =>
         $$"""
+        #nullable enable
+
         using System;
         using System.Collections.Generic;
         using System.IO;
