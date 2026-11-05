@@ -502,4 +502,19 @@ public sealed class コード生成診断のテスト
                     "---"));
     }
 
+    [Fact]
+    public void NameMappingsで列に無効なCSharp識別子を指定した場合は変換せずエラーを診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                DefinedNamesWithoutCollisionsExcelFilePath,
+                options => options.NameMappings["sales_detail.customer_id"] = "not-valid")
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "not-valid",
+                    ["customer_id"],
+                    "customer_id"));
+    }
+
 }

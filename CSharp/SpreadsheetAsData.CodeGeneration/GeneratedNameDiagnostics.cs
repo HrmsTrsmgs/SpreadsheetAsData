@@ -139,16 +139,22 @@ static class GeneratedNameDiagnostics
             [$"{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}Data"]);
 
     /// <summary>
-    /// 列プロパティ同士の名前衝突と、行データ型名との衝突を検出します。
+    /// ハイフンを含む列プロパティ名と、列同士・行データ型名との名前衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> ColumnPropertyNameDiagnostics(
         Table table,
         CodeGenerationOptions options) =>
-        NameCollisionDiagnostics(
+        [
+            .. from column in table.Columns
+               let propertyName = options.TableColumn(table, column)
+               where propertyName.Contains('-')
+               select new CodeGenerationDiagnostic(true, propertyName, [column.Name], column.Name),
+            .. NameCollisionDiagnostics(
             GroupMemberNames(
                 from column in table.Columns
                 select (column.Name, options.TableColumn(table, column))),
-            [options.GeneratedName(table.Name)]);
+            [options.GeneratedName(table.Name)])
+        ];
 
     /// <summary>
     /// Bookのシート・テーブル由来のプロパティを、元名と生成名の対応に揃えます。
