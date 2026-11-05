@@ -150,10 +150,10 @@ static class GeneratedNameDiagnostics
                where propertyName.Contains('-')
                select new CodeGenerationDiagnostic(true, propertyName, [column.Name], column.Name),
             .. NameCollisionDiagnostics(
-            GroupMemberNames(
-                from column in table.Columns
-                select (column.Name, options.TableColumn(table, column))),
-            [options.GeneratedName(table.Name)])
+                GroupMemberNames(
+                    from column in table.Columns
+                    select (column.Name, options.TableColumn(table, column))),
+                [options.GeneratedName(table.Name)])
         ];
 
     /// <summary>
