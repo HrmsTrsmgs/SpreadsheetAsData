@@ -64,6 +64,14 @@ public sealed class 型付きTableのテスト : IDisposable
     }
 
     [Fact]
+    public void 型付きTableは明示的な引数なしコンストラクターを持つ構造体へセル値を読み込みます()
+    {
+        book.ReadTable<StructWithParameterlessConstructor>(MappingTableName)
+            .Select(it => it.IntegerValue)
+            .Should().Equal(1, 2, 3);
+    }
+
+    [Fact]
     public void 型付きTableは列挙してもstaticプロパティを書き換えません()
     {
         RowWithStaticProperty.文字列 = "shared";
@@ -822,6 +830,17 @@ public sealed class 型付きTableのテスト : IDisposable
 
     public sealed class IntegerOnlyRow
     {
+        [SpreadsheetName("数値2")]
+        public int IntegerValue { get; set; }
+    }
+
+    public struct StructWithParameterlessConstructor
+    {
+        public StructWithParameterlessConstructor()
+        {
+            IntegerValue = -1;
+        }
+
         [SpreadsheetName("数値2")]
         public int IntegerValue { get; set; }
     }

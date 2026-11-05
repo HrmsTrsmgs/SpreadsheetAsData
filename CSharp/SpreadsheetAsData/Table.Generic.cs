@@ -85,7 +85,7 @@ public class Table<T> : Table, IEnumerable<T>
     /// <returns>変換した型付き行。</returns>
     T Map(TableRow row)
     {
-        var mapped = Activator.CreateInstance<T>();
+        object mapped = Activator.CreateInstance<T>() ?? throw new TableMappingException(this, typeof(T));
 
         foreach (var (property, value) in
             from property in MappedProperties
@@ -94,7 +94,7 @@ public class Table<T> : Table, IEnumerable<T>
             property.SetValue(mapped, value);
         }
 
-        return mapped;
+        return (T)mapped;
     }
 
     /// <summary>
