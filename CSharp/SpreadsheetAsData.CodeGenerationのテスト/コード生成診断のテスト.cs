@@ -562,7 +562,7 @@ public sealed class コード生成診断のテスト
                     "customer_id"));
     }
 
-    [Fact(Skip = "予約語判定がclassとstructに限定されているため。別のRed・Greenでenumも変換せずエラー診断できたら解除する。")]
+    [Fact]
     public void NameMappingsで列にenumを指定した場合も変換せずエラーを診断します()
     {
         GeneratedCodeInspection
