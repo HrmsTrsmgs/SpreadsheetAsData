@@ -547,7 +547,7 @@ public sealed class コード生成診断のテスト
                     "customer_id"));
     }
 
-    [Fact(Skip = "予約語判定がclassだけの三角測量途中のため。別のRed・Greenでstructも変換せずエラー診断できたら解除する。")]
+    [Fact]
     public void NameMappingsで列にclass以外のCSharp予約語を指定した場合も変換せずエラーを診断します()
     {
         GeneratedCodeInspection
