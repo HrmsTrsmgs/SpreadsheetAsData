@@ -63,6 +63,8 @@ P1はデータ・ファイルを損なう可能性があり先に扱いたいも
 
 #### F7 / P2・対応範囲確認: SDKで検証可能な文字列セルを読めない
 
+* 2026-11-05の対応: 開発者合意のもと、inlineStrと複数runの共有文字列からふりがなを除いた本文を読むテスト3ケースをRedからGreenへ進めた。部分書式を含むセルの書き換え・保存再読込2ケースは既存実装で成功し、書き込み処理は未変更。新規fixtureはSDK検証エラー0件。全C#786テスト成功、Ruby263例・失敗0・保留2。変更は未コミット。
+
 * 根拠: `CSharp/SpreadsheetAsData/Cell.cs:60-70,146-155`、`docs/design.md` のセル値の扱い。
 * 再現: 通常の `inlineStr` と、複数runで構成された共有文字列をそれぞれコピー上に作成した。両方とも `Workbook.Open(path, validate: true)` は成功するが、`Value` は `InvalidOperationException` になる。
 * 原因: inline stringの格納位置を読まず、共有文字列も直下の `Text` のみを要求する。既存の `str` テストはinline stringとは別の形式を確認している。

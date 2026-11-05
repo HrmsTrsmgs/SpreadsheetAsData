@@ -107,6 +107,42 @@ public class Cellのテスト : IDisposable
         tested.Should().Be("直接文字列");
     }
 
+    [Theory]
+    [InlineData("A1", "インライン文字列")]
+    [InlineData("A2", "東京駅")]
+    [InlineData("B2", "東京駅")]
+    public void Valueプロパティはインライン文字列と複数runの本文をふりがなを含めず文字列で取得できます(
+        string cellReference,
+        string text)
+    {
+        using var book = Workbook.Open(@"TestData\インラインとリッチテキスト.xlsx");
+
+        (book.Sheets["Sheet1"].Cells[cellReference].Value as object)
+            .Should().BeOfType<string>().Which.Should().Be(text);
+    }
+
+    [Theory]
+    [InlineData("A2")]
+    [InlineData("B2")]
+    public void Valueプロパティは複数runのセルを新しい文字列で置換して保存できます(string cellReference)
+    {
+        var filePath = temporaryFiles.Copy("インラインとリッチテキスト.xlsx");
+
+        using (var book = Workbook.Open(filePath))
+        {
+            var tested = book.Sheets["Sheet1"].Cells[cellReference];
+            tested.Value = "置換後の文字列";
+
+            (tested.Value as object).Should().Be("置換後の文字列");
+            book.Save();
+        }
+
+        using var saved = Workbook.Open(filePath);
+
+        (saved.Sheets["Sheet1"].Cells[cellReference].Value as object)
+            .Should().Be("置換後の文字列");
+    }
+
     [Fact]
     public void Valueプロパティは数値を設定すると同じセルから取得できます()
     {

@@ -49,8 +49,10 @@ public class Cell
     /// セルの値を取得または設定します。
     /// </summary>
     /// <remarks>
-    /// 空白セルは <see cref="BlankValue"/>、真偽値セルは <see cref="bool"/>、共有文字列セルと文字列セルは
+    /// 空白セルは <see cref="BlankValue"/>、真偽値セルは <see cref="bool"/>、共有文字列・インライン文字列・文字列セルは
     /// <see cref="string"/>、その他の数値セルは <see cref="double"/> として返します。
+    /// 文字列は部分書式やふりがなを含まない本文として返します。
+    /// 文字列を書き換える場合、セル内の部分書式は保持を保証しません。
     /// 値を設定すると、対象セルの既存の数式を削除します。
     /// また、Excelでブックを開く際に数式を再計算するよう要求します。ここでは計算結果を更新しません。
     /// </remarks>
@@ -63,6 +65,7 @@ public class Cell
             (var type, "0") when type == CellValues.Boolean => false,
             (var type, _) when type == CellValues.Boolean => true,
             (var type, _) when type == CellValues.SharedString => SharedStringValue,
+            (var type, _) when type == CellValues.InlineString => StringValue(Xml.InlineString ?? throw new InvalidOperationException()),
             (var type, string text) when type == CellValues.String => text,
             (_, string text) => double.Parse(text, CultureInfo.InvariantCulture),
             _ => throw new InvalidOperationException()
@@ -163,10 +166,18 @@ public class Cell
             var sharedStringTable =
                 Book.WorkbookPart.SharedStringTablePart?.SharedStringTable ?? throw new InvalidOperationException();
 
-            return sharedStringTable.Elements<SharedStringItem>().ElementAt(int.Parse(text)).Text?.Text
-                ?? throw new InvalidOperationException();
+            return StringValue(sharedStringTable.Elements<SharedStringItem>().ElementAt(int.Parse(text)));
         }
     }
+
+    /// <summary>
+    /// 直接の本文と本文runだけを連結し、ふりがなを除外します。
+    /// </summary>
+    static string StringValue(RstType text) =>
+        string.Concat(
+            from child in text.ChildElements
+            where child is Text or Run
+            select child.InnerText);
 
     /// <summary>
     /// セルが属するワークシートを取得します。
