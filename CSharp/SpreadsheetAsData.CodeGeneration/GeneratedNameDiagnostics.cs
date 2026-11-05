@@ -139,7 +139,7 @@ static class GeneratedNameDiagnostics
             [$"{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}Data"]);
 
     /// <summary>
-    /// ハイフンを含む列プロパティ名と、列同士・行データ型名との名前衝突を検出します。
+    /// ハイフンを含むか数字から始まる列プロパティ名と、列同士・行データ型名との名前衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> ColumnPropertyNameDiagnostics(
         Table table,
@@ -147,7 +147,7 @@ static class GeneratedNameDiagnostics
         [
             .. from column in table.Columns
                let propertyName = options.TableColumn(table, column)
-               where propertyName.Contains('-')
+               where propertyName.Contains('-') || (!propertyName.IsEmpty() && char.IsDigit(propertyName[0]))
                select new CodeGenerationDiagnostic(true, propertyName, [column.Name], column.Name),
             .. NameCollisionDiagnostics(
                 GroupMemberNames(

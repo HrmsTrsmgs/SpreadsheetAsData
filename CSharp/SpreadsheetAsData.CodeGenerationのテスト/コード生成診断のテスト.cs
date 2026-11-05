@@ -517,4 +517,19 @@ public sealed class コード生成診断のテスト
                     "customer_id"));
     }
 
+    [Fact]
+    public void NameMappingsで列に数字から始まる名前を指定した場合は変換せずエラーを診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                DefinedNamesWithoutCollisionsExcelFilePath,
+                options => options.NameMappings["sales_detail.customer_id"] = "1CustomerId")
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "1CustomerId",
+                    ["customer_id"],
+                    "customer_id"));
+    }
+
 }
