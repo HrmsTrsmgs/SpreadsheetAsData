@@ -532,4 +532,19 @@ public sealed class コード生成診断のテスト
                     "customer_id"));
     }
 
+    [Fact]
+    public void NameMappingsで列にCSharp予約語を指定した場合は変換せずエラーを診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                DefinedNamesWithoutCollisionsExcelFilePath,
+                options => options.NameMappings["sales_detail.customer_id"] = "class")
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "class",
+                    ["customer_id"],
+                    "customer_id"));
+    }
+
 }
