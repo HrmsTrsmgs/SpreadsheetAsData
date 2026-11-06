@@ -576,4 +576,19 @@ public sealed class コード生成診断のテスト
                     ["customer_id"],
                     "customer_id"));
     }
+
+    [Fact(Skip = "列名の予約語診断がinterfaceに未対応。対応後に解除する。")]
+    public void NameMappingsで列にinterfaceを指定した場合も変換せずエラーを診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                DefinedNamesWithoutCollisionsExcelFilePath,
+                options => options.NameMappings["sales_detail.customer_id"] = "interface")
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "interface",
+                    ["customer_id"],
+                    "customer_id"));
+    }
 }
