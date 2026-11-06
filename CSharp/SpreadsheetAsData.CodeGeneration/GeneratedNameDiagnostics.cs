@@ -149,20 +149,7 @@ static class GeneratedNameDiagnostics
                let propertyName = options.TableColumn(table, column)
                where propertyName.Contains('-')
                    || (propertyName.Any() && char.IsDigit(propertyName[0]))
-                   || propertyName is "class" or "struct" or "enum" or "interface"
-                       or "namespace" or "public" or "int" or "void" or "if"
-                       or "return" or "new" or "using" or "null" or "true"
-                       or "abstract" or "as" or "base" or "bool" or "break" or "byte"
-                       or "case" or "catch" or "char" or "checked" or "const" or "continue"
-                       or "decimal" or "default" or "delegate" or "do" or "double" or "else"
-                       or "event" or "explicit" or "extern" or "false" or "finally" or "fixed"
-                       or "float" or "for" or "foreach" or "goto" or "implicit" or "in"
-                       or "internal" or "is" or "lock" or "long" or "object" or "operator"
-                       or "out" or "override" or "params" or "private" or "protected" or "readonly"
-                       or "ref" or "sbyte" or "sealed" or "short" or "sizeof" or "stackalloc"
-                       or "static" or "string" or "switch" or "this" or "throw" or "try"
-                       or "typeof" or "uint" or "ulong" or "unchecked" or "unsafe" or "ushort"
-                       or "virtual" or "volatile" or "while"
+                   || IsCSharpKeyword(propertyName)
                select new CodeGenerationDiagnostic(true, propertyName, [column.Name], column.Name),
             .. NameCollisionDiagnostics(
                 GroupMemberNames(
@@ -170,6 +157,20 @@ static class GeneratedNameDiagnostics
                     select (column.Name, options.TableColumn(table, column))),
                 [options.GeneratedName(table.Name)])
         ];
+
+    static bool IsCSharpKeyword(string name) =>
+        name is "abstract" or "as" or "base" or "bool" or "break" or "byte"
+            or "case" or "catch" or "char" or "checked" or "class" or "const" or "continue"
+            or "decimal" or "default" or "delegate" or "do" or "double" or "else" or "enum"
+            or "event" or "explicit" or "extern" or "false" or "finally" or "fixed"
+            or "float" or "for" or "foreach" or "goto" or "if" or "implicit" or "in"
+            or "int" or "interface" or "internal" or "is" or "lock" or "long" or "namespace"
+            or "new" or "null" or "object" or "operator" or "out" or "override" or "params"
+            or "private" or "protected" or "public" or "readonly" or "ref" or "return"
+            or "sbyte" or "sealed" or "short" or "sizeof" or "stackalloc" or "static"
+            or "string" or "struct" or "switch" or "this" or "throw" or "true" or "try"
+            or "typeof" or "uint" or "ulong" or "unchecked" or "unsafe" or "ushort" or "using"
+            or "virtual" or "void" or "volatile" or "while";
 
     /// <summary>
     /// Bookのシート・テーブル由来のプロパティを、元名と生成名の対応に揃えます。
