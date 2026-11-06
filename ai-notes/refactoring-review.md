@@ -73,7 +73,7 @@ P1はデータ・ファイルを損なう可能性があり先に扱いたいも
 
 #### F8 / P2: 不正なNameMappingsの生成名を事前診断しない
 
-* 状態: 一部対応済み。`c128b54` でハイフン、`fc583bb` で先頭数字、`db8fe01` でclass、`bf997cf` でstruct、`2151f27` でenumの列指定名を診断。interface指定のSkipテストは未コミット。識別子規則全体・他経路の確認は未解決。
+* 状態: 一部対応済み。`c128b54` でハイフン、`fc583bb` で先頭数字、`db8fe01`・`bf997cf`・`2151f27` で予約語の一部を診断。開発者了承のもと、interfaceのGreen差分と予約語77件のTheory・実装を一つの未コミット変更にまとめた。全C#865件成功。他の無効名・生成先の確認は未解決。
 
 
 * 根拠: `CSharp/SpreadsheetAsData.CodeGeneration/GeneratedNameDiagnostics.cs:17-31,60-70` と `CodeGenerationOptionNames.cs`。

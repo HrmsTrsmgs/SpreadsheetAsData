@@ -532,62 +532,94 @@ public sealed class コード生成診断のテスト
                     "customer_id"));
     }
 
-    [Fact]
-    public void NameMappingsで列にCSharp予約語を指定した場合は変換せずエラーを診断します()
+    [Theory]
+    [InlineData("class")]
+    [InlineData("struct")]
+    [InlineData("enum")]
+    [InlineData("interface")]
+    [InlineData("namespace")]
+    [InlineData("public")]
+    [InlineData("int")]
+    [InlineData("void")]
+    [InlineData("if")]
+    [InlineData("return")]
+    [InlineData("new")]
+    [InlineData("using")]
+    [InlineData("null")]
+    [InlineData("true")]
+    [InlineData("abstract")]
+    [InlineData("as")]
+    [InlineData("base")]
+    [InlineData("bool")]
+    [InlineData("break")]
+    [InlineData("byte")]
+    [InlineData("case")]
+    [InlineData("catch")]
+    [InlineData("char")]
+    [InlineData("checked")]
+    [InlineData("const")]
+    [InlineData("continue")]
+    [InlineData("decimal")]
+    [InlineData("default")]
+    [InlineData("delegate")]
+    [InlineData("do")]
+    [InlineData("double")]
+    [InlineData("else")]
+    [InlineData("event")]
+    [InlineData("explicit")]
+    [InlineData("extern")]
+    [InlineData("false")]
+    [InlineData("finally")]
+    [InlineData("fixed")]
+    [InlineData("float")]
+    [InlineData("for")]
+    [InlineData("foreach")]
+    [InlineData("goto")]
+    [InlineData("implicit")]
+    [InlineData("in")]
+    [InlineData("internal")]
+    [InlineData("is")]
+    [InlineData("lock")]
+    [InlineData("long")]
+    [InlineData("object")]
+    [InlineData("operator")]
+    [InlineData("out")]
+    [InlineData("override")]
+    [InlineData("params")]
+    [InlineData("private")]
+    [InlineData("protected")]
+    [InlineData("readonly")]
+    [InlineData("ref")]
+    [InlineData("sbyte")]
+    [InlineData("sealed")]
+    [InlineData("short")]
+    [InlineData("sizeof")]
+    [InlineData("stackalloc")]
+    [InlineData("static")]
+    [InlineData("string")]
+    [InlineData("switch")]
+    [InlineData("this")]
+    [InlineData("throw")]
+    [InlineData("try")]
+    [InlineData("typeof")]
+    [InlineData("uint")]
+    [InlineData("ulong")]
+    [InlineData("unchecked")]
+    [InlineData("unsafe")]
+    [InlineData("ushort")]
+    [InlineData("virtual")]
+    [InlineData("volatile")]
+    [InlineData("while")]
+    public void NameMappingsで列にCSharp予約語を指定した場合は変換せずエラーを診断します(string keyword)
     {
         GeneratedCodeInspection
             .GenerateDiagnostics(
                 DefinedNamesWithoutCollisionsExcelFilePath,
-                options => options.NameMappings["sales_detail.customer_id"] = "class")
+                options => options.NameMappings["sales_detail.customer_id"] = keyword)
             .Should().ContainEquivalentOf(
                 new CodeGenerationDiagnostic(
                     true,
-                    "class",
-                    ["customer_id"],
-                    "customer_id"));
-    }
-
-    [Fact]
-    public void NameMappingsで列にclass以外のCSharp予約語を指定した場合も変換せずエラーを診断します()
-    {
-        GeneratedCodeInspection
-            .GenerateDiagnostics(
-                DefinedNamesWithoutCollisionsExcelFilePath,
-                options => options.NameMappings["sales_detail.customer_id"] = "struct")
-            .Should().ContainEquivalentOf(
-                new CodeGenerationDiagnostic(
-                    true,
-                    "struct",
-                    ["customer_id"],
-                    "customer_id"));
-    }
-
-    [Fact]
-    public void NameMappingsで列にenumを指定した場合も変換せずエラーを診断します()
-    {
-        GeneratedCodeInspection
-            .GenerateDiagnostics(
-                DefinedNamesWithoutCollisionsExcelFilePath,
-                options => options.NameMappings["sales_detail.customer_id"] = "enum")
-            .Should().ContainEquivalentOf(
-                new CodeGenerationDiagnostic(
-                    true,
-                    "enum",
-                    ["customer_id"],
-                    "customer_id"));
-    }
-
-    [Fact(Skip = "列名の予約語診断がinterfaceに未対応。対応後に解除する。")]
-    public void NameMappingsで列にinterfaceを指定した場合も変換せずエラーを診断します()
-    {
-        GeneratedCodeInspection
-            .GenerateDiagnostics(
-                DefinedNamesWithoutCollisionsExcelFilePath,
-                options => options.NameMappings["sales_detail.customer_id"] = "interface")
-            .Should().ContainEquivalentOf(
-                new CodeGenerationDiagnostic(
-                    true,
-                    "interface",
+                    keyword,
                     ["customer_id"],
                     "customer_id"));
     }

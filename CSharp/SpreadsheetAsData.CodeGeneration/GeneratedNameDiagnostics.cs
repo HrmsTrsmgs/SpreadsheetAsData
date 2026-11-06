@@ -139,7 +139,7 @@ static class GeneratedNameDiagnostics
             [$"{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}Data"]);
 
     /// <summary>
-    /// ハイフンを含むか数字から始まる列プロパティ名、予約語class・struct・enumと、列同士・行データ型名との名前衝突を検出します。
+    /// ハイフンを含むか数字から始まる列プロパティ名、指定の予約語と、列同士・行データ型名との名前衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> ColumnPropertyNameDiagnostics(
         Table table,
@@ -149,7 +149,20 @@ static class GeneratedNameDiagnostics
                let propertyName = options.TableColumn(table, column)
                where propertyName.Contains('-')
                    || (propertyName.Any() && char.IsDigit(propertyName[0]))
-                   || propertyName is "class" or "struct" or "enum"
+                   || propertyName is "class" or "struct" or "enum" or "interface"
+                       or "namespace" or "public" or "int" or "void" or "if"
+                       or "return" or "new" or "using" or "null" or "true"
+                       or "abstract" or "as" or "base" or "bool" or "break" or "byte"
+                       or "case" or "catch" or "char" or "checked" or "const" or "continue"
+                       or "decimal" or "default" or "delegate" or "do" or "double" or "else"
+                       or "event" or "explicit" or "extern" or "false" or "finally" or "fixed"
+                       or "float" or "for" or "foreach" or "goto" or "implicit" or "in"
+                       or "internal" or "is" or "lock" or "long" or "object" or "operator"
+                       or "out" or "override" or "params" or "private" or "protected" or "readonly"
+                       or "ref" or "sbyte" or "sealed" or "short" or "sizeof" or "stackalloc"
+                       or "static" or "string" or "switch" or "this" or "throw" or "try"
+                       or "typeof" or "uint" or "ulong" or "unchecked" or "unsafe" or "ushort"
+                       or "virtual" or "volatile" or "while"
                select new CodeGenerationDiagnostic(true, propertyName, [column.Name], column.Name),
             .. NameCollisionDiagnostics(
                 GroupMemberNames(
