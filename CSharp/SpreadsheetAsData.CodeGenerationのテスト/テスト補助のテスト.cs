@@ -24,7 +24,7 @@ public sealed class テスト補助のテスト
         var run = PowerShell実行結果.RunAsync(scriptFilePath, project.DirectoryPath);
         try
         {
-            var tested = await run.WaitAsync(TimeSpan.FromSeconds(15));
+            var tested = await run.WaitAsync(TimeSpan.FromSeconds(15), TestContext.Current.CancellationToken);
 
             tested.ExitCode.Should().Be(0);
             tested.Output.Should().Contain("completed");
