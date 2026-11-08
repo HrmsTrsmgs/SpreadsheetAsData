@@ -1,4 +1,6 @@
-﻿using Marimo.SpreadsheetAsData;
+﻿using System.Globalization;
+
+using Marimo.SpreadsheetAsData;
 
 namespace Marimo.SpreadsheetAsData.CodeGeneration;
 
@@ -139,7 +141,7 @@ static class GeneratedNameDiagnostics
             [$"{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}Data"]);
 
     /// <summary>
-    /// ハイフンを含むか数字から始まる列プロパティ名、指定の予約語と、列同士・行データ型名との名前衝突を検出します。
+    /// 不正な文字を含む列プロパティ名、指定の予約語と、列同士・行データ型名との名前衝突を検出します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> ColumnPropertyNameDiagnostics(
         Table table,
@@ -147,8 +149,16 @@ static class GeneratedNameDiagnostics
         [
             .. from column in table.Columns
                let propertyName = options.TableColumn(table, column)
-               where propertyName.Contains('-')
-                   || (propertyName.Any() && char.IsDigit(propertyName[0]))
+               where propertyName.Any(it => it != '@' && char.GetUnicodeCategory(it) is not (
+                       UnicodeCategory.UppercaseLetter or UnicodeCategory.LowercaseLetter
+                       or UnicodeCategory.TitlecaseLetter or UnicodeCategory.ModifierLetter
+                       or UnicodeCategory.OtherLetter or UnicodeCategory.LetterNumber
+                       or UnicodeCategory.DecimalDigitNumber or UnicodeCategory.ConnectorPunctuation
+                       or UnicodeCategory.NonSpacingMark or UnicodeCategory.SpacingCombiningMark
+                       or UnicodeCategory.Format))
+                   || (propertyName.Any() && (char.IsDigit(propertyName[0])
+                       || char.GetUnicodeCategory(propertyName[0]) is UnicodeCategory.NonSpacingMark
+                           or UnicodeCategory.SpacingCombiningMark))
                    || IsCSharpKeyword(propertyName)
                select new CodeGenerationDiagnostic(true, propertyName, [column.Name], column.Name),
             .. NameCollisionDiagnostics(

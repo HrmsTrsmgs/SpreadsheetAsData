@@ -533,6 +533,26 @@ public sealed class コード生成診断のテスト
     }
 
     [Theory]
+    [InlineData("Customer Id")]
+    [InlineData("Customer.Id")]
+    [InlineData("Customer+Id")]
+    [InlineData("\u0301Customer")]
+    [InlineData("Customer\U0001F600")]
+    public void NameMappingsで列に不正な文字を含む名前を指定した場合は変換せずエラーを診断します(string generatedName)
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                DefinedNamesWithoutCollisionsExcelFilePath,
+                options => options.NameMappings["sales_detail.customer_id"] = generatedName)
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    generatedName,
+                    ["customer_id"],
+                    "customer_id"));
+    }
+
+    [Theory]
     [InlineData("class")]
     [InlineData("struct")]
     [InlineData("enum")]
