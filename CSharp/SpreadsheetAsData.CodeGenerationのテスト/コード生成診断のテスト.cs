@@ -552,7 +552,7 @@ public sealed class コード生成診断のテスト
                     "customer_id"));
     }
 
-    [Fact(Skip = "名前途中の@は現在診断されないため、診断対応後に有効化する")]
+    [Fact]
     public void NameMappingsで列の名前途中にアットマークを指定した場合はエラーを診断します()
     {
         GeneratedCodeInspection
