@@ -63,6 +63,8 @@ static class GeneratedNameDiagnostics
         where propertyName.IsEmpty()
             || propertyName.Contains('-')
             || propertyName.Contains('!')
+            || propertyName.Contains('"')
+            || propertyName.Any(it => "#$%&'()*+,/:;<=>?[\\]^`{|}~".Contains(it))
             || propertyName.Contains(' ')
             || propertyName.Contains('.')
             || propertyName.Skip(1).Contains('@')
