@@ -61,6 +61,7 @@ static class GeneratedNameDiagnostics
         from sheet in book.Sheets.Values
         let propertyName = options.GeneratedName(sheet.Name)
         where propertyName.IsEmpty()
+            || propertyName.Contains('-')
         select new CodeGenerationDiagnostic(
             true,
             propertyName,
