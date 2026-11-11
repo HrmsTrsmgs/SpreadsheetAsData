@@ -62,6 +62,14 @@ static class GeneratedNameDiagnostics
         let propertyName = options.GeneratedName(sheet.Name)
         where propertyName.IsEmpty()
             || propertyName.Contains('-')
+            || propertyName.Contains(' ')
+            || propertyName.Contains('.')
+            || propertyName.Skip(1).Contains('@')
+            || propertyName.Any(char.IsSurrogate)
+            || propertyName == "@"
+            || (propertyName.Length > 0 && char.IsDigit(propertyName[0]))
+            || (propertyName.Length > 1 && propertyName[0] == '@' && char.IsDigit(propertyName[1]))
+            || IsCSharpKeyword(propertyName)
         select new CodeGenerationDiagnostic(
             true,
             propertyName,

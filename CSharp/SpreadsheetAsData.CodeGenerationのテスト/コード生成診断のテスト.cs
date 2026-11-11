@@ -502,17 +502,69 @@ public sealed class コード生成診断のテスト
                     "---"));
     }
 
-    [Fact]
-    public void NameMappingsでシートに無効なCSharp識別子を指定した場合は変換せずエラーを診断します()
+    [Theory]
+    [InlineData("not-valid")]
+    [InlineData("Sales Data")]
+    [InlineData("class")]
+    [InlineData("1SalesData")]
+    [InlineData("Sales@Data")]
+    [InlineData("Sales.Data")]
+    [InlineData("Sales\U0001F600")]
+    public void NameMappingsでシートに無効なCSharp識別子を指定した場合は変換せずエラーを診断します(string generatedName)
     {
         GeneratedCodeInspection
             .GenerateDiagnostics(
                 BasicStructureExcelFilePath,
-                options => options.NameMappings["SalesData"] = "not-valid")
+                options => options.NameMappings["SalesData"] = generatedName)
             .Should().ContainEquivalentOf(
                 new CodeGenerationDiagnostic(
                     true,
-                    "not-valid",
+                    generatedName,
+                    ["SalesData"],
+                    "SalesData"));
+    }
+
+    [Fact]
+    public void NameMappingsでシートにアットマークのみを指定した場合はエラーを診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                BasicStructureExcelFilePath,
+                options => options.NameMappings["SalesData"] = "@")
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "@",
+                    ["SalesData"],
+                    "SalesData"));
+    }
+
+    [Fact]
+    public void NameMappingsでシートにアットマークの後が数字で始まる名前を指定した場合はエラーを診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                BasicStructureExcelFilePath,
+                options => options.NameMappings["SalesData"] = "@1SalesData")
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "@1SalesData",
+                    ["SalesData"],
+                    "SalesData"));
+    }
+
+    [Fact(Skip = "シートの生成名に含まれる不正な文字の診断を実装したら解除する")]
+    public void NameMappingsでシートに感嘆符を含む名前を指定した場合はエラーを診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                BasicStructureExcelFilePath,
+                options => options.NameMappings["SalesData"] = "Sales!Data")
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "Sales!Data",
                     ["SalesData"],
                     "SalesData"));
     }
