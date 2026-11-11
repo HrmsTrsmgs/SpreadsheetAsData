@@ -61,12 +61,7 @@ static class GeneratedNameDiagnostics
         from sheet in book.Sheets.Values
         let propertyName = options.GeneratedName(sheet.Name)
         where propertyName.IsEmpty()
-            || propertyName.Contains('-')
-            || propertyName.Contains('!')
-            || propertyName.Contains('"')
-            || propertyName.Any(it => "#$%&'()*+,/:;<=>?[\\]^`{|}~".Contains(it))
-            || propertyName.Contains(' ')
-            || propertyName.Contains('.')
+            || propertyName.Any(it => " !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~".Contains(it))
             || propertyName.Skip(1).Contains('@')
             || propertyName.Any(char.IsSurrogate)
             || propertyName == "@"
