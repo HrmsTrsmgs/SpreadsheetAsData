@@ -569,6 +569,48 @@ public sealed class コード生成診断のテスト
                     "SalesData"));
     }
 
+    [Theory]
+    [InlineData("Sales\"Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales#Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales$Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales%Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales&Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales'Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales(Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales)Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales*Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales+Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales,Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales/Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales:Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales;Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales<Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales=Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales>Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales?Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales[Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales\\Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales]Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales^Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales`Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales{Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales|Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales}Data", Skip = "不正な記号の診断に対応したら解除する")]
+    [InlineData("Sales~Data", Skip = "不正な記号の診断に対応したら解除する")]
+    public void NameMappingsでシートに不正なASCII記号を含む名前を指定した場合はエラーを診断します(string generatedName)
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                BasicStructureExcelFilePath,
+                options => options.NameMappings["SalesData"] = generatedName)
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    generatedName,
+                    ["SalesData"],
+                    "SalesData"));
+    }
+
     [Fact]
     public void NameMappingsで列に無効なCSharp識別子を指定した場合は変換せずエラーを診断します()
     {
