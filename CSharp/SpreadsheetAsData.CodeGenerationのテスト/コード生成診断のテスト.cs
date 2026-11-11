@@ -554,7 +554,7 @@ public sealed class コード生成診断のテスト
                     "SalesData"));
     }
 
-    [Fact(Skip = "シートの生成名に含まれる不正な文字の診断を実装したら解除する")]
+    [Fact]
     public void NameMappingsでシートに感嘆符を含む名前を指定した場合はエラーを診断します()
     {
         GeneratedCodeInspection

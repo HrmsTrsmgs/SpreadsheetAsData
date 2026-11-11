@@ -62,6 +62,7 @@ static class GeneratedNameDiagnostics
         let propertyName = options.GeneratedName(sheet.Name)
         where propertyName.IsEmpty()
             || propertyName.Contains('-')
+            || propertyName.Contains('!')
             || propertyName.Contains(' ')
             || propertyName.Contains('.')
             || propertyName.Skip(1).Contains('@')
