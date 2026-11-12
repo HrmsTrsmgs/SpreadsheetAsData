@@ -509,6 +509,7 @@ public sealed class コード生成診断のテスト
     [InlineData("1SalesData")]
     [InlineData("Sales@Data")]
     [InlineData("Sales.Data")]
+    [InlineData("\u0301SalesData")]
     [InlineData("Sales\U0001F600")]
     public void NameMappingsでシートに無効なCSharp識別子を指定した場合は変換せずエラーを診断します(string generatedName)
     {
