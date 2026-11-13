@@ -65,8 +65,8 @@ static class GeneratedNameDiagnostics
             || propertyName.Skip(1).Contains('@')
             || propertyName.Any(char.IsSurrogate)
             || propertyName == "@"
-            || (propertyName.Length > 0 && char.IsDigit(propertyName[0]))
-            || (propertyName.Length > 0 && char.GetUnicodeCategory(propertyName[0]) == UnicodeCategory.NonSpacingMark)
+            || (propertyName.Any() && char.IsDigit(propertyName[0]))
+            || (propertyName.Any() && char.GetUnicodeCategory(propertyName[0]) == UnicodeCategory.NonSpacingMark)
             || (propertyName.Length > 1 && propertyName[0] == '@' && char.IsDigit(propertyName[1]))
             || IsCSharpKeyword(propertyName)
         select new CodeGenerationDiagnostic(
