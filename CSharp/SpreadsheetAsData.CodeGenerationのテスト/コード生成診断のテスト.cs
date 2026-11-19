@@ -622,17 +622,19 @@ public sealed class コード生成診断のテスト
                     "SalesData"));
     }
 
-    [Fact]
-    public void NameMappingsでテーブル名に無効なCSharp識別子を指定した場合は変換せずエラーを診断します()
+    [Theory]
+    [InlineData("not-valid")]
+    [InlineData("1SalesDetail")]
+    public void NameMappingsでテーブル名に無効なCSharp識別子を指定した場合は変換せずエラーを診断します(string generatedName)
     {
         GeneratedCodeInspection
             .GenerateDiagnostics(
                 BasicStructureExcelFilePath,
-                options => options.NameMappings["sales_detail"] = "not-valid")
+                options => options.NameMappings["sales_detail"] = generatedName)
             .Should().ContainEquivalentOf(
                 new CodeGenerationDiagnostic(
                     true,
-                    "not-valid",
+                    generatedName,
                     ["sales_detail"],
                     "sales_detail"));
     }
