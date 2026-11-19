@@ -18,9 +18,14 @@ static class GeneratedNameDiagnostics
         CodeGenerationOptions options) =>
         [
             .. InvalidPropertyNameDiagnostics(
-                from sheet in book.Sheets.Values select sheet.Name, options, IsInvalidSheetPropertyName),
+                from sheet in book.Sheets.Values
+                select sheet.Name,
+                options,
+                IsInvalidSheetPropertyName),
             .. InvalidPropertyNameDiagnostics(
-                from table in book.Tables select table.Name, options,
+                from table in book.Tables
+                select table.Name,
+                options,
                 name => name.Contains('-') || (name.Any() && char.IsDigit(name[0]))),
             .. TypeNameDiagnostics(filePath, book, options),
             .. BookPropertyNameDiagnostics(filePath, book, options),
