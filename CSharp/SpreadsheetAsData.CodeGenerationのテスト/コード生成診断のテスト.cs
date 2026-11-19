@@ -502,6 +502,16 @@ public sealed class コード生成診断のテスト
                     "---"));
     }
 
+    [Fact]
+    public void NameMappingsでシートの生成名の途中にSpacingCombiningMarkを指定しても診断を返しません()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                BasicStructureExcelFilePath,
+                options => options.NameMappings["SalesData"] = "Sales\u0903Data")
+            .Should().BeEmpty();
+    }
+
     [Theory]
     [InlineData("not-valid")]
     [InlineData("Sales Data")]
