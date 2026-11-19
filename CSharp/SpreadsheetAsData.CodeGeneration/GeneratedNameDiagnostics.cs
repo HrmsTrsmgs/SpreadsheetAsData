@@ -20,13 +20,11 @@ static class GeneratedNameDiagnostics
             .. InvalidPropertyNameDiagnostics(
                 from sheet in book.Sheets.Values
                 select sheet.Name,
-                options,
-                IsInvalidSheetPropertyName),
+                options),
             .. InvalidPropertyNameDiagnostics(
                 from table in book.Tables
                 select table.Name,
-                options,
-                name => name.Contains('-') || (name.Any() && char.IsDigit(name[0]))),
+                options),
             .. TypeNameDiagnostics(filePath, book, options),
             .. BookPropertyNameDiagnostics(filePath, book, options),
             .. SheetDefinedNameDiagnostics(book, options),
@@ -62,18 +60,17 @@ static class GeneratedNameDiagnostics
             []);
 
     /// <summary>
-    /// 生成名が対象の判定に該当した場合、対応する元名を添えて報告します。
+    /// シート・テーブルの生成プロパティ名が無効な場合、対応する元名を添えて報告します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> InvalidPropertyNameDiagnostics(
         IEnumerable<string> sourceNames,
-        CodeGenerationOptions options,
-        Func<string, bool> isInvalid) =>
+        CodeGenerationOptions options) =>
         from sourceName in sourceNames
         let propertyName = options.GeneratedName(sourceName)
-        where isInvalid(propertyName)
+        where IsInvalidPropertyName(propertyName)
         select new CodeGenerationDiagnostic(true, propertyName, [sourceName], sourceName);
 
-    static bool IsInvalidSheetPropertyName(string propertyName) =>
+    static bool IsInvalidPropertyName(string propertyName) =>
         propertyName.IsEmpty()
             || propertyName.Any(it => " !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~".Contains(it))
             || propertyName.Skip(1).Contains('@')

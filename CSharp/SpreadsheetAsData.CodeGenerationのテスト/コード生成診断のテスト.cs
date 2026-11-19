@@ -625,6 +625,8 @@ public sealed class コード生成診断のテスト
     [Theory]
     [InlineData("not-valid")]
     [InlineData("1SalesDetail")]
+    [InlineData("class")]
+    [InlineData("Sales@Detail")]
     public void NameMappingsでテーブル名に無効なCSharp識別子を指定した場合は変換せずエラーを診断します(string generatedName)
     {
         GeneratedCodeInspection
