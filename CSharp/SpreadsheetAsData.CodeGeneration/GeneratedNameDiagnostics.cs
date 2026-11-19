@@ -18,6 +18,10 @@ static class GeneratedNameDiagnostics
         CodeGenerationOptions options) =>
         [
             .. InvalidBookSheetPropertyNameDiagnostics(book, options),
+            .. from table in book.Tables
+               let name = options.GeneratedName(table.Name)
+               where name.Contains('-')
+               select new CodeGenerationDiagnostic(true, name, [table.Name], table.Name),
             .. TypeNameDiagnostics(filePath, book, options),
             .. BookPropertyNameDiagnostics(filePath, book, options),
             .. SheetDefinedNameDiagnostics(book, options),
