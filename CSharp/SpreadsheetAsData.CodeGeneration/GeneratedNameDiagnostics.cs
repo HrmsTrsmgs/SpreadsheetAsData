@@ -17,11 +17,10 @@ static class GeneratedNameDiagnostics
         Workbook book,
         CodeGenerationOptions options) =>
         [
-            .. InvalidBookSheetPropertyNameDiagnostics(book, options),
-            .. from table in book.Tables
-               let name = options.GeneratedName(table.Name)
-               where name.Contains('-')
-               select new CodeGenerationDiagnostic(true, name, [table.Name], table.Name),
+            .. InvalidPropertyNameDiagnostics(
+                from sheet in book.Sheets.Values select sheet.Name, options, IsInvalidSheetPropertyName),
+            .. InvalidPropertyNameDiagnostics(
+                from table in book.Tables select table.Name, options, name => name.Contains('-')),
             .. TypeNameDiagnostics(filePath, book, options),
             .. BookPropertyNameDiagnostics(filePath, book, options),
             .. SheetDefinedNameDiagnostics(book, options),
@@ -57,14 +56,19 @@ static class GeneratedNameDiagnostics
             []);
 
     /// <summary>
-    /// Book型のプロパティ名を生成できないワークシート名を検出します。
+    /// 生成名が対象の判定に該当した場合、対応する元名を添えて報告します。
     /// </summary>
-    static IEnumerable<CodeGenerationDiagnostic> InvalidBookSheetPropertyNameDiagnostics(
-        Workbook book,
-        CodeGenerationOptions options) =>
-        from sheet in book.Sheets.Values
-        let propertyName = options.GeneratedName(sheet.Name)
-        where propertyName.IsEmpty()
+    static IEnumerable<CodeGenerationDiagnostic> InvalidPropertyNameDiagnostics(
+        IEnumerable<string> sourceNames,
+        CodeGenerationOptions options,
+        Func<string, bool> isInvalid) =>
+        from sourceName in sourceNames
+        let propertyName = options.GeneratedName(sourceName)
+        where isInvalid(propertyName)
+        select new CodeGenerationDiagnostic(true, propertyName, [sourceName], sourceName);
+
+    static bool IsInvalidSheetPropertyName(string propertyName) =>
+        propertyName.IsEmpty()
             || propertyName.Any(it => " !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~".Contains(it))
             || propertyName.Skip(1).Contains('@')
             || propertyName.Any(char.IsSurrogate)
@@ -72,12 +76,7 @@ static class GeneratedNameDiagnostics
             || (propertyName.Any() && char.IsDigit(propertyName[0]))
             || (propertyName.Any() && char.GetUnicodeCategory(propertyName[0]) == UnicodeCategory.NonSpacingMark)
             || (propertyName.Length > 1 && propertyName[0] == '@' && char.IsDigit(propertyName[1]))
-            || IsCSharpKeyword(propertyName)
-        select new CodeGenerationDiagnostic(
-            true,
-            propertyName,
-            [sheet.Name],
-            sheet.Name);
+            || IsCSharpKeyword(propertyName);
 
     /// <summary>
     /// Book型の中で、定義名・ワークシート・Excelテーブルの生成プロパティ名同士、
