@@ -711,6 +711,21 @@ public sealed class コード生成診断のテスト
     }
 
     [Fact]
+    public void NameMappingsで列にアットマークの後が数字で始まる名前を指定した場合はエラーを診断します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                DefinedNamesWithoutCollisionsExcelFilePath,
+                options => options.NameMappings["sales_detail.customer_id"] = "@1CustomerId")
+            .Should().ContainEquivalentOf(
+                new CodeGenerationDiagnostic(
+                    true,
+                    "@1CustomerId",
+                    ["customer_id"],
+                    "customer_id"));
+    }
+
+    [Fact]
     public void NameMappingsで列の名前途中にアットマークを指定した場合はエラーを診断します()
     {
         GeneratedCodeInspection

@@ -167,7 +167,8 @@ static class GeneratedNameDiagnostics
         [
             .. from column in table.Columns
                let propertyName = options.TableColumn(table, column)
-               where propertyName.Any(it => it != '@' && char.GetUnicodeCategory(it) is not (
+               where IsInvalidPropertyName(propertyName)
+                   || propertyName.Any(it => it != '@' && char.GetUnicodeCategory(it) is not (
                        UnicodeCategory.UppercaseLetter or UnicodeCategory.LowercaseLetter
                        or UnicodeCategory.TitlecaseLetter or UnicodeCategory.ModifierLetter
                        or UnicodeCategory.OtherLetter or UnicodeCategory.LetterNumber
