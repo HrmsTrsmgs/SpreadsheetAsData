@@ -641,19 +641,23 @@ public sealed class コード生成診断のテスト
                     "sales_detail"));
     }
 
-    [Fact]
-    public void NameMappingsでブックスコープの定義名に無効なCSharp識別子を指定した場合は変換せずエラーを診断します()
+    [Theory]
+    [InlineData("book.main_cell", "main_cell")]
+    [InlineData("sales_data.local_cell", "local_cell")]
+    public void 文脈付きNameMappingsで定義名に無効なCSharp識別子を指定した場合は変換せずエラーを診断します(
+        string mappingKey,
+        string sourceName)
     {
         GeneratedCodeInspection
             .GenerateDiagnostics(
                 DefinedNamesWithoutCollisionsExcelFilePath,
-                options => options.NameMappings["book.main_cell"] = "not-valid")
+                options => options.NameMappings[mappingKey] = "not-valid")
             .Should().ContainEquivalentOf(
                 new CodeGenerationDiagnostic(
                     true,
                     "not-valid",
-                    ["main_cell"],
-                    "main_cell"));
+                    [sourceName],
+                    sourceName));
     }
 
     [Fact]

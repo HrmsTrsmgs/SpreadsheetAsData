@@ -25,9 +25,10 @@ static class GeneratedNameDiagnostics
                 from table in book.Tables
                 select table.Name,
                 options),
-            .. from member in BookDefinedNames(book, options)
-               where IsInvalidPropertyName(member.Name)
-               select new CodeGenerationDiagnostic(true, member.Name, [member.SourceName], member.SourceName),
+            .. from definedName in book.DefinedNames
+               let propertyName = options.GeneratedName(definedName)
+               where IsInvalidPropertyName(propertyName)
+               select new CodeGenerationDiagnostic(true, propertyName, [definedName.Name], definedName.Name),
             .. TypeNameDiagnostics(filePath, book, options),
             .. BookPropertyNameDiagnostics(filePath, book, options),
             .. SheetDefinedNameDiagnostics(book, options),
