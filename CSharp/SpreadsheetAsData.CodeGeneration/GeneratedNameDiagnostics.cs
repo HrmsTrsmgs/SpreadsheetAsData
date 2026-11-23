@@ -17,10 +17,11 @@ static class GeneratedNameDiagnostics
         Workbook book,
         CodeGenerationOptions options) =>
         [
-            .. InvalidPropertyNameDiagnostics(
-                from sheet in book.Sheets.Values
-                select sheet.Name,
-                options),
+            .. from sheet in book.Sheets.Values
+               let propertyName = options.GeneratedName(sheet.Name)
+               where IsInvalidPropertyName(propertyName)
+                   || propertyName.Any(it => char.GetUnicodeCategory(it) == UnicodeCategory.MathSymbol)
+               select new CodeGenerationDiagnostic(true, propertyName, [sheet.Name], sheet.Name),
             .. InvalidPropertyNameDiagnostics(
                 from table in book.Tables
                 select table.Name,
@@ -64,7 +65,7 @@ static class GeneratedNameDiagnostics
             []);
 
     /// <summary>
-    /// シート・テーブルの生成プロパティ名が無効な場合、対応する元名を添えて報告します。
+    /// テーブルの生成プロパティ名が無効な場合、対応する元名を添えて報告します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> InvalidPropertyNameDiagnostics(
         IEnumerable<string> sourceNames,
