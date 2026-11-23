@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
-    <_SpreadsheetAsDataTaskAssembly>$(MSBuildThisFileDirectory)..\tools\net10.0\SpreadsheetAsData.Build.dll</_SpreadsheetAsDataTaskAssembly>
-    <_SpreadsheetAsDataSupportsNetTaskHost Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(MSBuildVersion)', '18.0'))">true</_SpreadsheetAsDataSupportsNetTaskHost>
+    <_SpreadsheetAsDataTaskAssembly>$(MSBuildThisFileDirectory)..\tools\net11.0\SpreadsheetAsData.Build.dll</_SpreadsheetAsDataTaskAssembly>
+    <_SpreadsheetAsDataSupportsNetTaskHost Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(MSBuildVersion)', '18.12'))">true</_SpreadsheetAsDataSupportsNetTaskHost>
   </PropertyGroup>
 
   <UsingTask
@@ -34,7 +34,7 @@
     Condition="'@(SpreadsheetAsData)' != '' and '$(DesignTimeBuild)' != 'true' and '$(_SpreadsheetAsDataSupportsNetTaskHost)' != 'true'">
     <Error
       Code="SASD000"
-      Text="SpreadsheetAsData のコード生成には MSBuild 18.0 以降 (.NET SDK 10 / Visual Studio 2026) が必要です。" />
+      Text="SpreadsheetAsData のコード生成には MSBuild 18.12 以降 (.NET SDK 11 / Visual Studio 2026 18.12) が必要です。" />
   </Target>
 
   <Target

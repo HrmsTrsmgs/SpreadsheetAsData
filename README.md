@@ -440,8 +440,8 @@ Stream入力からファイルへ保存する例は、[サンプルの説明](sa
 ## ビルドとテスト
 
 C#版は `CSharp/SpreadsheetAsData.slnx` に含まれています。
-ライブラリ本体とテストプロジェクトは `net10.0` を対象にしています。
-現在のコードはC# 14の構文を使用します。
+ライブラリ本体とテストプロジェクトは `net11.0` を対象にしています。
+C#の言語バージョンは .NET 11 SDKの既定であるC# 15です。生成コードの構文は変更していません。
 
 このリポジトリのPowerShellスクリプトは、PowerShell 7以降の `pwsh` で実行します。
 Windows PowerShell 5.1の `powershell.exe` とPowerShell 7の `pwsh.exe` は同じマシンに共存できますが、このリポジトリでは `pwsh` を明示して使います。
@@ -458,9 +458,9 @@ pwsh -NoProfile -File .\scripts\Initialize-DevelopmentEnvironment.ps1
 ```
 
 このスクリプトは、開発環境の前提を確認したうえで、.NETローカルツールとC#ソリューションのNuGetパッケージを復元します。
-PowerShell 7、.NET 10 SDK、Gitなどの導入自体は行いません。
+PowerShell 7、.NET 11 SDK、Gitなどの導入自体は行いません。
 
-.NET 10 SDKが入っている環境では、次のコマンドでビルドとテストを実行できます。
+.NET 11 SDKが入っている環境では、次のコマンドでビルドとテストを実行できます。
 
 ```powershell
 dotnet build .\CSharp\SpreadsheetAsData.slnx
@@ -519,7 +519,7 @@ C#版は、NuGet.orgでパッケージとして公開しています。
 
 通常の利用者は `Marimo.SpreadsheetAsData` を参照してください。
 依存を絞りたい場合だけ、用途に応じて個別パッケージを参照します。
-コード生成タスクは .NET 10 / MSBuild 18 以降の .NET TaskHost を前提にしています。
+コード生成タスクは .NET 11 / MSBuild 18.12 以降の .NET TaskHost を前提にしています。
 
 ローカルでパッケージを生成する場合は、次のコマンドを実行します。
 

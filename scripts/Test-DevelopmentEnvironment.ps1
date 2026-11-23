@@ -54,7 +54,7 @@ Write-CheckResult `
     ".NET SDK" `
     ($null -ne $dotnetPath) `
     ($(if ($null -eq $dotnetPath) {
-        "dotnet が見つかりません。.NET 10 SDKをインストールしてください。"
+        "dotnet が見つかりません。.NET 11 SDKをインストールしてください。"
     }
     else {
         "dotnet: $dotnetPath"
@@ -62,19 +62,19 @@ Write-CheckResult `
 
 if ($null -ne $dotnetPath) {
     $dotnetSdks = dotnet --list-sdks
-    $dotnet10Sdks = @(
+    $dotnet11Sdks = @(
         $dotnetSdks |
-            Where-Object { $_ -match "^10\." }
+            Where-Object { $_ -match "^11\." }
     )
 
     Write-CheckResult `
-        ".NET 10 SDK" `
-        ($dotnet10Sdks.Count -gt 0) `
-        ($(if ($dotnet10Sdks.Count -gt 0) {
-            $dotnet10Sdks -join ", "
+        ".NET 11 SDK" `
+        ($dotnet11Sdks.Count -gt 0) `
+        ($(if ($dotnet11Sdks.Count -gt 0) {
+            $dotnet11Sdks -join ", "
         }
         else {
-            ".NET 10 SDKが見つかりません。"
+            ".NET 11 SDKが見つかりません。"
         }))
 }
 

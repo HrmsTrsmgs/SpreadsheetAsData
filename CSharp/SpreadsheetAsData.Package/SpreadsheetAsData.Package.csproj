@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <PackageId>Marimo.SpreadsheetAsData</PackageId>
     <Version>0.4.0</Version>
@@ -24,7 +24,7 @@
     <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
     <None Include="..\SpreadsheetAsData.Build\buildTransitive\Marimo.SpreadsheetAsData.Build.props" Pack="true" PackagePath="buildTransitive\Marimo.SpreadsheetAsData.props" Visible="false" />
     <None Include="..\SpreadsheetAsData.Build\buildTransitive\Marimo.SpreadsheetAsData.Build.targets" Pack="true" PackagePath="buildTransitive\Marimo.SpreadsheetAsData.targets" Visible="false" />
-    <None Include="PackagePlaceholder\_._" Pack="true" PackagePath="lib\net10.0\_._" Visible="false" />
+    <None Include="PackagePlaceholder\_._" Pack="true" PackagePath="lib\net11.0\_._" Visible="false" />
   </ItemGroup>
 
   <Target
@@ -34,12 +34,12 @@
       Condition="'$(NoBuild)' != 'true'"
       Projects="..\SpreadsheetAsData.Build\SpreadsheetAsData.Build.csproj"
       Targets="Build"
-      Properties="Configuration=$(Configuration);TargetFramework=net10.0" />
+      Properties="Configuration=$(Configuration);TargetFramework=net11.0" />
 
     <ItemGroup>
       <TfmSpecificPackageFile
-        Include="..\SpreadsheetAsData.Build\bin\$(Configuration)\net10.0\**\*.*">
-        <PackagePath>tools\net10.0\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+        Include="..\SpreadsheetAsData.Build\bin\$(Configuration)\net11.0\**\*.*">
+        <PackagePath>tools\net11.0\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
       </TfmSpecificPackageFile>
     </ItemGroup>
   </Target>

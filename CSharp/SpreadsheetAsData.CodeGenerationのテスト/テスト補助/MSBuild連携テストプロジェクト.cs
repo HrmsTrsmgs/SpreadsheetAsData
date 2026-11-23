@@ -17,7 +17,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
 {
     const string BasicStructureExcelFilePath = @"TestData\コード生成\BasicStructure.xlsx";
     const string Configuration = "Debug";
-    const string TargetFramework = "net10.0";
+    const string TargetFramework = "net11.0";
 
     MSBuild連携テストプロジェクト()
     {
@@ -179,7 +179,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
 
               <PropertyGroup>
                 <RootNamespace>Generated</RootNamespace>
-                <IntermediateOutputPath>obj\Debug\net10.0\</IntermediateOutputPath>
+                <IntermediateOutputPath>obj\Debug\net11.0\</IntermediateOutputPath>
                 <DesignTimeBuild>false</DesignTimeBuild>
               </PropertyGroup>
 
@@ -230,7 +230,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
 
               <PropertyGroup>
                 <RootNamespace>Generated</RootNamespace>
-                <IntermediateOutputPath>obj\Debug\net10.0\</IntermediateOutputPath>
+                <IntermediateOutputPath>obj\Debug\net11.0\</IntermediateOutputPath>
                 <DesignTimeBuild>true</DesignTimeBuild>
               </PropertyGroup>
 
@@ -275,7 +275,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
 
               <PropertyGroup>
                 <OutputType>Library</OutputType>
-                <TargetFramework>net10.0</TargetFramework>
+                <TargetFramework>net11.0</TargetFramework>
                 <ImplicitUsings>enable</ImplicitUsings>
                 <Nullable>enable</Nullable>
                 <RootNamespace>Generated</RootNamespace>
@@ -283,7 +283,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
               </PropertyGroup>
 
               <ItemGroup>
-                <Reference Include="SpreadsheetAsData" HintPath="Package\tools\net10.0\SpreadsheetAsData.dll" />
+                <Reference Include="SpreadsheetAsData" HintPath="Package\tools\net11.0\SpreadsheetAsData.dll" />
                 <SpreadsheetAsData Include="BasicStructure.xlsx" />
               </ItemGroup>
 
@@ -381,7 +381,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
             $$"""
             <Project Sdk="Microsoft.NET.Sdk">
               <PropertyGroup>
-                <TargetFramework>net10.0</TargetFramework>
+                <TargetFramework>net11.0</TargetFramework>
                 <OutputType>Exe</OutputType>
                 <RootNamespace>ConsumerModel</RootNamespace>
                 <UseSharedCompilation>false</UseSharedCompilation>
@@ -568,7 +568,7 @@ sealed record PowerShell実行結果(
         string scriptFilePath,
         string workingDirectory)
     {
-        using var process = Process.Start(new ProcessStartInfo
+        var result = await Process.RunAndCaptureTextAsync(new ProcessStartInfo
         {
             FileName = "pwsh",
             Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{scriptFilePath}\"",
@@ -576,15 +576,11 @@ sealed record PowerShell実行結果(
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false
-        }) ?? throw new InvalidOperationException("PowerShellを起動できませんでした。");
-
-        var standardOutput = process.StandardOutput.ReadToEndAsync();
-        var standardError = process.StandardError.ReadToEndAsync();
-        await process.WaitForExitAsync();
+        });
 
         return new(
-            process.ExitCode,
-            await standardOutput + await standardError);
+            result.ExitStatus.ExitCode,
+            result.StandardOutput + result.StandardError);
     }
 }
 

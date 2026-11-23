@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <RootNamespace>Marimo.SpreadsheetAsData.Build</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -40,7 +40,7 @@
     <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
     <None Include="buildTransitive\Marimo.SpreadsheetAsData.Build.props" Pack="true" PackagePath="buildTransitive\Marimo.SpreadsheetAsData.Build.props" Visible="false" />
     <None Include="buildTransitive\Marimo.SpreadsheetAsData.Build.targets" Pack="true" PackagePath="buildTransitive\Marimo.SpreadsheetAsData.Build.targets" Visible="false" />
-    <None Include="PackagePlaceholder\_._" Pack="true" PackagePath="lib\net10.0\_._" Visible="false" />
+    <None Include="PackagePlaceholder\_._" Pack="true" PackagePath="lib\net11.0\_._" Visible="false" />
   </ItemGroup>
 
   <Target
@@ -48,7 +48,7 @@
     Returns="@(TfmSpecificPackageFile)">
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(TargetDir)**\*.*">
-        <PackagePath>tools\net10.0\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+        <PackagePath>tools\net11.0\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
       </TfmSpecificPackageFile>
     </ItemGroup>
   </Target>
