@@ -20,7 +20,6 @@ static class GeneratedNameDiagnostics
             .. from sheet in book.Sheets.Values
                let propertyName = options.GeneratedName(sheet.Name)
                where IsInvalidPropertyName(propertyName)
-                   || propertyName.Any(it => char.GetUnicodeCategory(it) == UnicodeCategory.MathSymbol)
                select new CodeGenerationDiagnostic(true, propertyName, [sheet.Name], sheet.Name),
             .. InvalidPropertyNameDiagnostics(
                 from table in book.Tables
@@ -29,7 +28,6 @@ static class GeneratedNameDiagnostics
             .. from definedName in book.DefinedNames
                let propertyName = options.GeneratedName(definedName)
                where IsInvalidPropertyName(propertyName)
-                   || propertyName.Any(it => char.GetUnicodeCategory(it) == UnicodeCategory.MathSymbol)
                select new CodeGenerationDiagnostic(true, propertyName, [definedName.Name], definedName.Name),
             .. TypeNameDiagnostics(filePath, book, options),
             .. BookPropertyNameDiagnostics(filePath, book, options),
@@ -74,12 +72,12 @@ static class GeneratedNameDiagnostics
         from sourceName in sourceNames
         let propertyName = options.GeneratedName(sourceName)
         where IsInvalidPropertyName(propertyName)
-            || propertyName.Any(it => char.GetUnicodeCategory(it) == UnicodeCategory.MathSymbol)
         select new CodeGenerationDiagnostic(true, propertyName, [sourceName], sourceName);
 
     static bool IsInvalidPropertyName(string propertyName) =>
         propertyName.IsEmpty()
-            || propertyName.Any(it => " !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~".Contains(it))
+            || propertyName.Any(it => " !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~".Contains(it)
+                || char.GetUnicodeCategory(it) == UnicodeCategory.MathSymbol)
             || propertyName.Skip(1).Contains('@')
             || propertyName.Any(char.IsSurrogate)
             || propertyName == "@"
