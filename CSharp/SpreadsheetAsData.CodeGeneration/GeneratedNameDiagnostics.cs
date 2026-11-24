@@ -180,11 +180,6 @@ static class GeneratedNameDiagnostics
                        or UnicodeCategory.DecimalDigitNumber or UnicodeCategory.ConnectorPunctuation
                        or UnicodeCategory.NonSpacingMark or UnicodeCategory.SpacingCombiningMark
                        or UnicodeCategory.Format))
-                   || propertyName.Skip(1).Any(it => it == '@')
-                   || (propertyName.Any() && (char.IsDigit(propertyName[0])
-                       || char.GetUnicodeCategory(propertyName[0]) is UnicodeCategory.NonSpacingMark
-                           or UnicodeCategory.SpacingCombiningMark))
-                   || IsCSharpKeyword(propertyName)
                select new CodeGenerationDiagnostic(true, propertyName, [column.Name], column.Name),
             .. NameCollisionDiagnostics(
                 GroupMemberNames(
