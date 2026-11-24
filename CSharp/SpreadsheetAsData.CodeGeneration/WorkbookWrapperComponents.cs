@@ -250,7 +250,7 @@ static class WorkbookWrapperComponents
         var isSingleCell = IsSingleCellDefinedName(definedName);
         var propertyTypeName = isSingleCell
             ? CellValueTypeName(definedName.Range.TopLeftCell.TypedValue)
-            : "IEnumerable<IEnumerable<object?>>";
+            : "IEnumerable<IEnumerable<dynamic?>>";
         var propertyName = options.GeneratedName(definedName);
         var scopeDescription = definedName.Worksheet is { } worksheet
             ? $"ワークシート「{worksheet.Name}」の"
@@ -511,7 +511,7 @@ static class WorkbookWrapperComponents
             /// <summary>
             /// {{scopeDescription}}定義名「{{definedName.Name}}」が表すセル範囲の値を取得または設定します。
             /// </summary>
-            public IEnumerable<IEnumerable<object?>> {{propertyName}}
+            public IEnumerable<IEnumerable<dynamic?>> {{propertyName}}
             {
                 get => Range[{{StringLiteral(definedName.Name)}}].Values;
                 set => Range[{{StringLiteral(definedName.Name)}}].Values = value;

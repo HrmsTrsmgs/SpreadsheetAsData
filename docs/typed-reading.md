@@ -189,7 +189,9 @@ public sealed class OrderBookData
 
 `SpreadsheetNameAttribute` は、Excelテーブル名、列名、定義名の明示的な対応付けに共通して使用します。
 ここで説明した自動変換は、ブックのデータオブジェクトと定義名・テーブル名の対応規則です。行データ型 `Order` の列プロパティは、前節の列名規則に従います。
-複数セル定義名に対応するプロパティの型は `IEnumerable<IEnumerable<object?>>` です。
+`CellRange.Values` と生成された複数セル定義名のプロパティは `IEnumerable<IEnumerable<dynamic?>>` です。
+取り出した要素は `Cell.Value` と同様にキャストなしで使え、`null` を書き込むと空白セルになります。
+手書きのデータ型では引き続き `IEnumerable<IEnumerable<object?>>` も使えます。
 
 ## 4. `.xlsx` から型付き読み書きコードを生成する
 

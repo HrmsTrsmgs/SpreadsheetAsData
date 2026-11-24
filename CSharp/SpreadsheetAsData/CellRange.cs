@@ -66,7 +66,7 @@ public class CellRange
     /// <summary>
     /// 範囲内のセル値を、左上から右下へ向かう行ごとの列挙として取得または設定します。
     /// </summary>
-    public IEnumerable<IEnumerable<object?>> Values
+    public IEnumerable<IEnumerable<dynamic?>> Values
     {
         get =>
             from rowIndex in Enumerable.Range(

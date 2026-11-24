@@ -248,6 +248,16 @@ public class Range参照のテスト : IDisposable
     }
 
     [Fact]
+    public void Valuesから取得したセル値はキャストせず数値として計算できます()
+    {
+        using var book = Workbook.Open(@"TestData\Book1.xlsx");
+
+        double tested = book.Sheets["いろいろなデータ"].Range["A1:B2"].Values.First().First() * 2;
+
+        tested.Should().Be(2.2);
+    }
+
+    [Fact]
     public void ValuesはA1形式の範囲へ行ごとの値を書き込めます()
     {
         using var book = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));

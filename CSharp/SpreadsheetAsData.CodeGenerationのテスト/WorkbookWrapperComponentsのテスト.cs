@@ -509,7 +509,7 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     /// <summary>
                     /// 定義名「main_range」が表すセル範囲の値を取得または設定します。
                     /// </summary>
-                    public IEnumerable<IEnumerable<object?>> MainRange
+                    public IEnumerable<IEnumerable<dynamic?>> MainRange
                     {
                         get => Range["main_range"].Values;
                         set => Range["main_range"].Values = value;
@@ -551,7 +551,7 @@ public sealed class WorkbookWrapperComponentsのテスト : IDisposable
                     /// <summary>
                     /// ワークシート「sales_data」の定義名「local_range」が表すセル範囲の値を取得または設定します。
                     /// </summary>
-                    public IEnumerable<IEnumerable<object?>> LocalRange
+                    public IEnumerable<IEnumerable<dynamic?>> LocalRange
                     {
                         get => Range["local_range"].Values;
                         set => Range["local_range"].Values = value;

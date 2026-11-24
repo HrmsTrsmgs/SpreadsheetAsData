@@ -64,6 +64,7 @@ public sealed class コード生成型推論のテスト
         tested.Should().NotBeNull();
         tested.PropertyType.Should().Be(
             typeof(IEnumerable<IEnumerable<object?>>));
+        tested.GetCustomAttribute<DynamicAttribute>().Should().NotBeNull();
     }
 
     [Fact]
@@ -93,6 +94,7 @@ public sealed class コード生成型推論のテスト
         tested.Should().NotBeNull();
         tested.PropertyType.Should().Be(
             typeof(IEnumerable<IEnumerable<object?>>));
+        tested.GetCustomAttribute<DynamicAttribute>().Should().NotBeNull();
     }
 
     [Theory]
