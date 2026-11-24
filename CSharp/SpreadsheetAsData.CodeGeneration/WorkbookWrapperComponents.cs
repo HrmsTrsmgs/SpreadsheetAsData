@@ -249,7 +249,7 @@ static class WorkbookWrapperComponents
     {
         var isSingleCell = IsSingleCellDefinedName(definedName);
         var propertyTypeName = isSingleCell
-            ? CellValueTypeName(definedName.Range.TopLeftCell.Value)
+            ? CellValueTypeName(definedName.Range.TopLeftCell.TypedValue)
             : "IEnumerable<IEnumerable<object?>>";
         var propertyName = options.GeneratedName(definedName);
         var scopeDescription = definedName.Worksheet is { } worksheet

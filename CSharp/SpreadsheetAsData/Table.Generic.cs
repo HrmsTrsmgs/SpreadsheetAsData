@@ -63,7 +63,7 @@ public class Table<T> : Table, IEnumerable<T>
             let cell = row[GetColumnName(property)]
             select (cell, Value: ConvertValueToCellValue(sourceValue, row, property)))
         {
-            cell.Value = value;
+            cell.TypedValue = value;
         }
     }
 
@@ -165,8 +165,8 @@ public class Table<T> : Table, IEnumerable<T>
     /// <param name="row">値を取得するテーブル行。</param>
     /// <param name="property">マッピング先プロパティ。</param>
     /// <returns>プロパティに対応するセル値。</returns>
-    static object GetSourceValue(TableRow row, PropertyInfo property) =>
-        row[GetColumnName(property)].Value;
+    static TypedValue GetSourceValue(TableRow row, PropertyInfo property) =>
+        row[GetColumnName(property)].TypedValue;
 
     /// <summary>
     /// プロパティに対応する Excel テーブル列名を取得します。
@@ -226,12 +226,12 @@ public class Table<T> : Table, IEnumerable<T>
     /// <param name="property">変換先プロパティ。</param>
     /// <returns>プロパティへ設定する値。</returns>
     object? ConvertValue(
-        object sourceValue,
+        TypedValue sourceValue,
         TableRow row,
         PropertyInfo property) =>
         TableValueConversion.TryRead(sourceValue, property.PropertyType, out var converted)
             ? converted
-            : throw ValueConversionException(sourceValue, row, property);
+            : throw ValueConversionException(sourceValue.Value, row, property);
 
     /// <summary>
     /// マッピング元のプロパティ値を、セルへ設定できる値へ変換します。
@@ -240,7 +240,7 @@ public class Table<T> : Table, IEnumerable<T>
     /// <param name="row">書き込み先のテーブル行。</param>
     /// <param name="property">変換元プロパティ。</param>
     /// <returns>セルへ設定する値。</returns>
-    object? ConvertValueToCellValue(
+    TypedValue ConvertValueToCellValue(
         object? sourceValue,
         TableRow row,
         PropertyInfo property) =>

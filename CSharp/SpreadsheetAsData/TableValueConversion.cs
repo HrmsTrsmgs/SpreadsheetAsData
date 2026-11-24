@@ -13,7 +13,7 @@ static class TableValueConversion
     /// <param name="converted">変換に成功した場合の値。</param>
     /// <returns>変換できた場合は true。</returns>
     internal static bool TryRead(
-        object sourceValue,
+        TypedValue sourceValue,
         Type propertyType,
         out object? converted)
     {
@@ -31,7 +31,7 @@ static class TableValueConversion
 
         converted = (valueType, sourceValue) switch
         {
-            ({ } type, _) when type == typeof(object) => sourceValue,
+            ({ } type, _) when type == typeof(object) => sourceValue.Value,
             ({ } type, double number) when type == typeof(int)
                 && double.IsInteger(number)
                 && number is >= int.MinValue and <= int.MaxValue => (int)number,
@@ -56,11 +56,11 @@ static class TableValueConversion
     /// <returns>セルへ設定できる値に変換できた場合は true。</returns>
     internal static bool TryWrite(
         object? sourceValue,
-        out object? converted)
+        out TypedValue converted)
     {
         if (sourceValue is null or "")
         {
-            converted = null;
+            converted = new BlankValue();
             return true;
         }
 
@@ -70,9 +70,9 @@ static class TableValueConversion
             double number => number,
             string text => text,
             bool boolean => boolean,
-            _ => null
+            _ => default
         };
 
-        return converted != null;
+        return converted is not null;
     }
 }

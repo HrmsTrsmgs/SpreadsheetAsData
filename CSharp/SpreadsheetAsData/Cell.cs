@@ -59,6 +59,42 @@ public class Cell
     [System.Diagnostics.CodeAnalysis.AllowNull]
     public dynamic Value
     {
+        // TypedValue の取得は空白も BlankValue で返すため、Union の中身は null になりません。
+        get => TypedValue.Value!;
+        set
+        {
+            object? input = value;
+            TypedValue = NormalizeValue(input);
+        }
+    }
+
+    /// <summary>
+    /// 型を限定しない書き込み入力を、XMLを変更する前にセル値へ変換します。
+    /// </summary>
+    internal static TypedValue NormalizeValue(object? value)
+    {
+        return value switch
+        {
+            null => new BlankValue(),
+            string text => text,
+            bool boolean => boolean,
+            _ => ToNumber(value)
+        };
+
+        static double ToNumber(object value)
+        {
+            // 明示的に渡された BlankValue も従来どおり数値へ変換します。
+            dynamic input = value;
+            return (double)input;
+        }
+    }
+
+    /// <summary>
+    /// セルの値を文字列、数値、真偽値、空白のいずれかとして取得または設定します。
+    /// </summary>
+    /// <remarks><see cref="Value"/> と同じセル値を扱い、読み書きの副作用も同じです。</remarks>
+    public TypedValue TypedValue
+    {
         get => (Xml.DataType?.Value, Xml.CellValue?.Text) switch
         {
             (null, null) => new BlankValue(),
@@ -71,40 +107,22 @@ public class Cell
             _ => throw new InvalidOperationException()
         };
 
+
         set
         {
-            if (value is not null and not string and not bool)
+            (CellValues? DataType, string? Text) encoded = value switch
             {
-                value = (double)value;
-            }
+                BlankValue => (null, null),
+                string text => (CellValues.String, text),
+                bool boolean => (CellValues.Boolean, boolean ? "1" : "0"),
+                double number => (CellValues.Number, number.ToString(CultureInfo.InvariantCulture))
+            };
 
             AttachToWorksheet();
             Xml.CellFormula = null;
             (Book.WorkbookXml.CalculationProperties ??= new()).FullCalculationOnLoad = true;
-
-            if (value is null)
-            {
-                Xml.DataType = null;
-                Xml.CellValue = null;
-                return;
-            }
-
-            if (value is string text)
-            {
-                Xml.DataType = CellValues.String;
-                Xml.CellValue = new(text);
-                return;
-            }
-
-            if (value is bool boolean)
-            {
-                Xml.DataType = CellValues.Boolean;
-                Xml.CellValue = new(boolean ? "1" : "0");
-                return;
-            }
-
-            Xml.DataType = CellValues.Number;
-            Xml.CellValue = new(((double)value).ToString(CultureInfo.InvariantCulture));
+            Xml.DataType = encoded.DataType is CellValues type ? new(type) : null;
+            Xml.CellValue = encoded.Text is null ? null : new(encoded.Text);
         }
     }
 

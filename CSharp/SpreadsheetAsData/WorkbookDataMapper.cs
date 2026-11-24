@@ -32,18 +32,18 @@ sealed class WorkbookDataMapper(Workbook book)
 
             if (MapsSingleCell(property, range))
             {
-                return ConvertValue(range.TopLeftCell.Value, property.PropertyType);
+                return ConvertValue(range.TopLeftCell.TypedValue, property.PropertyType);
             }
 
             return range.Values;
         }
 
         // 空白値をstringプロパティへ設定できる値に変換します。
-        static object ConvertValue(object value, Type propertyType) =>
+        static object? ConvertValue(TypedValue value, Type propertyType) =>
             (value, propertyType) switch
             {
                 (BlankValue, var type) when type == typeof(string) => "",
-                _ => value
+                _ => value.Value
             };
     }
 
@@ -73,7 +73,7 @@ sealed class WorkbookDataMapper(Workbook book)
 
             if (MapsSingleCell(property, range))
             {
-                range.TopLeftCell.Value = property.GetValue(data);
+                range.TopLeftCell.TypedValue = Cell.NormalizeValue(property.GetValue(data));
                 return;
             }
 

@@ -14,7 +14,7 @@ static class GeneratedTypeNames
     {
         var values = (
             from row in table.Rows
-            select row[column].Value
+            select row[column].TypedValue
         ).ToArray();
 
         if (values.All(it => it is string or BlankValue))
@@ -40,7 +40,7 @@ static class GeneratedTypeNames
             : typeName;
 
         // セル値がintの範囲に収まる整数値かどうかを判定します。
-        static bool CanConvertToInt32(object value) =>
+        static bool CanConvertToInt32(TypedValue value) =>
             value is double number
             && double.IsInteger(number)
             && number is >= int.MinValue and <= int.MaxValue;
@@ -49,7 +49,7 @@ static class GeneratedTypeNames
     /// <summary>
     /// セルの現在値を表すC#プロパティ型名を返します。
     /// </summary>
-    internal static string CellValueTypeName(object value) =>
+    internal static string CellValueTypeName(TypedValue value) =>
         value switch
         {
             string => "string",

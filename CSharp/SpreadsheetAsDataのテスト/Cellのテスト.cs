@@ -52,6 +52,16 @@ public class Cellのテスト : IDisposable
     }
 
     [Fact]
+    public void TypedValueプロパティはValueと同じセル値を読み書きできます()
+    {
+        a1.TypedValue.Value.Should().Be(1.1);
+
+        a1.TypedValue = "変更後";
+
+        (a1.Value as object).Should().Be("変更後");
+    }
+
+    [Fact]
     public void Valueプロパティは数字の値を取得できます()
     {
         var a1Value = a1.Value as object;

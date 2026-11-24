@@ -76,7 +76,7 @@ public class CellRange
                 from columnIndex in Enumerable.Range(
                     (int)topLeft.ColumnIndex,
                     (int)(bottomRight.ColumnIndex - topLeft.ColumnIndex + 1))
-                select (object?)sheet.Cells[(uint)columnIndex, (uint)rowIndex].Value;
+                select sheet.Cells[(uint)columnIndex, (uint)rowIndex].Value;
         set
         {
             var rows = value.Select(it => it.ToArray()).ToArray();
@@ -98,7 +98,7 @@ public class CellRange
                         Value: item.Value)
                 ))
             {
-                cell.Value = cellValue;
+                cell.TypedValue = Cell.NormalizeValue(cellValue);
             }
         }
     }
