@@ -29,6 +29,7 @@ static class GeneratedNameDiagnostics
             .. from definedName in book.DefinedNames
                let propertyName = options.GeneratedName(definedName)
                where IsInvalidPropertyName(propertyName)
+                   || propertyName.Any(it => char.GetUnicodeCategory(it) == UnicodeCategory.MathSymbol)
                select new CodeGenerationDiagnostic(true, propertyName, [definedName.Name], definedName.Name),
             .. TypeNameDiagnostics(filePath, book, options),
             .. BookPropertyNameDiagnostics(filePath, book, options),

@@ -644,20 +644,22 @@ public sealed class コード生成診断のテスト
     }
 
     [Theory]
-    [InlineData("book.main_cell", "main_cell")]
-    [InlineData("sales_data.local_cell", "local_cell")]
+    [InlineData("book.main_cell", "main_cell", "not-valid")]
+    [InlineData("sales_data.local_cell", "local_cell", "not-valid")]
+    [InlineData("book.main_cell", "main_cell", "Main\u00D7Cell")]
     public void 文脈付きNameMappingsで定義名に無効なCSharp識別子を指定した場合は変換せずエラーを診断します(
         string mappingKey,
-        string sourceName)
+        string sourceName,
+        string generatedName)
     {
         GeneratedCodeInspection
             .GenerateDiagnostics(
                 DefinedNamesWithoutCollisionsExcelFilePath,
-                options => options.NameMappings[mappingKey] = "not-valid")
+                options => options.NameMappings[mappingKey] = generatedName)
             .Should().ContainEquivalentOf(
                 new CodeGenerationDiagnostic(
                     true,
-                    "not-valid",
+                    generatedName,
                     [sourceName],
                     sourceName));
     }
