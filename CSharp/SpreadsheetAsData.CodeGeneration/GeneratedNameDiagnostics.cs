@@ -74,17 +74,21 @@ static class GeneratedNameDiagnostics
         where IsInvalidPropertyName(propertyName)
         select new CodeGenerationDiagnostic(true, propertyName, [sourceName], sourceName);
 
-    static bool IsInvalidPropertyName(string propertyName) =>
-        propertyName.IsEmpty()
-            || propertyName.Any(it => " !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~".Contains(it)
+    static bool IsInvalidPropertyName(string propertyName)
+    {
+        var identifier = propertyName.AsSpan(propertyName.StartsWith('@') ? 1 : 0);
+
+        return identifier.IsEmpty
+            || propertyName.Any(it => char.IsWhiteSpace(it)
+                || "!\"#$%&'()*+,-./:;<=>?[\\]^`{|}~".Contains(it)
                 || char.GetUnicodeCategory(it) == UnicodeCategory.MathSymbol)
             || propertyName.Skip(1).Contains('@')
             || propertyName.Any(char.IsSurrogate)
-            || propertyName == "@"
-            || (propertyName.Any() && char.IsDigit(propertyName[0]))
-            || (propertyName.Any() && char.GetUnicodeCategory(propertyName[0]) == UnicodeCategory.NonSpacingMark)
-            || (propertyName.Length > 1 && propertyName[0] == '@' && char.IsDigit(propertyName[1]))
+            || char.GetUnicodeCategory(identifier[0]) is UnicodeCategory.DecimalDigitNumber
+                or UnicodeCategory.NonSpacingMark
+                or UnicodeCategory.SpacingCombiningMark
             || IsCSharpKeyword(propertyName);
+    }
 
     /// <summary>
     /// Book型の中で、定義名・ワークシート・Excelテーブルの生成プロパティ名同士、
