@@ -73,6 +73,7 @@ static class GeneratedNameDiagnostics
         from sourceName in sourceNames
         let propertyName = options.GeneratedName(sourceName)
         where IsInvalidPropertyName(propertyName)
+            || propertyName.Any(it => char.GetUnicodeCategory(it) == UnicodeCategory.MathSymbol)
         select new CodeGenerationDiagnostic(true, propertyName, [sourceName], sourceName);
 
     static bool IsInvalidPropertyName(string propertyName) =>
