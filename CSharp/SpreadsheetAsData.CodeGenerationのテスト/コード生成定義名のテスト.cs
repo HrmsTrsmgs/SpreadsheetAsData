@@ -87,7 +87,7 @@ public sealed class コード生成定義名のテスト : IDisposable
     {
         var filePath = temporaryFiles.Copy(DefinedNamesExcelFilePath);
 
-        using (var book = GeneratedCodeInspection
+        using (var tested = GeneratedCodeInspection
                    .AssemblyFrom(
                        GeneratedCodeInspection.GenerateSources(
                            DefinedNamesExcelFilePath))
@@ -95,15 +95,15 @@ public sealed class コード生成定義名のテスト : IDisposable
                        "定義名Book",
                        filePath))
         {
-            dynamic bookAccessor = book;
+            dynamic bookAccessor = tested;
 
             bookAccessor.MainCell = "generated";
-            book.Save();
+            tested.Save();
         }
 
-        using var tested = Workbook.Open(filePath);
+        using var savedBook = Workbook.Open(filePath);
 
-        (tested.Cell["main_cell"].Value as object)
+        (savedBook.Cell["main_cell"].Value as object)
             .Should().Be("generated");
     }
 
@@ -156,7 +156,7 @@ public sealed class コード生成定義名のテスト : IDisposable
             [300, 400]
         ];
 
-        using (var book = GeneratedCodeInspection
+        using (var tested = GeneratedCodeInspection
                    .AssemblyFrom(
                        GeneratedCodeInspection.GenerateSources(
                            DefinedNamesExcelFilePath))
@@ -164,14 +164,14 @@ public sealed class コード生成定義名のテスト : IDisposable
                        "定義名Book",
                        filePath))
         {
-            dynamic bookAccessor = book;
+            dynamic bookAccessor = tested;
 
             bookAccessor.MainRange = replacement;
-            book.Save();
+            tested.Save();
         }
 
-        using var tested = Workbook.Open(filePath);
-        var rows = tested.Range["main_range"].Values
+        using var savedBook = Workbook.Open(filePath);
+        var rows = savedBook.Range["main_range"].Values
             .Select(it => it.ToArray())
             .ToArray();
 
@@ -184,7 +184,7 @@ public sealed class コード生成定義名のテスト : IDisposable
     {
         var filePath = temporaryFiles.Copy(DefinedNamesExcelFilePath);
 
-        using (var book = GeneratedCodeInspection
+        using (var tested = GeneratedCodeInspection
                    .AssemblyFrom(
                        GeneratedCodeInspection.GenerateSources(
                            DefinedNamesExcelFilePath))
@@ -192,15 +192,15 @@ public sealed class コード生成定義名のテスト : IDisposable
                        "定義名Book",
                        filePath))
         {
-            dynamic bookAccessor = book;
+            dynamic bookAccessor = tested;
 
             bookAccessor.SalesData.LocalCell = "generated";
-            book.Save();
+            tested.Save();
         }
 
-        using var tested = Workbook.Open(filePath);
+        using var savedBook = Workbook.Open(filePath);
 
-        (tested.Sheets["sales_data"].Cell["local_cell"].Value as object)
+        (savedBook.Sheets["sales_data"].Cell["local_cell"].Value as object)
             .Should().Be("generated");
     }
 
@@ -253,7 +253,7 @@ public sealed class コード生成定義名のテスト : IDisposable
             [4, 40.5]
         ];
 
-        using (var book = GeneratedCodeInspection
+        using (var tested = GeneratedCodeInspection
                    .AssemblyFrom(
                        GeneratedCodeInspection.GenerateSources(
                            DefinedNamesExcelFilePath))
@@ -261,14 +261,14 @@ public sealed class コード生成定義名のテスト : IDisposable
                        "定義名Book",
                        filePath))
         {
-            dynamic bookAccessor = book;
+            dynamic bookAccessor = tested;
 
             bookAccessor.SalesData.LocalRange = replacement;
-            book.Save();
+            tested.Save();
         }
 
-        using var tested = Workbook.Open(filePath);
-        var rows = tested.Sheets["sales_data"].Range["local_range"].Values
+        using var savedBook = Workbook.Open(filePath);
+        var rows = savedBook.Sheets["sales_data"].Range["local_range"].Values
             .Select(it => it.ToArray())
             .ToArray();
 

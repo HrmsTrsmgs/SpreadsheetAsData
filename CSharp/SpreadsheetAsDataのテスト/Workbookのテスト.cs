@@ -10,7 +10,7 @@ namespace Marimo.SpreadsheetAsData.Test;
 public class Workbookのテスト : IDisposable
 {
 
-    readonly Workbook book1;
+    readonly Workbook tested;
     readonly TemporaryExcelFiles temporaryFiles = new();
 
     public const string コピーパス = @"TestData\Book1-Copy.xlsx";
@@ -21,12 +21,12 @@ public class Workbookのテスト : IDisposable
         {
             File.Copy(@"TestData\Book1.xlsx", コピーパス);
         }
-        book1 = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));
+        tested = Workbook.Open(temporaryFiles.Copy("Book1.xlsx"));
     }
 
     public void Dispose()
     {
-        book1.Close();
+        tested.Close();
         temporaryFiles.Dispose();
         GC.SuppressFinalize(this);
     }
@@ -51,30 +51,30 @@ public class Workbookのテスト : IDisposable
     public void Open中は元ファイルへの他からの書き込みを禁止します()
     {
         var filePath = temporaryFiles.Copy("Book1.xlsx");
-        using var book = Workbook.Open(filePath);
+        using var tested = Workbook.Open(filePath);
 
-        var tested = () =>
+        var action = () =>
         {
             using var stream = File.Open(filePath, FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
         };
 
-        tested.Should().Throw<IOException>();
+        action.Should().Throw<IOException>();
     }
 
     [Fact]
     public void Save後も元ファイルへの他からの書き込みを禁止します()
     {
         var filePath = temporaryFiles.Copy("Book1.xlsx");
-        using var book = Workbook.Open(filePath);
-        book.Sheets["いろいろなデータ"].Cell["A1"].Value = 9.9;
-        book.Save();
+        using var tested = Workbook.Open(filePath);
+        tested.Sheets["いろいろなデータ"].Cell["A1"].Value = 9.9;
+        tested.Save();
 
-        var tested = () =>
+        var action = () =>
         {
             using var stream = File.Open(filePath, FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
         };
 
-        tested.Should().Throw<IOException>();
+        action.Should().Throw<IOException>();
     }
 
     [Fact]
@@ -102,12 +102,12 @@ public class Workbookのテスト : IDisposable
     public void Saveは既存の読み取りハンドルを変更せず元ファイルを切り替えます()
     {
         var filePath = temporaryFiles.Copy("Book1.xlsx");
-        using var book = Workbook.Open(filePath);
+        using var tested = Workbook.Open(filePath);
         using var reader = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
         var originalBytes = File.ReadAllBytes(filePath);
 
-        book.Sheets["いろいろなデータ"].Cell["A1"].Value = 9.9;
-        book.Save();
+        tested.Sheets["いろいろなデータ"].Cell["A1"].Value = 9.9;
+        tested.Save();
 
         reader.Position = 0;
         using var savedBefore = new MemoryStream();
@@ -121,12 +121,12 @@ public class Workbookのテスト : IDisposable
     {
         var filePath = temporaryFiles.Copy("Book1.xlsx");
         var originalBytes = File.ReadAllBytes(filePath);
-        using var book = Workbook.Open(filePath);
-        book.Sheets["いろいろなデータ"].Cell["A1"].Value = 9.9;
+        using var tested = Workbook.Open(filePath);
+        tested.Sheets["いろいろなデータ"].Cell["A1"].Value = 9.9;
 
         using (var reader = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
         {
-            var save = () => book.Save();
+            var save = () => tested.Save();
             save.Should().Throw<IOException>();
         }
 
@@ -138,9 +138,9 @@ public class Workbookのテスト : IDisposable
         };
         write.Should().Throw<IOException>();
 
-        book.Save();
-        using var tested = Workbook.Open(filePath);
-        (tested.Sheets["いろいろなデータ"].Cell["A1"].Value as object).Should().Be(9.9);
+        tested.Save();
+        using var savedBook = Workbook.Open(filePath);
+        (savedBook.Sheets["いろいろなデータ"].Cell["A1"].Value as object).Should().Be(9.9);
     }
 
     [Fact]
@@ -353,19 +353,19 @@ public class Workbookのテスト : IDisposable
         using var stream = new MemoryStream([.. original]);
         var savedPath = temporaryFiles.NewFilePath();
 
-        using (var book = Workbook.Open(stream))
+        using (var tested = Workbook.Open(stream))
         {
-            book.Replace(
+            tested.Replace(
                 new WorkbookData
                 {
                     CustomerName = "佐藤花子"
                 });
-            book.SaveAs(savedPath);
+            tested.SaveAs(savedPath);
             stream.ToArray().Should().Equal(original);
 
-            using var tested = Workbook.Open(savedPath);
+            using var savedBook = Workbook.Open(savedPath);
 
-            (tested.Cell["CustomerName"].Value as object).Should().Be("佐藤花子");
+            (savedBook.Cell["CustomerName"].Value as object).Should().Be("佐藤花子");
         }
 
         stream.ToArray().Should().Equal(original);
@@ -381,14 +381,14 @@ public class Workbookのテスト : IDisposable
         using Stream stream = seekable ? source : new NonSeekableReadStream(source);
         var savedPath = temporaryFiles.NewFilePath();
 
-        using (var book = Workbook.Open(stream))
+        using (var tested = Workbook.Open(stream))
         {
-            book.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
-            book.SaveAs(savedPath);
+            tested.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
+            tested.SaveAs(savedPath);
 
-            using var tested = Workbook.Open(savedPath);
+            using var savedBook = Workbook.Open(savedPath);
 
-            (tested.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
+            (savedBook.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
             source.ToArray().Should().Equal(original);
         }
 
@@ -405,14 +405,14 @@ public class Workbookのテスト : IDisposable
         stream.Position = prefix.Length;
         var savedPath = temporaryFiles.NewFilePath();
 
-        using (var book = Workbook.Open(stream))
+        using (var tested = Workbook.Open(stream))
         {
-            book.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
-            book.SaveAs(savedPath);
+            tested.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
+            tested.SaveAs(savedPath);
 
-            using var tested = Workbook.Open(savedPath);
+            using var savedBook = Workbook.Open(savedPath);
 
-            (tested.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
+            (savedBook.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
             stream.ToArray().Should().Equal(original);
         }
 
@@ -428,13 +428,13 @@ public class Workbookのテスト : IDisposable
         var firstPath = temporaryFiles.NewFilePath();
         var secondPath = temporaryFiles.NewFilePath();
 
-        using (var book = Workbook.Open(stream))
+        using (var tested = Workbook.Open(stream))
         {
-            book.Sheets["Sheet1"].Cell["A1"].Value = "一回目";
-            book.SaveAs(firstPath);
-            book.Sheets["Sheet1"].Cell["A1"].Value = "二回目";
-            book.SaveAs(secondPath);
-            book.Sheets["Sheet1"].Cell["A1"].Value = "保存しない変更";
+            tested.Sheets["Sheet1"].Cell["A1"].Value = "一回目";
+            tested.SaveAs(firstPath);
+            tested.Sheets["Sheet1"].Cell["A1"].Value = "二回目";
+            tested.SaveAs(secondPath);
+            tested.Sheets["Sheet1"].Cell["A1"].Value = "保存しない変更";
         }
 
         using var first = Workbook.Open(firstPath);
@@ -453,20 +453,20 @@ public class Workbookのテスト : IDisposable
         var blockedPath = temporaryFiles.NewFilePath();
         var savedPath = temporaryFiles.NewFilePath();
 
-        using (var book = Workbook.Open(stream))
+        using (var tested = Workbook.Open(stream))
         {
-            book.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
+            tested.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
 
             using (var blockedFile = File.Create(blockedPath))
             {
-                var tested = () => book.SaveAs(blockedPath);
+                var action = () => tested.SaveAs(blockedPath);
 
-                tested.Should().Throw<IOException>();
+                action.Should().Throw<IOException>();
             }
 
             stream.CanRead.Should().BeTrue();
             stream.ToArray().Should().Equal(original);
-            book.SaveAs(savedPath);
+            tested.SaveAs(savedPath);
 
             using var saved = Workbook.Open(savedPath);
 
@@ -483,10 +483,10 @@ public class Workbookのテスト : IDisposable
         var sourcePath = temporaryFiles.Copy("Book1.xlsx");
         var savedPath = temporaryFiles.Copy("Book1.xlsx");
         var originalBytes = File.ReadAllBytes(savedPath);
-        using var book = Workbook.Open(sourcePath);
-        book.Sheets["いろいろなデータ"].Cell["A1"].Value = "invalid\u0001text";
+        using var tested = Workbook.Open(sourcePath);
+        tested.Sheets["いろいろなデータ"].Cell["A1"].Value = "invalid\u0001text";
 
-        var save = () => book.SaveAs(savedPath);
+        var save = () => tested.SaveAs(savedPath);
 
         save.Should().Throw<Exception>();
         File.ReadAllBytes(savedPath).Should().Equal(originalBytes);
@@ -497,10 +497,10 @@ public class Workbookのテスト : IDisposable
     {
         var sourcePath = temporaryFiles.Copy("Book1.xlsx");
         var savedPath = temporaryFiles.NewFilePath();
-        using var book = Workbook.Open(sourcePath);
-        book.Sheets["いろいろなデータ"].Cell["A1"].Value = "invalid\u0001text";
+        using var tested = Workbook.Open(sourcePath);
+        tested.Sheets["いろいろなデータ"].Cell["A1"].Value = "invalid\u0001text";
 
-        var save = () => book.SaveAs(savedPath);
+        var save = () => tested.SaveAs(savedPath);
 
         save.Should().Throw<Exception>();
         File.Exists(savedPath).Should().BeFalse();
@@ -512,9 +512,9 @@ public class Workbookのテスト : IDisposable
         var original = File.ReadAllBytes(@"TestData\定義名.xlsx");
         using var stream = new MemoryStream([.. original]);
 
-        using (var book = Workbook.Open(stream))
+        using (var tested = Workbook.Open(stream))
         {
-            book.Cell["CustomerName"].Value = "保存しない変更";
+            tested.Cell["CustomerName"].Value = "保存しない変更";
         }
 
         stream.ToArray().Should().Equal(original);
@@ -532,12 +532,12 @@ public class Workbookのテスト : IDisposable
         stream.Write(original);
         stream.Position = 0;
 
-        using (var book = Workbook.Open(stream))
+        using (var tested = Workbook.Open(stream))
         {
-            book.Cell["CustomerName"].Value = "佐藤花子";
-            var tested = () => book.Save();
+            tested.Cell["CustomerName"].Value = "佐藤花子";
+            var action = () => tested.Save();
 
-            tested.Should().Throw<NotSupportedException>();
+            action.Should().Throw<NotSupportedException>();
             stream.ToArray().Should().Equal(original);
         }
 
@@ -569,40 +569,40 @@ public class Workbookのテスト : IDisposable
     [Fact]
     public void Sheetsでシートが取得できます()
     {
-        book1.Sheets.Count.Should().Be(3);
+        tested.Sheets.Count.Should().Be(3);
     }
 
     [Fact]
     public void Sheetsはブック要素がない場合InvalidDataExceptionを投げます()
     {
-        using var book = Workbook.Open(@"TestData\ブック要素省略.xlsx");
+        using var tested = Workbook.Open(@"TestData\ブック要素省略.xlsx");
 
-        FluentActions.Invoking(() => book.Sheets["Sheet1"])
+        FluentActions.Invoking(() => tested.Sheets["Sheet1"])
             .Should().Throw<InvalidDataException>();
     }
 
     [Fact]
     public void Sheetsに数字を指定してシートが取得できます()
     {
-        book1.Sheets[0].Name.Should().Be("Sheet1");
+        tested.Sheets[0].Name.Should().Be("Sheet1");
     }
 
     [Fact]
     public void Sheetsにシート名を指定してシートが取得できます()
     {
-        book1.Sheets["Sheet1"].Name.Should().Be("Sheet1");
+        tested.Sheets["Sheet1"].Name.Should().Be("Sheet1");
     }
 
     [Fact]
     public void インデクサに数字を指定してシートが取得できます()
     {
-        book1[0].Name.Should().Be("Sheet1");
+        tested[0].Name.Should().Be("Sheet1");
     }
 
     [Fact]
     public void インデクサにシート名を指定してシートが取得できます()
     {
-        book1["Sheet1"].Name.Should().Be("Sheet1");
+        tested["Sheet1"].Name.Should().Be("Sheet1");
     }
 
     [Fact]
@@ -624,13 +624,13 @@ public class Workbookのテスト : IDisposable
     public void Saveはブックを閉じる前に元ファイルへ変更を反映します()
     {
         var filePath = temporaryFiles.Copy("Book1.xlsx");
-        using var book = Workbook.Open(filePath);
-        book.Sheets["いろいろなデータ"].Cells["A1"].Value = 9.9;
-        book.Save();
-
         using var tested = Workbook.Open(filePath);
+        tested.Sheets["いろいろなデータ"].Cells["A1"].Value = 9.9;
+        tested.Save();
 
-        (tested.Sheets["いろいろなデータ"].Cells["A1"].Value as object)
+        using var savedBook = Workbook.Open(filePath);
+
+        (savedBook.Sheets["いろいろなデータ"].Cells["A1"].Value as object)
             .Should().Be(9.9);
     }
 
@@ -650,11 +650,11 @@ public class Workbookのテスト : IDisposable
             File.Copy(@"TestData\Book1.xlsx", otherFilePath);
             Environment.CurrentDirectory = openedDirectory;
 
-            using (var book = Workbook.Open("Book1.xlsx"))
+            using (var tested = Workbook.Open("Book1.xlsx"))
             {
-                book.Sheets["いろいろなデータ"].Cells["A1"].Value = 9.9;
+                tested.Sheets["いろいろなデータ"].Cells["A1"].Value = 9.9;
                 Environment.CurrentDirectory = changedDirectory;
-                book.Save();
+                tested.Save();
             }
 
             using var savedBook = Workbook.Open(openedFilePath);
@@ -674,12 +674,12 @@ public class Workbookのテスト : IDisposable
     public void SaveはDispose後に呼び出すとファイルを再束縛せずに失敗します()
     {
         var filePath = temporaryFiles.Copy("Book1.xlsx");
-        using var book = Workbook.Open(filePath);
-        book.Dispose();
+        using var tested = Workbook.Open(filePath);
+        tested.Dispose();
 
-        var tested = () => book.Save();
+        var action = () => tested.Save();
 
-        tested.Should().Throw<ObjectDisposedException>();
+        action.Should().Throw<ObjectDisposedException>();
         FluentActions.Invoking(() => File.Delete(filePath)).Should().NotThrow();
     }
 
@@ -689,12 +689,12 @@ public class Workbookのテスト : IDisposable
         var sourcePath = temporaryFiles.Copy("Book1.xlsx");
         var savedPath = temporaryFiles.Copy("Book1.xlsx");
         var originalBytes = File.ReadAllBytes(savedPath);
-        using var book = Workbook.Open(sourcePath);
-        book.Dispose();
+        using var tested = Workbook.Open(sourcePath);
+        tested.Dispose();
 
-        var tested = () => book.SaveAs(savedPath);
+        var action = () => tested.SaveAs(savedPath);
 
-        tested.Should().Throw<ObjectDisposedException>();
+        action.Should().Throw<ObjectDisposedException>();
         File.ReadAllBytes(savedPath).Should().Equal(originalBytes);
     }
 
@@ -704,15 +704,15 @@ public class Workbookのテスト : IDisposable
         var sourcePath = temporaryFiles.Copy("Book1.xlsx");
         var savedPath = temporaryFiles.NewFilePath();
 
-        using (var book = Workbook.Open(sourcePath))
+        using (var tested = Workbook.Open(sourcePath))
         {
-            book.Sheets["いろいろなデータ"].Cells["A1"].Value = 9.9;
-            book.SaveAs(savedPath);
+            tested.Sheets["いろいろなデータ"].Cells["A1"].Value = 9.9;
+            tested.SaveAs(savedPath);
         }
 
-        using var tested = Workbook.Open(savedPath);
+        using var savedBook = Workbook.Open(savedPath);
 
-        (tested.Sheets["いろいろなデータ"].Cells["A1"].Value as object)
+        (savedBook.Sheets["いろいろなデータ"].Cells["A1"].Value as object)
             .Should().Be(9.9);
     }
 
@@ -723,17 +723,17 @@ public class Workbookのテスト : IDisposable
         var savedPath = temporaryFiles.Copy("Book1.xlsx");
         var originalBytes = File.ReadAllBytes(savedPath);
         using var reader = File.Open(savedPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
-        using var book = Workbook.Open(sourcePath);
-        book.Sheets["いろいろなデータ"].Cell["A1"].Value = 9.9;
+        using var tested = Workbook.Open(sourcePath);
+        tested.Sheets["いろいろなデータ"].Cell["A1"].Value = 9.9;
 
-        book.SaveAs(savedPath);
+        tested.SaveAs(savedPath);
 
         reader.Position = 0;
         using var savedBefore = new MemoryStream();
         reader.CopyTo(savedBefore);
         savedBefore.ToArray().Should().Equal(originalBytes);
-        using var tested = Workbook.Open(savedPath);
-        (tested.Sheets["いろいろなデータ"].Cell["A1"].Value as object).Should().Be(9.9);
+        using var savedBook = Workbook.Open(savedPath);
+        (savedBook.Sheets["いろいろなデータ"].Cell["A1"].Value as object).Should().Be(9.9);
     }
 
     [Fact]
@@ -742,66 +742,66 @@ public class Workbookのテスト : IDisposable
         var sourcePath = temporaryFiles.Copy("Book1.xlsx");
         var savedPath = temporaryFiles.NewFilePath();
 
-        using (var book = Workbook.Open(sourcePath))
+        using (var tested = Workbook.Open(sourcePath))
         {
-            book.Sheets["いろいろなデータ"].Cells["A1"].Value = 9.9;
-            book.SaveAs(savedPath);
+            tested.Sheets["いろいろなデータ"].Cells["A1"].Value = 9.9;
+            tested.SaveAs(savedPath);
         }
 
-        using var tested = Workbook.Open(sourcePath);
+        using var originalBook = Workbook.Open(sourcePath);
 
-        (tested.Sheets["いろいろなデータ"].Cells["A1"].Value as object)
+        (originalBook.Sheets["いろいろなデータ"].Cells["A1"].Value as object)
             .Should().Be(1.1);
     }
 
     [Fact]
     public void SaveAsはWorkbookを閉じる前に変更したセル値を出力Streamへ保存します()
     {
-        using var book = Workbook.Open(@"TestData\文字列セル.xlsx");
+        using var tested = Workbook.Open(@"TestData\文字列セル.xlsx");
         using var destination = new MemoryStream();
-        book.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
+        tested.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
 
-        book.SaveAs(destination);
+        tested.SaveAs(destination);
         destination.Position = 0;
-        using var tested = Workbook.Open(destination);
+        using var savedBook = Workbook.Open(destination);
 
-        (tested.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
+        (savedBook.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
     }
 
     [Fact]
     public void SaveAsは出力Streamの現在位置によらず先頭から文書を保存します()
     {
-        using var book = Workbook.Open(@"TestData\文字列セル.xlsx");
+        using var tested = Workbook.Open(@"TestData\文字列セル.xlsx");
         using var destination = new MemoryStream();
         destination.Write([1, 2, 3, 4]);
-        book.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
+        tested.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
 
-        book.SaveAs(destination);
+        tested.SaveAs(destination);
 
         // xlsxのZIPヘッダーが、既存の4バイトより後ではなく先頭にあることを確認します。
         destination.ToArray().Take(4).Should().Equal([0x50, 0x4b, 0x03, 0x04]);
         destination.Position = 0;
-        using var tested = Workbook.Open(destination);
-        (tested.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
+        using var savedBook = Workbook.Open(destination);
+        (savedBook.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
     }
 
     [Fact]
     public void SaveAsは保存結果より長い出力Streamの古い末尾を残さず読み直せます()
     {
-        using var book = Workbook.Open(@"TestData\文字列セル.xlsx");
+        using var tested = Workbook.Open(@"TestData\文字列セル.xlsx");
         using var destination = new MemoryStream();
-        book.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
-        book.SaveAs(destination);
+        tested.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
+        tested.SaveAs(destination);
         var savedLength = destination.Length;
         destination.SetLength(savedLength + 1024);
         destination.Position = 0;
 
-        book.SaveAs(destination);
+        tested.SaveAs(destination);
 
         destination.Length.Should().Be(savedLength);
         destination.Position = 0;
-        using var tested = Workbook.Open(destination);
-        (tested.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
+        using var savedBook = Workbook.Open(destination);
+        (savedBook.Sheets["Sheet1"].Cell["A1"].Value as object).Should().Be("保存した文字列");
     }
 
     [Fact]
@@ -811,10 +811,10 @@ public class Workbookのテスト : IDisposable
         var original = File.ReadAllBytes(sourcePath);
         using var destination = new MemoryStream();
 
-        using (var book = Workbook.Open(sourcePath))
+        using (var tested = Workbook.Open(sourcePath))
         {
-            book.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
-            book.SaveAs(destination);
+            tested.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
+            tested.SaveAs(destination);
 
             File.ReadAllBytes(sourcePath).Should().Equal(original);
         }
@@ -829,10 +829,10 @@ public class Workbookのテスト : IDisposable
         using var source = new MemoryStream([.. original]);
         using var destination = new MemoryStream();
 
-        using (var book = Workbook.Open(source))
+        using (var tested = Workbook.Open(source))
         {
-            book.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
-            book.SaveAs(destination);
+            tested.Sheets["Sheet1"].Cell["A1"].Value = "保存した文字列";
+            tested.SaveAs(destination);
 
             source.ToArray().Should().Equal(original);
         }
@@ -845,9 +845,9 @@ public class Workbookのテスト : IDisposable
     {
         using var destination = new MemoryStream();
 
-        using (var book = Workbook.Open(@"TestData\文字列セル.xlsx"))
+        using (var tested = Workbook.Open(@"TestData\文字列セル.xlsx"))
         {
-            book.SaveAs(destination);
+            tested.SaveAs(destination);
 
             destination.CanRead.Should().BeTrue();
             destination.CanWrite.Should().BeTrue();
@@ -863,13 +863,13 @@ public class Workbookのテスト : IDisposable
         using var firstStream = new MemoryStream();
         using var secondStream = new MemoryStream();
 
-        using (var book = Workbook.Open(@"TestData\文字列セル.xlsx"))
+        using (var tested = Workbook.Open(@"TestData\文字列セル.xlsx"))
         {
-            book.Sheets["Sheet1"].Cell["A1"].Value = "一回目";
-            book.SaveAs(firstStream);
-            book.Sheets["Sheet1"].Cell["A1"].Value = "二回目";
-            book.SaveAs(secondStream);
-            book.Sheets["Sheet1"].Cell["A1"].Value = "保存しない変更";
+            tested.Sheets["Sheet1"].Cell["A1"].Value = "一回目";
+            tested.SaveAs(firstStream);
+            tested.Sheets["Sheet1"].Cell["A1"].Value = "二回目";
+            tested.SaveAs(secondStream);
+            tested.Sheets["Sheet1"].Cell["A1"].Value = "保存しない変更";
         }
 
         firstStream.Position = 0;
@@ -886,12 +886,12 @@ public class Workbookのテスト : IDisposable
     {
         byte[] original = [1, 2, 3, 4];
         using var destination = new MemoryStream([.. original]);
-        using var book = Workbook.Open(@"TestData\文字列セル.xlsx");
-        book.Dispose();
+        using var tested = Workbook.Open(@"TestData\文字列セル.xlsx");
+        tested.Dispose();
 
-        var tested = () => book.SaveAs(destination);
+        var action = () => tested.SaveAs(destination);
 
-        tested.Should().Throw<ObjectDisposedException>();
+        action.Should().Throw<ObjectDisposedException>();
         destination.ToArray().Should().Equal(original);
     }
 
@@ -902,13 +902,13 @@ public class Workbookのテスト : IDisposable
         var original = File.ReadAllBytes(sourcePath);
         using var destination = new FailingWriteStream(bytesBeforeFailure: 128);
 
-        using (var book = Workbook.Open(sourcePath))
+        using (var tested = Workbook.Open(sourcePath))
         {
-            book.Sheets["Sheet1"].Cell["A1"].Value = "保存できない文字列";
+            tested.Sheets["Sheet1"].Cell["A1"].Value = "保存できない文字列";
 
-            var tested = () => book.SaveAs(destination);
+            var action = () => tested.SaveAs(destination);
 
-            tested.Should().Throw<IOException>();
+            action.Should().Throw<IOException>();
             destination.WrittenByteCount.Should().Be(128);
             destination.CanWrite.Should().BeTrue();
             File.ReadAllBytes(sourcePath).Should().Equal(original);
@@ -925,13 +925,13 @@ public class Workbookのテスト : IDisposable
         using var source = new MemoryStream([.. original]);
         using var destination = new FailingWriteStream(bytesBeforeFailure: 128);
 
-        using (var book = Workbook.Open(source))
+        using (var tested = Workbook.Open(source))
         {
-            book.Sheets["Sheet1"].Cell["A1"].Value = "保存できない文字列";
+            tested.Sheets["Sheet1"].Cell["A1"].Value = "保存できない文字列";
 
-            var tested = () => book.SaveAs(destination);
+            var action = () => tested.SaveAs(destination);
 
-            tested.Should().Throw<IOException>();
+            action.Should().Throw<IOException>();
             destination.WrittenByteCount.Should().Be(128);
             destination.CanWrite.Should().BeTrue();
             source.ToArray().Should().Equal(original);
@@ -949,13 +949,13 @@ public class Workbookのテスト : IDisposable
         source.Write(original);
         source.Position = 0;
 
-        using (var book = Workbook.Open(source))
+        using (var tested = Workbook.Open(source))
         {
-            book.Sheets["Sheet1"].Cell["A1"].Value = "保存しない文字列";
+            tested.Sheets["Sheet1"].Cell["A1"].Value = "保存しない文字列";
 
-            var tested = () => book.SaveAs(source);
+            var action = () => tested.SaveAs(source);
 
-            tested.Should().Throw<NotSupportedException>();
+            action.Should().Throw<NotSupportedException>();
             source.ToArray().Should().Equal(original);
         }
 
@@ -967,11 +967,11 @@ public class Workbookのテスト : IDisposable
     {
         byte[] original = [1, 2, 3, 4];
         using var destination = new MemoryStream([.. original], writable: false);
-        using var book = Workbook.Open(@"TestData\文字列セル.xlsx");
+        using var tested = Workbook.Open(@"TestData\文字列セル.xlsx");
 
-        var tested = () => book.SaveAs(destination);
+        var action = () => tested.SaveAs(destination);
 
-        tested.Should().Throw<NotSupportedException>();
+        action.Should().Throw<NotSupportedException>();
         destination.ToArray().Should().Equal(original);
     }
 
@@ -1025,10 +1025,10 @@ public class Workbookのテスト : IDisposable
     [Fact]
     public void Readは文字列セルをUri型のプロパティへ読み込めません()
     {
-        using var book = Workbook.Open(@"TestData\定義名.xlsx");
-        var tested = () => book.Read<UriWorkbookData>();
+        using var tested = Workbook.Open(@"TestData\定義名.xlsx");
+        var action = () => tested.Read<UriWorkbookData>();
 
-        tested.Should().Throw<Exception>();
+        action.Should().Throw<Exception>();
     }
 
     [Fact]
@@ -1094,20 +1094,20 @@ public class Workbookのテスト : IDisposable
     [Fact]
     public void Readはテーブルのnullableプロパティへ値と空白を読み込みます()
     {
-        using var book = Workbook.Open(@"TestData\テーブル.xlsx");
-        var tested = book.Read<NullableWorkbookTableData>().空白数値マッピング.ToArray();
+        using var tested = Workbook.Open(@"TestData\テーブル.xlsx");
+        var rows = tested.Read<NullableWorkbookTableData>().空白数値マッピング.ToArray();
 
-        tested.Select(it => it.数値).Should().Equal(0, null);
-        tested.Select(it => it.小数).Should().Equal(1.5, null);
-        tested.Select(it => it.真偽値).Should().Equal(false, null);
+        rows.Select(it => it.数値).Should().Equal(0, null);
+        rows.Select(it => it.小数).Should().Equal(1.5, null);
+        rows.Select(it => it.真偽値).Should().Equal(false, null);
     }
 
     [Fact]
     public void Replaceはテーブルのnullableプロパティの値とnullを書き込みます()
     {
-        using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
+        using var tested = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
 
-        book.Replace(
+        tested.Replace(
             new NullableWorkbookTableData
             {
                 空白数値マッピング =
@@ -1117,12 +1117,12 @@ public class Workbookのテスト : IDisposable
                 ]
             });
 
-        var tested = book.Tables["空白数値マッピング"].Rows.ToArray();
-        tested.Select(it => it["数値"].Value as object)
+        var rows = tested.Tables["空白数値マッピング"].Rows.ToArray();
+        rows.Select(it => it["数値"].Value as object)
             .Should().Equal(new BlankValue(), 10d);
-        tested.Select(it => it["小数"].Value as object)
+        rows.Select(it => it["小数"].Value as object)
             .Should().Equal(new BlankValue(), 2.5);
-        tested.Select(it => it["真偽値"].Value as object)
+        rows.Select(it => it["真偽値"].Value as object)
             .Should().Equal(new BlankValue(), true);
     }
 

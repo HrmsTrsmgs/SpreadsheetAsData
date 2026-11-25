@@ -193,24 +193,24 @@ public sealed class コード生成型付きTableのテスト : IDisposable
             }
         ];
 
-        using (var book = generatedAssembly.GeneratedInstance<Workbook>(
+        using (var tested = generatedAssembly.GeneratedInstance<Workbook>(
                    "BasicStructureBook",
                    filePath))
         {
-            dynamic bookAccessor = book;
+            dynamic bookAccessor = tested;
             dynamic generatedRows = CreateRows(
                 rowType,
                 replacement.Select(it => (it.CustomerId, it.Amount, it.Description)).ToArray());
 
             bookAccessor.SalesDetail.Replace(generatedRows);
-            book.Save();
+            tested.Save();
         }
 
-        using var tested = Workbook.Open(filePath);
+        using var savedBook = Workbook.Open(filePath);
         using var handWrittenBook = Workbook.Open(temporaryFiles.Copy(BasicStructureExcelFilePath));
         handWrittenBook.ReadTable<ReadTableComparison>("sales_detail").Replace(replacement);
 
-        tested.Tables["sales_detail"].Range.Values.Should().BeEquivalentTo(
+        savedBook.Tables["sales_detail"].Range.Values.Should().BeEquivalentTo(
             handWrittenBook.Tables["sales_detail"].Range.Values,
             options => options.WithStrictOrdering());
     }
