@@ -4,11 +4,12 @@
 
 ## 現在の作業
 
-* 目的: [F8のレビュー記録](refactoring-review.md#f8--p2-不正なnamemappingsの生成名を事前診断しない)に記した、生成先による許可文字の判定差を解消する。
-* 基準: `4038667`（F8の記録整理。ローカル `master` にコミット済み、未push）。作業ブランチは `codex/common-generated-name-validation`。
-* 現在地: 列専用だった許可文字判定をシート・テーブル・定義名にも共通適用した。Green確認済み。作業ブランチは未push。
+* 目的: C#・テスト・ビルド連携・Ruby全体を、公開APIと既存の振る舞いを変えずに整理する。変更理由と別件は[全体の精査記録](refactoring-review.md#2026-11-25の全体リファクタリング)を参照。
+* 基準: `master` と `origin/master` は `4038667`。F8の修正 `15eb057` は `codex/common-generated-name-validation` にコミット済み。今回の作業ブランチ `codex/repository-refactor` はそのコミットから分けた。
+* 現在地: F8と全体リファクタリングを別コミットに分け、`codex/repository-refactor` から `master` 宛てのPRで取り込む。
 
 ## 検証と次回
 
-* 検証: 診断が出ない3件でRedを確認。SDK 11.0.100のアナライザー付き非増分ビルドは警告・エラー0、全C#テスト928件（本体368件、コード生成・MSBuild連携560件）が成功。整形検査は未変更行のCA1861のみ。
-* 次の着手点: 了承後にローカル `master` の文書コミットをpushし、修正ブランチからPRを作る。識別子の先頭など、今回変更していない判定の見直しは未予定。
+* 検証: .NET SDK 11.0.100でアナライザー付きビルドは警告・エラー0。C#全934件（本体371、コード生成・MSBuild連携563）が成功。保留2例を加えた後は該当Theoryを再実行し、5件成功・2件Skip。Rubyは隔離したデータでRSpec 262例・失敗0・pending 3、サンプルも成功。PowerShellの構文検査は成功。Visual Studioの画面確認、公開操作、性能計測は対象外。
+* 静的検査: 全体の `dotnet format --verify-no-changes --severity info` に残るのは `CellRange.Values` の `CA2208` 1件。寸法不一致時の `ArgumentException` のメッセージ・`ParamName` は変更していない。
+* 次の着手点: PRの取り込み後、必要に応じて保留例を別のRedから扱う。Rubyの列順とC#の生成名の先頭文字の修正は、この差分に含めない。

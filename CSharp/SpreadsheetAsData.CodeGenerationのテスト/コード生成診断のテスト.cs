@@ -490,6 +490,30 @@ public sealed class コード生成診断のテスト
     }
 
     [Fact]
+    public void 無効名はシートとテーブルと定義名の順に報告し列の無効名はBookの衝突の後に報告します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                DefinedNamesWithoutCollisionsExcelFilePath,
+                options => options.NameMappings = new()
+                {
+                    ["sales_data"] = "@@Read",
+                    ["sales_detail"] = "bad-table",
+                    ["book.main_cell"] = "bad.cell",
+                    ["sales_detail.customer_id"] = "bad column"
+                })
+            .Should().BeEquivalentTo<CodeGenerationDiagnostic>(
+                [
+                    new(true, "@@Read", ["sales_data"], "sales_data"),
+                    new(true, "bad-table", ["sales_detail"], "sales_detail"),
+                    new(true, "bad.cell", ["main_cell"], "main_cell"),
+                    new(true, "Read", ["sales_data"]),
+                    new(true, "bad column", ["customer_id"], "customer_id")
+                ],
+                options => options.WithStrictOrdering());
+    }
+
+    [Fact]
     public void 区切り文字だけのシート名はCSharp識別子を生成できないため診断します()
     {
         GeneratedCodeInspection
@@ -705,6 +729,8 @@ public sealed class コード生成診断のテスト
     [InlineData("Customer.Id")]
     [InlineData("Customer+Id")]
     [InlineData("\u0301Customer")]
+    [InlineData("\u203FCustomer", Skip = "アンダースコア以外の連結用句読点を先頭でも受理しているため。先頭文字を区別して診断する際に解除する。")]
+    [InlineData("\u200CCustomer", Skip = "書式文字を先頭でも受理しているため。先頭文字を区別して診断する際に解除する。")]
     [InlineData("Customer\U0001F600")]
     public void NameMappingsで列に不正な文字を含む名前を指定した場合は変換せずエラーを診断します(string generatedName)
     {

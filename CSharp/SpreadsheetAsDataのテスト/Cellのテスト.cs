@@ -1,10 +1,10 @@
-﻿using FluentAssertions;
+﻿using System.Globalization;
+using FluentAssertions;
 using Marimo.SpreadsheetAsData;
 using Marimo.SpreadsheetAsData.Test.テスト補助;
-using System.Globalization;
+using Xunit;
 using Packaging = DocumentFormat.OpenXml.Packaging;
 using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
-using Xunit;
 
 namespace Marimo.SpreadsheetAsData.Test;
 

@@ -96,12 +96,10 @@ static class WorkbookWrapperComponents
             public void Replace({{bookFileIdentifier}}Data data) =>
                 base.Replace(data);
         {{ForEach([
-            .. from definedName in BookScopedDefinedNames(book)
-               where IsSingleCellDefinedName(definedName)
-               select BookCellDefinedNamePropertyDeclaration(definedName, options),
-            .. from definedName in BookScopedDefinedNames(book)
-               where !IsSingleCellDefinedName(definedName)
-               select BookCellRangeDefinedNamePropertyDeclaration(definedName, options),
+            .. from item in SingleCellsThenRanges(BookScopedDefinedNames(book))
+               select item.IsSingleCell
+                   ? BookCellDefinedNamePropertyDeclaration(item.Definition, options)
+                   : BookCellRangeDefinedNamePropertyDeclaration(item.Definition, options),
             .. from sheet in book.Sheets.Values
                select SheetPropertyDeclaration(sheet, options),
             .. from table in book.Tables
@@ -190,8 +188,8 @@ static class WorkbookWrapperComponents
         public partial class {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Data
         {
         {{ForEach([
-            .. from definedName in BookDataDefinedNames(book)
-               select BookDataDefinedNamePropertyDeclaration(definedName, options),
+            .. from item in BookDataDefinedNames(book)
+               select BookDataDefinedNamePropertyDeclaration(item.Definition, item.IsSingleCell, options),
             .. from table in book.Tables
                select BookDataTablePropertyDeclaration(table, options)
         ])}}
@@ -201,23 +199,26 @@ static class WorkbookWrapperComponents
     /// <summary>
     /// BookData型へ平坦化する定義名を、スコープごとに単一セル、セル範囲の順で列挙します。
     /// </summary>
-    static IEnumerable<DefinedName> BookDataDefinedNames(Workbook book) =>
+    static IEnumerable<(DefinedName Definition, bool IsSingleCell)> BookDataDefinedNames(Workbook book) =>
     [
-        .. from definedName in BookScopedDefinedNames(book)
-           where IsSingleCellDefinedName(definedName)
-           select definedName,
-        .. from definedName in BookScopedDefinedNames(book)
-           where !IsSingleCellDefinedName(definedName)
-           select definedName,
-        .. from sheet in book.Sheets.Values
-           from definedName in SheetScopedDefinedNames(sheet)
-           where IsSingleCellDefinedName(definedName)
-           select definedName,
-        .. from sheet in book.Sheets.Values
-           from definedName in SheetScopedDefinedNames(sheet)
-           where !IsSingleCellDefinedName(definedName)
-           select definedName
+        .. SingleCellsThenRanges(BookScopedDefinedNames(book)),
+        .. SingleCellsThenRanges(
+            from sheet in book.Sheets.Values
+            from definedName in SheetScopedDefinedNames(sheet)
+            select definedName)
     ];
+
+    /// <summary>
+    /// 宣言順を単一セル、範囲の順に揃え、それぞれの中では元の列挙順を維持します。
+    /// </summary>
+    static IEnumerable<(DefinedName Definition, bool IsSingleCell)> SingleCellsThenRanges(
+        IEnumerable<DefinedName> definedNames) =>
+        (from definition in definedNames
+         where IsSingleCellDefinedName(definition)
+         select (definition, true)).Concat(
+            from definition in definedNames
+            where !IsSingleCellDefinedName(definition)
+            select (definition, false));
 
     /// <summary>
     /// ブックデータ型に、Excelテーブルの行データを表すプロパティを生成します。
@@ -245,9 +246,9 @@ static class WorkbookWrapperComponents
     /// </summary>
     internal static string BookDataDefinedNamePropertyDeclaration(
         DefinedName definedName,
+        bool isSingleCell,
         CodeGenerationOptions options)
     {
-        var isSingleCell = IsSingleCellDefinedName(definedName);
         var propertyTypeName = isSingleCell
             ? CellValueTypeName(definedName.Range.TopLeftCell.TypedValue)
             : "IEnumerable<IEnumerable<dynamic?>>";
@@ -346,12 +347,10 @@ static class WorkbookWrapperComponents
             {
             }
         {{ForEach([
-            .. from definedName in SheetScopedDefinedNames(sheet)
-               where IsSingleCellDefinedName(definedName)
-               select SheetCellDefinedNamePropertyDeclaration(sheet, definedName, options),
-            .. from definedName in SheetScopedDefinedNames(sheet)
-               where !IsSingleCellDefinedName(definedName)
-               select SheetCellRangeDefinedNamePropertyDeclaration(sheet, definedName, options),
+            .. from item in SingleCellsThenRanges(SheetScopedDefinedNames(sheet))
+               select item.IsSingleCell
+                   ? SheetCellDefinedNamePropertyDeclaration(sheet, item.Definition, options)
+                   : SheetCellRangeDefinedNamePropertyDeclaration(sheet, item.Definition, options),
             .. from table in sheet.Book.Tables
                where table.Worksheet.Name == sheet.Name
                select SheetTablePropertyDeclaration(table, options)

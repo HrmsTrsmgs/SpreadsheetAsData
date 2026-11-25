@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Diagnostics.CodeAnalysis;
+using FluentAssertions;
 using Marimo.SpreadsheetAsData;
 using Marimo.SpreadsheetAsData.Test.テスト補助;
 using Xunit;
@@ -219,22 +220,22 @@ public sealed class 型付きTableのテスト : IDisposable
 
         using (var book = Workbook.Open(filePath))
         {
-            book.ReadTable<WritableMappedRow>(MappingTableName)
+            book.ReadTable<TestMappedRow>(MappingTableName)
                 .Replace(
                     [
-                        new WritableMappedRow
+                        new()
                         {
                             IntegerValue = 10,
                             FloatingPointValue = 1.5,
                             TextValue = "first"
                         },
-                        new WritableMappedRow
+                        new()
                         {
                             IntegerValue = 20,
                             FloatingPointValue = 2.5,
                             TextValue = "second"
                         },
-                        new WritableMappedRow
+                        new()
                         {
                             IntegerValue = 30,
                             FloatingPointValue = 3.5,
@@ -350,15 +351,15 @@ public sealed class 型付きTableのテスト : IDisposable
 
         using (var book = Workbook.Open(filePath))
         {
-            book.ReadTable<WritablePropertyNameMappedRow>(PropertyNameMappingTableName)
+            book.ReadTable<PropertyNameMappedRow>(PropertyNameMappingTableName)
                 .Replace(
                     [
-                        new WritablePropertyNameMappedRow
+                        new()
                         {
                             @float = 10.1,
                             @string = "first"
                         },
-                        new WritablePropertyNameMappedRow
+                        new()
                         {
                             @float = 20.2,
                             @string = "second"
@@ -393,12 +394,12 @@ public sealed class 型付きTableのテスト : IDisposable
 
         using (var book = Workbook.Open(filePath))
         {
-            book.ReadTable<WritableIntegerOnlyRow>(MappingTableName)
+            book.ReadTable<IntegerOnlyRow>(MappingTableName)
                 .Replace(
                     [
-                        new WritableIntegerOnlyRow { IntegerValue = 10 },
-                        new WritableIntegerOnlyRow { IntegerValue = 20 },
-                        new WritableIntegerOnlyRow { IntegerValue = 30 }
+                        new() { IntegerValue = 10 },
+                        new() { IntegerValue = 20 },
+                        new() { IntegerValue = 30 }
                     ]);
             book.Save();
         }
@@ -417,12 +418,12 @@ public sealed class 型付きTableのテスト : IDisposable
 
         using (var book = Workbook.Open(filePath))
         {
-            book.ReadTable<WritableIntegerOnlyRow>(MappingTableName)
+            book.ReadTable<IntegerOnlyRow>(MappingTableName)
                 .Replace(
                     [
-                        new WritableIntegerOnlyRow { IntegerValue = 10 },
-                        new WritableIntegerOnlyRow { IntegerValue = 20 },
-                        new WritableIntegerOnlyRow { IntegerValue = 30 }
+                        new() { IntegerValue = 10 },
+                        new() { IntegerValue = 20 },
+                        new() { IntegerValue = 30 }
                     ]);
             book.Save();
         }
@@ -436,38 +437,21 @@ public sealed class 型付きTableのテスト : IDisposable
     }
 
     [Fact]
-    public void Replaceは属性で指定した列が存在しない場合に失敗します()
+    public void ReadTableは置換用の型が存在しない列を指定した場合に失敗します()
     {
         using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
 
-        var action = () =>
-        {
-            book.ReadTable<WritableMissingColumnRow>(MappingTableName)
-                .Replace([new WritableMissingColumnRow { Value = 1 }]);
-        };
-
-        action.Should().Throw<TableMappingException>();
+        FluentActions.Invoking(() => book.ReadTable<MissingColumnRow>(MappingTableName))
+            .Should().Throw<TableMappingException>();
     }
 
     [Fact]
-    public void Replaceは複数プロパティが同じ列を指定した場合に失敗します()
+    public void ReadTableは置換用の型の複数プロパティが同じ列を指定した場合に失敗します()
     {
         using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
 
-        var action = () =>
-        {
-            book.ReadTable<WritableDuplicateColumnRow>(MappingTableName)
-                .Replace(
-                    [
-                        new WritableDuplicateColumnRow
-                        {
-                            FirstValue = 1,
-                            SecondValue = 2
-                        }
-                    ]);
-        };
-
-        action.Should().Throw<TableMappingException>();
+        FluentActions.Invoking(() => book.ReadTable<DuplicateColumnRow>(MappingTableName))
+            .Should().Throw<TableMappingException>();
     }
 
     [Fact]
@@ -475,11 +459,8 @@ public sealed class 型付きTableのテスト : IDisposable
     {
         using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
 
-        var action = () =>
-        {
-            book.ReadTable<WritableAttributedPropertyWithoutPublicGetterRow>(MappingTableName)
-                .Replace([new WritableAttributedPropertyWithoutPublicGetterRow()]);
-        };
+        var table = book.ReadTable<WritableAttributedPropertyWithoutPublicGetterRow>(MappingTableName);
+        var action = () => table.Replace([new WritableAttributedPropertyWithoutPublicGetterRow()]);
 
         action.Should().Throw<TableMappingException>();
     }
@@ -507,11 +488,8 @@ public sealed class 型付きTableのテスト : IDisposable
     {
         using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
 
-        var action = () =>
-        {
-            book.ReadTable<WritableUnsupportedValueRow>(MappingTableName)
-                .Replace([new WritableUnsupportedValueRow { Value = DateTime.Today }]);
-        };
+        var table = book.ReadTable<WritableUnsupportedValueRow>(MappingTableName);
+        var action = () => table.Replace([new WritableUnsupportedValueRow { Value = DateTime.Today }]);
 
         action.Should().Throw<TableMappingException>();
     }
@@ -527,20 +505,14 @@ public sealed class 型付きTableのテスト : IDisposable
     [Fact]
     public void 型付きTableは属性で指定した列が存在しない場合に失敗します()
     {
-        var action = () =>
-        {
-            _ = book.ReadTable<MissingColumnRow>(MappingTableName)
-                .ToArray();
-        };
-
-        var thrown = action
+        var thrown = FluentActions.Invoking(() => book.ReadTable<MissingColumnRow>(MappingTableName))
             .Should().Throw<TableMappingException>();
 
         thrown.Which.TableName.Should().Be(MappingTableName);
-        thrown.Which.MappingType.Should().Be(typeof(MissingColumnRow));
+        thrown.Which.MappingType.Should().Be<MissingColumnRow>();
         thrown.Which.ColumnName.Should().Be("missing");
         thrown.Which.PropertyName.Should().Be(nameof(MissingColumnRow.Value));
-        thrown.Which.PropertyType.Should().Be(typeof(int));
+        thrown.Which.PropertyType.Should().Be<int>();
         thrown.Which.WorksheetRowIndex.Should().BeNull();
         thrown.Which.SourceValue.Should().BeNull();
     }
@@ -548,20 +520,15 @@ public sealed class 型付きTableのテスト : IDisposable
     [Fact]
     public void 型付きTableはセル値をプロパティ型へ変換できない場合に失敗します()
     {
-        var action = () =>
-        {
-            _ = book.ReadTable<StringAsIntegerRow>(MappingTableName)
-                .ToArray();
-        };
-
-        var thrown = action
+        var table = book.ReadTable<StringAsIntegerRow>(MappingTableName);
+        var thrown = FluentActions.Invoking(() => table.ToArray())
             .Should().Throw<TableMappingException>();
 
         thrown.Which.TableName.Should().Be(MappingTableName);
-        thrown.Which.MappingType.Should().Be(typeof(StringAsIntegerRow));
+        thrown.Which.MappingType.Should().Be<StringAsIntegerRow>();
         thrown.Which.ColumnName.Should().Be("文字列");
         thrown.Which.PropertyName.Should().Be(nameof(StringAsIntegerRow.Value));
-        thrown.Which.PropertyType.Should().Be(typeof(int));
+        thrown.Which.PropertyType.Should().Be<int>();
         thrown.Which.WorksheetRowIndex.Should().Be(7U);
         thrown.Which.SourceValue.Should().Be("さしすせそ");
     }
@@ -569,22 +536,16 @@ public sealed class 型付きTableのテスト : IDisposable
     [Fact]
     public void 型付きTableは小数をintへ変換しようとした場合に失敗します()
     {
-        var action = () =>
-        {
-            _ = book.ReadTable<FloatingPointAsIntegerRow>(MappingTableName)
-                .ToArray();
-        };
-
-        var thrown = action
+        var table = book.ReadTable<FloatingPointAsIntegerRow>(MappingTableName);
+        var thrown = FluentActions.Invoking(() => table.ToArray())
             .Should().Throw<TableMappingException>();
 
         thrown.Which.TableName.Should().Be(MappingTableName);
-        thrown.Which.MappingType.Should().Be(
-            typeof(FloatingPointAsIntegerRow));
+        thrown.Which.MappingType.Should().Be<FloatingPointAsIntegerRow>();
         thrown.Which.ColumnName.Should().Be("数値");
         thrown.Which.PropertyName.Should().Be(
             nameof(FloatingPointAsIntegerRow.Value));
-        thrown.Which.PropertyType.Should().Be(typeof(int));
+        thrown.Which.PropertyType.Should().Be<int>();
         thrown.Which.WorksheetRowIndex.Should().Be(7U);
         thrown.Which.SourceValue.Should().Be(4.4);
     }
@@ -592,15 +553,11 @@ public sealed class 型付きTableのテスト : IDisposable
     [Fact]
     public void 型付きTableは小数をnullableなintへ変換しようとした場合に失敗します()
     {
-        var action = () =>
-        {
-            _ = book.ReadTable<NullableIntegerWithBlankRow>(MappingTableName)
-                .ToArray();
-        };
+        var table = book.ReadTable<NullableIntegerWithBlankRow>(MappingTableName);
+        var thrown = FluentActions.Invoking(() => table.ToArray())
+            .Should().Throw<TableMappingException>();
 
-        var thrown = action.Should().Throw<TableMappingException>();
-
-        thrown.Which.PropertyType.Should().Be(typeof(int?));
+        thrown.Which.PropertyType.Should().Be<int?>();
         thrown.Which.SourceValue.Should().Be(4.4);
     }
 
@@ -612,9 +569,9 @@ public sealed class 型付きTableのテスト : IDisposable
         using var book = Workbook.Open(temporaryFiles.Copy("テーブル.xlsx"));
         book.Tables[MappingTableName].Rows.First()["数値2"].Value = value;
 
-        var tested = () => book.ReadTable<IntegerOnlyRow>(MappingTableName).ToArray();
+        var table = book.ReadTable<IntegerOnlyRow>(MappingTableName);
 
-        tested.Should().Throw<TableMappingException>()
+        FluentActions.Invoking(() => table.ToArray()).Should().Throw<TableMappingException>()
             .Which.SourceValue.Should().Be(value);
     }
 
@@ -633,17 +590,11 @@ public sealed class 型付きTableのテスト : IDisposable
     [Fact]
     public void 型付きTableは複数のプロパティが同じ列を指定した場合に失敗します()
     {
-        var action = () =>
-        {
-            _ = book.ReadTable<DuplicateColumnRow>(MappingTableName)
-                .ToArray();
-        };
-
-        var thrown = action
+        var thrown = FluentActions.Invoking(() => book.ReadTable<DuplicateColumnRow>(MappingTableName))
             .Should().Throw<TableMappingException>();
 
         thrown.Which.TableName.Should().Be(MappingTableName);
-        thrown.Which.MappingType.Should().Be(typeof(DuplicateColumnRow));
+        thrown.Which.MappingType.Should().Be<DuplicateColumnRow>();
         thrown.Which.ColumnName.Should().Be("数値2");
         thrown.Which.WorksheetRowIndex.Should().BeNull();
         thrown.Which.SourceValue.Should().BeNull();
@@ -652,23 +603,16 @@ public sealed class 型付きTableのテスト : IDisposable
     [Fact]
     public void 型付きTableは属性を付けたプロパティにpublicなsetterがない場合に失敗します()
     {
-        var action = () =>
-        {
-            _ = book.ReadTable<AttributedPropertyWithoutPublicSetterRow>(MappingTableName)
-                .ToArray();
-        };
-
-        var thrown = action
+        var thrown = FluentActions.Invoking(() => book.ReadTable<AttributedPropertyWithoutPublicSetterRow>(MappingTableName))
             .Should().Throw<TableMappingException>();
 
         thrown.Which.TableName.Should().Be(MappingTableName);
-        thrown.Which.MappingType.Should().Be(
-            typeof(AttributedPropertyWithoutPublicSetterRow));
+        thrown.Which.MappingType.Should().Be<AttributedPropertyWithoutPublicSetterRow>();
         thrown.Which.ColumnName.Should().Be("数値2");
         thrown.Which.PropertyName.Should().Be(
             nameof(
                 AttributedPropertyWithoutPublicSetterRow.IntegerValue));
-        thrown.Which.PropertyType.Should().Be(typeof(int));
+        thrown.Which.PropertyType.Should().Be<int>();
         thrown.Which.WorksheetRowIndex.Should().BeNull();
         thrown.Which.SourceValue.Should().BeNull();
     }
@@ -692,18 +636,11 @@ public sealed class 型付きTableのテスト : IDisposable
     [Fact]
     public void 型付きTableはpublicな引数なしコンストラクターがない型では失敗します()
     {
-        var action = () =>
-        {
-            _ = book.ReadTable<RowWithoutPublicParameterlessConstructor>(MappingTableName)
-                .ToArray();
-        };
-
-        var thrown = action
+        var thrown = FluentActions.Invoking(() => book.ReadTable<RowWithoutPublicParameterlessConstructor>(MappingTableName))
             .Should().Throw<TableMappingException>();
 
         thrown.Which.TableName.Should().Be(MappingTableName);
-        thrown.Which.MappingType.Should().Be(
-            typeof(RowWithoutPublicParameterlessConstructor));
+        thrown.Which.MappingType.Should().Be<RowWithoutPublicParameterlessConstructor>();
         thrown.Which.ColumnName.Should().BeNull();
         thrown.Which.PropertyName.Should().BeNull();
         thrown.Which.PropertyType.Should().BeNull();
@@ -713,54 +650,17 @@ public sealed class 型付きTableのテスト : IDisposable
 
     public sealed class PropertyNameMappedRow
     {
+#pragma warning disable IDE1006 // 属性を使わず、Excel列名そのものに対応付けるテストです。
         public double @float { get; set; }
 
         public string @string { get; set; } = "";
-    }
-
-    public sealed class WritableMappedRow
-    {
-        [SpreadsheetName("数値2")]
-        public int IntegerValue { get; set; }
-
-        [SpreadsheetName("数値")]
-        public double FloatingPointValue { get; set; }
-
-        [SpreadsheetName("文字列")]
-        public string TextValue { get; set; } = "";
-    }
-
-    public sealed class WritablePropertyNameMappedRow
-    {
-        public double @float { get; set; }
-
-        public string @string { get; set; } = "";
-    }
-
-    public sealed class WritableIntegerOnlyRow
-    {
-        [SpreadsheetName("数値2")]
-        public int IntegerValue { get; set; }
-    }
-
-    public sealed class WritableMissingColumnRow
-    {
-        [SpreadsheetName("missing")]
-        public int Value { get; set; }
-    }
-
-    public sealed class WritableDuplicateColumnRow
-    {
-        [SpreadsheetName("数値2")]
-        public int FirstValue { get; set; }
-
-        [SpreadsheetName("数値2")]
-        public int SecondValue { get; set; }
+#pragma warning restore IDE1006
     }
 
     public sealed class WritableAttributedPropertyWithoutPublicGetterRow
     {
         [SpreadsheetName("数値2")]
+        [SuppressMessage("Performance", "CA1822", Justification = "属性を付けた書き込み専用のインスタンスプロパティを検証するため。")]
         public int IntegerValue
         {
             set { }
@@ -772,6 +672,7 @@ public sealed class 型付きTableのテスト : IDisposable
         [SpreadsheetName("数値2")]
         public int IntegerValue { get; set; }
 
+        [SuppressMessage("Performance", "CA1822", Justification = "行の書き込み専用インスタンスプロパティが置換対象外になることを検証するため。")]
         public string Description
         {
             set { }
@@ -892,17 +793,13 @@ public sealed class 型付きTableのテスト : IDisposable
         [SpreadsheetName("数値2")]
         public int IntegerValue { get; set; }
 
+        [SuppressMessage("Performance", "CA1822", Justification = "行の読み取り専用インスタンスプロパティが読み込み対象外になることを検証するため。")]
         public string Description => "computed";
     }
 
-    public sealed class RowWithoutPublicParameterlessConstructor
+    public sealed class RowWithoutPublicParameterlessConstructor(int value)
     {
-        public RowWithoutPublicParameterlessConstructor(int value)
-        {
-            Value = value;
-        }
-
         [SpreadsheetName("数値2")]
-        public int Value { get; set; }
+        public int Value { get; set; } = value;
     }
 }

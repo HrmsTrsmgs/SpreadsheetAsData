@@ -7,9 +7,9 @@ describe WorkBook do
   subject{ TestFile.book1 }
   let(:book2){ TestFile.book2 }
   let(:anomaly){ TestFile.変則リレーション }
-  let(:utf_8){WorkBook.open(TestFile.book1_path, 'UTF-8')}
-  let(:euc_jp){WorkBook.open(TestFile.book1_path, 'EUC-JP')}
-  
+  let(:utf_8){TestFile.open_book(TestFile.book1_path, 'UTF-8')}
+  let(:euc_jp){TestFile.open_book(TestFile.book1_path, 'EUC-JP')}
+
   after do
     TestFile.close
   end
@@ -24,25 +24,25 @@ describe WorkBook do
         book.class.should == WorkBook
       end
     end
-    
+
     it 'はファイルを束縛します。' do
       book = WorkBook.open(TestFile.book1_copy_path)
       expect { File.delete(TestFile.book1_copy_path) }.to raise_error Errno::EACCES
       book.close
     end
-    
+
     it 'はブロック内でファイルを束縛します。' do
       WorkBook.open(TestFile.book1_copy_path) do |book|
         expect { File.delete(TestFile.book1_copy_path) }.to raise_error Errno::EACCES
       end
     end
-    
+
     it 'はブロック終了時にファイルを開放します。' do
       WorkBook.open(TestFile.book1_copy_path) do |book|
       end
       expect { File.delete(TestFile.book1_copy_path) }.to_not raise_error
     end
-    
+
     it 'は例外発生時もブロック終了時にファイルを開放します。' do
       begin
         WorkBook.open(TestFile.book1_copy_path) do |book|
@@ -81,18 +81,18 @@ describe WorkBook do
   end
 
   describe '#close' do
-  
+
     it 'はファイルを開放します。' do
       book = WorkBook.open(TestFile.book1_copy_path)
       book.close
       expect { File.delete(TestFile.book1_copy_path) }.to_not raise_error
     end
-  
+
     it 'の時に変更は保存されています。' do
       book = WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.cell(:A1).value = 999
       end
-      
+
       WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.A1.should == 999
       end
@@ -159,24 +159,24 @@ describe WorkBook do
       subject.いろいろなデータ.should equal subject.sheets[2]
     end
   end
-  
+
   context 'に保存方法として' do
     before { skip }
     it 'cell.valueを使った書き込みは保存されています。' do
       book = WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.cell(:A1).value = 999
       end
-      
+
       WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.A1.should == 999
       end
     end
-    
+
     it 'セル名を使った書き込みは保存されています。' do
       book = WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.A1 = 999
       end
-      
+
       WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.A1.should == 999
       end
@@ -189,51 +189,51 @@ describe WorkBook do
         book.Sheet1.A1 = 666
         book.Sheet1.C3 = 999
       end
-      
+
       WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.A1.should == 666
         book.Sheet1.C3.should == 999
       end
     end
-    
+
     it 'trueの書き込みは保存されています。' do
       book = WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.A1 = true
       end
-      
+
       WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.A1.should == true
       end
     end
-    
+
     it 'falseの書き込みは保存されています。' do
       book = WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.A1 = false
       end
-      
+
       WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.A1.should == false
       end
     end
-    
+
     it '文字列の書き込みは保存されています。' do
       book = WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.A1 = 'abcde'
         book.Sheet1.C3 = 'fghi'
       end
-      
+
       WorkBook.open(TestFile.book1_copy_path) do |book|
         book.Sheet1.A1.should == 'abcde'
         book.Sheet1.C3.should == 'fghi'
       end
     end
   end
-  
+
   it 'の空白セルに書き込みがされています。' do
     book = WorkBook.open(TestFile.book1_copy_path) do |book|
       book.Sheet1.B1 = 999
     end
-    
+
     WorkBook.open(TestFile.book1_copy_path) do |book|
       book.Sheet1.B1.should == 999
     end
@@ -243,17 +243,17 @@ describe WorkBook do
     book = WorkBook.open(TestFile.book1_copy_path) do |book|
       book.Sheet1.B2 = 999
     end
-    
+
     WorkBook.open(TestFile.book1_copy_path) do |book|
       book.Sheet1.B2.should == 999
     end
   end
-  
+
   it 'の空白セルに書き込みがされた時に、行の整合性が取れています。' do
     book = WorkBook.open(TestFile.book1_copy_path) do |book|
       book.Sheet1.B1 = 999
     end
-    
+
     WorkBook.open(TestFile.book1_copy_path) do |book|
       book.Sheet1.B1.should == 999
       book.Sheet1.A1.should == 1

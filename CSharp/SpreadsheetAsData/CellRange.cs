@@ -1,5 +1,5 @@
-﻿
-namespace Marimo.SpreadsheetAsData;
+﻿namespace Marimo.SpreadsheetAsData;
+
 /// <summary>
 /// ワークシート上のセル範囲を表します。
 /// </summary>
@@ -63,40 +63,32 @@ public class CellRange
     /// </summary>
     public Cell BottomRightCell => sheet.Cells[bottomRight.ToString()];
 
+    int RowCount => (int)(bottomRight.RowIndex - topLeft.RowIndex + 1);
+
+    int ColumnCount => (int)(bottomRight.ColumnIndex - topLeft.ColumnIndex + 1);
+
     /// <summary>
     /// 範囲内のセル値を、左上から右下へ向かう行ごとの列挙として取得または設定します。
     /// </summary>
     public IEnumerable<IEnumerable<dynamic?>> Values
     {
         get =>
-            from rowIndex in Enumerable.Range(
-                (int)topLeft.RowIndex,
-                (int)(bottomRight.RowIndex - topLeft.RowIndex + 1))
+            from rowIndex in Enumerable.Range((int)topLeft.RowIndex, RowCount)
             select
-                from columnIndex in Enumerable.Range(
-                    (int)topLeft.ColumnIndex,
-                    (int)(bottomRight.ColumnIndex - topLeft.ColumnIndex + 1))
+                from columnIndex in Enumerable.Range((int)topLeft.ColumnIndex, ColumnCount)
                 select sheet.Cells[(uint)columnIndex, (uint)rowIndex].Value;
         set
         {
             var rows = value.Select(it => it.ToArray()).ToArray();
-            var rowCount = (int)(bottomRight.RowIndex - topLeft.RowIndex + 1);
-            var columnCount = (int)(bottomRight.ColumnIndex - topLeft.ColumnIndex + 1);
-
-            if (rows.Length != rowCount
-                || rows.Any(it => it.Length != columnCount))
+            if (rows.Length != RowCount || rows.Any(row => row.Length != ColumnCount))
             {
                 throw new ArgumentException();
             }
 
             foreach (var (cell, cellValue) in
-                (
-                    from row in rows.WithIndex((int)topLeft.RowIndex)
-                    from item in row.Value.WithIndex((int)topLeft.ColumnIndex)
-                    select (
-                        Cell: sheet.Cells[(uint)item.Index, (uint)row.Index],
-                        Value: item.Value)
-                ))
+                from row in rows.WithIndex((int)topLeft.RowIndex)
+                from item in row.Value.WithIndex((int)topLeft.ColumnIndex)
+                select (Cell: sheet.Cells[(uint)item.Index, (uint)row.Index], item.Value))
             {
                 cell.TypedValue = Cell.NormalizeValue(cellValue);
             }

@@ -9,15 +9,20 @@ namespace Marimo.SpreadsheetAsData.CodeGeneration.Test;
 
 public sealed class GitHubPages生成スクリプトのテスト
 {
-    [Fact]
-    public async Task 末尾に区切り文字を付けたリポジトリルートを出力先に指定すると内容を変更せず拒否します()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task 末尾の区切り文字の有無によらずリポジトリルートへの出力を内容変更前に拒否します(bool withTrailingSeparator)
     {
         using var repository = new 一時スクリプトリポジトリ();
         repository.AddPagesContent();
         var markerPath = Path.Combine(repository.DirectoryPath, "keep.txt");
         File.WriteAllText(markerPath, "keep");
 
-        var tested = await repository.RunPages(repository.DirectoryPath + Path.DirectorySeparatorChar);
+        var outputPath = withTrailingSeparator
+            ? repository.DirectoryPath + Path.DirectorySeparatorChar
+            : repository.DirectoryPath;
+        var tested = await repository.RunPages(outputPath);
 
         using var scope = new AssertionScope();
         tested.ExitCode.Should().NotBe(0);
@@ -30,17 +35,19 @@ public sealed class GitHubPages生成スクリプトのテスト
     }
 
     [Fact]
-    public async Task リポジトリルートを出力先に指定すると内容を変更せず拒否します()
+    public async Task ドキュメント生成でdotnetが失敗した場合は既存の出力を残して原因を報告します()
     {
         using var repository = new 一時スクリプトリポジトリ();
         repository.AddPagesContent();
-        var markerPath = Path.Combine(repository.DirectoryPath, "keep.txt");
+        var outputPath = Path.Combine(repository.DirectoryPath, "artifacts", "github-pages");
+        Directory.CreateDirectory(outputPath);
+        var markerPath = Path.Combine(outputPath, "keep.txt");
         File.WriteAllText(markerPath, "keep");
 
-        var tested = await repository.RunPages(repository.DirectoryPath);
+        var tested = await repository.RunPages(outputPath, dotnetExitCode: 17);
 
         tested.ExitCode.Should().NotBe(0);
-        tested.Output.Should().Contain("repository root");
+        tested.Output.Should().Contain("dotnet tool restore failed with exit code 17");
         File.ReadAllText(markerPath).Should().Be("keep");
     }
 
@@ -85,7 +92,7 @@ public sealed class 変更ファイル正規化スクリプトのテスト
 
         (await repository.RunNormalizer()).ExitCode.Should().Be(0);
 
-        File.ReadAllBytes(filePath).Take(3).Should().Equal(0x74, 0x65, 0x78);
+        File.ReadAllBytes(filePath).Take(3).Should().Equal("tex"u8.ToArray());
     }
 
     [Fact]
@@ -121,11 +128,14 @@ sealed class 一時スクリプトリポジトリ : IDisposable
         File.WriteAllText(Path.Combine(sitePath, "index.html"), "api");
     }
 
-    internal Task<PowerShell実行結果> RunPages(string outputPath) =>
-        Run(
+    internal Task<PowerShell実行結果> RunPages(string outputPath, int dotnetExitCode = 0)
+    {
+        CopyScript("Invoke-Dotnet.ps1");
+        return Run(
             "build-github-pages.ps1",
             $"-OutputPath '{PowerShellLiteral(outputPath)}'",
-            "function dotnet { $global:LASTEXITCODE = 0 }");
+            $"function dotnet {{ $global:LASTEXITCODE = {dotnetExitCode} }}");
+    }
 
     internal async Task<PowerShell実行結果> RunNormalizer()
     {
@@ -135,7 +145,7 @@ sealed class 一時スクリプトリポジトリ : IDisposable
             ArgumentList = { "init", "--quiet", DirectoryPath },
             UseShellExecute = false
         }) ?? throw new InvalidOperationException("Gitを起動できませんでした。");
-        git.WaitForExit();
+        await git.WaitForExitAsync();
         if (git.ExitCode != 0)
         {
             throw new InvalidOperationException("一時リポジトリを作成できませんでした。");
@@ -154,17 +164,23 @@ sealed class 一時スクリプトリポジトリ : IDisposable
 
     async Task<PowerShell実行結果> Run(string fileName, string arguments, string setup = "")
     {
+        var scriptPath = CopyScript(fileName);
+        var runnerPath = Path.Combine(DirectoryPath, "Run.ps1");
+        File.WriteAllText(
+            runnerPath,
+            $"{setup}\n& '{PowerShellLiteral(scriptPath)}' {arguments}\n");
+        return await PowerShell実行結果.RunAsync(runnerPath, DirectoryPath);
+    }
+
+    string CopyScript(string fileName)
+    {
         var scriptPath = Path.Combine(DirectoryPath, "scripts", fileName);
         File.Copy(
             Path.GetFullPath(Path.Combine(
                 AppContext.BaseDirectory, "..", "..", "..", "..", "..", "scripts", fileName)),
             scriptPath,
             true);
-        var runnerPath = Path.Combine(DirectoryPath, "Run.ps1");
-        File.WriteAllText(
-            runnerPath,
-            $"{setup}\n& '{PowerShellLiteral(scriptPath)}' {arguments}\n");
-        return await PowerShell実行結果.RunAsync(runnerPath, DirectoryPath);
+        return scriptPath;
     }
 
     static string PowerShellLiteral(string path) => path.Replace("'", "''");

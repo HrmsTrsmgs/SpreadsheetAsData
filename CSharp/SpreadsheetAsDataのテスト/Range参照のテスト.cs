@@ -177,6 +177,20 @@ public class Range参照のテスト : IDisposable
     }
 
     [Fact]
+    public void 名前付き範囲のキャッシュは未解決の名前を再検索し解決した範囲だけを再利用します()
+    {
+        var range = book.Range["book_range"];
+        CellRange? resolved = null;
+        var cache = new NamedRangeCache(_ => resolved);
+
+        cache.Find("book_range").Should().BeNull();
+        resolved = range;
+        cache.Find("book_range").Should().BeSameAs(range);
+        resolved = null;
+        cache.Find("book_range").Should().BeSameAs(range);
+    }
+
+    [Fact]
     public void Rangeは同じA1形式の範囲参照から取得した範囲を同一オブジェクトとして扱います()
     {
         sheet2.Range["C32:D36"].Should().BeSameAs(sheet2.Range["C32:D36"]);

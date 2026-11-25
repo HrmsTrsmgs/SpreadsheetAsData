@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Marimo.SpreadsheetAsData;
 using Xunit;
 
@@ -19,6 +19,7 @@ public class SpreadsheetNameAttributeのテスト
     {
         var action = () =>
         {
+            // nullableを認識しない呼び出し元からのnullを、実行時にも拒否することを検証します。
             _ = new SpreadsheetNameAttribute(null!);
         };
 

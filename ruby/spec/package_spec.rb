@@ -5,7 +5,8 @@ require 'package'
 require 'tmpdir'
 
 describe Package do
-  subject { Package.open(TestFile.book1_path) }
+  let(:package_path) { TestFile.book1_path }
+  subject { Package.open(package_path) }
 
   after do
     subject.close
@@ -21,7 +22,7 @@ describe Package do
           zip.get_output_stream('../outside.txt') { |stream| stream.write('outside') }
         end
 
-        expect { Package.open(archive_path) { } }.to raise_error
+        expect { Package.open(archive_path) { } }.to raise_error(ArgumentError)
         expect(File.exist?(outside_path)).to be false
       end
     end
@@ -62,9 +63,11 @@ describe Package do
   end
 
   describe '#close' do
+    let(:package_path) { TestFile.book1_copy_path }
+
     it 'はファイルを開放します。' do
       subject.close
-      expect { File.delete(TestFile.book1_copy_path) }.to_not raise_error
+      expect { File.delete(package_path) }.to_not raise_error
     end
   end
 

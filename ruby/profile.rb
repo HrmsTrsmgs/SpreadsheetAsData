@@ -1,6 +1,5 @@
 # coding:UTF-8
-$: <<  './lib'
-require './lib/work_book'
+require_relative 'lib/work_book'
 require 'benchmark'
 #require 'profiler'
 

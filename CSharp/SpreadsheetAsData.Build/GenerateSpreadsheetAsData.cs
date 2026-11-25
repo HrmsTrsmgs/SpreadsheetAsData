@@ -74,7 +74,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
             var generatedNamespace = GeneratedNamespace(excelFile);
             var fingerprint = Fingerprint(excelFilePath, dictionaryFilePath, generatedNamespace);
 
-            var stampFilePath = StampFilePath(excelFilePath);
+            var stampFilePath = StampFilePath(runtimeWorkbookPath, outputFilePath);
 
             if (IsUpToDate(outputFilePath, stampFilePath, fingerprint))
             {
@@ -112,6 +112,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
                 excelFilePath,
                 ConfigureOptions);
 
+            // どちらも生成ファイル名を持つ絶対パスなので、親ディレクトリがあります。
             Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath)!);
             Directory.CreateDirectory(Path.GetDirectoryName(stampFilePath)!);
             WriteIfChanged(outputFilePath, sources.Single());
@@ -207,12 +208,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
 
     string? DictionaryFilePath(string excelFilePath)
     {
-        var dictionaryFileName =
-            $"{Path.GetFileNameWithoutExtension(excelFilePath)}.spreadsheetasdata.json";
-
-        var sameDirectoryDictionaryPath = Path.Combine(
-            Path.GetDirectoryName(excelFilePath)!,
-            dictionaryFileName);
+        var sameDirectoryDictionaryPath = Path.ChangeExtension(excelFilePath, "spreadsheetasdata.json");
 
         if (File.Exists(sameDirectoryDictionaryPath))
         {
@@ -221,7 +217,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
 
         var projectDirectoryDictionaryPath = Path.Combine(
             ProjectDirectory,
-            dictionaryFileName);
+            Path.GetFileName(sameDirectoryDictionaryPath));
 
         return File.Exists(projectDirectoryDictionaryPath)
             ? projectDirectoryDictionaryPath
@@ -269,6 +265,7 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
     }
 
     static string OutputFilePath(string excelFilePath) =>
+        // FullPathで解決したExcelファイルの隣に生成します。ファイルパスには親があります。
         Path.Combine(
             Path.GetDirectoryName(excelFilePath)!,
             $"{Path.GetFileNameWithoutExtension(excelFilePath)}.SpreadsheetAsData.g.cs");
@@ -283,19 +280,15 @@ public sealed class GenerateSpreadsheetAsData : Microsoft.Build.Utilities.Task
         return item;
     }
 
-    string StampFilePath(string excelFilePath)
-    {
-        var relativePath = Path.GetRelativePath(ProjectDirectory, excelFilePath);
-        var relativeDirectory = Path.GetDirectoryName(relativePath);
-        var stampDirectory = Path.Combine(
+    /// <summary>
+    /// プロジェクト相対のフォルダー構造を保ち、中間出力へ生成ファイルごとのスタンプを置きます。
+    /// </summary>
+    string StampFilePath(string runtimeWorkbookPath, string outputFilePath) =>
+        Path.Combine(
             FullIntermediateOutputPath,
             "SpreadsheetAsData",
-            relativeDirectory ?? "");
-
-        return Path.Combine(
-            stampDirectory,
-            $"{Path.GetFileNameWithoutExtension(excelFilePath)}.SpreadsheetAsData.g.cs.stamp");
-    }
+            Path.GetDirectoryName(runtimeWorkbookPath) ?? "",
+            Path.GetFileName(outputFilePath) + ".stamp");
 
     string FullIntermediateOutputPath =>
         Path.GetFullPath(

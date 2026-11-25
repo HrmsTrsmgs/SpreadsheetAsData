@@ -18,7 +18,7 @@ describe CellRange do
       subject.all.size.should == 11
       table2.all.size.should == 2
     end
-    
+
     it 'で取得したデータ行からセルのデータが取得されています。' do
       subject.all.first.float.should == 4.4
       subject.all.first.string.should == 'か'
@@ -27,28 +27,22 @@ describe CellRange do
     it 'で空行は取得されません。' do
       sheet1.A1_C5.all.size.should == 2
     end
-    
+
      it 'で空行の次の有効行は取得されます。' do
       sheet1.A1_C6.all.size.should == 3
     end
+    it 'は範囲内の実在行を行番号順に一度ずつ返します。' do
+      allow(sheet3).to receive(:real_row_nums).and_return([4, 3, 1, 3, 2])
+      sheet3.A1_C3.all.map { |row| row.int }.should == [4, 2]
+    end
+
     it 'で列として指定したデータの行が取得されています。' do
       sheet3.A_C.all.size.should == 11
     end
   end
-  
+
   describe '#where' do
     describe 'で整数列に対して' do
-      it '値を指定してデータの検索ができています。' do
-        result = subject.where(int: 5)
-        result.size.should == 2
-        result.should be_all{ |row| row.int == 5 }
-      end
-     it '範囲を指定してデータの検索ができています。' do
-        result = subject.where(int: 2..4)
-        result.size.should == 3
-        result.should be_all{ |row| 2 <= row.int && row.int <= 4 }
-      end
-      
       it '値を指定してデータの検索ができています。' do
         result = subject.where(int: 5)
         result.size.should == 2
@@ -64,7 +58,7 @@ describe CellRange do
         result.size.should == 4
         result.should be_all{ |row| [1, 3, 5].include? row.int }
       end
-      
+
       it '複数の条件を指定してデータの検索ができています。' do
         result = subject.where(int: 5, float: 6.6)
         result.size.should == 1
@@ -83,17 +77,6 @@ describe CellRange do
         result.size.should == 3
         result.should be_all{ |row| 2 <= row.float && row.float <= 5 }
       end
-      
-      it '値を指定してデータの検索ができています。' do
-        result = subject.where(float: 6.6)
-        result.size.should == 2
-        result.should be_all{ |row| row.float == 6.6 }
-      end
-      it '範囲を指定してデータの検索ができています。' do
-        result = subject.where(float: 2..5)
-        result.size.should == 3
-        result.should be_all{ |row| 2 <= row.float && row.float <= 5 }
-      end
       it '複数の要素を指定してデータの検索ができています。' do
         result = subject.where(float: [1.1, 3.3, 6.6])
         result.size.should == 4
@@ -101,13 +84,13 @@ describe CellRange do
       end
     end
   end
-  
+
   describe '#order' do
     it 'で並べ替えができます。' do
       subject.order('float').map{|row| row.float }.should == subject.all.map{|row| row.float }.sort
       subject.order('string').map{|row| row.string }.should == subject.all.map{|row| row.string }.sort
     end
-    
+
      it 'でaskを指定して並べ替えができます。' do
       subject.order('float asc').map{|row| row.float }.should == subject.all.map{|row| row.float }.sort
       subject.order('string asc').map{|row| row.string }.should == subject.all.map{|row| row.string }.sort
@@ -125,7 +108,7 @@ describe CellRange do
       subject.order('string DESC').map{|row| row.string }.should == subject.all.map{|row| row.string }.sort.reverse
     end
   end
-  
+
   describe '#column_names' do
     it 'で列名が取得されています' do
       subject.column_names.should == [:int, :float, :string]

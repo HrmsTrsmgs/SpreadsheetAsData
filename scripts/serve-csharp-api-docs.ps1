@@ -8,12 +8,7 @@ $ErrorActionPreference = "Stop"
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $docfxConfig = Join-Path $repositoryRoot "docs\api\csharp\docfx.json"
 
-function Invoke-Dotnet {
-    dotnet @args
-    if ($LASTEXITCODE -ne 0) {
-        throw "dotnet $($args -join ' ') failed with exit code $LASTEXITCODE."
-    }
-}
+. (Join-Path $PSScriptRoot "Invoke-Dotnet.ps1")
 
 Push-Location $repositoryRoot
 try {

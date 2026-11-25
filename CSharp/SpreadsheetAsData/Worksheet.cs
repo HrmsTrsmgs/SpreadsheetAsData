@@ -100,15 +100,16 @@ public class Worksheet
     Cell CreateCell(CellName cellName)
     {
         var cellReference = cellName.ToString();
-        var cellXml =
+        var cellXml = (
             from xml in WorksheetXml.Descendants<Spreadsheet.Cell>()
             let reference = xml.CellReference?.Value ?? throw new NotSupportedException()
             where reference == cellReference
-            select xml;
+            select xml
+        ).SingleOrDefault();
 
-        return cellXml.IsEmpty()
-            ? new Cell(this, cellReference)
-            : new Cell(this, cellXml.Single());
+        return cellXml is null
+            ? new(this, cellReference)
+            : new(this, cellXml);
     }
 
     /// <summary>
@@ -120,13 +121,12 @@ public class Worksheet
         Book.ResolveNamedRange(name, LocalSheetId);
 
     /// <summary>
-    /// ワークシートスコープの定義名をセル範囲として解決できるか確認します。
+    /// ワークシートスコープに定義名があれば、その範囲を返します。
     /// </summary>
     /// <param name="name">解決する定義名。</param>
-    /// <param name="range">定義名が見つかった場合のセル範囲。</param>
-    /// <returns>定義名を解決できた場合は true。</returns>
-    internal bool TryResolveNamedRange(string name, out CellRange range) =>
-        Book.TryResolveNamedRange(name, LocalSheetId, out range);
+    /// <returns>定義名が表すセル範囲。未定義の場合は null。</returns>
+    internal CellRange? FindNamedRange(string name) =>
+        Book.FindNamedRange(name, LocalSheetId);
 
     /// <summary>
     /// ローカル定義名のスコープに使う、ブック内のシートの位置を取得します。

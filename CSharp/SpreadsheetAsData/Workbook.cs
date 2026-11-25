@@ -145,64 +145,36 @@ public class Workbook : IDisposable
             : null;
 
     /// <summary>
-    /// ブックスコープの定義名をセル範囲として解決します。
+    /// 指定したスコープの定義名を解決します。セルの名前参照では未定義名を拒否します。
     /// </summary>
     /// <param name="name">解決する定義名。</param>
+    /// <param name="localSheetId">シートの位置。省略時はブックスコープ。</param>
     /// <returns>定義名が表すセル範囲。</returns>
-    internal CellRange ResolveNamedRange(string name) =>
-        ResolveNamedRange(name, localSheetId: null);
+    internal CellRange ResolveNamedRange(string name, uint? localSheetId = null) =>
+        FindNamedRange(name, localSheetId) ?? throw new KeyNotFoundException();
 
     /// <summary>
-    /// ブックスコープの定義名をセル範囲として解決できるか確認します。
+    /// 定義名の不在だけを null で表し、無効な参照の解析エラーはそのまま返します。
     /// </summary>
     /// <param name="name">解決する定義名。</param>
-    /// <param name="range">定義名が見つかった場合のセル範囲。</param>
-    /// <returns>定義名を解決できた場合は true。</returns>
-    internal bool TryResolveNamedRange(string name, out CellRange range) =>
-        TryResolveNamedRange(name, localSheetId: null, out range);
-
-    /// <summary>
-    /// 指定したワークシートスコープの定義名をセル範囲として解決します。
-    /// </summary>
-    /// <param name="name">解決する定義名。</param>
-    /// <param name="localSheetId">定義名が属するワークシートの 0 始まりの位置。</param>
-    /// <returns>定義名が表すセル範囲。</returns>
-    internal CellRange ResolveNamedRange(string name, uint localSheetId) =>
-        ResolveNamedRange(name, (uint?)localSheetId);
-
-    /// <summary>
-    /// 指定したワークシートスコープの定義名をセル範囲として解決できるか確認します。
-    /// </summary>
-    /// <param name="name">解決する定義名。</param>
-    /// <param name="localSheetId">定義名が属するワークシートの 0 始まりの位置。</param>
-    /// <param name="range">定義名が見つかった場合のセル範囲。</param>
-    /// <returns>定義名を解決できた場合は true。</returns>
-    internal bool TryResolveNamedRange(string name, uint localSheetId, out CellRange range) =>
-        TryResolveNamedRange(name, (uint?)localSheetId, out range);
-
-    CellRange ResolveNamedRange(string name, uint? localSheetId) =>
-        TryResolveNamedRange(name, localSheetId, out var range)
-            ? range
-            : throw new KeyNotFoundException();
-
-    bool TryResolveNamedRange(string name, uint? localSheetId, out CellRange range)
+    /// <param name="localSheetId">シートの位置。省略時はブックスコープ。</param>
+    /// <returns>定義名が表すセル範囲。未定義の場合は null。</returns>
+    internal CellRange? FindNamedRange(string name, uint? localSheetId = null)
     {
         var definedName = FindDefinedName(name, localSheetId);
 
         if (definedName == null)
         {
-            range = default!;
-            return false;
+            return null;
         }
 
         var rangeReference = CellRangeReference.Parse(definedName.Text);
         var targetSheet = Sheets[rangeReference.SheetName ?? throw new NotImplementedException()];
-        range = new(
+        return new(
             targetSheet,
             rangeReference.TopLeft,
             rangeReference.BottomRight,
             name);
-        return true;
     }
 
     Spreadsheet.DefinedName? FindDefinedName(string name, uint? localSheetId) =>

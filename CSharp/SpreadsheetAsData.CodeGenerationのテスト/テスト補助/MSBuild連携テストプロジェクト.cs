@@ -60,8 +60,8 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
     /// <returns>追加したExcelファイルの絶対パス。</returns>
     internal string AddBasicStructureExcel(string relativePath)
     {
+        Directory.CreateDirectory(ExcelDirectoryFor(relativePath));
         var destinationPath = Path.Combine(DirectoryPath, relativePath);
-        Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
         File.Copy(BasicStructureExcelFilePath, destinationPath);
         return destinationPath;
     }
@@ -75,11 +75,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
     internal string AddProjectDictionaryFor(
         string excelFileName,
         string json) =>
-        WriteDictionary(
-            Path.Combine(
-                DirectoryPath,
-                DictionaryFileName(excelFileName)),
-            json);
+        WriteDictionary(DirectoryPath, excelFileName, json);
 
     /// <summary>
     /// Excelファイルと同じディレクトリへ、識別子名変換辞書を置きます。
@@ -90,12 +86,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
     internal string AddExcelDictionaryFor(
         string excelRelativePath,
         string json) =>
-        WriteDictionary(
-            Path.Combine(
-                DirectoryPath,
-                Path.GetDirectoryName(excelRelativePath) ?? "",
-                DictionaryFileName(excelRelativePath)),
-            json);
+        WriteDictionary(ExcelDirectoryFor(excelRelativePath), excelRelativePath, json);
 
     /// <summary>
     /// MSBuildタスクを直接実行します。
@@ -144,8 +135,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
     /// <returns>生成ファイルの絶対パス。</returns>
     internal string GeneratedFilePathFor(string excelRelativePath) =>
         Path.Combine(
-            DirectoryPath,
-            Path.GetDirectoryName(excelRelativePath) ?? "",
+            ExcelDirectoryFor(excelRelativePath),
             $"{Path.GetFileNameWithoutExtension(excelRelativePath)}.SpreadsheetAsData.g.cs");
 
     /// <summary>
@@ -157,12 +147,12 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
         File.ReadAllText(GeneratedFilePathFor(excelRelativePath));
 
     /// <summary>
-    /// 指定したExcelファイルの絶対パスを取得します。
+    /// 親ディレクトリの指定がない場合は、一時プロジェクトの直下を使います。
     /// </summary>
     /// <param name="excelRelativePath">一時プロジェクト内のExcelファイル相対パス。</param>
-    /// <returns>Excelファイルの絶対パス。</returns>
-    internal string ExcelFilePathFor(string excelRelativePath) =>
-        Path.Combine(DirectoryPath, excelRelativePath);
+    /// <returns>Excelファイルを置くディレクトリの絶対パス。</returns>
+    string ExcelDirectoryFor(string excelRelativePath) =>
+        Path.Combine(DirectoryPath, Path.GetDirectoryName(excelRelativePath) ?? "");
 
     /// <summary>
     /// PowerShellからdotnet msbuildを起動するサンプルを作成します。
@@ -255,6 +245,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
             $ErrorActionPreference = 'Stop'
 
             dotnet msbuild .\SpreadsheetAsData.DesignTimeBuild.proj /t:Build /nologo /v:minimal
+            exit $LASTEXITCODE
             """);
 
         return scriptFilePath;
@@ -505,10 +496,12 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
                 relativePathFromCSharpDirectory));
 
     static string WriteDictionary(
-        string filePath,
+        string directoryPath,
+        string excelFileName,
         string json)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+        Directory.CreateDirectory(directoryPath);
+        var filePath = Path.Combine(directoryPath, DictionaryFileName(excelFileName));
         File.WriteAllText(filePath, json);
         return filePath;
     }

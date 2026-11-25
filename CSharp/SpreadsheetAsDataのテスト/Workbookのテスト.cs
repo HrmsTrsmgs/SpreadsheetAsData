@@ -1,7 +1,7 @@
-﻿using FluentAssertions;
+﻿using System.Diagnostics.CodeAnalysis;
+using FluentAssertions;
 using Marimo.SpreadsheetAsData;
 using Marimo.SpreadsheetAsData.Test.テスト補助;
-using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
 namespace Marimo.SpreadsheetAsData.Test;
@@ -1081,6 +1081,17 @@ public class Workbookのテスト : IDisposable
     }
 
     [Fact]
+    public void 二次元のプロパティは単一セルの定義名も一行一列の範囲として読み書きします()
+    {
+        using var tested = Workbook.Open(temporaryFiles.Copy("定義名.xlsx"));
+
+        tested.Replace(new SingleCellRangeData { Values = [["一セル"]] });
+
+        (tested.Cell["book_cell"].Value as object).Should().Be("一セル");
+        tested.Read<SingleCellRangeData>().Values.Single().Single().Should().Be("一セル");
+    }
+
+    [Fact]
     public void Readはプロパティ名と同じExcelテーブルから行データを読み込みます()
     {
         using var tested = Workbook.Open(@"TestData\テーブル.xlsx");
@@ -1369,6 +1380,12 @@ public class Workbookのテスト : IDisposable
     public sealed class AttributedWorkbookRangeData
     {
         [SpreadsheetName("book_range")]
+        public IEnumerable<IEnumerable<object?>> Values { get; set; } = [];
+    }
+
+    public sealed class SingleCellRangeData
+    {
+        [SpreadsheetName("book_cell")]
         public IEnumerable<IEnumerable<object?>> Values { get; set; } = [];
     }
 

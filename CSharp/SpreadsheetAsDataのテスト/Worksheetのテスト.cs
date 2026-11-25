@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Marimo.SpreadsheetAsData;
 using Xunit;
+using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Marimo.SpreadsheetAsData.Test;
 
@@ -71,6 +72,16 @@ public class Worksheetのテスト : IDisposable
 
         FluentActions.Invoking(() => book.Sheets["Sheet1"].Cells["A1"])
             .Should().Throw<NotSupportedException>();
+    }
+
+    [Fact]
+    public void Cellsは同じ参照を持つセルが複数ある場合に拒否します()
+    {
+        data.WorksheetXml.Descendants<Spreadsheet.Cell>()
+            .Single(it => it.CellReference?.Value == "B1").CellReference = "A1";
+
+        FluentActions.Invoking(() => data.Cells["A1"])
+            .Should().Throw<InvalidOperationException>();
     }
 
     [Fact]

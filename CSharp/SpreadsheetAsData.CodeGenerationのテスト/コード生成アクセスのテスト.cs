@@ -1,6 +1,6 @@
-﻿using FluentAssertions;
+﻿using System.Reflection;
+using FluentAssertions;
 using Marimo.SpreadsheetAsData;
-using System.Reflection;
 using Marimo.SpreadsheetAsData.CodeGeneration.Test.テスト補助;
 using Xunit;
 
@@ -115,10 +115,7 @@ public sealed class コード生成アクセスのテスト
     [Fact]
     public void 生成されたBook型は必要なシートがないファイルをOpenすると失敗します()
     {
-        var generatedType = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
-            .GeneratedType("BasicStructureBook");
+        var generatedType = CompileBookType(BasicStructureExcelFilePath, "BasicStructureBook");
 
         // 生成元のSalesDataとProductMasterは、開くファイルには存在しません。
         var tested = () =>
@@ -135,10 +132,7 @@ public sealed class コード生成アクセスのテスト
     [Fact]
     public void 生成されたBook型は必要なテーブルがないファイルをOpenすると失敗します()
     {
-        var generatedType = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
-            .GeneratedType("BasicStructureBook");
+        var generatedType = CompileBookType(BasicStructureExcelFilePath, "BasicStructureBook");
 
         // SalesDataとProductMasterはありますが、sales_detailとProductListはありません。
         var tested = () =>
@@ -154,10 +148,7 @@ public sealed class コード生成アクセスのテスト
     [Fact]
     public void 生成されたBook型は必要なテーブル列がないファイルをOpenすると失敗します()
     {
-        var generatedType = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
-            .GeneratedType("BasicStructureBook");
+        var generatedType = CompileBookType(BasicStructureExcelFilePath, "BasicStructureBook");
 
         // シートとテーブルは同じですが、sales_detailのDescription列がありません。
         var tested = () =>
@@ -173,10 +164,7 @@ public sealed class コード生成アクセスのテスト
     [Fact]
     public void 生成されたBook型は必要なブックスコープの定義名がないファイルをOpenすると失敗します()
     {
-        var generatedType = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(DefinedNamesExcelFilePath))
-            .GeneratedType("定義名Book");
+        var generatedType = CompileBookType(DefinedNamesExcelFilePath, "定義名Book");
 
         // シートとテーブル、main_cellはありますが、main_rangeとtotalはありません。
         var tested = () =>
@@ -192,10 +180,7 @@ public sealed class コード生成アクセスのテスト
     [Fact]
     public void 生成されたBook型は単一セルのブック定義名が複数セルに変わったファイルをOpenすると失敗します()
     {
-        var generatedType = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(DefinedNamesExcelFilePath))
-            .GeneratedType("定義名Book");
+        var generatedType = CompileBookType(DefinedNamesExcelFilePath, "定義名Book");
 
         // main_cellの参照先だけがE1からE1:F1へ広がり、他の構造と値は同じです。
         var tested = () =>
@@ -211,10 +196,7 @@ public sealed class コード生成アクセスのテスト
     [Fact]
     public void 生成されたBook型は必要なシートローカルの定義名がないファイルをOpenすると失敗します()
     {
-        var generatedType = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(DefinedNamesWithSheetScopeExcelFilePath))
-            .GeneratedType("定義名Book");
+        var generatedType = CompileBookType(DefinedNamesWithSheetScopeExcelFilePath, "定義名Book");
 
         // シート、テーブル、ブックスコープの定義名は同じですが、sales_dataのlocal_cellはありません。
         var tested = () =>
@@ -230,10 +212,7 @@ public sealed class コード生成アクセスのテスト
     [Fact]
     public void 生成されたBook型は単一セルのシートローカル定義名が複数セルに変わったファイルをOpenすると失敗します()
     {
-        var generatedType = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(DefinedNamesWithSheetScopeExcelFilePath))
-            .GeneratedType("定義名Book");
+        var generatedType = CompileBookType(DefinedNamesWithSheetScopeExcelFilePath, "定義名Book");
 
         // sales_dataのlocal_cellだけがA2からA2:B2へ広がり、他の構造と値は同じです。
         var tested = () =>
@@ -249,12 +228,10 @@ public sealed class コード生成アクセスのテスト
     [Fact]
     public void 生成されたBook型は同名のブック定義名があっても必要なシートローカル定義名がなければOpenに失敗します()
     {
-        var generatedType = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(
-                    @"TestData\コード生成\定義名.xlsx",
-                    options => options.NameMappings = new() { ["sales_data.total"] = "SheetTotal" }))
-            .GeneratedType("定義名Book");
+        var generatedType = CompileBookType(
+            @"TestData\コード生成\定義名.xlsx",
+            "定義名Book",
+            options => options.NameMappings = new() { ["sales_data.total"] = "SheetTotal" });
 
         // totalはブックスコープにだけ存在し、sales_dataではsheet_totalという別名です。
         // その他のシート、テーブル、定義名は生成元と一致します。
@@ -271,10 +248,7 @@ public sealed class コード生成アクセスのテスト
     [Fact]
     public void 生成されたBook型は別シートの同名定義名を必要なシートローカル定義名の代わりにしません()
     {
-        var generatedType = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(DefinedNamesWithSheetScopeExcelFilePath))
-            .GeneratedType("定義名Book");
+        var generatedType = CompileBookType(DefinedNamesWithSheetScopeExcelFilePath, "定義名Book");
 
         // local_cellの参照先は同じsales_data!A2ですが、所属はproduct_masterです。
         var tested = () =>
@@ -398,9 +372,7 @@ public sealed class コード生成アクセスのテスト
     [Fact]
     public void 生成されたBook型は必要なテーブルが別シートへ移動したファイルをOpenすると失敗します()
     {
-        var generatedType = GeneratedCodeInspection
-            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
-            .GeneratedType("BasicStructureBook");
+        var generatedType = CompileBookType(BasicStructureExcelFilePath, "BasicStructureBook");
 
         // シート名とテーブル名は揃っていますが、二つのテーブルの所属シートが逆です。
         var tested = () =>
@@ -416,9 +388,7 @@ public sealed class コード生成アクセスのテスト
     [Fact]
     public void 生成されたBook型は別テーブルの同名列を必要な列の代わりにしません()
     {
-        var generatedType = GeneratedCodeInspection
-            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
-            .GeneratedType("BasicStructureBook");
+        var generatedType = CompileBookType(BasicStructureExcelFilePath, "BasicStructureBook");
 
         // DescriptionはProductListにだけあり、sales_detailにはありません。
         var tested = () =>
@@ -452,10 +422,7 @@ public sealed class コード生成アクセスのテスト
     {
         using var temporaryFiles = new TemporaryExcelFiles();
         var excelFilePath = temporaryFiles.Copy(DefinedNamesExcelFilePath);
-        var generatedType = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(DefinedNamesWithSheetScopeExcelFilePath))
-            .GeneratedType("定義名Book");
+        var generatedType = CompileBookType(DefinedNamesWithSheetScopeExcelFilePath, "定義名Book");
 
         var openBook = () =>
         {
@@ -478,9 +445,7 @@ public sealed class コード生成アクセスのテスト
     {
         using var temporaryFiles = new TemporaryExcelFiles();
         var excelFilePath = temporaryFiles.Copy(@"TestData\テーブル範囲属性省略.xlsx");
-        var generatedType = GeneratedCodeInspection
-            .AssemblyFrom(GeneratedCodeInspection.GenerateSources(@"TestData\テーブル.xlsx"))
-            .GeneratedType("テーブルBook");
+        var generatedType = CompileBookType(@"TestData\テーブル.xlsx", "テーブルBook");
 
         var openBook = () =>
         {
@@ -509,10 +474,7 @@ public sealed class コード生成アクセスのテスト
     [Fact]
     public void 生成されたBook型は必要なシートがないStreamをOpenすると失敗します()
     {
-        var generatedType = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
-            .GeneratedType("BasicStructureBook");
+        var generatedType = CompileBookType(BasicStructureExcelFilePath, "BasicStructureBook");
 
         // 生成元のSalesDataとProductMasterは、開くStreamには存在しません。
         using var stream = new MemoryStream(File.ReadAllBytes(DefinedNamesExcelFilePath));
@@ -530,10 +492,7 @@ public sealed class コード生成アクセスのテスト
     public void 生成されたBook型は構造の検証でOpenに失敗しても呼び出し側のStreamを閉じません()
     {
         using var stream = new MemoryStream(File.ReadAllBytes(DefinedNamesExcelFilePath));
-        var generatedType = GeneratedCodeInspection
-            .AssemblyFrom(
-                GeneratedCodeInspection.GenerateSources(DefinedNamesWithSheetScopeExcelFilePath))
-            .GeneratedType("定義名Book");
+        var generatedType = CompileBookType(DefinedNamesWithSheetScopeExcelFilePath, "定義名Book");
 
         var openBook = () =>
         {
@@ -756,4 +715,14 @@ public sealed class コード生成アクセスのテスト
         tested.Range.Should().NotBeNull();
         tested.Cells.Should().NotBeNull();
     }
+
+    /// <summary>
+    /// Openの検証とは別に、各ケースの設定で生成したソースをその場でコンパイルします。
+    /// </summary>
+    static Type CompileBookType(
+        string sourcePath,
+        string expectedTypeName,
+        Action<CodeGenerationOptions>? configure = null) =>
+        GeneratedCodeInspection.AssemblyFrom(GeneratedCodeInspection.GenerateSources(sourcePath, configure))
+            .GeneratedType(expectedTypeName);
 }

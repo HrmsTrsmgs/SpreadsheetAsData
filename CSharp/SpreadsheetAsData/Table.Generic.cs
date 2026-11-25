@@ -8,6 +8,16 @@ namespace Marimo.SpreadsheetAsData;
 /// <typeparam name="T">各データ行を対応付ける型。</typeparam>
 public class Table<T> : Table, IEnumerable<T>
 {
+    readonly record struct ColumnMapping(PropertyInfo Property, string? ExplicitName)
+    {
+        internal string ColumnName => ExplicitName ?? Property.Name;
+    }
+
+    /// <summary>
+    /// 検証と各行の読み書きで共有する列対応です。セルやプロパティ値は保持しません。
+    /// </summary>
+    readonly ColumnMapping[] mappings;
+
     /// <summary>
     /// 指定した非型付き Excel テーブルから型付きテーブルを作成します。
     /// </summary>
@@ -16,6 +26,12 @@ public class Table<T> : Table, IEnumerable<T>
         : base(source.TableDefinitionPart, source.Worksheet)
     {
         ValidateMappingTypeCanBeCreated();
+        mappings = [
+            .. from property in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+               let name = property.GetCustomAttribute<SpreadsheetNameAttribute>()?.Name
+               where name is not null || HasPublicGetter(property) && HasPublicSetter(property)
+               select new ColumnMapping(property, name)
+        ];
         ValidateColumns();
     }
 
@@ -58,10 +74,10 @@ public class Table<T> : Table, IEnumerable<T>
     void Replace(TableRow row, T item)
     {
         foreach (var (cell, value) in
-            from property in MappedProperties
-            let sourceValue = property.GetValue(item)
-            let cell = row[GetColumnName(property)]
-            select (cell, Value: ConvertValueToCellValue(sourceValue, row, property)))
+            from mapping in mappings
+            let sourceValue = mapping.Property.GetValue(item)
+            let cell = row[mapping.ColumnName]
+            select (cell, Value: ConvertValueToCellValue(sourceValue, row, mapping)))
         {
             cell.TypedValue = value;
         }
@@ -88,8 +104,9 @@ public class Table<T> : Table, IEnumerable<T>
         object mapped = Activator.CreateInstance<T>() ?? throw new TableMappingException(this, typeof(T));
 
         foreach (var (property, value) in
-            from property in MappedProperties
-            select (property, Value: ConvertValue(GetSourceValue(row, property), row, property)))
+            from mapping in mappings
+            let cell = row[mapping.ColumnName]
+            select (mapping.Property, Value: ConvertValue(cell.TypedValue, row, mapping)))
         {
             property.SetValue(mapped, value);
         }
@@ -105,12 +122,7 @@ public class Table<T> : Table, IEnumerable<T>
         ValidateDuplicateColumns();
         ValidateAttributedProperties(HasPublicSetter);
 
-        if ((
-            from property in MappedProperties
-            let columnName = GetColumnName(property)
-            where !Columns.Contains(columnName)
-            select (Property: property, ColumnName: columnName)
-        ).TryGetFirst(out var missingColumn))
+        if (mappings.Where(it => !Columns.Contains(it.ColumnName)).TryGetFirst(out var missingColumn))
         {
             throw new TableMappingException(
                 this,
@@ -126,8 +138,8 @@ public class Table<T> : Table, IEnumerable<T>
     void ValidateDuplicateColumns()
     {
         if ((
-            from property in MappedProperties
-            group property by GetColumnName(property) into propertiesByColumn
+            from mapping in mappings
+            group mapping by mapping.ColumnName into propertiesByColumn
             where propertiesByColumn.Skip(1).Any()
             select propertiesByColumn.Key
         ).TryGetFirst(out var duplicateColumnName))
@@ -145,45 +157,18 @@ public class Table<T> : Table, IEnumerable<T>
     void ValidateAttributedProperties(Func<PropertyInfo, bool> hasPublicAccessor)
     {
         if ((
-            from property in MappedProperties
-            where HasSpreadsheetNameAttribute(property)
-                && !hasPublicAccessor(property)
-            select property
-        ).TryGetFirst(out var propertyWithoutPublicAccessor))
+            from mapping in mappings
+            where mapping.ExplicitName is not null && !hasPublicAccessor(mapping.Property)
+            select mapping
+        ).TryGetFirst(out var invalidMapping))
         {
             throw new TableMappingException(
                 this,
                 typeof(T),
-                GetColumnName(propertyWithoutPublicAccessor),
-                propertyWithoutPublicAccessor);
+                invalidMapping.ColumnName,
+                invalidMapping.Property);
         }
     }
-
-    /// <summary>
-    /// テーブル行から、指定したプロパティに対応する元セル値を取得します。
-    /// </summary>
-    /// <param name="row">値を取得するテーブル行。</param>
-    /// <param name="property">マッピング先プロパティ。</param>
-    /// <returns>プロパティに対応するセル値。</returns>
-    static TypedValue GetSourceValue(TableRow row, PropertyInfo property) =>
-        row[GetColumnName(property)].TypedValue;
-
-    /// <summary>
-    /// プロパティに対応する Excel テーブル列名を取得します。
-    /// </summary>
-    /// <param name="property">列名を取得するプロパティ。</param>
-    /// <returns>属性で指定した列名。属性がない場合はプロパティ名。</returns>
-    static string GetColumnName(PropertyInfo property) =>
-        property.GetCustomAttribute<SpreadsheetNameAttribute>()?.Name
-            ?? property.Name;
-
-    /// <summary>
-    /// プロパティに Excel テーブル列名を明示する属性があるかどうかを返します。
-    /// </summary>
-    /// <param name="property">確認するプロパティ。</param>
-    /// <returns>列名を明示する属性がある場合は true。</returns>
-    static bool HasSpreadsheetNameAttribute(PropertyInfo property) =>
-        property.GetCustomAttribute<SpreadsheetNameAttribute>() is not null;
 
     /// <summary>
     /// プロパティに public setter があるかどうかを返します。
@@ -202,62 +187,44 @@ public class Table<T> : Table, IEnumerable<T>
         property.GetMethod?.IsPublic == true;
 
     /// <summary>
-    /// プロパティがマッピング対象かどうかを返します。
-    /// </summary>
-    /// <param name="property">確認するプロパティ。</param>
-    /// <returns>列属性を持つ、または public getter と public setter を持つ場合は true。</returns>
-    static bool IsMappedProperty(PropertyInfo property) =>
-        HasSpreadsheetNameAttribute(property)
-            || HasPublicGetter(property) && HasPublicSetter(property);
-
-    /// <summary>
-    /// 行のインスタンスに属する公開プロパティからマッピング対象を取得します。
-    /// </summary>
-    static IEnumerable<PropertyInfo> MappedProperties =>
-        from property in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
-        where IsMappedProperty(property)
-        select property;
-
-    /// <summary>
     /// 元セル値を、指定したプロパティへ設定できる値へ変換します。
     /// </summary>
     /// <param name="sourceValue">変換元のセル値。</param>
     /// <param name="row">変換元のテーブル行。</param>
-    /// <param name="property">変換先プロパティ。</param>
+    /// <param name="mapping">変換先プロパティと列の対応。</param>
     /// <returns>プロパティへ設定する値。</returns>
     object? ConvertValue(
         TypedValue sourceValue,
         TableRow row,
-        PropertyInfo property) =>
-        TableValueConversion.TryRead(sourceValue, property.PropertyType, out var converted)
+        ColumnMapping mapping) =>
+        TableValueConversion.TryRead(sourceValue, mapping.Property.PropertyType, out var converted)
             ? converted
-            : throw ValueConversionException(sourceValue.Value, row, property);
+            : throw ValueConversionException(sourceValue.Value, row, mapping);
 
     /// <summary>
     /// マッピング元のプロパティ値を、セルへ設定できる値へ変換します。
     /// </summary>
     /// <param name="sourceValue">変換元のプロパティ値。</param>
     /// <param name="row">書き込み先のテーブル行。</param>
-    /// <param name="property">変換元プロパティ。</param>
+    /// <param name="mapping">変換元プロパティと列の対応。</param>
     /// <returns>セルへ設定する値。</returns>
     TypedValue ConvertValueToCellValue(
         object? sourceValue,
         TableRow row,
-        PropertyInfo property) =>
+        ColumnMapping mapping) =>
         TableValueConversion.TryWrite(sourceValue, out var converted)
             ? converted
-            : throw ValueConversionException(sourceValue, row, property);
+            : throw ValueConversionException(sourceValue, row, mapping);
 
     /// <summary>
     /// 読み書きどちらの変換失敗にも、同じ列・プロパティ・行の情報を付けます。
     /// </summary>
-    TableMappingException ValueConversionException(object? sourceValue, TableRow row, PropertyInfo property) =>
+    TableMappingException ValueConversionException(object? sourceValue, TableRow row, ColumnMapping mapping) =>
         new(
             this,
             typeof(T),
-            GetColumnName(property),
-            property,
+            mapping.ColumnName,
+            mapping.Property,
             row,
             sourceValue ?? new BlankValue());
-
 }
