@@ -16,13 +16,13 @@ public sealed class MSBuild連携タスクのテスト
         Directory.CreateDirectory(project.DirectoryPath);
         var excelFilePath = Path.Combine(project.DirectoryPath, "定義名.xlsx");
         File.Copy(@"TestData\コード生成\ブックスコープ\定義名.xlsx", excelFilePath);
-        var generated = project.Generate(excelFilePath);
-        generated.Succeeded.Should().BeTrue();
+        var tested = project.Generate(excelFilePath);
+        tested.Succeeded.Should().BeTrue();
 
         var action = () => GeneratedSourceCompiler.Compile(
-            [generated.SingleGeneratedSource],
+            [tested.SingleGeneratedSource],
             warningsAsErrors: [diagnosticId],
-            sourceFilePath: generated.SingleGeneratedFilePath,
+            sourceFilePath: tested.SingleGeneratedFilePath,
             nullableContextOptions: NullableContextOptions.Enable);
 
         action.Should().NotThrow();

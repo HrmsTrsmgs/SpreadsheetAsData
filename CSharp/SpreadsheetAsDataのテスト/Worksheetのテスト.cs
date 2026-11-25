@@ -8,13 +8,13 @@ public class Worksheetのテスト : IDisposable
 {
 
     readonly Workbook book;
-    readonly Worksheet sheet1;
+    readonly Worksheet tested;
     readonly Worksheet data;
 
     public Worksheetのテスト()
     {
         book = Workbook.Open(@"TestData\Book1.xlsx");
-        sheet1 = book.Sheets["Sheet1"];
+        tested = book.Sheets["Sheet1"];
         data = book.Sheets["いろいろなデータ"];
     }
 
@@ -27,7 +27,7 @@ public class Worksheetのテスト : IDisposable
     [Fact]
     public void Nameはシート名を返します()
     {
-        sheet1.Name.Should().Be("Sheet1");
+        tested.Name.Should().Be("Sheet1");
     }
 
     [Fact]
@@ -39,20 +39,20 @@ public class Worksheetのテスト : IDisposable
     [Fact]
     public void ToStringはシート名を返します()
     {
-        sheet1.ToString().Should().Be("Sheet1");
+        tested.ToString().Should().Be("Sheet1");
         data.ToString().Should().Be("いろいろなデータ");
     }
 
     [Fact]
     public void Bookは所属しているWorkbookを取得します()
     {
-        sheet1.Book.Should().BeSameAs(book);
+        tested.Book.Should().BeSameAs(book);
     }
 
     [Fact]
     public void Cellsはセルの参照文字列を文字列を指定してセル取得します()
     {
-        sheet1.Cells["C3"].Reference.Should().Be("C3");
+        tested.Cells["C3"].Reference.Should().Be("C3");
     }
 
     [Fact]
@@ -77,125 +77,125 @@ public class Worksheetのテスト : IDisposable
     public void Cellsはセルの参照文字列に存在しないセル名を指定した時にFormatExceptionを投げます()
     {
         FluentActions.Invoking(
-            () => sheet1.Cells["a1"]
+            () => tested.Cells["a1"]
         ).Should().Throw<FormatException>();
     }
 
     [Fact]
     public void Cellsは一文字の列名称の列を取得します()
     {
-        sheet1.Cells["A1"].Reference.Should().Be("A1");
-        sheet1.Cells["Z1"].Reference.Should().Be("Z1");
+        tested.Cells["A1"].Reference.Should().Be("A1");
+        tested.Cells["Z1"].Reference.Should().Be("Z1");
     }
 
     [Fact]
     public void Cellsは二文字の列名称の列を取得します()
     {
-        sheet1.Cells["AA1"].Reference.Should().Be("AA1");
-        sheet1.Cells["ZZ1"].Reference.Should().Be("ZZ1");
+        tested.Cells["AA1"].Reference.Should().Be("AA1");
+        tested.Cells["ZZ1"].Reference.Should().Be("ZZ1");
     }
 
     [Fact]
     public void Cellsは三文字の列名称の列を取得します()
     {
-        sheet1.Cells["AAA1"].Reference.Should().Be("AAA1");
-        sheet1.Cells["XFD1"].Reference.Should().Be("XFD1");
+        tested.Cells["AAA1"].Reference.Should().Be("AAA1");
+        tested.Cells["XFD1"].Reference.Should().Be("XFD1");
     }
 
     [Fact]
     public void Cellsは大きすぎる列名を指定した時にFormatExceptionを投げます()
     {
         FluentActions.Invoking(
-            () => sheet1.Cells["XFE1"]
+            () => tested.Cells["XFE1"]
         ).Should().Throw<FormatException>();
         FluentActions.Invoking(
-            () => sheet1.Cells["ZZZ1"]
+            () => tested.Cells["ZZZ1"]
         ).Should().Throw<FormatException>();
         FluentActions.Invoking(
-            () => sheet1.Cells["AAAA1"]
+            () => tested.Cells["AAAA1"]
         ).Should().Throw<FormatException>();
     }
 
     [Fact]
     public void Cellsは大きな行番号のセルを取得します()
     {
-        sheet1.Cells["A1048576"].Reference.Should().Be("A1048576");
+        tested.Cells["A1048576"].Reference.Should().Be("A1048576");
     }
 
     [Fact]
     public void Cellsは大きすぎる行番号を指定した時にFormatExceptionを投げます()
     {
         FluentActions.Invoking(
-            () => sheet1.Cells["A1048577"]
+            () => tested.Cells["A1048577"]
         ).Should().Throw<FormatException>();
     }
 
     [Fact]
     public void Cellsは空のセルも取得します()
     {
-        sheet1.Cells["B1"].Reference.Should().Be("B1");
+        tested.Cells["B1"].Reference.Should().Be("B1");
     }
 
     [Fact]
     public void Cellsはは同じセルの場合は同じオブジェクトを取得します()
     {
-        sheet1.Cells["A1"].Should().BeSameAs(sheet1.Cells["A1"]);
+        tested.Cells["A1"].Should().BeSameAs(tested.Cells["A1"]);
     }
 
     [Fact]
     public void Cellsはセルの座標を数値で指定してセル取得します()
     {
-        sheet1.Cells[3, 3].Reference.Should().Be("C3");
+        tested.Cells[3, 3].Reference.Should().Be("C3");
     }
 
     [Fact]
     public void Cellsは指定方法が違っても同じセルの場合は同じオブジェクトを取得します()
     {
-        sheet1.Cells[1, 1].Should().BeSameAs(sheet1.Cells["A1"]);
+        tested.Cells[1, 1].Should().BeSameAs(tested.Cells["A1"]);
     }
 
     [Fact]
     public void CellsはCellNameを指定してセル取得します()
     {
-        sheet1.Cells[CellName.Parse("C3")].Reference.Should().Be("C3");
+        tested.Cells[CellName.Parse("C3")].Reference.Should().Be("C3");
     }
 
     [Fact]
     public void CellsはCellNameと文字列で同じセルの場合は同じオブジェクトを取得します()
     {
-        sheet1.Cells[CellName.Parse("A1")].Should().BeSameAs(sheet1.Cells["A1"]);
+        tested.Cells[CellName.Parse("A1")].Should().BeSameAs(tested.Cells["A1"]);
     }
 
     [Fact]
     public void Rangeは2引数を指定して範囲を取得します()
     {
-        sheet1.Range["A1", "C3"].ToString().Should().Be("A1:C3");
-        sheet1.Range["B2", "B2"].ToString().Should().Be("B2:B2");
+        tested.Range["A1", "C3"].ToString().Should().Be("A1:C3");
+        tested.Range["B2", "B2"].ToString().Should().Be("B2:B2");
     }
 
     [Fact]
     public void Rangeは単一セル参照を単一セル範囲として取得します()
     {
-        sheet1.Range["A1"].ToString().Should().Be("A1:A1");
+        tested.Range["A1"].ToString().Should().Be("A1:A1");
     }
 
     [Fact]
     public void Rangeは2引数を指定して同じ範囲を指定した場合に同じセルを返します()
     {
-        sheet1.Range["A1", "C3"].Should().BeSameAs(sheet1.Range["A1", "C3"]);
+        tested.Range["A1", "C3"].Should().BeSameAs(tested.Range["A1", "C3"]);
     }
 
     [Fact]
     public void RangeはCellNameを指定して範囲を取得します()
     {
-        sheet1.Range[CellName.Parse("A1"), CellName.Parse("C3")]
+        tested.Range[CellName.Parse("A1"), CellName.Parse("C3")]
             .ToString().Should().Be("A1:C3");
     }
 
     [Fact]
     public void RangeはCellNameと文字列で同じ範囲の場合に同じオブジェクトを取得します()
     {
-        sheet1.Range[CellName.Parse("A1"), CellName.Parse("C3")]
-            .Should().BeSameAs(sheet1.Range["A1", "C3"]);
+        tested.Range[CellName.Parse("A1"), CellName.Parse("C3")]
+            .Should().BeSameAs(tested.Range["A1", "C3"]);
     }
 }

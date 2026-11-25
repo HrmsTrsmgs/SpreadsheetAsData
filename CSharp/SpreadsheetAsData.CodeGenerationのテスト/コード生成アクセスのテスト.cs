@@ -50,21 +50,21 @@ public sealed class コード生成アクセスのテスト
         using var temporaryFiles = new TemporaryExcelFiles();
         var filePath = temporaryFiles.Copy(BasicStructureExcelFilePath);
 
-        using (var book = GeneratedCodeInspection
+        using (var tested = GeneratedCodeInspection
                    .AssemblyFrom(GeneratedCodeInspection.GenerateSources(BasicStructureExcelFilePath))
                    .GeneratedInstance<Workbook>("BasicStructureBook", filePath))
         {
-            dynamic bookAccessor = book;
+            dynamic bookAccessor = tested;
             Cell firstCell = bookAccessor.SalesData.Cells["XFD1048576"];
             Cell secondCell = bookAccessor.SalesData.Cells["XFD1048576"];
 
             firstCell.Value = "first";
             secondCell.Value = "last";
-            book.Save();
+            tested.Save();
         }
 
-        using var tested = Workbook.Open(filePath);
-        (tested.Sheets["SalesData"].Cells["XFD1048576"].Value as object).Should().Be("last");
+        using var savedBook = Workbook.Open(filePath);
+        (savedBook.Sheets["SalesData"].Cells["XFD1048576"].Value as object).Should().Be("last");
     }
 
     [Fact]
@@ -657,7 +657,7 @@ public sealed class コード生成アクセスのテスト
         var filePath = temporaryFiles.Copy(
             DefinedNamesWithSheetScopeExcelFilePath);
 
-        using (var book = GeneratedCodeInspection
+        using (var tested = GeneratedCodeInspection
                    .AssemblyFrom(
                        GeneratedCodeInspection.GenerateSources(
                            DefinedNamesWithSheetScopeExcelFilePath))
@@ -665,17 +665,17 @@ public sealed class コード生成アクセスのテスト
                        "定義名Book",
                        filePath))
         {
-            dynamic bookAccessor = book;
+            dynamic bookAccessor = tested;
             dynamic dataAccessor = bookAccessor.Read();
             dataAccessor.LocalCell = 2d;
 
             bookAccessor.Replace(dataAccessor);
-            book.Save();
+            tested.Save();
         }
 
-        using var tested = Workbook.Open(filePath);
+        using var savedBook = Workbook.Open(filePath);
 
-        (tested.Sheets["sales_data"].Cell["local_cell"].Value as object)
+        (savedBook.Sheets["sales_data"].Cell["local_cell"].Value as object)
             .Should().Be(2d);
     }
 

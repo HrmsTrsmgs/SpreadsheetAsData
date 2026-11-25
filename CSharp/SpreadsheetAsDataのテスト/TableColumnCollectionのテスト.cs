@@ -9,12 +9,12 @@ public class TableColumnCollectionのテスト : IDisposable
     const string TestFilePath = @"TestData\テーブル.xlsx";
 
     readonly Workbook book;
-    readonly TableColumnCollection columns;
+    readonly TableColumnCollection tested;
 
     public TableColumnCollectionのテスト()
     {
         book = Workbook.Open(TestFilePath);
-        columns = book.Tables["型付き行マッピング"].Columns;
+        tested = book.Tables["型付き行マッピング"].Columns;
     }
 
     public void Dispose()
@@ -26,24 +26,24 @@ public class TableColumnCollectionのテスト : IDisposable
     [Fact]
     public void Columnsは名前から列を取得します()
     {
-        var tested = columns["数値2"];
+        var byName = tested["数値2"];
 
-        tested.Name.Should().Be("数値2");
+        byName.Name.Should().Be("数値2");
     }
 
     [Fact]
     public void Columnsは0始まりの位置から列を取得します()
     {
-        var tested = columns[1];
+        var byOrdinal = tested[1];
 
-        tested.Name.Should().Be("数値2");
+        byOrdinal.Name.Should().Be("数値2");
     }
 
     [Fact]
     public void Columnsは名前と位置から同じ列オブジェクトを取得します()
     {
-        var byName = columns["数値2"];
-        var byOrdinal = columns[1];
+        var byName = tested["数値2"];
+        var byOrdinal = tested[1];
 
         byName.Should().BeSameAs(byOrdinal);
     }
@@ -51,7 +51,7 @@ public class TableColumnCollectionのテスト : IDisposable
     [Fact]
     public void Columnsは存在しない名前を指定した場合に失敗します()
     {
-        var action = () => _ = columns["not_found"];
+        var action = () => _ = tested["not_found"];
 
         action.Should().Throw<KeyNotFoundException>();
     }
@@ -59,14 +59,14 @@ public class TableColumnCollectionのテスト : IDisposable
     [Fact]
     public void Containsは指定した名前の列が存在するかを返します()
     {
-        columns.Contains("数値2").Should().BeTrue();
-        columns.Contains("not_found").Should().BeFalse();
+        tested.Contains("数値2").Should().BeTrue();
+        tested.Contains("not_found").Should().BeFalse();
     }
 
     [Fact]
     public void CountはExcelテーブルの列数を返します()
     {
-        columns.Count.Should().Be(4);
+        tested.Count.Should().Be(4);
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public class TableColumnCollectionのテスト : IDisposable
     [Fact]
     public void Columnsは範囲外の位置を指定した場合に失敗します()
     {
-        var action = () => _ = columns[4];
+        var action = () => _ = tested[4];
 
         action.Should().Throw<ArgumentOutOfRangeException>();
     }

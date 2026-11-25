@@ -11,7 +11,7 @@ public class TableRowのテスト : IDisposable
 
     readonly Workbook book;
     readonly Table table;
-    readonly TableRow firstRow;
+    readonly TableRow tested;
     readonly TableColumn secondColumn;
     readonly TemporaryExcelFiles temporaryFiles = new();
 
@@ -19,7 +19,7 @@ public class TableRowのテスト : IDisposable
     {
         book = Workbook.Open(TestFilePath);
         table = book.Tables["型付き行マッピング"];
-        firstRow = table.Rows.First();
+        tested = table.Rows.First();
         secondColumn = table.Columns["数値2"];
     }
 
@@ -33,32 +33,32 @@ public class TableRowのテスト : IDisposable
     [Fact]
     public void Ordinalはテーブル内の0始まりのデータ行位置を返します()
     {
-        firstRow.Ordinal.Should().Be(0);
+        tested.Ordinal.Should().Be(0);
     }
 
     [Fact]
     public void WorksheetRowIndexはワークシート上の1始まりの行番号を返します()
     {
-        firstRow.WorksheetRowIndex.Should().Be(7u);
+        tested.WorksheetRowIndex.Should().Be(7u);
     }
 
     [Fact]
     public void Tableは行が属するExcelテーブルを返します()
     {
-        firstRow.Table.Should().BeSameAs(table);
+        tested.Table.Should().BeSameAs(table);
     }
 
     [Fact]
     public void 列名を指定すると対応するセルを返します()
     {
-        firstRow["数値2"]
+        tested["数値2"]
             .Reference.Should().Be("C7");
     }
 
     [Fact]
     public void TableRowの列名とWorksheetのセル参照から取得した同じセルは同一オブジェクトです()
     {
-        var fromTableRow = firstRow["数値2"];
+        var fromTableRow = tested["数値2"];
         var fromWorksheet = table.Worksheet.Cells["C7"];
 
         fromTableRow.Should().BeSameAs(fromWorksheet);
@@ -67,14 +67,14 @@ public class TableRowのテスト : IDisposable
     [Fact]
     public void TableColumnを指定すると対応するセルを返します()
     {
-        firstRow[secondColumn]
+        tested[secondColumn]
             .Reference.Should().Be("C7");
     }
 
     [Fact]
     public void TableRowのTableColumnとWorksheetのセル参照から取得した同じセルは同一オブジェクトです()
     {
-        var fromTableRow = firstRow[secondColumn];
+        var fromTableRow = tested[secondColumn];
         var fromWorksheet = table.Worksheet.Cells["C7"];
 
         fromTableRow.Should().BeSameAs(fromWorksheet);
@@ -83,14 +83,14 @@ public class TableRowのテスト : IDisposable
     [Fact]
     public void 列位置を指定すると対応するセルを返します()
     {
-        firstRow[1]
+        tested[1]
             .Reference.Should().Be("C7");
     }
 
     [Fact]
     public void TableRowの列位置とWorksheetのセル参照から取得した同じセルは同一オブジェクトです()
     {
-        var fromTableRow = firstRow[1];
+        var fromTableRow = tested[1];
         var fromWorksheet = table.Worksheet.Cells["C7"];
 
         fromTableRow.Should().BeSameAs(fromWorksheet);
@@ -99,7 +99,7 @@ public class TableRowのテスト : IDisposable
     [Fact]
     public void 存在しない列名を指定した場合に失敗します()
     {
-        var action = () => _ = firstRow["not_found"];
+        var action = () => _ = tested["not_found"];
 
         action.Should().Throw<KeyNotFoundException>();
     }
@@ -111,7 +111,7 @@ public class TableRowのテスト : IDisposable
             book.Tables["別テーブル列検証"]
                 .Columns["数値2"];
 
-        var action = () => _ = firstRow[foreignColumn];
+        var action = () => _ = tested[foreignColumn];
 
         action.Should().Throw<ArgumentException>();
     }
@@ -119,7 +119,7 @@ public class TableRowのテスト : IDisposable
     [Fact]
     public void 範囲外の列位置を指定した場合に失敗します()
     {
-        var action = () => _ = firstRow[4];
+        var action = () => _ = tested[4];
 
         action.Should().Throw<ArgumentOutOfRangeException>();
     }
@@ -135,9 +135,9 @@ public class TableRowのテスト : IDisposable
             book.Save();
         }
 
-        using var tested = Workbook.Open(filePath);
+        using var savedBook = Workbook.Open(filePath);
 
-        (tested.Tables["型付き行マッピング"].Rows.First()["数値2"].Value as object)
+        (savedBook.Tables["型付き行マッピング"].Rows.First()["数値2"].Value as object)
             .Should().Be(99d);
     }
 }
