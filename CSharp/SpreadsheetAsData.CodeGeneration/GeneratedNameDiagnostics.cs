@@ -79,11 +79,14 @@ static class GeneratedNameDiagnostics
         var identifier = propertyName.AsSpan(propertyName.StartsWith('@') ? 1 : 0);
 
         return identifier.IsEmpty
-            || propertyName.Any(it => char.IsWhiteSpace(it)
-                || "!\"#$%&'()*+,-./:;<=>?[\\]^`{|}~".Contains(it)
-                || char.GetUnicodeCategory(it) == UnicodeCategory.MathSymbol)
+            || propertyName.Any(it => it != '@' && char.GetUnicodeCategory(it) is not (
+                UnicodeCategory.UppercaseLetter or UnicodeCategory.LowercaseLetter
+                or UnicodeCategory.TitlecaseLetter or UnicodeCategory.ModifierLetter
+                or UnicodeCategory.OtherLetter or UnicodeCategory.LetterNumber
+                or UnicodeCategory.DecimalDigitNumber or UnicodeCategory.ConnectorPunctuation
+                or UnicodeCategory.NonSpacingMark or UnicodeCategory.SpacingCombiningMark
+                or UnicodeCategory.Format))
             || propertyName.Skip(1).Contains('@')
-            || propertyName.Any(char.IsSurrogate)
             || char.GetUnicodeCategory(identifier[0]) is UnicodeCategory.DecimalDigitNumber
                 or UnicodeCategory.NonSpacingMark
                 or UnicodeCategory.SpacingCombiningMark
@@ -173,13 +176,6 @@ static class GeneratedNameDiagnostics
             .. from column in table.Columns
                let propertyName = options.TableColumn(table, column)
                where IsInvalidPropertyName(propertyName)
-                   || propertyName.Any(it => it != '@' && char.GetUnicodeCategory(it) is not (
-                       UnicodeCategory.UppercaseLetter or UnicodeCategory.LowercaseLetter
-                       or UnicodeCategory.TitlecaseLetter or UnicodeCategory.ModifierLetter
-                       or UnicodeCategory.OtherLetter or UnicodeCategory.LetterNumber
-                       or UnicodeCategory.DecimalDigitNumber or UnicodeCategory.ConnectorPunctuation
-                       or UnicodeCategory.NonSpacingMark or UnicodeCategory.SpacingCombiningMark
-                       or UnicodeCategory.Format))
                select new CodeGenerationDiagnostic(true, propertyName, [column.Name], column.Name),
             .. NameCollisionDiagnostics(
                 GroupMemberNames(

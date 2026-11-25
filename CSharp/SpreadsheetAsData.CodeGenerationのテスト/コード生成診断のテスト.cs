@@ -521,6 +521,7 @@ public sealed class コード生成診断のテスト
     [InlineData("Sales@Data")]
     [InlineData("Sales.Data")]
     [InlineData("Sales\u00D7Data")]
+    [InlineData("Sales\u2605Data")]
     [InlineData("\u0301SalesData")]
     [InlineData("\u0903SalesData")]
     [InlineData("@\u0903SalesData")]
@@ -632,6 +633,7 @@ public sealed class コード生成診断のテスト
     [InlineData("class")]
     [InlineData("Sales@Detail")]
     [InlineData("Sales\u00D7Detail")]
+    [InlineData("Sales\u2605Detail")]
     public void NameMappingsでテーブル名に無効なCSharp識別子を指定した場合は変換せずエラーを診断します(string generatedName)
     {
         GeneratedCodeInspection
@@ -650,6 +652,7 @@ public sealed class コード生成診断のテスト
     [InlineData("book.main_cell", "main_cell", "not-valid")]
     [InlineData("sales_data.local_cell", "local_cell", "not-valid")]
     [InlineData("book.main_cell", "main_cell", "Main\u00D7Cell")]
+    [InlineData("book.main_cell", "main_cell", "Main\u2605Cell")]
     public void 文脈付きNameMappingsで定義名に無効なCSharp識別子を指定した場合は変換せずエラーを診断します(
         string mappingKey,
         string sourceName,
