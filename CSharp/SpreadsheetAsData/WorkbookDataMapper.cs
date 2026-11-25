@@ -7,108 +7,93 @@ namespace Marimo.SpreadsheetAsData;
 /// </summary>
 sealed class WorkbookDataMapper(Workbook book)
 {
+    readonly union PropertyTarget(Table, Cell, CellRange);
+
     internal T Read<T>()
     {
         // 値型でも各SetValueが同じインスタンスを更新するよう、一度だけボックス化します。
         object? data = Activator.CreateInstance<T>();
 
-        foreach (var property in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        foreach (var (property, value) in
+            from property in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            select (property, Value: ReadPropertyValue(property)))
         {
-            property.SetValue(data, ReadPropertyValue(property));
+            property.SetValue(data, value);
         }
 
         // Tとして作った値を戻します。nullの場合も元のTが許すnullのまま返します。
         return (T)data!;
-
-        // プロパティに対応するテーブル、単一セル、範囲から設定する値を読み取ります。
-        object? ReadPropertyValue(PropertyInfo property)
-        {
-            if (TryGetTable(property, out var table))
-            {
-                return CreateTypedTable(table, TableRowType(property));
-            }
-
-            var range = DefinedNameRange(property);
-
-            if (MapsSingleCell(property, range))
-            {
-                return ConvertValue(range.TopLeftCell.TypedValue, property.PropertyType);
-            }
-
-            return range.Values;
-        }
-
-        // 空白値をstringプロパティへ設定できる値に変換します。
-        static object? ConvertValue(TypedValue value, Type propertyType) =>
-            (value, propertyType) switch
-            {
-                (BlankValue, var type) when type == typeof(string) => "",
-                _ => value.Value
-            };
     }
+
+    object? ReadPropertyValue(PropertyInfo property) =>
+        ResolveTarget(property) switch
+        {
+            Table table => CreateTypedTable(table, TableRowType(property)),
+            Cell cell => ReadCellValue(cell.TypedValue, property.PropertyType),
+            CellRange range => range.Values
+        };
+
+    static object? ReadCellValue(TypedValue value, Type propertyType) =>
+        value is BlankValue && propertyType == typeof(string) ? "" : value.Value;
 
     internal void Replace<T>(T data)
     {
-        foreach (var property in
+        foreach (var (property, target) in
             from property in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
             where property.CanRead
-            select property)
+            select (property, Target: ResolveTarget(property)))
         {
-            ReplacePropertyValue(property);
+            ReplacePropertyValue(property, target, data);
         }
+    }
 
-        // 一つのプロパティを、対応するテーブル、単一セル、範囲へ書き込みます。
-        void ReplacePropertyValue(PropertyInfo property)
+    static void ReplacePropertyValue<T>(PropertyInfo property, PropertyTarget target, T data)
+    {
+        switch (target)
         {
-            if (TryGetTable(property, out var table))
-            {
-                ReplaceTableRows(
-                    table,
-                    TableRowType(property),
-                    property.GetValue(data));
-                return;
-            }
-
-            var range = DefinedNameRange(property);
-
-            if (MapsSingleCell(property, range))
-            {
-                range.TopLeftCell.TypedValue = Cell.NormalizeValue(property.GetValue(data));
-                return;
-            }
-
-            range.Values =
-                (IEnumerable<IEnumerable<object?>>)(
-                    property.GetValue(data)
-                        ?? Array.Empty<IEnumerable<object?>>());
+            case Table table:
+                ReplaceTableRows(table, TableRowType(property), property.GetValue(data));
+                break;
+            case Cell cell:
+                cell.TypedValue = Cell.NormalizeValue(property.GetValue(data));
+                break;
+            case CellRange range:
+                range.Values = (IEnumerable<IEnumerable<object?>>)(
+                    property.GetValue(data) ?? Array.Empty<IEnumerable<object?>>());
+                break;
         }
     }
 
     /// <summary>
-    /// 二次元の値を受け取るプロパティは、範囲が一セルでも範囲として対応付けます。
+    /// テーブルを定義名より優先します。二次元の値を受け取る場合は一セルでも範囲として扱います。
     /// </summary>
-    static bool MapsSingleCell(PropertyInfo property, CellRange range) =>
-        range.TopLeftCell == range.BottomRightCell
-            && property.PropertyType != typeof(IEnumerable<IEnumerable<object?>>);
+    PropertyTarget ResolveTarget(PropertyInfo property)
+    {
+        var attribute = property.GetCustomAttribute<SpreadsheetNameAttribute>();
+        if (FindTable(property, attribute?.Name) is { } table)
+        {
+            return table;
+        }
+
+        var range = DefinedNameRange(property, attribute);
+        var topLeft = range.TopLeftCell;
+        return topLeft == range.BottomRightCell
+            && property.PropertyType != typeof(IEnumerable<IEnumerable<object?>>)
+            ? topLeft
+            : range;
+    }
 
     /// <summary>
     /// 属性で指定した名前を優先し、対応するExcelテーブルを検索します。
     /// </summary>
-    bool TryGetTable(PropertyInfo property, out Table table)
-    {
-        var tableName = property
-            .GetCustomAttribute<SpreadsheetNameAttribute>()
-            ?.Name;
-
-        return
-            (
-                from candidate in book.Tables
-                where tableName is not null
-                    ? candidate.Name == tableName
-                    : candidate.Name.ToCSharpIdentifier() == property.Name
-                select candidate
-            ).TryGetFirst(out table);
-    }
+    Table? FindTable(PropertyInfo property, string? tableName) =>
+        (
+            from candidate in book.Tables
+            where tableName is not null
+                ? candidate.Name == tableName
+                : candidate.Name.ToCSharpIdentifier() == property.Name
+            select candidate
+        ).FirstOrDefault();
 
     /// <summary>
     /// Excelテーブルへ対応付けるプロパティから行データ型を取得します。
@@ -142,11 +127,8 @@ sealed class WorkbookDataMapper(Workbook book)
             CreateTypedTable(table, rowType),
             [rows]);
 
-    CellRange DefinedNameRange(PropertyInfo property)
+    CellRange DefinedNameRange(PropertyInfo property, SpreadsheetNameAttribute? attribute)
     {
-        var attribute =
-            property.GetCustomAttribute<SpreadsheetNameAttribute>();
-
         if (attribute is not null)
         {
             return attribute.WorksheetName is string worksheetName

@@ -48,7 +48,7 @@ public sealed class コード生成型推論のテスト
             .GetProperty("MainCell");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(bool));
+        tested.PropertyType.Should().Be<bool>();
     }
 
     [Fact]
@@ -62,8 +62,7 @@ public sealed class コード生成型推論のテスト
             .GetProperty("MainRange");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(
-            typeof(IEnumerable<IEnumerable<object?>>));
+        tested.PropertyType.Should().Be<IEnumerable<IEnumerable<object?>>>();
         tested.GetCustomAttribute<DynamicAttribute>().Should().NotBeNull();
     }
 
@@ -78,7 +77,7 @@ public sealed class コード生成型推論のテスト
             .GetProperty("LocalCell");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(double));
+        tested.PropertyType.Should().Be<double>();
     }
 
     [Fact]
@@ -92,8 +91,7 @@ public sealed class コード生成型推論のテスト
             .GetProperty("LocalRange");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(
-            typeof(IEnumerable<IEnumerable<object?>>));
+        tested.PropertyType.Should().Be<IEnumerable<IEnumerable<object?>>>();
         tested.GetCustomAttribute<DynamicAttribute>().Should().NotBeNull();
     }
 
@@ -145,7 +143,7 @@ public sealed class コード生成型推論のテスト
             .GetProperty("CustomerId");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(int));
+        tested.PropertyType.Should().Be<int>();
     }
 
     [Fact]
@@ -158,7 +156,7 @@ public sealed class コード生成型推論のテスト
             .GetProperty("Amount");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(double));
+        tested.PropertyType.Should().Be<double>();
     }
 
     [Theory]
@@ -197,7 +195,7 @@ public sealed class コード生成型推論のテスト
             .GetProperty("Description");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(string));
+        tested.PropertyType.Should().Be<string>();
     }
 
     [Fact]
@@ -254,7 +252,7 @@ public sealed class コード生成型推論のテスト
             .GetProperty("Description");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(string));
+        tested.PropertyType.Should().Be<string>();
     }
 
     [Fact]
@@ -274,7 +272,7 @@ public sealed class コード生成型推論のテスト
             .GetProperty("文字列");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(string));
+        tested.PropertyType.Should().Be<string>();
     }
 
     [Fact]
@@ -287,7 +285,7 @@ public sealed class コード生成型推論のテスト
             .GetProperty("真偽値");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(bool));
+        tested.PropertyType.Should().Be<bool>();
     }
 
     [Fact]
@@ -300,7 +298,7 @@ public sealed class コード生成型推論のテスト
             .GetProperty("数値");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(int?));
+        tested.PropertyType.Should().Be<int?>();
     }
 
     [Fact]
@@ -313,7 +311,7 @@ public sealed class コード生成型推論のテスト
             .GetProperty("真偽値");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(bool?));
+        tested.PropertyType.Should().Be<bool?>();
     }
 
     [Fact]
@@ -326,7 +324,7 @@ public sealed class コード生成型推論のテスト
             .GetProperty("小数");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(double?));
+        tested.PropertyType.Should().Be<double?>();
     }
 
     [Fact]

@@ -1,4 +1,4 @@
-namespace Marimo.SpreadsheetAsData.Test.テスト補助;
+﻿namespace Marimo.SpreadsheetAsData.Test.テスト補助;
 
 /// <summary>
 /// ネットワーク入力などを模して、順方向の読み取りだけを公開します。

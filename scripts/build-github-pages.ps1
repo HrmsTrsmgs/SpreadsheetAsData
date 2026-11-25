@@ -19,12 +19,7 @@ if ([System.IO.Path]::GetFullPath($pagesOutputPath).TrimEnd([System.IO.Path]::Di
     throw "The repository root cannot be used as the GitHub Pages output directory."
 }
 
-function Invoke-Dotnet {
-    dotnet @args
-    if ($LASTEXITCODE -ne 0) {
-        throw "dotnet $($args -join ' ') failed with exit code $LASTEXITCODE."
-    }
-}
+. (Join-Path $PSScriptRoot "Invoke-Dotnet.ps1")
 
 function New-Directory {
     param(

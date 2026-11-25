@@ -490,6 +490,30 @@ public sealed class コード生成診断のテスト
     }
 
     [Fact]
+    public void 無効名はシートとテーブルと定義名の順に報告し列の無効名はBookの衝突の後に報告します()
+    {
+        GeneratedCodeInspection
+            .GenerateDiagnostics(
+                DefinedNamesWithoutCollisionsExcelFilePath,
+                options => options.NameMappings = new()
+                {
+                    ["sales_data"] = "@@Read",
+                    ["sales_detail"] = "bad-table",
+                    ["book.main_cell"] = "bad.cell",
+                    ["sales_detail.customer_id"] = "bad column"
+                })
+            .Should().BeEquivalentTo<CodeGenerationDiagnostic>(
+                [
+                    new(true, "@@Read", ["sales_data"], "sales_data"),
+                    new(true, "bad-table", ["sales_detail"], "sales_detail"),
+                    new(true, "bad.cell", ["main_cell"], "main_cell"),
+                    new(true, "Read", ["sales_data"]),
+                    new(true, "bad column", ["customer_id"], "customer_id")
+                ],
+                options => options.WithStrictOrdering());
+    }
+
+    [Fact]
     public void 区切り文字だけのシート名はCSharp識別子を生成できないため診断します()
     {
         GeneratedCodeInspection
@@ -521,6 +545,7 @@ public sealed class コード生成診断のテスト
     [InlineData("Sales@Data")]
     [InlineData("Sales.Data")]
     [InlineData("Sales\u00D7Data")]
+    [InlineData("Sales\u2605Data")]
     [InlineData("\u0301SalesData")]
     [InlineData("\u0903SalesData")]
     [InlineData("@\u0903SalesData")]
@@ -632,6 +657,7 @@ public sealed class コード生成診断のテスト
     [InlineData("class")]
     [InlineData("Sales@Detail")]
     [InlineData("Sales\u00D7Detail")]
+    [InlineData("Sales\u2605Detail")]
     public void NameMappingsでテーブル名に無効なCSharp識別子を指定した場合は変換せずエラーを診断します(string generatedName)
     {
         GeneratedCodeInspection
@@ -650,6 +676,7 @@ public sealed class コード生成診断のテスト
     [InlineData("book.main_cell", "main_cell", "not-valid")]
     [InlineData("sales_data.local_cell", "local_cell", "not-valid")]
     [InlineData("book.main_cell", "main_cell", "Main\u00D7Cell")]
+    [InlineData("book.main_cell", "main_cell", "Main\u2605Cell")]
     public void 文脈付きNameMappingsで定義名に無効なCSharp識別子を指定した場合は変換せずエラーを診断します(
         string mappingKey,
         string sourceName,
@@ -702,6 +729,8 @@ public sealed class コード生成診断のテスト
     [InlineData("Customer.Id")]
     [InlineData("Customer+Id")]
     [InlineData("\u0301Customer")]
+    [InlineData("\u203FCustomer", Skip = "アンダースコア以外の連結用句読点を先頭でも受理しているため。先頭文字を区別して診断する際に解除する。")]
+    [InlineData("\u200CCustomer", Skip = "書式文字を先頭でも受理しているため。先頭文字を区別して診断する際に解除する。")]
     [InlineData("Customer\U0001F600")]
     public void NameMappingsで列に不正な文字を含む名前を指定した場合は変換せずエラーを診断します(string generatedName)
     {

@@ -27,7 +27,8 @@ class WorkSheet
   end
 
   def cell_value(cell_name)
-    cell(cell_name).value if cell(cell_name)
+    found = cell(cell_name)
+    found.value if found
   end
 
   def blank?(cell_name)
@@ -36,27 +37,22 @@ class WorkSheet
 
   def cell(ref)
     ref = ref.to_s
-    @cell_cache[ref] ||=
-      if cell_xml(ref)
-        Cell.new(cell_xml(ref), self, @tag_in_book)
-      elsif CellName.valid?(ref)
-        Cell.new(ref, self, @tag_in_book)
-      end
+    @cell_cache[ref] ||= build_cell(ref)
   end
-  
+
   def defined_name
     sheet_tables
   end
-  
+
   def sheet_tables
     Array.new(@xml.get_elements('//tableParts/tablePart').size)
   end
-  
+
   def range(*corner)
     raise ArgumentError, "wrong number of arguments (#{corner.size} for 1..2)" if 3 <= corner.size
 
     name = RangeName.new(*corner)
-    
+
     @range_cache[name] ||=
       name.valid? ? CellRange.new(name.upper_left, name.lower_right, self) : nil
   end
@@ -75,7 +71,7 @@ class WorkSheet
       end
       row.add_element(c)
   end
-  
+
   def real_row_nums
     rows_xml.map{|row| row.attributes['r'].to_i  }
   end
@@ -87,6 +83,15 @@ private
   def ref_split(ref)
     name = CellName.new(ref)
     [name.column_name, name.row_num]
+  end
+
+  def build_cell(ref)
+    element = cell_xml(ref)
+    if element
+      Cell.new(element, self, @tag_in_book)
+    elsif CellName.valid?(ref)
+      Cell.new(ref, self, @tag_in_book)
+    end
   end
 
   def cell_xml(ref)

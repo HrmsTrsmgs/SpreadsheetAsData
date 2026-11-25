@@ -1,7 +1,9 @@
-﻿using FluentAssertions;
-using Marimo.SpreadsheetAsData.CodeGeneration.Test.テスト補助;
+﻿using DocumentFormat.OpenXml.Packaging;
+using FluentAssertions;
 using Marimo.SpreadsheetAsData;
+using Marimo.SpreadsheetAsData.CodeGeneration.Test.テスト補助;
 using Xunit;
+using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Marimo.SpreadsheetAsData.CodeGeneration.Test;
 
@@ -19,6 +21,30 @@ public sealed class コード生成定義名のテスト : IDisposable
     }
 
     [Fact]
+    public void Dataの定義名はブックスコープの後に全シートの単一セルと範囲の順で生成します()
+    {
+        var filePath = temporaryFiles.Copy(DefinedNamesExcelFilePath);
+        using (var document = SpreadsheetDocument.Open(filePath, true))
+        {
+            var definedNames = document.WorkbookPart?.Workbook?.DefinedNames
+                ?? throw new InvalidOperationException("テストブックに定義名がありません。");
+            definedNames.AppendChild(new Spreadsheet.DefinedName
+            {
+                Name = "product_cell",
+                LocalSheetId = 1U,
+                Text = "product_master!$A$2"
+            });
+        }
+
+        GeneratedCodeInspection.SyntaxFrom(GeneratedCodeInspection.GenerateSources(filePath))
+            .GeneratedType($"{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}Data")
+            .PropertyNames.Should().Equal(
+                "MainCell", "Total", "MainRange",
+                "SheetTotal", "LocalCell", "ProductCell", "LocalRange",
+                "SalesDetail", "ProductList");
+    }
+
+    [Fact]
     public void ブックスコープの単一セル定義名をBookの値プロパティとして生成します()
     {
         var tested = GeneratedCodeInspection
@@ -28,7 +54,7 @@ public sealed class コード生成定義名のテスト : IDisposable
             .GetProperty("MainCell");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(object));
+        tested.PropertyType.Should().Be<object>();
     }
 
     [Fact]
@@ -41,7 +67,7 @@ public sealed class コード生成定義名のテスト : IDisposable
             .GetProperty("MainRange");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(IEnumerable<IEnumerable<object?>>));
+        tested.PropertyType.Should().Be<IEnumerable<IEnumerable<object?>>>();
     }
 
     [Fact]
@@ -54,7 +80,7 @@ public sealed class コード生成定義名のテスト : IDisposable
             .GetProperty("LocalCell");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(object));
+        tested.PropertyType.Should().Be<object>();
     }
 
     [Fact]
@@ -67,7 +93,7 @@ public sealed class コード生成定義名のテスト : IDisposable
             .GetProperty("LocalRange");
 
         tested.Should().NotBeNull();
-        tested.PropertyType.Should().Be(typeof(IEnumerable<IEnumerable<object?>>));
+        tested.PropertyType.Should().Be<IEnumerable<IEnumerable<object?>>>();
     }
 
     [Fact]

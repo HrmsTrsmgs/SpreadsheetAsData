@@ -10,7 +10,7 @@ class WorkBook
 
   # 共有文字列をさすリレーションのIDです。
   SHARED_STRING_ID = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings'
-  
+
   # ブックドキュメントをさすリレーションのIDです。
   DOCUMENT_ID = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument'
 
@@ -18,7 +18,7 @@ class WorkBook
   attr_reader :encoding
 
   # 新しいインスタンスの初期化を行います。
-  
+
   def initialize(file_path, encoding)
     @package = Package.new(file_path)
     @encoding = encoding
@@ -45,12 +45,12 @@ class WorkBook
   def close
     @package.close
   end
-  
+
   # 開いたExcelファイルのパスです。
   def file_path
     @package.file_path
   end
-  
+
   # このブックで利用する共有文字列を取得します。
   def shared_strings
     @shared_strings ||= SharedStrings.new(@part.relation(SHARED_STRING_ID))
@@ -59,8 +59,10 @@ class WorkBook
   # ブックが持つシートを取得します。
   def sheets
     @sheets ||=
-      @part.xml_document.root.get_elements('./sheets/sheet')
-        .map{ |tag| WorkSheet.new(tag, @part.relation(tag).xml_document, self, @part.relation(tag))}
+      @part.xml_document.root.get_elements('./sheets/sheet').map do |tag|
+        sheet_part = @part.relation(tag)
+        WorkSheet.new(tag, sheet_part.xml_document, self, sheet_part)
+      end
   end
 
   # 名前を指定し、ブックが持つシートを取得します。

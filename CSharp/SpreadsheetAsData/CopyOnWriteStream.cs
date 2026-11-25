@@ -1,4 +1,4 @@
-namespace Marimo.SpreadsheetAsData;
+﻿namespace Marimo.SpreadsheetAsData;
 
 /// <summary>
 /// 元のStreamを借りて読み込み、最初の変更から拡張可能なコピーへ切り替えます。

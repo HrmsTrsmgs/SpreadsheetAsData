@@ -11,12 +11,12 @@ describe RangeName do
       RangeName.valid?('A1:').should be_falsey
       RangeName.valid?(':B2').should be_falsey
     end
-    
+
     it 'はメソッド呼び出しではなく、when句に利用しても使えます。' do
       RangeName.valid?.should === 'A1:A1'
       RangeName.valid?.should_not === 'A1:'
     end
-    
+
     it 'はメソッド呼び出しではなく、when句に利用した時に列指定に対応します。' do
       RangeName.valid?.should === 'A:A'
       RangeName.valid?.should === 'B:C'
@@ -27,10 +27,10 @@ describe RangeName do
     it 'は位置が同じ時に同値と判定されます。' do
       hash[RangeName.new('A1:B2')].should == 1
     end
-    it 'は左上セルが違うときにに同値ではないと判定されます。' do      
+    it 'は左上セルが違うときにに同値ではないと判定されます。' do
       hash[RangeName.new('B2:B2')].should be_nil
     end
-    it 'は右下セルが違うときにに同値ではないと判定されます。' do      
+    it 'は右下セルが違うときにに同値ではないと判定されます。' do
       hash[RangeName.new('A1:A1')].should be_nil
     end
   end
@@ -218,6 +218,11 @@ describe RangeName do
         RangeName.new('B:C').to_s.should == 'B:C'
       end
     end
+    it 'はZ列とAA列をまたぐ範囲をシートの列順で表します。' do
+      pending '列名を文字列として比較しているため。列番号順で両端を正規化した時に解除する。'
+      RangeName.new('Z1:AA2').to_s.should == 'Z1:AA2'
+    end
+
     it 'は無効な場合は"{invalid range}"を返します。' do
       RangeName.new('A1:').to_s.should == '{invalid range}'
     end

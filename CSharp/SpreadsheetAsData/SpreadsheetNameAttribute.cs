@@ -1,4 +1,4 @@
-namespace Marimo.SpreadsheetAsData;
+﻿namespace Marimo.SpreadsheetAsData;
 
 /// <summary>
 /// 自動名前対応と異なる Excel 上の名前をプロパティへ対応付けます。

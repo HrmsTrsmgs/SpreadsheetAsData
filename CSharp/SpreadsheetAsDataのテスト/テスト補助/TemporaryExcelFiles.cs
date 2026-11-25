@@ -1,4 +1,4 @@
-namespace Marimo.SpreadsheetAsData.Test.テスト補助;
+﻿namespace Marimo.SpreadsheetAsData.Test.テスト補助;
 
 /// <summary>
 /// 書き込みテストで、元のテストデータを変更しないための一時Excelファイルを管理します。

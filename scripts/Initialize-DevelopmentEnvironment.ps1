@@ -6,13 +6,7 @@ $ErrorActionPreference = "Stop"
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $solutionPath = Join-Path $repositoryRoot "CSharp\SpreadsheetAsData.slnx"
 
-function Invoke-Dotnet {
-    dotnet @args
-
-    if ($LASTEXITCODE -ne 0) {
-        throw "dotnet $($args -join ' ') failed with exit code $LASTEXITCODE."
-    }
-}
+. (Join-Path $PSScriptRoot "Invoke-Dotnet.ps1")
 
 & (Join-Path $PSScriptRoot "Test-DevelopmentEnvironment.ps1")
 

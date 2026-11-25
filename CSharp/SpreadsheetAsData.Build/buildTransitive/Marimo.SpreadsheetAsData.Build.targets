@@ -22,9 +22,9 @@
       DesignTimeSharedInput="true"
       AutoGen="true"
       DesignTime="true" />
-    <Compile Remove="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename).SpreadsheetAsData.g.cs')" />
-    <None Remove="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename).SpreadsheetAsData.g.cs')" />
-    <Content Remove="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename).SpreadsheetAsData.g.cs')" />
+    <Compile Remove="@(_SpreadsheetAsDataGeneratedCompile)" />
+    <None Remove="@(_SpreadsheetAsDataGeneratedCompile)" />
+    <Content Remove="@(_SpreadsheetAsDataGeneratedCompile)" />
     <Compile Include="@(_SpreadsheetAsDataGeneratedCompile)" />
   </ItemGroup>
 

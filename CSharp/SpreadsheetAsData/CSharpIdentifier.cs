@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace Marimo.SpreadsheetAsData;
 
@@ -17,8 +17,7 @@ public static class CSharpIdentifier
             EnsureValidIdentifierStart(
                 ContainsNonAscii(self)
                     ? CapitalizeFirstLetter(
-                        ReplaceInvalidIdentifierPartCharacters(
-                            self.Replace('-', '_').Replace(' ', '_')))
+                        ReplaceInvalidIdentifierPartCharacters(self))
                     : AsciiIdentifier(self));
     }
 
@@ -34,7 +33,7 @@ public static class CSharpIdentifier
     /// C#識別子の開始文字として使えない場合に、先頭へアンダースコアを補います。
     /// </summary>
     static string EnsureValidIdentifierStart(string identifier) =>
-        identifier.Length == 0 || IsIdentifierStartCharacter(identifier[0])
+        identifier.AsSpan().IsEmpty || IsIdentifierStartCharacter(identifier[0])
             ? identifier
             : $"_{identifier}";
 
@@ -115,7 +114,7 @@ public static class CSharpIdentifier
     /// 先頭文字だけを大文字化します。
     /// </summary>
     static string CapitalizeFirstLetter(string word) =>
-        word.Length == 0
+        word.AsSpan().IsEmpty
             ? word
             : $"{char.ToUpperInvariant(word[0])}{word[1..]}";
 }

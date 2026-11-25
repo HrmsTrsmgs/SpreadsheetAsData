@@ -5,6 +5,12 @@ Encoding.default_external = Encoding::UTF_8
 
 require 'work_book'
 
+RSpec.configure do |config|
+  config.expect_with :rspec do |expectations|
+    expectations.syntax = [:should, :expect]
+  end
+end
+
 TEST_FILE_DIRECTORY = '../TestData/'
 
 def test_file(basename)
@@ -13,22 +19,19 @@ def test_file(basename)
 end
 
 class TestFile
+  @opened_books = []
+  @copy_paths = {}
+
   class << self
     basenames = Dir.glob("#{TEST_FILE_DIRECTORY}*.xlsx").map{|file| File.basename(file, '.xlsx') }
     basenames.each do |basename|
       basename_downcase = basename.downcase.gsub('-', '_')
       define_method basename_downcase do
-        book = WorkBook.open(send("#{basename_downcase}_path"))
-        name = "@#{basename_downcase}"
-        instance_variable_set(name, book) until instance_variable_get(name)
-        book
+        open_book(send("#{basename_downcase}_path"))
       end
 
       define_method "#{basename_downcase}_copy" do
-        book = WorkBook.open(send("#{basename_downcase}_copy_path"))
-        name = "@#{basename_downcase}_copy"
-        instance_variable_set(name, book) until instance_variable_get(name)
-        book
+        open_book(send("#{basename_downcase}_copy_path"))
       end
 
       define_method("#{basename_downcase}_path") do
@@ -36,38 +39,25 @@ class TestFile
       end
 
       define_method "#{basename_downcase}_copy_path" do
-        name = "@#{basename_downcase}_copy_path"
-        if not instance_variable_get(name)
-          copy_path = test_file("#{basename}_Copy")
-          instance_variable_set(name, copy_path)
-          FileUtils.cp(send("#{basename_downcase}_path"), copy_path)
+        @copy_paths[basename] ||= begin
+          path = test_file("#{basename}_Copy")
+          FileUtils.cp(send("#{basename_downcase}_path"), path)
+          path
         end
-        instance_variable_get(name)
       end
     end
-    define_method :close do
-      basenames.each do |basename|
-        basename_downcase = basename.downcase.gsub('-', '_')
-        book_name = "@#{basename_downcase}"
-        if instance_variable_get(book_name)
-          instance_variable_get(book_name).close
-          instance_variable_set(book_name, nil)
-        end
-        book_copy_name = "@#{basename_downcase}_copy"
-        if instance_variable_get(book_copy_name)
-          instance_variable_get(book_copy_name).close
-          instance_variable_set(book_copy_name, nil)
-        end
-        book_copy_path_name = "@#{basename_downcase}_copy_path"
-        if instance_variable_get(book_copy_path_name)
-          copy_path = send("#{basename_downcase}_copy_path")
-          begin
-            File.delete(copy_path) if File.exist?(copy_path)
-          rescue
-          end
-          instance_variable_set(book_copy_path_name, nil)
-        end
-      end
+
+    def open_book(path, *options)
+      book = WorkBook.open(path, *options)
+      @opened_books << book
+      book
+    end
+
+    def close
+      @opened_books.each(&:close)
+      @opened_books.clear
+      FileUtils.rm_f(@copy_paths.values)
+      @copy_paths.clear
     end
   end
 end

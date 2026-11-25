@@ -231,7 +231,7 @@ public sealed class コード生成型構造のテスト
                     BasicStructureExcelFilePath))
             .GeneratedType("SalesDetail");
 
-        dataType.BaseType.Should().Be(typeof(object));
+        dataType.BaseType.Should().Be<object>();
         dataType.Should().NotBeAssignableTo<TableRow>();
     }
 

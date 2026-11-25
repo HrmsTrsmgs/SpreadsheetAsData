@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-using Marimo.SpreadsheetAsData;
+﻿using Marimo.SpreadsheetAsData;
 
 namespace Marimo.SpreadsheetAsData.CodeGeneration;
 
@@ -17,18 +15,10 @@ static class GeneratedNameDiagnostics
         Workbook book,
         CodeGenerationOptions options) =>
         [
-            .. from sheet in book.Sheets.Values
-               let propertyName = options.GeneratedName(sheet.Name)
-               where IsInvalidPropertyName(propertyName)
-               select new CodeGenerationDiagnostic(true, propertyName, [sheet.Name], sheet.Name),
+            .. InvalidPropertyNameDiagnostics(BookPropertyNames(book, options)),
             .. InvalidPropertyNameDiagnostics(
-                from table in book.Tables
-                select table.Name,
-                options),
-            .. from definedName in book.DefinedNames
-               let propertyName = options.GeneratedName(definedName)
-               where IsInvalidPropertyName(propertyName)
-               select new CodeGenerationDiagnostic(true, propertyName, [definedName.Name], definedName.Name),
+                from definedName in book.DefinedNames
+                select (definedName.Name, options.GeneratedName(definedName))),
             .. TypeNameDiagnostics(filePath, book, options),
             .. BookPropertyNameDiagnostics(filePath, book, options),
             .. SheetDefinedNameDiagnostics(book, options),
@@ -46,14 +36,15 @@ static class GeneratedNameDiagnostics
     static IEnumerable<CodeGenerationDiagnostic> TypeNameDiagnostics(
         string filePath,
         Workbook book,
-        CodeGenerationOptions options) =>
-        NameCollisionDiagnostics(
+        CodeGenerationOptions options)
+    {
+        var fileName = Path.GetFileName(filePath);
+        var fileIdentifier = Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier();
+        return NameCollisionDiagnostics(
             GroupMemberNames(
                 [
-                    .. from suffix in new[] { "Book", "Data" }
-                       select (
-                           Path.GetFileName(filePath),
-                           $"{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}{suffix}"),
+                    (fileName, $"{fileIdentifier}Book"),
+                    (fileName, $"{fileIdentifier}Data"),
                     .. from sheet in book.Sheets.Values
                        select (sheet.Name, $"{options.GeneratedName(sheet.Name)}Sheet"),
                     .. from table in book.Tables
@@ -62,33 +53,16 @@ static class GeneratedNameDiagnostics
                        select (table.Name, typeName)
                 ]),
             []);
+    }
 
     /// <summary>
-    /// テーブルの生成プロパティ名が無効な場合、対応する元名を添えて報告します。
+    /// 生成先ごとに解決済みのプロパティ名を調べ、無効な表記を対応する元名とともに入力順で報告します。
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> InvalidPropertyNameDiagnostics(
-        IEnumerable<string> sourceNames,
-        CodeGenerationOptions options) =>
-        from sourceName in sourceNames
-        let propertyName = options.GeneratedName(sourceName)
-        where IsInvalidPropertyName(propertyName)
-        select new CodeGenerationDiagnostic(true, propertyName, [sourceName], sourceName);
-
-    static bool IsInvalidPropertyName(string propertyName)
-    {
-        var identifier = propertyName.AsSpan(propertyName.StartsWith('@') ? 1 : 0);
-
-        return identifier.IsEmpty
-            || propertyName.Any(it => char.IsWhiteSpace(it)
-                || "!\"#$%&'()*+,-./:;<=>?[\\]^`{|}~".Contains(it)
-                || char.GetUnicodeCategory(it) == UnicodeCategory.MathSymbol)
-            || propertyName.Skip(1).Contains('@')
-            || propertyName.Any(char.IsSurrogate)
-            || char.GetUnicodeCategory(identifier[0]) is UnicodeCategory.DecimalDigitNumber
-                or UnicodeCategory.NonSpacingMark
-                or UnicodeCategory.SpacingCombiningMark
-            || IsCSharpKeyword(propertyName);
-    }
+        IEnumerable<(string SourceName, string Name)> members) =>
+        from member in members
+        where !member.Name.IsValidGeneratedIdentifier
+        select new CodeGenerationDiagnostic(true, member.Name, [member.SourceName], member.SourceName);
 
     /// <summary>
     /// Book型の中で、定義名・ワークシート・Excelテーブルの生成プロパティ名同士、
@@ -168,39 +142,19 @@ static class GeneratedNameDiagnostics
     /// </summary>
     static IEnumerable<CodeGenerationDiagnostic> ColumnPropertyNameDiagnostics(
         Table table,
-        CodeGenerationOptions options) =>
+        CodeGenerationOptions options)
+    {
+        var propertyNames =
+            from column in table.Columns
+            select (column.Name, options.TableColumn(table, column));
+        return
         [
-            .. from column in table.Columns
-               let propertyName = options.TableColumn(table, column)
-               where IsInvalidPropertyName(propertyName)
-                   || propertyName.Any(it => it != '@' && char.GetUnicodeCategory(it) is not (
-                       UnicodeCategory.UppercaseLetter or UnicodeCategory.LowercaseLetter
-                       or UnicodeCategory.TitlecaseLetter or UnicodeCategory.ModifierLetter
-                       or UnicodeCategory.OtherLetter or UnicodeCategory.LetterNumber
-                       or UnicodeCategory.DecimalDigitNumber or UnicodeCategory.ConnectorPunctuation
-                       or UnicodeCategory.NonSpacingMark or UnicodeCategory.SpacingCombiningMark
-                       or UnicodeCategory.Format))
-               select new CodeGenerationDiagnostic(true, propertyName, [column.Name], column.Name),
+            .. InvalidPropertyNameDiagnostics(propertyNames),
             .. NameCollisionDiagnostics(
-                GroupMemberNames(
-                    from column in table.Columns
-                    select (column.Name, options.TableColumn(table, column))),
+                GroupMemberNames(propertyNames),
                 [options.GeneratedName(table.Name)])
         ];
-
-    static bool IsCSharpKeyword(string name) =>
-        name is "abstract" or "as" or "base" or "bool" or "break" or "byte"
-            or "case" or "catch" or "char" or "checked" or "class" or "const" or "continue"
-            or "decimal" or "default" or "delegate" or "do" or "double" or "else" or "enum"
-            or "event" or "explicit" or "extern" or "false" or "finally" or "fixed"
-            or "float" or "for" or "foreach" or "goto" or "if" or "implicit" or "in"
-            or "int" or "interface" or "internal" or "is" or "lock" or "long" or "namespace"
-            or "new" or "null" or "object" or "operator" or "out" or "override" or "params"
-            or "private" or "protected" or "public" or "readonly" or "ref" or "return"
-            or "sbyte" or "sealed" or "short" or "sizeof" or "stackalloc" or "static"
-            or "string" or "struct" or "switch" or "this" or "throw" or "true" or "try"
-            or "typeof" or "uint" or "ulong" or "unchecked" or "unsafe" or "ushort" or "using"
-            or "virtual" or "void" or "volatile" or "while";
+    }
 
     /// <summary>
     /// Bookのシート・テーブル由来のプロパティを、元名と生成名の対応に揃えます。
@@ -210,8 +164,10 @@ static class GeneratedNameDiagnostics
         CodeGenerationOptions options) =>
         from sourceName in
             Enumerable.Concat(
-                from sheet in book.Sheets.Values select sheet.Name,
-                from table in book.Tables select table.Name)
+                from sheet in book.Sheets.Values
+                select sheet.Name,
+                from table in book.Tables
+                select table.Name)
         select (sourceName, options.GeneratedName(sourceName));
 
     /// <summary>

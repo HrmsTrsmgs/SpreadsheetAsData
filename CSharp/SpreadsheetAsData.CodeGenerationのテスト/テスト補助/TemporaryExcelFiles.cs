@@ -1,4 +1,4 @@
-namespace Marimo.SpreadsheetAsData.CodeGeneration.Test.テスト補助;
+﻿namespace Marimo.SpreadsheetAsData.CodeGeneration.Test.テスト補助;
 
 /// <summary>
 /// コード生成の書き込みテストで、元のテストデータを変更しないための一時Excelファイルを管理します。

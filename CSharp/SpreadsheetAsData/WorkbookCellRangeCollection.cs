@@ -13,13 +13,17 @@ public class WorkbookCellRangeCollection
     /// <summary>
     /// 同じ定義名から取得した範囲の同一性を保持します。
     /// </summary>
-    readonly Dictionary<string, CellRange> namedRangeCache = [];
+    readonly NamedRangeCache namedRangeCache;
 
     /// <summary>
     /// ブックの範囲参照へのアクセスを構成します。
     /// </summary>
     /// <param name="book">範囲参照を解決するブック。</param>
-    internal WorkbookCellRangeCollection(Workbook book) => this.book = book;
+    internal WorkbookCellRangeCollection(Workbook book)
+    {
+        this.book = book;
+        namedRangeCache = new(name => book.FindNamedRange(name));
+    }
 
     /// <summary>
     /// 定義名、またはシート名付きA1形式の範囲参照からセル範囲を取得します。
@@ -31,14 +35,9 @@ public class WorkbookCellRangeCollection
     {
         get
         {
-            if (namedRangeCache.TryGetValue(reference, out var cachedRange))
+            if (namedRangeCache.Find(reference) is { } namedRange)
             {
-                return cachedRange;
-            }
-
-            if (book.TryResolveNamedRange(reference, out var namedRange))
-            {
-                return namedRangeCache.GetValue(reference, () => namedRange);
+                return namedRange;
             }
 
             var rangeReference = CellRangeReference.Parse(reference);

@@ -114,7 +114,7 @@ public sealed class コード生成型付きTableのテスト : IDisposable
         {
             dynamic bookAccessor = generatedWorkbook;
             IEnumerable<object> salesDetail = bookAccessor.SalesDetail;
-            generatedRows = salesDetail.Select(ReadGeneratedRow).ToArray();
+            generatedRows = [.. salesDetail.Select(ReadGeneratedRow)];
         }
 
         using var book = Workbook.Open(BasicStructureExcelFilePath);
@@ -200,7 +200,7 @@ public sealed class コード生成型付きTableのテスト : IDisposable
             dynamic bookAccessor = tested;
             dynamic generatedRows = CreateRows(
                 rowType,
-                replacement.Select(it => (it.CustomerId, it.Amount, it.Description)).ToArray());
+                [.. replacement.Select(it => (it.CustomerId, it.Amount, it.Description))]);
 
             bookAccessor.SalesDetail.Replace(generatedRows);
             tested.Save();

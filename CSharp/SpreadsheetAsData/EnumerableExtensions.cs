@@ -1,4 +1,6 @@
-﻿namespace Marimo.SpreadsheetAsData;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Marimo.SpreadsheetAsData;
 
 /// <summary>
 /// 列挙処理を読みやすくするための内部拡張です。
@@ -35,7 +37,7 @@ static class EnumerableExtensions
         /// </summary>
         /// <param name="value">取得できた先頭要素。取得できなかった場合は使用しない。</param>
         /// <returns>先頭要素を取得できた場合は true。</returns>
-        internal bool TryGetFirst(out T value)
+        internal bool TryGetFirst([MaybeNullWhen(false)] out T value)
         {
             using var enumerator = self.GetEnumerator();
 
@@ -45,7 +47,7 @@ static class EnumerableExtensions
                 return true;
             }
 
-            value = default!;
+            value = default;
             return false;
         }
     }

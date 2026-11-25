@@ -421,8 +421,8 @@ public sealed class MSBuild連携タスクのテスト
     public async Task PowerShellからdotnet_msbuildのDesignTimeBuildで生成コードを参照できます()
     {
         using var project = MSBuild連携テストプロジェクト.Create();
-        project.AddBasicStructureExcel("BasicStructure.xlsx");
-        project.Generate(project.ExcelFilePathFor("BasicStructure.xlsx"));
+        var excelFilePath = project.AddBasicStructureExcel("BasicStructure.xlsx");
+        project.Generate(excelFilePath).Succeeded.Should().BeTrue();
         var scriptFilePath = project.AddPowerShellDesignTimeBuildSample();
 
         var tested = await PowerShell実行結果.RunAsync(

@@ -1,4 +1,4 @@
-namespace Marimo.SpreadsheetAsData;
+﻿namespace Marimo.SpreadsheetAsData;
 
 /// <summary>
 /// ブックスコープの定義名、またはシート名と座標から単一セルを取得します。
