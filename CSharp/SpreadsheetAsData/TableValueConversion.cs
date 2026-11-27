@@ -33,8 +33,7 @@ static class TableValueConversion
         {
             ({ } type, _) when type == typeof(object) => sourceValue.Value,
             ({ } type, double number) when type == typeof(int)
-                && double.IsInteger(number)
-                && number is >= int.MinValue and <= int.MaxValue => (int)number,
+                && CanConvertToInt32(number) => (int)number,
             ({ } type, double number) when type == typeof(double) => number,
             ({ } type, string text) when type == typeof(string) => text,
             ({ } type, BlankValue blank) when type == typeof(string) => (string)blank,
@@ -47,6 +46,12 @@ static class TableValueConversion
 
         return converted != null;
     }
+
+    /// <summary>
+    /// 数値がintへ変換できる整数か判定します。
+    /// </summary>
+    internal static bool CanConvertToInt32(double number) =>
+        double.IsInteger(number) && number is >= int.MinValue and <= int.MaxValue;
 
     /// <summary>
     /// プロパティ値をセルへ直接設定できる値へ変換します。

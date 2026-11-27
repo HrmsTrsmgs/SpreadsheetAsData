@@ -1,16 +1,16 @@
 # 開発再開メモ
 
-更新: 2026-11-27。現在の作業だけを上書き更新し、過去の経過はGit履歴を参照する。
+更新: 2026-11-28。現在の作業だけを上書き更新し、過去の経過はGit履歴を参照する。
 
 ## 現在の作業
 
-* 目的: C#の2テストプロジェクトをMicrosoft.Testing.Platformへ移行する。実行手順はREADMEを参照。
-* 基準: `codex/microsoft-testing-platform` の起点は `5d4a155`。GitHub Projectの移行項目は進行中。依存と構成の移行案は了承済みで、コミット前の差分レビュー待ち。
-* 変更: 両テストを `xunit.v3.mtp-v2` 4.0.2へ切り替え、`global.json` でMTPを選択した。復元されたMTPは2.5.1。テスト用のMSBuild参照を.NET SDK同梱版に揃え、テストから起動する子ビルドのノード再利用を無効にした。
+* 目的: Rubyを除くDRY精査の候補を一件ずつ扱う。[非公開GitHub Project](https://github.com/users/HrmsTrsmgs/projects/1)の対応項目は進行中。
+* 基準: `codex/dry-cleanup` の `95089c3`。単一セル判定は既存の比較方法と公開APIの境界を変えずに有効な集約が見当たらず、変更なし。
+* 現在地: 数値がInt32に収まるかの判定を本体に集約し、コード生成側で再利用する未コミット差分が人間レビュー待ち。生成器は既に本体を参照しているため、`InternalsVisibleTo` で本体の内部判定を再利用する方針とした。生成コードにはこの内部呼び出しは含まれない。
+* 衝突診断と生成名先頭文字の不具合修正は別ブランチ `codex/fix-identifier-start` の担当チャットに引き継ぎ済み。衝突診断のコミットは `codex/dry-follow-up` に残る。DRY作業のレビュー場所は `dry-follow-up` 作業ツリーに戻し、同じ場所で `codex/dry-cleanup` を使用する。
 
 ## 検証と次回
 
-* .NET SDK 11.0.100でのアナライザー付き非増分ビルドは警告・エラー0件。通常の `dotnet test` とVisual Studio 2026 18.12のテスト エクスプローラーは、それぞれ成功934件・失敗0件・既存のSkip 2件。Visual StudioではMTPホストでの実行を確認した。
-* 修正前はVisual Studioの.NET Framework用MSBuild DLLを読み込んで `System.Xaml` が見つからず、ノード再利用が有効な条件で一時DLLの削除にも失敗した。修正後は両方の実行経路で解消した。
-* `dotnet format --verify-no-changes --severity info` に残るのは変更対象外の `CellRange.cs` の既存 `CA2208` 1件。変更箇所にアナライザー指摘はなし。
-* 次の着手点: 差分の了承後、`master` 宛てのPRを作成し、GitHub Projectの移行項目に関連づける。取り込み後に完了とする。
+* 非増分ビルド成功、警告・エラー0。本体テスト378件、コード生成型推論テスト29件成功。コード生成全テストは出力停止で中断、未完了。
+* `dotnet test` はMTP/VSTestの判定不整合で開始失敗。上記テストは実行ファイルから実行。formatは既存の `CellRange.cs` のCA2208で失敗し、変更箇所の指摘なし。
+* 次の着手点: 未コミット差分の人間レビューとコミット了承を待つ。

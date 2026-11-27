@@ -42,8 +42,7 @@ static class GeneratedTypeNames
         // セル値がintの範囲に収まる整数値かどうかを判定します。
         static bool CanConvertToInt32(TypedValue value) =>
             value is double number
-            && double.IsInteger(number)
-            && number is >= int.MinValue and <= int.MaxValue;
+            && TableValueConversion.CanConvertToInt32(number);
     }
 
     /// <summary>
