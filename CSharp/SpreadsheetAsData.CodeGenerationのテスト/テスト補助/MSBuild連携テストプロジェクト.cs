@@ -365,7 +365,7 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
                         new XElement("packageSource", new XAttribute("key", $"cache{index}"),
                             new XElement("package", new XAttribute("pattern", "*"))))))
                 .ToString());
-        var version = XDocument.Load(RepositoryFilePath(@"SpreadsheetAsData.Package\SpreadsheetAsData.Package.csproj"))
+        var version = XDocument.Load(RepositoryFilePath("SpreadsheetAsData.PackageMetadata.props"))
             .Descendants("Version").Single().Value;
         File.WriteAllText(
             Path.Combine(DirectoryPath, "Consumer.csproj"),
