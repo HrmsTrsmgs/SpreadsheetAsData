@@ -1,4 +1,5 @@
 ﻿using Marimo.SpreadsheetAsData;
+using static Marimo.SpreadsheetAsData.CodeGeneration.GeneratedTypeNames;
 
 namespace Marimo.SpreadsheetAsData.CodeGeneration;
 
@@ -39,17 +40,16 @@ static class GeneratedNameDiagnostics
         CodeGenerationOptions options)
     {
         var fileName = Path.GetFileName(filePath);
-        var fileIdentifier = Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier();
         return NameCollisionDiagnostics(
             GroupMemberNames(
                 [
-                    (fileName, $"{fileIdentifier}Book"),
-                    (fileName, $"{fileIdentifier}Data"),
+                    (fileName, BookTypeName(filePath)),
+                    (fileName, DataTypeName(filePath)),
                     .. from sheet in book.Sheets.Values
-                       select (sheet.Name, $"{options.GeneratedName(sheet.Name)}Sheet"),
+                       select (sheet.Name, SheetTypeName(sheet, options)),
                     .. from table in book.Tables
-                       let name = options.GeneratedName(table.Name)
-                       from typeName in new[] { $"{name}Table", name }
+                       let rowTypeName = options.GeneratedName(table.Name)
+                       from typeName in new[] { TableTypeName(rowTypeName), rowTypeName }
                        select (table.Name, typeName)
                 ]),
             []);
@@ -135,7 +135,7 @@ static class GeneratedNameDiagnostics
                     .. from table in book.Tables
                        select (table.Name, options.GeneratedName(table.Name))
                 ]),
-            [$"{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}Data"]);
+            [DataTypeName(filePath)]);
 
     /// <summary>
     /// 不正な文字を含む列プロパティ名、指定の予約語と、列同士・行データ型名との名前衝突を検出します。
@@ -185,7 +185,7 @@ static class GeneratedNameDiagnostics
     /// </summary>
     static string[] BookReservedNames(string filePath) =>
         [
-            $"{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}Book",
+            BookTypeName(filePath),
             nameof(Workbook.Read), nameof(Workbook.Open), nameof(Workbook.Replace), "ValidateStructure",
             nameof(Workbook.Cell), nameof(Workbook.Range),
             nameof(Workbook.Tables), nameof(Workbook.DefinedNames), nameof(Workbook.Sheets),
@@ -198,7 +198,7 @@ static class GeneratedNameDiagnostics
     /// </summary>
     static string[] SheetReservedNames(Worksheet sheet, CodeGenerationOptions options) =>
         [
-            $"{options.GeneratedName(sheet.Name)}Sheet", nameof(Worksheet.Cell), nameof(Worksheet.Range),
+            SheetTypeName(sheet, options), nameof(Worksheet.Cell), nameof(Worksheet.Range),
             nameof(Worksheet.Book), nameof(Worksheet.Name), nameof(Worksheet.Cells), nameof(Worksheet.ToString)
         ];
 

@@ -3,10 +3,37 @@
 namespace Marimo.SpreadsheetAsData.CodeGeneration;
 
 /// <summary>
-/// 値からの型推論と、生成名に隠されない型名の表記を扱います。宣言テンプレートの構文から分離します。
+/// 生成する型の名前、値から推論する型、生成名に隠されない参照型の表記を扱います。
 /// </summary>
 static class GeneratedTypeNames
 {
+    /// <summary>
+    /// ファイル名から、ブックを型付きで表すクラスの識別子を決定します。
+    /// </summary>
+    internal static string BookTypeName(string filePath) =>
+        $"{WorkbookFileIdentifier(filePath)}Book";
+
+    /// <summary>
+    /// 同じファイル名から、ブック全体のデータを表すクラスの識別子を決定します。
+    /// </summary>
+    internal static string DataTypeName(string filePath) =>
+        $"{WorkbookFileIdentifier(filePath)}Data";
+
+    static string WorkbookFileIdentifier(string filePath) =>
+        Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier();
+
+    /// <summary>
+    /// ワークシートの設定済み生成名を、派生型の識別子に変換します。
+    /// </summary>
+    internal static string SheetTypeName(Worksheet sheet, CodeGenerationOptions options) =>
+        $"{options.GeneratedName(sheet.Name)}Sheet";
+
+    /// <summary>
+    /// 対応する行データ型の識別子からテーブルの派生型名を決定します。
+    /// </summary>
+    internal static string TableTypeName(string rowTypeName) =>
+        $"{rowTypeName}Table";
+
     /// <summary>
     /// 既存の型付きTableマッピングで読み込めるプロパティ型名を、列の値から決定します。
     /// </summary>
