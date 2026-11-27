@@ -544,6 +544,7 @@ public sealed class コード生成診断のテスト
     [InlineData("1SalesData")]
     [InlineData("Sales@Data")]
     [InlineData("Sales.Data")]
+    [InlineData("Sales!Data")]
     [InlineData("Sales\u00D7Data")]
     [InlineData("Sales\u2605Data")]
     [InlineData("\u0301SalesData")]
@@ -590,63 +591,6 @@ public sealed class コード生成診断のテスト
                 new CodeGenerationDiagnostic(
                     true,
                     "@1SalesData",
-                    ["SalesData"],
-                    "SalesData"));
-    }
-
-    [Fact]
-    public void NameMappingsでシートに感嘆符を含む名前を指定した場合はエラーを診断します()
-    {
-        GeneratedCodeInspection
-            .GenerateDiagnostics(
-                BasicStructureExcelFilePath,
-                options => options.NameMappings["SalesData"] = "Sales!Data")
-            .Should().ContainEquivalentOf(
-                new CodeGenerationDiagnostic(
-                    true,
-                    "Sales!Data",
-                    ["SalesData"],
-                    "SalesData"));
-    }
-
-    [Theory]
-    [InlineData("Sales\"Data")]
-    [InlineData("Sales#Data")]
-    [InlineData("Sales$Data")]
-    [InlineData("Sales%Data")]
-    [InlineData("Sales&Data")]
-    [InlineData("Sales'Data")]
-    [InlineData("Sales(Data")]
-    [InlineData("Sales)Data")]
-    [InlineData("Sales*Data")]
-    [InlineData("Sales+Data")]
-    [InlineData("Sales,Data")]
-    [InlineData("Sales/Data")]
-    [InlineData("Sales:Data")]
-    [InlineData("Sales;Data")]
-    [InlineData("Sales<Data")]
-    [InlineData("Sales=Data")]
-    [InlineData("Sales>Data")]
-    [InlineData("Sales?Data")]
-    [InlineData("Sales[Data")]
-    [InlineData("Sales\\Data")]
-    [InlineData("Sales]Data")]
-    [InlineData("Sales^Data")]
-    [InlineData("Sales`Data")]
-    [InlineData("Sales{Data")]
-    [InlineData("Sales|Data")]
-    [InlineData("Sales}Data")]
-    [InlineData("Sales~Data")]
-    public void NameMappingsでシートに不正なASCII記号を含む名前を指定した場合はエラーを診断します(string generatedName)
-    {
-        GeneratedCodeInspection
-            .GenerateDiagnostics(
-                BasicStructureExcelFilePath,
-                options => options.NameMappings["SalesData"] = generatedName)
-            .Should().ContainEquivalentOf(
-                new CodeGenerationDiagnostic(
-                    true,
-                    generatedName,
                     ["SalesData"],
                     "SalesData"));
     }

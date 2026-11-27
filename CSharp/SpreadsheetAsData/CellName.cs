@@ -22,6 +22,11 @@ public partial struct CellName : IEquatable<CellName>
     const uint alphabetCount = 26;
 
     /// <summary>
+    /// 最大列番号に対応する列名の長さです。
+    /// </summary>
+    static readonly int maxColumnNameLength = GetColumnName(MaxColumnIndex).Length;
+
+    /// <summary>
     /// 生成された正規表現を、セル参照の検証用プロパティとして扱います。
     /// </summary>
     static Regex CellNamePattern => GeneratedCellNameRegex();
@@ -81,7 +86,13 @@ public partial struct CellName : IEquatable<CellName>
             return false;
         }
 
-        var columnIndex = GetColumnIndex(match.Groups["column"].Value);
+        var column = match.Groups["column"];
+        if (column.Length > maxColumnNameLength)
+        {
+            return false;
+        }
+
+        var columnIndex = GetColumnIndex(column.Value);
         if (columnIndex > MaxColumnIndex)
         {
             return false;
@@ -144,14 +155,12 @@ public partial struct CellName : IEquatable<CellName>
     /// <summary>
     /// Excel の列名を 26 進数相当として 1 始まりの列番号に変換します。
     /// </summary>
-    /// <param name="columnNameChars">列名を構成する文字列。</param>
+    /// <param name="columnNameChars">長さを検証済みの列名を構成する文字列。</param>
     /// <returns>1 始まりの列番号。</returns>
     static uint GetColumnIndex(IEnumerable<char> columnNameChars) =>
         columnNameChars.Aggregate(
             0U,
-            (columnIndex, character) => columnIndex > MaxColumnIndex
-                ? columnIndex
-                : columnIndex * alphabetCount + (uint)(character - 'A') + 1);
+            (columnIndex, character) => columnIndex * alphabetCount + (uint)(character - 'A') + 1);
 
     /// <summary>
     /// 1 始まりの列番号を Excel の列名へ再帰的に変換します。
