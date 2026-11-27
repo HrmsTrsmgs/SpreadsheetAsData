@@ -48,20 +48,21 @@ static class WorkbookWrapperComponents
         CodeGenerationOptions options)
     {
         var bookFileName = Path.GetFileNameWithoutExtension(filePath);
-        var bookFileIdentifier = bookFileName.ToCSharpIdentifier();
+        var bookTypeName = BookTypeName(filePath);
+        var dataTypeName = DataTypeName(filePath);
 
         return
             $$"""
         /// <summary>
         /// Excelブック「{{bookFileName}}」を型付きで表します。
         /// </summary>
-        public partial class {{bookFileIdentifier}}Book : {{ReferencedTypeName("Workbook", book, options)}}
+        public partial class {{bookTypeName}} : {{ReferencedTypeName("Workbook", book, options)}}
         {
-            public {{bookFileIdentifier}}Book() : this({{ReferencedTypeName("System.IO.Path", book, options, usedAsExpression: true)}}.Combine({{ReferencedTypeName("System.AppContext", book, options, usedAsExpression: true)}}.BaseDirectory, {{StringLiteral(options.RuntimeWorkbookPath ?? filePath)}}))
+            public {{bookTypeName}}() : this({{ReferencedTypeName("System.IO.Path", book, options, usedAsExpression: true)}}.Combine({{ReferencedTypeName("System.AppContext", book, options, usedAsExpression: true)}}.BaseDirectory, {{StringLiteral(options.RuntimeWorkbookPath ?? filePath)}}))
             {
             }
 
-            public {{bookFileIdentifier}}Book(string filePath) : base(filePath)
+            public {{bookTypeName}}(string filePath) : base(filePath)
             {
             }
 
@@ -69,10 +70,10 @@ static class WorkbookWrapperComponents
             /// 生成元のシート、テーブルとその列、両スコープの定義名を確認して、Excelブックを開きます。
             /// </summary>
             /// <exception cref="{{ReferencedTypeName("System.IO.InvalidDataException", book, options)}}">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、テーブルの所属シートが異なるか、単一セルの定義名が複数セルを参照しています。</exception>
-            public static new {{bookFileIdentifier}}Book Open(string filePath) =>
+            public static new {{bookTypeName}} Open(string filePath) =>
                 ValidateStructure(new(filePath));
 
-            {{bookFileIdentifier}}Book({{ReferencedTypeName("System.IO.Stream", book, options)}} stream) : base(stream)
+            {{bookTypeName}}({{ReferencedTypeName("System.IO.Stream", book, options)}} stream) : base(stream)
             {
             }
 
@@ -80,20 +81,20 @@ static class WorkbookWrapperComponents
             /// 生成元のシート、テーブルとその列、両スコープの定義名を確認して、Stream上のExcelブックを開きます。
             /// </summary>
             /// <exception cref="{{ReferencedTypeName("System.IO.InvalidDataException", book, options)}}">生成元のシート、テーブルとその列、両スコープの定義名のいずれかが存在しないか、テーブルの所属シートが異なるか、単一セルの定義名が複数セルを参照しています。</exception>
-            public static new {{bookFileIdentifier}}Book Open({{ReferencedTypeName("System.IO.Stream", book, options)}} stream) =>
+            public static new {{bookTypeName}} Open({{ReferencedTypeName("System.IO.Stream", book, options)}} stream) =>
                 ValidateStructure(new(stream));
-        {{BookStructureValidationDeclaration(bookFileIdentifier, book, options)}}
+        {{BookStructureValidationDeclaration(bookTypeName, book, options)}}
 
             /// <summary>
             /// Excelブック全体のデータを読み込みます。
             /// </summary>
-            public {{bookFileIdentifier}}Data Read() =>
-                base.Read<{{bookFileIdentifier}}Data>();
+            public {{dataTypeName}} Read() =>
+                base.Read<{{dataTypeName}}>();
 
             /// <summary>
             /// Excelブック全体のデータを置換します。
             /// </summary>
-            public void Replace({{bookFileIdentifier}}Data data) =>
+            public void Replace({{dataTypeName}} data) =>
                 base.Replace(data);
         {{ForEach([
             .. from item in SingleCellsThenRanges(BookScopedDefinedNames(book))
@@ -113,7 +114,7 @@ static class WorkbookWrapperComponents
     /// Bookの宣言から独立して、生成元との構造照合と検証失敗時の解放処理を生成します。
     /// </summary>
     static string BookStructureValidationDeclaration(
-        string bookFileIdentifier,
+        string bookTypeName,
         Workbook book,
         CodeGenerationOptions options) =>
         $$"""
@@ -121,7 +122,7 @@ static class WorkbookWrapperComponents
             /// <summary>
             /// 生成元に対応するシート、テーブルとその列、両スコープの定義名を確認し、検証中に例外が発生した場合は開いたブックを破棄します。
             /// </summary>
-            static {{bookFileIdentifier}}Book ValidateStructure({{bookFileIdentifier}}Book book)
+            static {{bookTypeName}} ValidateStructure({{bookTypeName}} book)
             {
                 try
                 {
@@ -185,7 +186,7 @@ static class WorkbookWrapperComponents
         /// <summary>
         /// Excelブック「{{Path.GetFileNameWithoutExtension(filePath)}}」のデータを表します。
         /// </summary>
-        public partial class {{Path.GetFileNameWithoutExtension(filePath).ToCSharpIdentifier()}}Data
+        public partial class {{DataTypeName(filePath)}}
         {
         {{ForEach([
             .. from item in BookDataDefinedNames(book)
@@ -304,7 +305,7 @@ static class WorkbookWrapperComponents
             /// <summary>
             /// ワークシート「{{sheet.Name}}」を取得します。
             /// </summary>
-            public {{options.GeneratedName(sheet.Name)}}Sheet {{options.GeneratedName(sheet.Name)}} => new(this);
+            public {{SheetTypeName(sheet, options)}} {{options.GeneratedName(sheet.Name)}} => new(this);
         """;
 
     /// <summary>
@@ -327,7 +328,7 @@ static class WorkbookWrapperComponents
             /// <summary>
             /// Excelテーブル「{{table.Name}}」を取得します。
             /// </summary>
-            public {{options.GeneratedName(table.Name)}}Table {{options.GeneratedName(table.Name)}} => new({{tableCollection}}[{{StringLiteral(table.Name)}}]);
+            public {{TableTypeName(options.GeneratedName(table.Name))}} {{options.GeneratedName(table.Name)}} => new({{tableCollection}}[{{StringLiteral(table.Name)}}]);
         """;
 
     /// <summary>
@@ -341,9 +342,9 @@ static class WorkbookWrapperComponents
         /// <summary>
         /// ワークシート「{{sheet.Name}}」を型付きで表します。
         /// </summary>
-        public partial class {{options.GeneratedName(sheet.Name)}}Sheet : {{ReferencedTypeName("Worksheet", sheet.Book, options)}}
+        public partial class {{SheetTypeName(sheet, options)}} : {{ReferencedTypeName("Worksheet", sheet.Book, options)}}
         {
-            public {{options.GeneratedName(sheet.Name)}}Sheet({{ReferencedTypeName("Workbook", sheet.Book, options)}} book) : base(book, {{StringLiteral(sheet.Name)}})
+            public {{SheetTypeName(sheet, options)}}({{ReferencedTypeName("Workbook", sheet.Book, options)}} book) : base(book, {{StringLiteral(sheet.Name)}})
             {
             }
         {{ForEach([
@@ -365,16 +366,17 @@ static class WorkbookWrapperComponents
         Table table,
         CodeGenerationOptions options)
     {
-        var tableIdentifier = options.GeneratedName(table.Name);
+        var rowTypeName = options.GeneratedName(table.Name);
+        var tableTypeName = TableTypeName(rowTypeName);
 
         return $$"""
 
         /// <summary>
         /// Excelテーブル「{{table.Name}}」を型付きで表します。
         /// </summary>
-        public partial class {{tableIdentifier}}Table : Table<{{tableIdentifier}}>
+        public partial class {{tableTypeName}} : Table<{{rowTypeName}}>
         {
-            public {{tableIdentifier}}Table({{ReferencedTypeName("Table", table.Worksheet.Book, options)}} source) : base(source)
+            public {{tableTypeName}}({{ReferencedTypeName("Table", table.Worksheet.Book, options)}} source) : base(source)
             {
             }
         }

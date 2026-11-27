@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup>
+    <_SpreadsheetAsDataGeneratedSourceSuffix>.SpreadsheetAsData.g.cs</_SpreadsheetAsDataGeneratedSourceSuffix>
     <_SpreadsheetAsDataTaskAssembly>$(MSBuildThisFileDirectory)..\tools\net11.0\SpreadsheetAsData.Build.dll</_SpreadsheetAsDataTaskAssembly>
     <_SpreadsheetAsDataSupportsNetTaskHost Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(MSBuildVersion)', '18.12'))">true</_SpreadsheetAsDataSupportsNetTaskHost>
   </PropertyGroup>
@@ -14,10 +15,10 @@
     <Content Include="@(SpreadsheetAsData)" CopyToOutputDirectory="PreserveNewest" Visible="false" />
     <SpreadsheetAsData Update="@(SpreadsheetAsData)">
       <SpreadsheetAsDataDependentUpon>%(Filename)%(Extension)</SpreadsheetAsDataDependentUpon>
-      <LastGenOutput>%(Filename).SpreadsheetAsData.g.cs</LastGenOutput>
+      <LastGenOutput>%(Filename)$(_SpreadsheetAsDataGeneratedSourceSuffix)</LastGenOutput>
     </SpreadsheetAsData>
     <_SpreadsheetAsDataGeneratedCompile
-      Include="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename).SpreadsheetAsData.g.cs')"
+      Include="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename)$(_SpreadsheetAsDataGeneratedSourceSuffix)')"
       DependentUpon="%(SpreadsheetAsDataDependentUpon)"
       DesignTimeSharedInput="true"
       AutoGen="true"
@@ -56,6 +57,6 @@
 
   <!-- Excelの隣の生成物もClean対象にし、元Excelと手書きコードは残します。 -->
   <Target Name="CleanSpreadsheetAsDataSources" AfterTargets="CoreClean">
-    <Delete Files="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename).SpreadsheetAsData.g.cs')" />
+    <Delete Files="@(SpreadsheetAsData->'%(RootDir)%(Directory)%(Filename)$(_SpreadsheetAsDataGeneratedSourceSuffix)')" />
   </Target>
 </Project>

@@ -1,11 +1,13 @@
-﻿namespace Marimo.SpreadsheetAsData.Test.テスト補助;
+﻿using Marimo.SpreadsheetAsData.Testing;
+
+namespace Marimo.SpreadsheetAsData.Test.テスト補助;
 
 /// <summary>
 /// 書き込みテストで、元のテストデータを変更しないための一時Excelファイルを管理します。
 /// </summary>
 sealed class TemporaryExcelFiles : IDisposable
 {
-    readonly List<string> filePaths = [];
+    readonly TemporaryExcelFilePaths filePaths = new("SpreadsheetAsData.Tests");
 
     /// <summary>
     /// TestData配下のExcelファイルを一時ファイルへコピーします。
@@ -32,23 +34,7 @@ sealed class TemporaryExcelFiles : IDisposable
     /// 新しい一時Excelファイルパスを予約します。
     /// </summary>
     /// <returns>まだ存在しない一時Excelファイルパス。</returns>
-    internal string NewFilePath()
-    {
-        var directory = Path.Combine(Path.GetTempPath(), "SpreadsheetAsData.Tests");
-        Directory.CreateDirectory(directory);
+    internal string NewFilePath() => filePaths.Reserve();
 
-        var filePath = Path.Combine(directory, $"{Guid.NewGuid():N}.xlsx");
-
-        filePaths.Add(filePath);
-
-        return filePath;
-    }
-
-    public void Dispose()
-    {
-        foreach (var filePath in filePaths.Where(File.Exists))
-        {
-            File.Delete(filePath);
-        }
-    }
+    public void Dispose() => filePaths.Dispose();
 }

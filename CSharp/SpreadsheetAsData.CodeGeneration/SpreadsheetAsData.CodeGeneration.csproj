@@ -7,23 +7,14 @@
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>Marimo.SpreadsheetAsData.CodeGeneration</PackageId>
-    <Version>0.4.0</Version>
-    <Authors>HrmsTrsmgs</Authors>
     <Description>Generates typed C# wrappers from Excel workbook structure for SpreadsheetAsData.</Description>
     <PackageTags>excel;spreadsheet;openxml;code-generation;xlsx</PackageTags>
-    <PackageProjectUrl>https://github.com/HrmsTrsmgs/SpreadsheetAsData</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/HrmsTrsmgs/SpreadsheetAsData</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <Import Project="..\SpreadsheetAsData.PackageMetadata.props" />
 
   <ItemGroup>
     <ProjectReference Include="..\SpreadsheetAsData\SpreadsheetAsData.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
   </ItemGroup>
 
 </Project>
