@@ -13,6 +13,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\テスト共通\TemporaryExcelFilePaths.cs" Link="テスト補助\TemporaryExcelFilePaths.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="..\..\TestData\*.xlsx" Link="TestData\%(Filename)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
