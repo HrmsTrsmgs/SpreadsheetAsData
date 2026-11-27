@@ -4,13 +4,12 @@
 
 ## 現在の作業
 
-* 目的: Rubyを除くDRY精査の候補を一件ずつ扱う。[非公開GitHub Project](https://github.com/users/HrmsTrsmgs/projects/1)の対応項目は進行中。
-* 基準: `codex/dry-cleanup` の `26145d7`。5件のDRY整理とMSBuild連携テストの追随修正はコミット済み。
-* 現在地: DRYブランチの検証完了。`master` の基点以降の変更は `CLAUDE.md` の改行整理のみで、マージ競合なし。
-* 衝突診断と生成名先頭文字の不具合修正は別ブランチ `codex/fix-identifier-start` の担当チャットに引き継ぎ済み。衝突診断のコミットは `codex/dry-follow-up` に残る。DRY作業のレビュー場所は `dry-follow-up` 作業ツリーに戻し、同じ場所で `codex/dry-cleanup` を使用する。
+* 目的: 実用上不要なエッジケースと、それだけを支える実装を整理する。作業項目は[非公開GitHub Project](https://github.com/users/HrmsTrsmgs/projects/1)の「SpreadsheetAsData: 実用上不要なエッジケースと分岐を精査する」。
+* 基準: `origin/master` の `86b1fcf`。元の作業ツリーの `codex/prune-edge-cases` で検証を完了。ほかの作業ツリーは変更していない。
+* 現在地: 識別子の禁止文字は代表例に絞り、生成名の判定は変更していない。A1参照は最大列番号から求めた文字数上限を先に確認し、文字ごとの桁あふれ対策を削除した。最大列・次の列・4文字の列名のテストは維持した。保存・解放・実ファイルの互換性を保証する処理とテスト、Ruby、共有テストデータは維持した。
 
 ## 検証と次回
 
-* `26145d7` のC#全テストは943件成功・失敗0・既存Skip 2件。本体380件、コード生成・MSBuild連携563件。SDK 11.0.100、`MSBUILDDISABLENODEREUSE=1`、`dotnet test .\CSharp\SpreadsheetAsData.slnx` で実行。
-* NuGet共通設定への参照追随後、パッケージ連携を含む全テストで成功。ブランチ全体の差分検査も成功。
-* 次の着手点: `master` 宛てPRで取り込み、マージ確認後にGitHub Projectの対応項目を完了にする。
+* 分岐計測: 製品コードを変更せずテスト87件を減らした前後の比較で、ヒットがなくなったのは `CellName.GetColumnIndex` 内の桁あふれ防止分岐だけ（7回から0回）。製品コード変更後は従来の分岐がなくなり、列名の長さを超えた場合の拒否と、文字数内で列番号上限を超えた場合の拒否の両方に到達した。計測はC#本体・コード生成が対象。MSBuild連携とスクリプトは通常テストで実行した。計測設定と結果はGit管理外の `artifacts/edge-case-audit/`。
+* 検証: .NET SDK 11.0.100のアナライザー付き非増分ビルドは警告・エラー0件。MTPのC#全テストは856件成功、失敗0件、既存Skip 2件（`MSBUILDDISABLENODEREUSE=1`、通常のビルド出力、Coverletなし）。`dotnet format` は既存の `CellRange.cs` の `CA2208` のみ。Rubyは未変更のため未実行。
+* 取り込み: `master` 宛てのPRで取り込み、マージ確認後にGitHub Projectの対応項目を完了にする。

@@ -38,14 +38,6 @@ public class CellNameのテスト
         CellName.TryParse("XFE1", out _).Should().BeFalse();
     }
 
-    [Theory]
-    [InlineData("MWLQKWV1")]
-    [InlineData("MWLQKWW1")]
-    public void TryParseはuintに収まらない列番号の場合にfalseを返します(string reference)
-    {
-        CellName.TryParse(reference, out _).Should().BeFalse();
-    }
-
     [Fact]
     public void TryParseはuintに収まらない行番号の場合にfalseを返します()
     {
@@ -156,9 +148,6 @@ public class CellNameのテスト
         ).Should().Throw<FormatException>();
         FluentActions.Invoking(
             () => CellName.Parse("AAAA1")
-        ).Should().Throw<FormatException>();
-        FluentActions.Invoking(
-            () => CellName.Parse("ZZZZ1")
         ).Should().Throw<FormatException>();
     }
 
