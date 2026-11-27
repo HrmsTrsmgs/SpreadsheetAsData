@@ -425,9 +425,9 @@ sealed class MSBuild連携テストプロジェクト : IDisposable
             # 任意指定のVisual Studio版MSBuildでも、同じ利用プロジェクトを検証できます。
             function Invoke-MSBuild {
                 if ($env:SPREADSHEETASDATA_TEST_MSBUILD) {
-                    & $env:SPREADSHEETASDATA_TEST_MSBUILD ./Consumer.csproj /nr:false /nologo /v:minimal @args
+                    & $env:SPREADSHEETASDATA_TEST_MSBUILD ./Consumer.csproj /nologo /v:minimal @args
                 } else {
-                    dotnet msbuild ./Consumer.csproj /nr:false /nologo /v:minimal @args
+                    dotnet msbuild ./Consumer.csproj /nologo /v:minimal @args
                 }
                 if ($LASTEXITCODE -ne 0) { throw "MSBuild failed: $LASTEXITCODE" }
             }
@@ -568,7 +568,9 @@ sealed record PowerShell実行結果(
             WorkingDirectory = workingDirectory,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
-            UseShellExecute = false
+            UseShellExecute = false,
+            // 一時プロジェクトの DLL がロックされたままにならないよう、子ビルドのノードを再利用しません。
+            Environment = { ["MSBUILDDISABLENODEREUSE"] = "1" }
         });
 
         return new(

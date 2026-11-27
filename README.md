@@ -460,7 +460,7 @@ pwsh -NoProfile -File .\scripts\Initialize-DevelopmentEnvironment.ps1
 このスクリプトは、開発環境の前提を確認したうえで、.NETローカルツールとC#ソリューションのNuGetパッケージを復元します。
 PowerShell 7、.NET 11 SDK、Gitなどの導入自体は行いません。
 
-.NET 11 SDKが入っている環境では、次のコマンドでビルドとテストを実行できます。
+.NET 11 SDKが入っている環境では、次のコマンドでビルドとテストを実行できます。テストはMicrosoft.Testing.Platformで実行します。
 
 ```powershell
 dotnet build .\CSharp\SpreadsheetAsData.slnx
