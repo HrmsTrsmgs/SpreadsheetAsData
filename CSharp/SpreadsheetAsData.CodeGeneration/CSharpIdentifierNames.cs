@@ -43,7 +43,8 @@ static class CSharpIdentifierNames
             UnicodeCategory.UppercaseLetter or UnicodeCategory.LowercaseLetter
                 or UnicodeCategory.TitlecaseLetter or UnicodeCategory.ModifierLetter
                 or UnicodeCategory.OtherLetter or UnicodeCategory.LetterNumber
-                or UnicodeCategory.ConnectorPunctuation or UnicodeCategory.Format => true,
+                or UnicodeCategory.Format => true,
+            UnicodeCategory.ConnectorPunctuation => !isFirst || character == '_',
             UnicodeCategory.DecimalDigitNumber or UnicodeCategory.NonSpacingMark
                 or UnicodeCategory.SpacingCombiningMark => !isFirst,
             _ => false

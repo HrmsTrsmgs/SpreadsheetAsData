@@ -673,7 +673,7 @@ public sealed class コード生成診断のテスト
     [InlineData("Customer.Id")]
     [InlineData("Customer+Id")]
     [InlineData("\u0301Customer")]
-    [InlineData("\u203FCustomer", Skip = "アンダースコア以外の連結用句読点を先頭でも受理しているため。先頭文字を区別して診断する際に解除する。")]
+    [InlineData("\u203FCustomer")]
     [InlineData("\u200CCustomer", Skip = "書式文字を先頭でも受理しているため。先頭文字を区別して診断する際に解除する。")]
     [InlineData("Customer\U0001F600")]
     public void NameMappingsで列に不正な文字を含む名前を指定した場合は変換せずエラーを診断します(string generatedName)
