@@ -35,7 +35,7 @@ static class CSharpIdentifierNames
     }
 
     /// <summary>
-    /// 生成名の診断では、連結用句読点と書式文字は先頭でも受理し、数字と結合記号は後続でのみ受理します。
+    /// 生成名の診断では、_ 以外の連結用句読点と書式文字・数字・結合記号は後続でのみ受理します。
     /// </summary>
     static bool IsAllowedCharacter(char character, bool isFirst) =>
         char.GetUnicodeCategory(character) switch
@@ -43,9 +43,9 @@ static class CSharpIdentifierNames
             UnicodeCategory.UppercaseLetter or UnicodeCategory.LowercaseLetter
                 or UnicodeCategory.TitlecaseLetter or UnicodeCategory.ModifierLetter
                 or UnicodeCategory.OtherLetter or UnicodeCategory.LetterNumber
-                or UnicodeCategory.Format => true,
+                => true,
             UnicodeCategory.ConnectorPunctuation => !isFirst || character == '_',
-            UnicodeCategory.DecimalDigitNumber or UnicodeCategory.NonSpacingMark
+            UnicodeCategory.Format or UnicodeCategory.DecimalDigitNumber or UnicodeCategory.NonSpacingMark
                 or UnicodeCategory.SpacingCombiningMark => !isFirst,
             _ => false
         };
