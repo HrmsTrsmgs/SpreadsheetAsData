@@ -17,7 +17,7 @@ pwsh -NoProfile -File .\scripts\build-github-pages.ps1
 C# APIドキュメントは `artifacts/github-pages/api/csharp/` に配置します。
 Pagesルートには、C# APIへ移動する `index.html` と、GitHub PagesのJekyll処理を無効にする `.nojekyll` を生成します。
 
-`master` へpushすると、`.github/workflows/publish-api-docs.yml` が同じ生成処理を実行し、GitHub Pagesへデプロイします。
+`main` へpushすると、`.github/workflows/publish-api-docs.yml` が同じ生成処理を実行し、GitHub Pagesへデプロイします。
 リポジトリのPages設定では、公開元にGitHub Actionsを選択します。
 
 公開後のC# APIドキュメントは次のURLで参照します。
